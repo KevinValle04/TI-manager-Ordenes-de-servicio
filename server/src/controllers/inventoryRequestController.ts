@@ -180,6 +180,48 @@ export class InventoryRequestController {
   }
 
   // Aprobar o rechazar una solicitud
+  // Obtener historial de solicitudes (solo admin)
+  public static getRequestHistory: RequestHandler = async (req, res) => {
+    try {
+      // Obtener solicitudes procesadas (aprobadas o rechazadas)
+      const requests = await InventoryRequest.find({
+        estado: { $in: ['APROBADA', 'RECHAZADA'] }
+      })
+      .populate('solicitanteId', 'username')
+      .populate('aprobadorId', 'username')
+      .sort({ fechaAprobacion: -1 })
+      .lean();
+
+      // Popular los items manualmente
+      const populatedRequests: PopulatedRequest[] = await Promise.all(
+        requests.map(async (request: any) => {
+          const ItemModel = request.inventarioTipo === 'INTERIOR' ? 
+            InventoryItem : InventoryExteriorItem;
+          
+          try {
+            const item = await ItemModel.findById(request.itemId).lean();
+            return {
+              ...request,
+              itemId: item || null
+            };
+          } catch (err) {
+            console.error(`Error al obtener item para solicitud ${request._id}:`, err);
+            return request;
+          }
+        })
+      );
+
+      res.json(populatedRequests);
+    } catch (error) {
+      console.error('Error al obtener historial de solicitudes:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      res.status(500).json({ 
+        message: 'Error al obtener el historial',
+        error: errorMessage
+      });
+    }
+  }
+
   public static processRequest: RequestHandler = async (req, res) => {
     try {
       const { requestId } = req.params;

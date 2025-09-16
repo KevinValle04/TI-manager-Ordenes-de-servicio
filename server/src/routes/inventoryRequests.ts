@@ -11,5 +11,6 @@ router.get('/my-requests', isAuthenticated, InventoryRequestController.getUserRe
 // Rutas para administradores
 router.get('/pending', isAuthenticated, isAdmin, InventoryRequestController.getPendingRequests);
 router.post('/:requestId/process', isAuthenticated, isAdmin, InventoryRequestController.processRequest);
+router.get('/history', isAuthenticated, isAdmin, InventoryRequestController.getRequestHistory);
 
 export default router;

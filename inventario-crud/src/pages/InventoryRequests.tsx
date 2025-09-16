@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Tabs } from 'antd';
 import PendingRequestsList from '../components/inventory/PendingRequestsList';
 import MyRequestsList from '../components/inventory/MyRequestsList';
+import RequestHistoryList from '../components/inventory/RequestHistoryList';
 import { jwtDecode } from 'jwt-decode';
 
 const InventoryRequests: React.FC = () => {
@@ -19,6 +20,11 @@ const InventoryRequests: React.FC = () => {
       key: '1',
       label: 'Solicitudes Pendientes',
       children: <PendingRequestsList />
+    },
+    {
+      key: '2',
+      label: 'Historial de Solicitudes',
+      children: <RequestHistoryList />
     }
   ] : [
     {
