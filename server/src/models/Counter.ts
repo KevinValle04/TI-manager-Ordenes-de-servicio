@@ -7,7 +7,7 @@ interface ICounter extends Document {
 
 const CounterSchema = new Schema({
   _id: { type: String, required: true },
-  sequence_value: { type: Number, default: 0 }
+  sequence_value: { type: Number, default: 45 } // Iniciamos en 45 para que el primer ID sea 46
 });
 
 export default mongoose.model<ICounter>('Counter', CounterSchema);
