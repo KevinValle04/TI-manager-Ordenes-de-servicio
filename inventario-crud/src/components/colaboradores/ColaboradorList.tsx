@@ -481,20 +481,24 @@ const ColaboradorList: React.FC = () => {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Nombre</Form.Label>
+                  <Form.Label htmlFor="nombre">Nombre</Form.Label>
                   <Form.Control 
                     id="nombre"
+                    name="nombre"
                     type="text" 
                     value={newColaborador.nombre} 
                     onChange={e => setNewColaborador({ ...newColaborador, nombre: e.target.value })}
                     required
+                    aria-label="Nombre"
                   />
                 </Form.Group>
               </Col>
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>NSS</Form.Label>
+                  <Form.Label htmlFor="nss">NSS</Form.Label>
                   <Form.Control 
+                    id="nss"
+                    name="nss"
                     type="text" 
                     inputMode="numeric"
                     pattern="\d{11}"
@@ -516,6 +520,7 @@ const ColaboradorList: React.FC = () => {
                     }}
                     maxLength={11}
                     placeholder="11 dígitos numéricos"
+                    aria-label="NSS"
                   />
                 </Form.Group>
               </Col>
@@ -523,23 +528,27 @@ const ColaboradorList: React.FC = () => {
             <Row>
               <Col md={6} className="mb-3">
                 <Form.Group>
-                  <Form.Label>Puesto</Form.Label>
+                  <Form.Label htmlFor="puesto">Puesto</Form.Label>
                   <Form.Control 
                     id="puesto"
+                    name="puesto"
                     type="text" 
                     value={newColaborador.puesto} 
                     onChange={e => setNewColaborador({ ...newColaborador, puesto: e.target.value })}
+                    aria-label="Puesto"
                   />
                 </Form.Group>
               </Col>
               <Col md={6} className="mb-3">
                 <Form.Group>
-                  <Form.Label>Fecha Alta IMSS</Form.Label>
+                  <Form.Label htmlFor="fechaAltaIMSS">Fecha Alta IMSS</Form.Label>
                   <Form.Control 
                     id="fechaAltaIMSS"
+                    name="fechaAltaIMSS"
                     type="date" 
                     value={typeof newColaborador.fechaAltaIMSS === 'string' ? newColaborador.fechaAltaIMSS : format(newColaborador.fechaAltaIMSS, 'yyyy-MM-dd')} 
                     onChange={e => setNewColaborador({ ...newColaborador, fechaAltaIMSS: e.target.value })}
+                    aria-label="Fecha Alta IMSS"
                   />
                 </Form.Group>
               </Col>
@@ -547,9 +556,10 @@ const ColaboradorList: React.FC = () => {
             <Row>
               <Col md={6} className="mb-3">
                 <Form.Group>
-                  <Form.Label>Razón Social</Form.Label>
+                  <Form.Label htmlFor="razonSocialId">Razón Social</Form.Label>
                   <Form.Select 
                     id="razonSocialId"
+                    name="razonSocialId"
                     value={typeof newColaborador.razonSocialId === 'object' 
                       ? (newColaborador.razonSocialId as RazonSocial)._id 
                       : (newColaborador.razonSocialId || '')
@@ -560,6 +570,7 @@ const ColaboradorList: React.FC = () => {
                         razonSocialId: e.target.value
                       });
                     }}
+                    aria-label="Razón Social"
                   >
                     <option value="">Seleccione una razón social</option>
                     {razonesSociales.map(razon => (
@@ -572,7 +583,7 @@ const ColaboradorList: React.FC = () => {
               </Col>
               <Col md={6} className="mb-3">
                 <Form.Group>
-                  <Form.Label>Fotografía</Form.Label>
+                  <Form.Label htmlFor="fotografia">Fotografía</Form.Label>
                   {editId && newColaborador.fotografia && (
                     <div className="mb-2">
                       <Image 
@@ -591,9 +602,11 @@ const ColaboradorList: React.FC = () => {
                   )}
                   <Form.Control 
                     id="fotografia"
+                    name="fotografia"
                     type="file" 
                     onChange={handleFileChange}
                     accept="image/*"
+                    aria-label="Fotografía"
                   />
                 </Form.Group>
               </Col>

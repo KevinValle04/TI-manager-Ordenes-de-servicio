@@ -29,21 +29,24 @@ test('CRUD de colaboradores', async ({ page }) => {
   await page.getByLabel('Fotografía').setInputFiles('test.jpg');
   await page.getByRole('button', { name: /Guardar/i }).click();
 
-  // Verifica que el colaborador fue creado (usa exact: true para evitar duplicados)
-  await expect(page.getByRole('cell', { name: 'Nuevo Colaborador', exact: true })).toBeVisible();
+  // Verifica que el colaborador fue creado
+  await expect(page.getByRole('cell', { name: 'Nuevo Colaborador', exact: true }))
+    .toBeVisible();
 
   // Edita el colaborador
   await page.getByRole('button', { name: /^Editar/ }).first().click();
   await page.getByLabel('Nombre').fill('Colaborador Editado');
   await page.getByRole('button', { name: /Guardar/i }).click();
 
-  // Espera a que la tabla se actualice
-  await expect(page.getByRole('cell', { name: 'Colaborador Editado', exact: true })).toBeVisible({ timeout: 10000 });
+  // Verifica que la tabla se actualizó
+  await expect(page.getByRole('cell', { name: 'Colaborador Editado', exact: true }))
+    .toBeVisible({ timeout: 10000 });
 
-  // Elimina el colaborador
-  await page.getByRole('button', { name: /^Eliminar/ }).first().click();
+  // Elimina el colaborador (un solo click + aceptar confirmación)
   page.once('dialog', dialog => dialog.accept());
+  await page.getByRole('button', { name: /^Eliminar/ }).first().click();
 
-  // Verifica que el colaborador fue eliminado
-  await expect(page.getByRole('cell', { name: 'Colaborador Editado', exact: true })).not.toBeVisible();
+  // Espera a que desaparezca de la tabla
+  await expect(page.getByRole('cell', { name: 'Colaborador Editado', exact: true }))
+    .toHaveCount(0);
 });
