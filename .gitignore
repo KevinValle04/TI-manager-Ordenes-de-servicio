@@ -12,3 +12,9 @@ server/.env
 inventario-crud/.env
 
 server/pdfs
+
+# Archivos de test específicos
+inventario-crud/tests/OrdenCompraTest/test.pdf
+inventario-crud/tests/OrdenCompraTest/orden-compra-visualizacion.png
+
+
