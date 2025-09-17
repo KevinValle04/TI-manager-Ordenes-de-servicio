@@ -1,0 +1,61 @@
+.documentos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  padding: 16px;
+}
+
+.documento-card {
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.documento-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.documento-card .ant-card-head {
+  min-height: unset;
+  padding: 8px 12px;
+}
+
+.documento-card .ant-card-head-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0;
+  font-size: 14px;
+}
+
+.documento-card .ant-card-extra {
+  padding: 0;
+}
+
+.documento-card .ant-card-body {
+  padding: 12px;
+}
+
+.documento-info {
+  font-size: 12px;
+  color: #666;
+  margin: 4px 0;
+}
+
+.documento-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.documento-view-button {
+  padding: 0;
+  height: auto;
+}
+
+.documento-date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}

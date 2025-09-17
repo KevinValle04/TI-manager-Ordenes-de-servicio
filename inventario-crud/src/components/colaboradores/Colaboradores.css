@@ -15,25 +15,47 @@
 /* Estilos para el modal de imagen */
 .modal-90w {
   max-width: 90vw !important;
+  width: 90vw;
+  margin: 1.75rem auto;
 }
 
 .modal-90w .modal-content {
   background-color: #ffffff;
   border: none;
   box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  height: auto;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-90w .modal-header {
   background-color: #f8f9fa;
   border-bottom: 1px solid #dee2e6;
   border-radius: 0.3rem 0.3rem 0 0;
+  padding: 1rem;
 }
 
 .modal-90w .modal-body {
   background-color: #ffffff;
   border-radius: 0 0 0.3rem 0.3rem;
-  padding: 2rem;
+  padding: 1rem;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+}
+
+/* Estilos específicos para el modal de documentos */
+.modal-documentos {
+  width: 70vw !important;
+  max-width: 1000px !important;
+}
+
+.modal-documentos .modal-content {
+  max-height: 80vh;
+}
+
+.modal-documentos .modal-body {
+  padding: 1rem;
+  overflow-y: auto;
 }

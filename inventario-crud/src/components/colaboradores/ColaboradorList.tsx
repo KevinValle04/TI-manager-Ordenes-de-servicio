@@ -5,6 +5,8 @@ import { Button, Col, Form, Image, Modal, Row } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { message } from 'antd';
+import { jwtDecode } from 'jwt-decode';
+import { FaTools, FaFileAlt } from 'react-icons/fa';
 import DataTable, { DataTableColumn } from '../common/DataTable';
 import PaginationCompact from '../common/PaginationCompact';
 import SearchBar from '../common/SearchBar';
@@ -80,6 +82,15 @@ const ColaboradorList: React.FC = () => {
   const [colaboradores, setColaboradores] = useState<Colaborador[]>([]);
   const [filteredColaboradores, setFilteredColaboradores] = useState<Colaborador[]>([]);
   const [razonesSociales, setRazonesSociales] = useState<RazonSocial[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = jwtDecode(token) as { isAdmin: boolean };
+      setIsAdmin(decodedToken.isAdmin);
+    }
+  }, []);
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -433,6 +444,7 @@ const ColaboradorList: React.FC = () => {
     { 
       key: 'fotografia', 
       label: 'Foto',
+
       render: (colaborador) => {
         const getImageUrl = (path: string) => {
           const baseUrl = urlServer.replace(/\/api\/?$/, '');
@@ -509,17 +521,19 @@ const ColaboradorList: React.FC = () => {
           placeholder="Buscar por número de empleado, nombre, NSS o puesto..."
           className="flex-grow-1"
         />
-        <Button 
-          variant="success" 
-          onClick={() => { 
-            setShowModal(true); 
-            setEditId(null); 
-            setNewColaborador({ ...emptyColaborador });
-            setSelectedFile(null);
-          }}
-        >
-          Agregar Colaborador
-        </Button>
+        {isAdmin && (
+          <Button 
+            variant="success" 
+            onClick={() => { 
+              setShowModal(true); 
+              setEditId(null); 
+              setNewColaborador({ ...emptyColaborador });
+              setSelectedFile(null);
+            }}
+          >
+            Agregar Colaborador
+          </Button>
+        )}
       </div>
 
       <div className="table-responsive" style={{ minHeight: 'calc(100vh - 270px)', maxHeight: 'calc(100vh - 270px)', overflowY: 'auto', background: '#fff', borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
@@ -528,23 +542,51 @@ const ColaboradorList: React.FC = () => {
           data={paginated}
           actions={(colaborador) => (
             <div className="d-flex flex-column flex-sm-row align-items-stretch gap-1">
-              <Button variant="warning" size="sm" className="w-100 w-sm-auto" onClick={() => handleEdit(colaborador)}>
-                Editar
+              {isAdmin && (
+                <>
+                  <Button variant="warning" size="sm" className="w-100 w-sm-auto" onClick={() => handleEdit(colaborador)}>
+                    Editar
+                  </Button>
+                  <Button variant="danger" size="sm" className="w-100 w-sm-auto" onClick={() => handleDelete(colaborador._id!)}>
+                    Eliminar
+                  </Button>
+                </>
+              )}
+              <Button 
+                variant="info" 
+                size="sm" 
+                style={{ 
+                  width: '40px', 
+                  height: '40px', 
+                  padding: '8px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center' 
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleShowHerramientas(colaborador);
+                }}
+              >
+                <FaTools size={16} />
               </Button>
-              <Button variant="danger" size="sm" className="w-100 w-sm-auto" onClick={() => handleDelete(colaborador._id!)}>
-                Eliminar
-              </Button>
-              <Button variant="info" size="sm" className="w-100 w-sm-auto" onClick={(e) => {
-                e.preventDefault();
-                handleShowHerramientas(colaborador);
-              }}>
-                <i className="fas fa-tools"></i>
-              </Button>
-              <Button variant="info" size="sm" className="w-100 w-sm-auto" onClick={(e) => {
-                e.preventDefault();
-                handleShowDocumentos(colaborador);
-              }}>
-                <i className="fas fa-file-alt"></i>
+              <Button 
+                variant="info" 
+                size="sm" 
+                style={{ 
+                  width: '40px', 
+                  height: '40px', 
+                  padding: '8px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center' 
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleShowDocumentos(colaborador);
+                }}
+              >
+                <FaFileAlt size={16} />
               </Button>
             </div>
           )}
@@ -769,14 +811,15 @@ const ColaboradorList: React.FC = () => {
       <Modal 
         show={showHerramientasModal} 
         onHide={() => setShowHerramientasModal(false)} 
-        size="lg"
+        size="xl"
+        dialogClassName="modal-90w"
       >
         <Modal.Header closeButton>
           <Modal.Title>
             Herramientas - {selectedColaborador?.nombre}
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{ maxHeight: '80vh', overflowY: 'auto', padding: '20px' }}>
           {selectedColaborador && (
             <HerramientaList
               colaboradorId={selectedColaborador._id!}
@@ -791,7 +834,8 @@ const ColaboradorList: React.FC = () => {
       <Modal 
         show={showDocumentosModal} 
         onHide={() => setShowDocumentosModal(false)} 
-        size="lg"
+        dialogClassName="modal-documentos"
+        centered
       >
         <Modal.Header closeButton>
           <Modal.Title>

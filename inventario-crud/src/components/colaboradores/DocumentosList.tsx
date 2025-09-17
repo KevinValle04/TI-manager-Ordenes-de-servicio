@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, Button, Form, DatePicker, message, Upload, Tooltip } from 'antd';
-import { PlusOutlined, DeleteOutlined, FileOutlined, EditOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, FileOutlined, EditOutlined, CalendarOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import moment from 'moment';
+import './DocumentosList.css';
 
 interface Documento {
   _id: string;
@@ -80,14 +81,15 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
         Agregar Documento
       </Button>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px' }}>
+      <div className="documentos-grid">
         {documentos.map((doc) => (
           <Card
             key={doc._id}
             size="small"
             title={doc.nombre}
+            className="documento-card"
             extra={
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div className="documento-actions">
                 <Tooltip title="Editar">
                   <Button
                     type="text"
@@ -109,19 +111,25 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
               </div>
             }
           >
-            <p>
-              <Button
-                type="link"
-                icon={<FileOutlined />}
-                onClick={() => window.open(`http://localhost:6051/api/documentos/ver/${doc._id}`, '_blank')}
-              >
-                Ver documento
-              </Button>
-            </p>
-            <p>Fecha: {moment(doc.fechaSubida).format('DD/MM/YYYY')}</p>
-            {doc.fechaVencimiento && (
-              <p>Vence: {moment(doc.fechaVencimiento).format('DD/MM/YYYY')}</p>
-            )}
+            <Button
+              className="documento-view-button"
+              type="link"
+              block
+              icon={<FileOutlined />}
+              onClick={() => window.open(`http://localhost:6051/api/documentos/ver/${doc._id}`, '_blank')}
+            >
+              Ver documento
+            </Button>
+            <div className="documento-info">
+              <div className="documento-date">
+                <CalendarOutlined /> {moment(doc.fechaSubida).format('DD/MM/YYYY')}
+              </div>
+              {doc.fechaVencimiento && (
+                <div className="documento-date">
+                  <CalendarOutlined style={{ color: '#ff4d4f' }} /> Vence: {moment(doc.fechaVencimiento).format('DD/MM/YYYY')}
+                </div>
+              )}
+            </div>
           </Card>
         ))}
       </div>
