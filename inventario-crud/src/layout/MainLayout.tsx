@@ -61,7 +61,15 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
         { path: "/solicitudes-inventario", label: "Solicitudes", icon: <FaFileAlt size={14} /> },
       ],
     }] : []),
-    // Guías sin agrupar
+    // Colaboradores
+    {
+      label: "Colaboradores",
+      icon: <FaUsers size={16} />,
+      items: [
+        { path: "/colaboradores", label: "Colaboradores", icon: <FaUsers size={14} /> },
+      ],
+    },
+    // Guías
     {
       label: "Guías",
       icon: <FaFileAlt size={16} />,
@@ -85,7 +93,6 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
       items: [
         { path: "/inventario", label: "Inventario Interior", icon: <FaWarehouse size={14} /> },
         { path: "/inventarioExterior", label: "Inventario Exterior", icon: <FaWarehouse size={14} /> },
-        { path: "/herramientas", label: "Herramientas", icon: <FaTools size={14} /> },
         ...((token && !(jwtDecode(token) as any).isAdmin) ? [
           { path: "/solicitudes-inventario", label: "Solicitudes", icon: <FaFileAlt size={14} /> }
         ] : []),
@@ -95,7 +102,6 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
       label: "Bases de Datos",
       icon: <FaUsers size={16} />,
       items: [
-        { path: "/colaboradores", label: "Colaboradores", icon: <FaUsers size={14} /> },
         { path: "/clientes", label: "Clientes", icon: <FaUsers size={14} /> },
         { path: "/proveedores", label: "Proveedores", icon: <FaTruck size={14} /> },
         { path: "/razones-sociales", label: "Razones Sociales", icon: <FaBuilding size={14} /> },

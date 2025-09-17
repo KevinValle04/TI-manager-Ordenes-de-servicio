@@ -4,10 +4,32 @@ import React, { useEffect, useState } from 'react';
 import { Button, Col, Form, Image, Modal, Row } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { message } from 'antd';
 import DataTable, { DataTableColumn } from '../common/DataTable';
 import PaginationCompact from '../common/PaginationCompact';
 import SearchBar from '../common/SearchBar';
+import HerramientaList from './HerramientaList';
+import DocumentosList from './DocumentosList';
 import './Colaboradores.css';
+
+interface Herramienta {
+  _id: string;
+  nombre: string;
+  marca: string;
+  modelo: string;
+  valor: number;
+  serialNumber: string;
+  fechaAsignacion: string;
+}
+
+interface Documento {
+  _id: string;
+  nombre: string;
+  url: string;
+  tipo: 'pdf' | 'image';
+  fechaSubida: string;
+  fechaVencimiento?: string;
+}
 
 interface RazonSocial {
   _id?: string;
@@ -66,6 +88,11 @@ const ColaboradorList: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string>('');
+  const [showHerramientasModal, setShowHerramientasModal] = useState(false);
+  const [showDocumentosModal, setShowDocumentosModal] = useState(false);
+  const [selectedColaborador, setSelectedColaborador] = useState<Colaborador | null>(null);
+  const [documentos, setDocumentos] = useState<{ [key: string]: Documento[] }>({});
+  const [herramientas, setHerramientas] = useState<{ [key: string]: Herramienta[] }>({});
   const itemsPerPage = 10;
 
   const urlServer = import.meta.env.VITE_API_URL;
@@ -93,6 +120,52 @@ const ColaboradorList: React.FC = () => {
     fetchColaboradores();
     fetchRazonesSociales();
   }, []);
+
+  const fetchHerramientas = async (colaboradorId: string) => {
+    try {
+      const response = await axios.get<Herramienta[]>(`${urlServer}herramientas/colaborador/${colaboradorId}`);
+      if (Array.isArray(response.data)) {
+        setHerramientas(prev => ({
+          ...prev,
+          [colaboradorId]: response.data
+        }));
+      }
+    } catch (error) {
+      console.error('Error al cargar herramientas:', error);
+      message.error('Error al cargar herramientas');
+    }
+  };
+
+  const fetchDocumentos = async (colaboradorId: string) => {
+    try {
+      const response = await axios.get<Documento[]>(`${urlServer}documentos/colaborador/${colaboradorId}`);
+      if (Array.isArray(response.data)) {
+        setDocumentos(prev => ({
+          ...prev,
+          [colaboradorId]: response.data
+        }));
+      }
+    } catch (error) {
+      console.error('Error al cargar documentos:', error);
+      message.error('Error al cargar documentos');
+    }
+  };
+
+  const handleShowHerramientas = async (colaborador: Colaborador) => {
+    setSelectedColaborador(colaborador);
+    setShowHerramientasModal(true);
+    if (!herramientas[colaborador._id!]) {
+      await fetchHerramientas(colaborador._id!);
+    }
+  };
+
+  const handleShowDocumentos = async (colaborador: Colaborador) => {
+    setSelectedColaborador(colaborador);
+    setShowDocumentosModal(true);
+    if (!documentos[colaborador._id!]) {
+      await fetchDocumentos(colaborador._id!);
+    }
+  };
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
@@ -461,6 +534,18 @@ const ColaboradorList: React.FC = () => {
               <Button variant="danger" size="sm" className="w-100 w-sm-auto" onClick={() => handleDelete(colaborador._id!)}>
                 Eliminar
               </Button>
+              <Button variant="info" size="sm" className="w-100 w-sm-auto" onClick={(e) => {
+                e.preventDefault();
+                handleShowHerramientas(colaborador);
+              }}>
+                <i className="fas fa-tools"></i>
+              </Button>
+              <Button variant="info" size="sm" className="w-100 w-sm-auto" onClick={(e) => {
+                e.preventDefault();
+                handleShowDocumentos(colaborador);
+              }}>
+                <i className="fas fa-file-alt"></i>
+              </Button>
             </div>
           )}
           className="small"
@@ -677,6 +762,50 @@ const ColaboradorList: React.FC = () => {
               </div>
             )}
           </div>
+        </Modal.Body>
+      </Modal>
+
+      {/* Modal de Herramientas */}
+      <Modal 
+        show={showHerramientasModal} 
+        onHide={() => setShowHerramientasModal(false)} 
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Herramientas - {selectedColaborador?.nombre}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedColaborador && (
+            <HerramientaList
+              colaboradorId={selectedColaborador._id!}
+              herramientas={herramientas[selectedColaborador._id!] || []}
+              onHerramientasChange={() => fetchHerramientas(selectedColaborador._id!)}
+            />
+          )}
+        </Modal.Body>
+      </Modal>
+
+      {/* Modal de Documentos */}
+      <Modal 
+        show={showDocumentosModal} 
+        onHide={() => setShowDocumentosModal(false)} 
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Documentos - {selectedColaborador?.nombre}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedColaborador && (
+            <DocumentosList
+              colaboradorId={selectedColaborador._id!}
+              documentos={documentos[selectedColaborador._id!] || []}
+              onDocumentosChange={() => fetchDocumentos(selectedColaborador._id!)}
+            />
+          )}
         </Modal.Body>
       </Modal>
     </div>
