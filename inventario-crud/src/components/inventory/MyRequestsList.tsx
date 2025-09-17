@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Table, Tag, Modal, message } from 'antd';
+import { Table, Tag, Modal, message, Button } from 'antd';
+import { ReloadOutlined } from '@ant-design/icons';
 import type { TablePaginationConfig } from 'antd/es/table';
 import axios from 'axios';
 
@@ -13,29 +14,46 @@ const MyRequestsList = () => {
   });
 
   const loadRequests = async () => {
+    console.log('Cargando solicitudes del usuario...');
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
       
       // Si no hay token, no hacer la petición
       if (!token) {
+        console.error('No se encontró token de autenticación');
         setRequests([]);
         return;
       }
+      
+      console.log('Token encontrado, realizando petición...');
 
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}inventory-requests/my-requests`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}inventory-requests/my-requests`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       
       // Asegurarse de que response.data sea un array
+      console.log('Respuesta del servidor:', response.data);
       if (Array.isArray(response.data)) {
         setRequests(response.data);
+        console.log('Solicitudes cargadas:', response.data.length);
       } else {
         console.error('La respuesta no es un array:', response.data);
         setRequests([]);
       }
     } catch (error: any) {
-      // Solo mostrar errores que no sean de autenticación
-      if (error.response?.status !== 401 && error.response?.status !== 403) {
-        console.error('Error al cargar las solicitudes:', error);
+      // Loguear todos los errores para debugging
+      console.error('Error al cargar las solicitudes:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
+      
+      if (error.response?.status === 401) {
+        message.error('Sesión expirada. Por favor, inicie sesión nuevamente.');
+      } else if (error.response?.status === 403) {
+        message.error('No tiene permisos para ver las solicitudes.');
+      } else {
         message.error('Error al cargar las solicitudes. Por favor, intente nuevamente.');
       }
       setRequests([]);
@@ -139,7 +157,17 @@ const MyRequestsList = () => {
 
   return (
     <div>
-      <h2>Mis Solicitudes</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h2>Mis Solicitudes</h2>
+        <Button
+          type="primary"
+          onClick={loadRequests}
+          loading={loading}
+          icon={<ReloadOutlined />}
+        >
+          Actualizar
+        </Button>
+      </div>
       
       <Table
         columns={columns}

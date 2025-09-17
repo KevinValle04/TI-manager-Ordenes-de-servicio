@@ -4,8 +4,8 @@ import { isAuthenticated, isAdmin } from '../middleware/auth';
 
 const router = express.Router();
 
-// Rutas para usuarios normales (no requieren autenticación)
-router.post('/', InventoryRequestController.createRequest);
+// Rutas para usuarios normales (requieren autenticación)
+router.post('/', isAuthenticated, InventoryRequestController.createRequest);
 router.get('/my-requests', isAuthenticated, InventoryRequestController.getUserRequests);
 
 // Rutas para administradores

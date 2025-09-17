@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const API_URL = import.meta.env.VITE_API_URL;
 
 // Configurar interceptor de Axios
 export const setupAxiosInterceptors = () => {
@@ -9,7 +8,7 @@ export const setupAxiosInterceptors = () => {
   axios.interceptors.request.use(
     (config) => {
       const token = localStorage.getItem('token');
-      if (token && config.url?.includes(API_URL)) {
+      if (token) {
         if (!config.headers) {
           config.headers = {};
         }

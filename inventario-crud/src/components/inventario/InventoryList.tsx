@@ -1,6 +1,6 @@
 // Componente principal de la lista de inventario
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../../utils/axios-config";
 import { IInventoryItem } from "../../types";
 import { Button, Modal, Form, Table, Row, Col } from "react-bootstrap";
 import SearchBar from "../common/SearchBar";
@@ -213,7 +213,7 @@ const Inventario: React.FC = () => {
       }
 
       // Enviar solicitud de baja
-      const response = await axios.post("/api/inventory-requests", {
+      const response = await axios.post(`${urlServer}../inventory-requests`, {
         tipoMovimiento: "SALIDA",
         inventarioTipo: "INTERIOR",
         itemId: item._id,
@@ -252,7 +252,7 @@ const Inventario: React.FC = () => {
     try {
       if (item) {
         // Crear solicitud de alta para item existente
-        const response = await axios.post("/api/inventory-requests", {
+        const response = await axios.post(`${urlServer}../inventory-requests`, {
           tipoMovimiento: "ENTRADA",
           inventarioTipo: "INTERIOR",
           itemId: item._id,
