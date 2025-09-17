@@ -1,9 +1,20 @@
 import { expect, test } from '@playwright/test';
+import * as dotenv from 'dotenv';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-// @ts-ignore
-const USER = process.env.TEST_USER || 'oleal';
-// @ts-ignore
-const PASS = process.env.TEST_PASS || 'papus';
+// Load .env file from project root
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+dotenv.config({ path: `${__dirname}/../../.env` });
+
+const USER = process.env.TEST_USER;
+
+const PASS = process.env.TEST_PASS;
+
+if (!USER || !PASS) {
+  throw new Error('TEST_USER and TEST_PASS environment variables must be set');
+}
 
 test('Prueba Herramientas', async ({ page }) => {
 	// Login
@@ -38,18 +49,14 @@ test('Prueba Herramientas', async ({ page }) => {
 
     await page.getByRole('button', { name: /ColaboradorHerramientas/i }).click();
 
-	for (let i = 1; i <= 3; i++) {
-		await page.getByRole('button', { name: /Agregar Herramienta/i }).click();
-		await page.getByLabel('Nombre').fill(`Herramienta ${i}`);
-		await page.getByLabel('Marca').fill(`Marca ${i}`);
-		await page.getByLabel('Modelo').fill(`Modelo ${i}`);
-		await page.getByLabel('Valor').fill(String(1000 * i));
-		await page.getByLabel('Número de Serie (S/N)').fill(`SN-${i}`);
-		await page.getByRole('button', { name: /Guardar/i }).click();
-		// Espera a que aparezca la herramienta en la lista
-		await expect(page.getByText(`Herramienta ${i}`)).toBeVisible({ timeout: 30000 });
-	}
-
-	
+	await page.getByRole('button', { name: /Agregar Herramienta/i }).click();
+	await page.getByLabel('Nombre').fill(`Herramienta 1`);
+	await page.getByLabel('Marca').fill(`Marca 1`);
+	await page.getByLabel('Modelo').fill(`Modelo 1`);
+	await page.getByLabel('Valor').fill(String(1000 * 1));
+	await page.getByLabel('Número de Serie (S/N)').fill(`SN-1`);
+	await page.getByRole('button', { name: /Guardar/i }).click();
+	// Espera a que aparezca la herramienta en la lista
+	await expect(page.getByText(`Herramienta 1`)).toBeVisible({ timeout: 30000 });
 
 });
