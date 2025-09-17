@@ -18,7 +18,7 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@zxing/browser": "^0.1.5",
     "antd": "^5.27.2",
-    "axios": "^1.9.0",
+    "axios": "^1.12.2",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.9",
     "date-fns": "^4.1.0",
@@ -38,7 +38,6 @@
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@playwright/test": "^1.55.0",
-    "@types/axios": "^0.9.36",
     "@types/node": "^22.18.1",
     "@types/react": "^19.1.12",
     "@types/react-big-calendar": "^1.16.2",

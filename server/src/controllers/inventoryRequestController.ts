@@ -22,8 +22,14 @@ interface PopulatedRequest {
 
 export class InventoryRequestController {
   // Crear una nueva solicitud
-  public static createRequest: RequestHandler = async (req, res) => {
+  public static createRequest: RequestHandler = async (req, res, next) => {
     try {
+      // Verificar autenticación
+      if (!req.user?._id) {
+        res.status(401).json({ message: 'No autorizado. Por favor, inicie sesión.' });
+        return;
+      }
+
       const {
         tipoMovimiento,
         inventarioTipo,
@@ -67,15 +73,34 @@ export class InventoryRequestController {
         }
       }
 
+      // Verificar autenticación y obtener el ID del usuario
+      const userId = req.user?._id;
+      console.log('Usuario que intenta crear la solicitud:', {
+        userId,
+        userInfo: req.user
+      });
+
       // Crear la solicitud
       const request = new InventoryRequest({
         tipoMovimiento,
         inventarioTipo,
         itemId,
         cantidad,
-        solicitanteId: req.user?._id || null, // Permitir solicitudes sin usuario
+        solicitanteId: userId,
+        estado: 'PENDIENTE',
         motivoSolicitud,
-        numerosSerie
+        numerosSerie,
+        fechaSolicitud: new Date()
+      });
+      
+      console.log('Creando solicitud con datos:', {
+        tipoMovimiento,
+        inventarioTipo,
+        itemId,
+        cantidad,
+        solicitanteId: req.user._id,
+        estado: 'PENDIENTE',
+        motivoSolicitud
       });
 
       await request.save();
@@ -91,11 +116,12 @@ export class InventoryRequestController {
         message: 'Error al crear la solicitud',
         error: error instanceof Error ? error.message : 'Error desconocido'
       });
+      return;
     }
   }
 
   // Obtener solicitudes pendientes (para administradores)
-  public static getPendingRequests: RequestHandler = async (req, res) => {
+  public static getPendingRequests: RequestHandler = async (req, res, next) => {
     try {
       console.log('Buscando solicitudes pendientes...');
       
@@ -126,6 +152,7 @@ export class InventoryRequestController {
 
       console.log('Solicitudes encontradas:', populatedRequests.length);
       res.json(populatedRequests);
+      return;
     } catch (error) {
       console.error('Error al obtener solicitudes:', error);
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
@@ -138,15 +165,27 @@ export class InventoryRequestController {
   }
 
   // Obtener solicitudes de un usuario
-  public static getUserRequests: RequestHandler = async (req, res) => {
+  public static getUserRequests: RequestHandler = async (req, res, next) => {
     try {
-      const userId = req.user?._id as mongoose.Types.ObjectId;
+      if (!req.user?._id) {
+        res.status(401).json({ message: 'Usuario no autenticado' });
+        return;
+      }
       
-      // Obtener solicitudes del usuario con el aprobador populado
-      const requests = await InventoryRequest.find({ solicitanteId: userId })
-        .populate('aprobadorId', 'username')
-        .sort({ fechaSolicitud: -1 })
-        .lean();
+      const userId = req.user._id as mongoose.Types.ObjectId;
+      console.log('Buscando solicitudes para usuario:', userId);
+      
+      // Obtener todas las solicitudes del usuario (pendientes y procesadas)
+      console.log('User ID para búsqueda:', userId);
+      const requests = await InventoryRequest.find({ 
+        solicitanteId: userId.toString() 
+      })
+      .populate('solicitanteId', 'username')
+      .populate('aprobadorId', 'username')
+      .sort({ fechaSolicitud: -1 })
+      .lean();
+      
+      console.log('Solicitudes encontradas en la base de datos:', requests.length);
 
       // Popular los items manualmente
       const populatedRequests: PopulatedRequest[] = await Promise.all(
@@ -176,12 +215,13 @@ export class InventoryRequestController {
         message: 'Error al obtener las solicitudes',
         error: errorMessage
       });
+      return;
     }
   }
 
   // Aprobar o rechazar una solicitud
   // Obtener historial de solicitudes (solo admin)
-  public static getRequestHistory: RequestHandler = async (req, res) => {
+  public static getRequestHistory: RequestHandler = async (req, res, next) => {
     try {
       // Obtener solicitudes procesadas (aprobadas o rechazadas)
       const requests = await InventoryRequest.find({
@@ -219,10 +259,11 @@ export class InventoryRequestController {
         message: 'Error al obtener el historial',
         error: errorMessage
       });
+      return;
     }
   }
 
-  public static processRequest: RequestHandler = async (req, res) => {
+  public static processRequest: RequestHandler = async (req, res, next) => {
     try {
       const { requestId } = req.params;
       const { action, motivoRechazo } = req.body;

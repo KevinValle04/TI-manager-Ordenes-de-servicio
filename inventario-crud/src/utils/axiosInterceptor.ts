@@ -9,12 +9,17 @@ axios.defaults.headers.common['Content-Type'] = 'application/json';
 // Lista de rutas que no requieren autenticación
 const publicRoutes = [
   'auth/login',
-  'auth/register',
-  'inventory-requests'  // Solo la creación de solicitudes no requiere autenticación
+  'auth/register'
 ];
 
-// Configurar interceptor para añadir token automáticamente
+// Activar el modo de depuración para ver las cabeceras
 axios.interceptors.request.use((config) => {
+  console.log('Request headers:', config.headers);
+  return config;
+});
+
+// Configurar interceptor para añadir token automáticamente
+axios.interceptors.request.use((config: any) => {
   const token = localStorage.getItem('token');
   // Verificar si la ruta es pública
   const url = config.url || '';
@@ -25,31 +30,20 @@ axios.interceptors.request.use((config) => {
     relativePath = url.substring(API_URL.length);
   }
   
-  const isPublicRoute = publicRoutes.some(route => {
-    if (route === 'inventory-requests') {
-      return relativePath.startsWith(route) && config.method?.toLowerCase() === 'post';
-    }
-    return relativePath.startsWith(route);
-  });
+  // Verificar si es una ruta pública
+  const isPublicRoute = publicRoutes.some(route => relativePath.startsWith(route));
 
-  // Si no es una ruta pública y hay headers, añadir el token
-  if (!isPublicRoute && config.headers) {
+  // Si no es una ruta pública, añadir el token
+  if (!isPublicRoute) {
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
     } else {
       console.warn('No se encontró token para ruta protegida:', url);
     }
   }
 
-  console.log('Request:', {
-    url,
-    relativePath,
-    isPublicRoute,
-    hasToken: !!token,
-    method: config.method,
-    headers: config.headers
-  });
-
+  // Devolver la configuración actualizada
   return config;
 }, (error) => {
   return Promise.reject(error);
@@ -63,14 +57,7 @@ axios.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response) {
-      console.log('Error Response:', {
-        status: error.response.status,
-        message: error.response.data?.message,
-        url: error.config?.url
-      });
-
       if ((error.response.status === 401 || error.response.status === 403) && !isRedirecting) {
-        console.log('Token inválido o expirado, redirigiendo al login...');
         // Token inválido o expirado
         isRedirecting = true;
         localStorage.removeItem('token');
