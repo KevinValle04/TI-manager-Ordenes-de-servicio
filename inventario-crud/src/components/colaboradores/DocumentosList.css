@@ -1,8 +1,12 @@
+.documentos-container {
+  padding: 16px;
+}
+
 .documentos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
-  padding: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
 }
 
 /* Estilos para los modales y sus elementos */
@@ -73,13 +77,33 @@
 }
 
 .documento-view-button {
-  padding: 0;
-  height: auto;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  width: 100%;
+  text-align: center;
 }
 
 .documento-date {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-bottom: 4px;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* Estilos para el área de arrastrar y soltar */
+.ant-upload-drag {
+  background: #fafafa !important;
+  border: 2px dashed #d9d9d9 !important;
+  border-radius: 4px !important;
+  transition: all 0.3s !important;
+}
+
+.ant-upload-drag:hover {
+  border-color: #1890ff !important;
+}
+
+.ant-upload-drag-icon {
+  color: #1890ff;
+  font-size: 48px;
+  margin-bottom: 16px;
 }
