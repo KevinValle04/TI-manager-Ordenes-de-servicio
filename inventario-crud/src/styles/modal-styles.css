@@ -1,0 +1,101 @@
+/* Reset de z-index para contenedores modales */
+.ant-modal-root {
+  position: relative;
+}
+
+/* Contenedor principal del modal */
+.ant-modal {
+  position: relative !important;
+}
+
+/* Asignar z-index específicos para cada nivel de modal */
+.ant-modal-wrap {
+  position: fixed !important;
+}
+
+.ant-modal-wrap:nth-of-type(1) {
+  z-index: 1000 !important;
+}
+
+.ant-modal-wrap:nth-of-type(2) {
+  z-index: 1100 !important;
+}
+
+.ant-modal-wrap:nth-of-type(3) {
+  z-index: 1200 !important;
+}
+
+/* Máscaras de modal */
+.ant-modal-mask {
+  position: fixed !important;
+}
+
+.ant-modal-mask:nth-of-type(1) {
+  z-index: 999 !important;
+}
+
+.ant-modal-mask:nth-of-type(2) {
+  z-index: 1099 !important;
+}
+
+.ant-modal-mask:nth-of-type(3) {
+  z-index: 1199 !important;
+}
+
+/* Contenido del modal */
+.ant-modal-content {
+  position: relative !important;
+  background: white !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Asegurar que los elementos de formulario sean interactivos */
+.ant-modal-content .ant-form,
+.ant-modal-content .ant-form-item,
+.ant-modal-content input,
+.ant-modal-content button,
+.ant-modal-content select,
+.ant-modal-content .ant-select,
+.ant-modal-content .ant-picker,
+.ant-modal-content .ant-input-number,
+.ant-modal-content .ant-upload {
+  position: relative !important;
+  z-index: auto !important;
+}
+
+/* Estilo para modal activo */
+.ant-modal-wrap:last-child {
+  pointer-events: auto !important;
+}
+
+.ant-modal-wrap:last-child .ant-modal-content {
+  pointer-events: auto !important;
+}
+
+/* Prevenir interacción con modales de fondo */
+.ant-modal-wrap:not(:last-child) {
+  pointer-events: none !important;
+}
+
+/* Asegurar que los backdrops no interfieran */
+.ant-modal-mask {
+  pointer-events: auto !important;
+}
+
+/* Mejorar la visibilidad del modal activo */
+.ant-modal-wrap:last-child .ant-modal {
+  transform: scale(1) !important;
+  opacity: 1 !important;
+}
+
+/* Estilos específicos para formularios dentro de modales */
+.ant-modal .ant-form {
+  position: relative !important;
+  z-index: auto !important;
+}
+
+/* Asegurar que los elementos de formulario estén por encima */
+.ant-modal .ant-form-item-control {
+  position: relative !important;
+  z-index: 1 !important;
+}
