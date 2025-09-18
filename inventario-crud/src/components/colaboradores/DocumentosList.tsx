@@ -315,7 +315,7 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
                   message.error('No se pudo determinar el nombre del archivo');
                   return;
                 }
-                const viewUrl = new URL('api/documentos/ver/' + fileName, urlServer);
+                const viewUrl = new URL('documentos/ver/' + fileName, urlServer);
                 window.open(viewUrl.toString(), '_blank');
               }}
             >
