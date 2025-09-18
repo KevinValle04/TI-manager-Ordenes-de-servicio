@@ -12,6 +12,37 @@
   border-color: #0d6efd;
 }
 
+/* Base styles for all modals */
+.modal {
+  z-index: 1050; /* Base z-index for modals */
+}
+
+/* Increment z-index for subsequent modals */
+.modal.show:nth-child(2) {
+  z-index: 1060;
+}
+
+.modal.show:nth-child(3) {
+  z-index: 1070;
+}
+
+.modal.show:nth-child(4) {
+  z-index: 1080;
+}
+
+/* Ensure modal backdrop doesn't block subsequent modals */
+.modal-backdrop:nth-child(2) {
+  z-index: 1055;
+}
+
+.modal-backdrop:nth-child(3) {
+  z-index: 1065;
+}
+
+.modal-backdrop:nth-child(4) {
+  z-index: 1075;
+}
+
 /* Estilos para el modal de imagen */
 .modal-90w {
   max-width: 90vw !important;

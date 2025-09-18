@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Button, Form, DatePicker, message, Upload, Tooltip, Modal } from 'antd';
+import { Card, Button, Form, DatePicker, message, Upload, Tooltip, Modal, Input } from 'antd';
 import { PlusOutlined, DeleteOutlined, FileOutlined, EditOutlined, CalendarOutlined, InboxOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import moment from 'moment';
@@ -101,9 +101,10 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
 
       <Modal
         title="Agregar Documento"
-        visible={modalVisible}
+        open={modalVisible}
         onCancel={() => setModalVisible(false)}
         footer={null}
+        style={{ zIndex: 1300 }}
       >
         <Form form={form} onFinish={handleAddDocument}>
           <Form.Item
@@ -111,7 +112,7 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
             label="Nombre del documento"
             rules={[{ required: true, message: 'Por favor ingrese un nombre' }]}
           >
-            <input type="text" />
+            <Input />
           </Form.Item>
 
           <Form.Item

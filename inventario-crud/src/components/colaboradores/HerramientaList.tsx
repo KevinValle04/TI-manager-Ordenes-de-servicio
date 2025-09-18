@@ -149,6 +149,7 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
       <Modal
         title={editingHerramienta ? "Editar Herramienta" : "Agregar Herramienta"}
         open={modalVisible}
+        style={{ zIndex: 1300 }}
         onCancel={() => {
           setModalVisible(false);
           form.resetFields();

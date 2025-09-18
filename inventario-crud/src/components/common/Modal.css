@@ -1,0 +1,59 @@
+/* ================================================================== */
+/*          SOLUCIÓN CSS DEFINITIVA PARA MODALES ANIDADOS             */
+/* ================================================================== */
+
+/*
+  DIAGNÓSTICO: Una regla de CSS conflictiva o código en línea en
+  DocumentosList.tsx interfiere con el 'z-index' del segundo modal.
+
+  ESTA SOLUCIÓN: Utiliza valores de 'z-index' extremadamente altos
+  para ganar la "guerra de z-index" y anular cualquier otra regla.
+*/
+
+/*
+  NUEVO ORDEN DE APILAMIENTO:
+  - Modal Nivel 1 (Bootstrap) Fondo/Contenido: ~1050
+  - Modal Nivel 2 (Ant Design) Fondo (Mask):    2000 (¡Mucho más alto!)
+  - Modal Nivel 2 (Ant Design) Contenido:       2001 (El más alto)
+*/
+
+/* 1. Fondo (Mask) del modal de Ant Design (Nivel 2) */
+.custom-modal-wrap .ant-modal-mask {
+  z-index: 2000 !important;
+  background-color: rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* 2. Contenedor principal del modal de Ant Design */
+.custom-modal-wrap.ant-modal-wrap {
+  z-index: 2000 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  overflow: auto !important;
+  outline: 0 !important;
+}
+
+/* 3. El diálogo del modal de Ant Design (el recuadro) */
+.custom-modal-wrap .ant-modal {
+  z-index: 2001 !important; /* El más alto para asegurar visibilidad */
+  position: relative !important;
+  margin: 0 auto !important;
+  pointer-events: auto !important;
+}
+
+/* 4. Estilos de limpieza y visuales */
+.ant-modal-content {
+  position: relative !important;
+  background-color: #fff !important;
+  border-radius: 8px !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12) !important;
+  pointer-events: auto !important;
+}
+
+.form-container {
+  background: #fff !important;
+}
