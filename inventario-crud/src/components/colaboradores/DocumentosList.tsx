@@ -5,10 +5,6 @@ import moment from 'moment';
 import React, { useState } from 'react';
 import './DocumentosList.css';
 
-const urlServer = import.meta.env.VITE_API_URL.endsWith('/') 
-  ? import.meta.env.VITE_API_URL 
-  : import.meta.env.VITE_API_URL + '/';
-
 interface Documento {
   _id: string;
   nombre: string;
@@ -33,89 +29,30 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
-  const handleAddDocument = async (values: { nombre: string; archivo: any[]; fechaVencimiento?: moment.Moment }) => {
+  const handleAddDocument = async (values: { nombre: string; documento: any[]; fechaVencimiento?: moment.Moment }) => {
     try {
       setLoading(true);
-
-      console.log('Valores del formulario:', values); // Para depuración
-
-      // Validar el nombre
-      if (!values.nombre || values.nombre.trim() === '') {
-        throw new Error('Por favor ingrese un nombre para el documento');
-      }
-
-      // Validar el archivo
-      if (!values.archivo) {
-        throw new Error('Por favor seleccione un archivo');
-      }
-
-      if (!Array.isArray(values.archivo)) {
-        console.error('Tipo de archivo inesperado:', typeof values.archivo);
-        throw new Error('Formato de archivo no válido');
-      }
-
-      if (values.archivo.length === 0) {
-        throw new Error('Por favor seleccione un archivo');
-      }
-
-      const fileInfo = values.archivo[0];
-      if (!fileInfo) {
-        throw new Error('No se pudo acceder al archivo');
-      }
-
-      const file = fileInfo.originFileObj;
-      console.log('Información del archivo:', file); // Para depuración
-
-      if (!file) {
-        throw new Error('No se pudo acceder al archivo seleccionado');
-      }
-
-      if (!(file instanceof File)) {
-        console.error('Tipo de archivo:', file.constructor.name);
-        throw new Error('El archivo seleccionado no es válido');
-      }
-
-      // Validar el tamaño del archivo (máximo 10MB)
-      const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB en bytes
-      if (file.size > MAX_FILE_SIZE) {
-        throw new Error('El archivo es demasiado grande. El tamaño máximo permitido es 10MB');
-      }
-
-      // Validar el tipo de archivo
-      const allowedTypes = [
-        'application/pdf',
-        'image/jpeg',
-        'image/png',
-        'image/gif',
-        'image/webp'
-      ];
-      
-      if (!allowedTypes.includes(file.type)) {
-        throw new Error('Tipo de archivo no permitido. Solo se permiten archivos PDF, JPG, PNG, GIF y WEBP');
-      }
-
-      // Crear el FormData
       const formData = new FormData();
-      formData.append('nombre', values.nombre.trim());
-      formData.append('documento', file);
-
-      // Procesar la fecha de vencimiento
-      if (values.fechaVencimiento && moment.isMoment(values.fechaVencimiento) && values.fechaVencimiento.isValid()) {
-        const fecha = values.fechaVencimiento.clone().endOf('day');
-        formData.append('fechaVencimiento', fecha.toISOString());
+      
+      if (values.documento && values.documento[0]) {
+        const file = values.documento[0].originFileObj;
+        formData.append('documento', file);
+      } else {
+        throw new Error('No se seleccionó ningún archivo');
       }
 
-      // Construir la URL directamente sin duplicar 'api'
-      const baseUrl = urlServer.includes('/api/') ? urlServer.replace('/api/', '/') : urlServer;
-      const url = `${baseUrl}documentos/colaborador/${colaboradorId}`;
-      console.log('URL de la solicitud:', url); // Para depuración
+      formData.append('nombre', values.nombre);
+      formData.append('colaboradorId', colaboradorId);
+      
+      if (values.fechaVencimiento) {
+        formData.append('fechaVencimiento', values.fechaVencimiento.toISOString());
+      }
 
-      // Enviar la solicitud
       await axios.post(
-        url,
+        `http://localhost:6051/api/documentos/colaborador/${colaboradorId}`,
         formData,
-        { 
-          headers: { 
+        {
+          headers: {
             'Content-Type': 'multipart/form-data'
           }
         }
@@ -162,7 +99,7 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
 
   const handleDeleteDocument = async (documentoId: string) => {
     try {
-      await axios.delete(`${urlServer}documentos/${documentoId}`);
+      await axios.delete(`http://localhost:6051/api/documentos/${documentoId}`);
       message.success('Documento eliminado correctamente');
       onDocumentosChange();
     } catch (error) {
@@ -240,28 +177,23 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
             </div>
 
             <Form.Item
-              name="archivo"
-              label="Archivo"
-              rules={[{ required: true, message: 'Por favor seleccione un archivo' }]}
+              name="documento"
+              label="Documento"
+              valuePropName="fileList"
+              getValueFromEvent={(e) => {
+                if (Array.isArray(e)) {
+                  return e;
+                }
+                return e?.fileList;
+              }}
+              rules={[{ required: true, message: 'Por favor selecciona un documento' }]}
             >
               <Upload.Dragger
-                name="archivo"
-                multiple={false}
+                name="documento"
                 beforeUpload={() => false}
-                maxCount={1}
                 accept=".pdf,.jpg,.jpeg,.png,.gif,.webp"
-                style={{ padding: '10px 0' }}
-                fileList={form.getFieldValue('archivo') || []}
-                onChange={(info) => {
-                  const { file, fileList } = info;
-                  
-                  if (file.status === 'removed') {
-                    form.setFieldValue('archivo', undefined);
-                  } else {
-                    // Actualizar el valor del formulario con la lista de archivos
-                    form.setFieldValue('archivo', fileList);
-                  }
-                }}
+                maxCount={1}
+                listType="picture"
               >
                 <div>
                   <p className="ant-upload-drag-icon">
@@ -310,13 +242,7 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
               block
               icon={<FileOutlined />}
               onClick={() => {
-                const fileName = doc.url.split('/').pop();
-                if (!fileName) {
-                  message.error('No se pudo determinar el nombre del archivo');
-                  return;
-                }
-                const viewUrl = new URL('documentos/ver/' + fileName, urlServer);
-                window.open(viewUrl.toString(), '_blank');
+                window.open(`http://localhost:6051/api/documentos/ver/${doc.url}`, '_blank');
               }}
             >
               Ver documento
