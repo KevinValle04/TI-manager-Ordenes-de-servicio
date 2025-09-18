@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Card, Button, Modal, Form, Input, InputNumber, message } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, FilePdfOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, FilePdfOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Card, Form, Input, InputNumber, message } from 'antd';
 import axios from 'axios';
+import React, { useState } from 'react';
 
 interface Herramienta {
   _id: string;
@@ -24,6 +24,7 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
   herramientas, 
   onHerramientasChange 
 }) => {
+
   const [modalVisible, setModalVisible] = useState(false);
   const [editingHerramienta, setEditingHerramienta] = useState<Herramienta | null>(null);
   const [form] = Form.useForm();
@@ -46,8 +47,10 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
         message.success('Herramienta agregada correctamente');
       }
       
-      setModalVisible(false);
-      form.resetFields();
+      setTimeout(() => {
+        setModalVisible(false);
+        form.resetFields();
+      }, 100);
       setEditingHerramienta(null);
       onHerramientasChange();
     } catch (error: any) {
@@ -73,28 +76,124 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
 
   return (
     <div>
-      <div style={{ display: 'flex', gap: '10px', marginBottom: 16 }}>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => {
-            setEditingHerramienta(null);
-            form.resetFields();
-            setModalVisible(true);
-          }}
-        >
-          Agregar Herramienta
-        </Button>
-        <Button
-          type="default"
-          icon={<FilePdfOutlined />}
-          onClick={() => {
-            window.open(`http://localhost:6051/api/herramientas/pdf/${colaboradorId}`, '_blank');
-          }}
-        >
-          Exportar PDF
-        </Button>
+      <div className="tools-header" style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        marginBottom: 16,
+        borderBottom: '1px solid #f0f0f0',
+        paddingBottom: 16
+      }}>
+        <h3 style={{ margin: 0 }}>Lista de Herramientas</h3>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              setEditingHerramienta(null);
+              form.resetFields();
+              setModalVisible(!modalVisible);
+            }}
+          >
+            {modalVisible ? 'Cancelar' : 'Agregar Herramienta'}
+          </Button>
+          <Button
+            type="default"
+            icon={<FilePdfOutlined />}
+            onClick={() => {
+              window.open(`http://localhost:6051/api/herramientas/pdf/${colaboradorId}`, '_blank');
+            }}
+          >
+            Exportar PDF
+          </Button>
+        </div>
       </div>
+
+      {modalVisible && (
+        <Card
+          size="small"
+          style={{ marginBottom: 16 }}
+          title={editingHerramienta ? "Editar Herramienta" : "Nueva Herramienta"}
+        >
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleAddOrEdit}
+          >
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+              <Form.Item
+                name="nombre"
+                label="Nombre"
+                rules={[{ required: true, message: 'Por favor ingresa el nombre' }]}
+              >
+                <Input 
+                  placeholder="Ingrese el nombre"
+                  allowClear
+                  autoComplete="off"
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="marca"
+                label="Marca"
+                rules={[{ required: true, message: 'Por favor ingresa la marca' }]}
+              >
+                <Input 
+                  placeholder="Ingrese la marca"
+                  allowClear
+                  autoComplete="off"
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="modelo"
+                label="Modelo"
+                rules={[{ required: true, message: 'Por favor ingresa el modelo' }]}
+              >
+                <Input 
+                  placeholder="Ingrese el modelo"
+                  allowClear
+                  autoComplete="off"
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="valor"
+                label="Valor ($)"
+                rules={[{ required: true, message: 'Por favor ingresa el valor' }]}
+              >
+                <InputNumber<number>
+                  style={{ width: '100%' }}
+                  formatter={(value) => value ? `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : ''}
+                  parser={(displayValue) => {
+                    const stringValue = displayValue?.replace(/\$\s?|(,*)/g, '') || '0';
+                    return Number(stringValue);
+                  }}
+                  min={0}
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="serialNumber"
+                label="Número de Serie (S/N)"
+                rules={[{ required: true, message: 'Por favor ingresa el número de serie' }]}
+              >
+                <Input 
+                  placeholder="Ingrese el número de serie"
+                  allowClear
+                  autoComplete="off"
+                />
+              </Form.Item>
+            </div>
+
+            <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
+              <Button type="primary" htmlType="submit">
+                {editingHerramienta ? 'Actualizar' : 'Guardar'}
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+      )}
 
       <Card
         size="small"
@@ -146,77 +245,7 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
         ))}
       </div>
 
-      <Modal
-        title={editingHerramienta ? "Editar Herramienta" : "Agregar Herramienta"}
-        open={modalVisible}
-        style={{ zIndex: 1300 }}
-        onCancel={() => {
-          setModalVisible(false);
-          form.resetFields();
-          setEditingHerramienta(null);
-        }}
-        footer={null}
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleAddOrEdit}
-        >
-          <Form.Item
-            name="nombre"
-            label="Nombre"
-            rules={[{ required: true, message: 'Por favor ingresa el nombre' }]}
-          >
-            <Input />
-          </Form.Item>
 
-          <Form.Item
-            name="marca"
-            label="Marca"
-            rules={[{ required: true, message: 'Por favor ingresa la marca' }]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
-            name="modelo"
-            label="Modelo"
-            rules={[{ required: true, message: 'Por favor ingresa el modelo' }]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
-            name="valor"
-            label="Valor ($)"
-            rules={[{ required: true, message: 'Por favor ingresa el valor' }]}
-          >
-            <InputNumber<number>
-              style={{ width: '100%' }}
-              formatter={(value) => value ? `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : ''}
-              parser={(displayValue) => {
-                const stringValue = displayValue?.replace(/\$\s?|(,*)/g, '') || '0';
-                return Number(stringValue);
-              }}
-              min={0}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="serialNumber"
-            label="Número de Serie (S/N)"
-            rules={[{ required: true, message: 'Por favor ingresa el número de serie' }]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item>
-            <Button type="primary" htmlType="submit" block>
-              {editingHerramienta ? 'Actualizar' : 'Guardar'}
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
     </div>
   );
 };

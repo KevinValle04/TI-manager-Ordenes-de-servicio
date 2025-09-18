@@ -1,18 +1,18 @@
+import { message } from 'antd';
 import axios from 'axios';
 import { format } from 'date-fns';
+import { jwtDecode } from 'jwt-decode';
 import React, { useEffect, useState } from 'react';
 import { Button, Col, Form, Image, Modal, Row } from 'react-bootstrap';
+import { FaFileAlt, FaTools } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { message } from 'antd';
-import { jwtDecode } from 'jwt-decode';
-import { FaTools, FaFileAlt } from 'react-icons/fa';
 import DataTable, { DataTableColumn } from '../common/DataTable';
 import PaginationCompact from '../common/PaginationCompact';
 import SearchBar from '../common/SearchBar';
-import HerramientaList from './HerramientaList';
-import DocumentosList from './DocumentosList';
 import './Colaboradores.css';
+import DocumentosList from './DocumentosList';
+import HerramientaList from './HerramientaList';
 
 interface Herramienta {
   _id: string;
@@ -86,9 +86,15 @@ const ColaboradorList: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const isAdminUser = localStorage.getItem('isAdmin') === 'true';
     if (token) {
-      const decodedToken = jwtDecode(token) as { isAdmin: boolean };
-      setIsAdmin(decodedToken.isAdmin);
+      try {
+        const decodedToken = jwtDecode(token) as { isAdmin: boolean };
+        setIsAdmin(decodedToken.isAdmin || isAdminUser);
+      } catch (error) {
+        // Si hay un error al decodificar el token, usar el valor de localStorage
+        setIsAdmin(isAdminUser);
+      }
     }
   }, []);
   const [searchTerm, setSearchTerm] = useState('');

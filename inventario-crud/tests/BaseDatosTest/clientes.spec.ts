@@ -16,6 +16,56 @@ if (!USER || !PASS) {
   throw new Error('TEST_USER and TEST_PASS environment variables must be set');
 }
 
+test('Crear cliente con campos vacíos', async ({ page }) => {
+  // Login antes de acceder a clientes
+  await page.goto('http://localhost/login');
+  await page.getByPlaceholder('Usuario').fill(USER);
+  await page.getByPlaceholder('Contraseña').fill(PASS);
+  await page.getByRole('button', { name: /Entrar/i }).click();
+  await page.waitForURL('**/dashboard', { timeout: 10000 }).catch(() => {});
+
+  // Navega a clientes
+  await page.goto('http://localhost/clientes');
+  await page.waitForLoadState('networkidle');
+
+  // Abre el modal de nuevo cliente
+  const addButton = page.getByRole('button', { name: /Agregar Cliente/i });
+  await expect(addButton).toBeVisible({ timeout: 10000 });
+  await addButton.click();
+
+  // Espera el modal
+  const modal = page.getByRole('dialog');
+  await expect(modal).toBeVisible({ timeout: 10000 });
+
+  // Guardar sin llenar ningún campo
+  await modal.getByRole('button', { name: /Guardar/i }).click();
+
+  // Espera a que desaparezca el modal (indicando que se guardó exitosamente)
+  await expect(modal).not.toBeVisible({ timeout: 10000 });
+
+  // Verifica que el cliente vacío aparezca en la lista
+  // Como no hay empresa, buscamos por celda vacía
+  const row = page.locator('tbody tr').first();
+  await expect(row).toBeVisible({ timeout: 10000 });
+
+  // Verifica que los campos estén vacíos
+  const cells = row.locator('td');
+  await expect(cells.nth(0)).toHaveText(''); // Empresa
+  await expect(cells.nth(1)).toHaveText(''); // Dirección
+  await expect(cells.nth(2)).toHaveText(''); // Teléfono
+
+  // Eliminar el cliente vacío
+  page.once('dialog', async (dialog) => {
+    expect(dialog.type()).toBe('confirm');
+    expect(dialog.message()).toMatch(/¿Eliminar cliente?/);
+    await dialog.accept();
+  });
+  await row.getByRole('button', { name: /Eliminar/i }).click();
+
+  // Espera a que desaparezca la fila
+  await expect(row).not.toBeVisible({ timeout: 10000 });
+});
+
 test('CRUD de clientes', async ({ page }) => {
   // Login antes de acceder a clientes
   await page.goto('http://localhost/login');

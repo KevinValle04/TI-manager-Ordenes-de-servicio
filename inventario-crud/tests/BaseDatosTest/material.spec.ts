@@ -16,6 +16,48 @@ if (!USER || !PASS) {
   throw new Error('TEST_USER and TEST_PASS environment variables must be set');
 }
 
+test("Validación de campos vacíos en Material de Canalización", async ({ page }) => {
+  // ---- LOGIN ----
+  await page.goto("http://localhost/login");
+  await page.getByPlaceholder("Usuario").fill(USER);
+  await page.getByPlaceholder("Contraseña").fill(PASS);
+  await page.getByRole("button", { name: /Entrar/i }).click();
+  await page.waitForURL("**/dashboard", { timeout: 10000 }).catch(() => {});
+
+  // ---- IR A MATERIAL CANALIZACION ----
+  await page.goto("http://localhost/mat-elec");
+  await page.waitForLoadState("networkidle");
+
+  // Contar materiales antes de intentar crear uno vacío
+  const initialRowCount = await page.locator('tbody tr').count();
+
+  // ---- INTENTAR AGREGAR MATERIAL VACÍO ----
+  const addButton = page.getByRole("button", { name: /Agregar Material de Canalización/i });
+  await expect(addButton).toBeVisible({ timeout: 10000 });
+  await addButton.click();
+
+  const modal = page.getByRole("dialog");
+  await expect(modal).toBeVisible({ timeout: 10000 });
+
+  // Intentar guardar sin llenar campos
+  await modal.getByRole("button", { name: /Guardar/i }).click();
+
+  // Verificar que aparece el mensaje de error
+  const errorAlert = page.getByText("No se pudo guardar el material de canalización");
+  await expect(errorAlert).toBeVisible({ timeout: 10000 });
+
+  // El modal debería seguir visible después del error
+  await expect(modal).toBeVisible();
+
+  // Cerrar el modal
+  await modal.getByRole("button", { name: /Cancelar/i }).click();
+  await expect(modal).not.toBeVisible();
+
+  // Verificar que no se agregó ningún material nuevo
+  const finalRowCount = await page.locator('tbody tr').count();
+  expect(finalRowCount).toBe(initialRowCount);
+});
+
 test("CRUD de Material de Canalización", async ({ page }) => {
   // ---- LOGIN ----
   await page.goto("http://localhost/login");

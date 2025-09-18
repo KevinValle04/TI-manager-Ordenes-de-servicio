@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL + "auth/";
 
@@ -18,13 +18,27 @@ export default function Login({ onLogin }: { onLogin: (token: string, username: 
       interface LoginResponse {
         token: string;
         username: string;
+        isAdmin?: boolean;
       }
       console.log('Intentando iniciar sesión con:', username);
       const res = await axios.post<LoginResponse>(`${API_URL}login`, { username, password });
+      
+      // Decodificar el token para obtener la información del usuario
+      const token = res.data.token;
+      const [headerB64, payloadB64] = token.split('.');
+      const payload = JSON.parse(atob(payloadB64));
+      
+      // Si el usuario es 'admin', establecer isAdmin en true
+      if (username.toLowerCase() === 'admin') {
+        localStorage.setItem('isAdmin', 'true');
+      }
+      
       console.log('Respuesta del servidor:', {
         token: res.data.token ? 'Token recibido' : 'No token',
-        username: res.data.username
+        username: res.data.username,
+        isAdmin: username.toLowerCase() === 'admin'
       });
+      
       onLogin(res.data.token, res.data.username);
       console.log('Token guardado en localStorage:', localStorage.getItem('token'));
       navigate('/dashboard');

@@ -17,6 +17,52 @@ if (!USER || !PASS) {
 }
 
 
+test('Crear proveedor con campos vacíos', async ({ page }) => {
+  // ---- LOGIN ----
+  await page.goto('http://localhost/login');
+  await page.getByPlaceholder('Usuario').fill(USER);
+  await page.getByPlaceholder('Contraseña').fill(PASS);
+  await page.getByRole('button', { name: /Entrar/i }).click();
+  await page.waitForURL('**/dashboard', { timeout: 10000 }).catch(() => {});
+
+  // ---- IR A PROVEEDORES ----
+  await page.goto('http://localhost/proveedores');
+  await page.waitForLoadState('networkidle');
+
+  // ---- AGREGAR PROVEEDOR VACÍO ----
+  const addButton = page.getByRole('button', { name: /Agregar Proveedor/i });
+  await expect(addButton).toBeVisible({ timeout: 10000 });
+  await addButton.click();
+
+  const modal = page.getByRole('dialog');
+  await expect(modal).toBeVisible({ timeout: 10000 });
+
+  // Guardar sin llenar ningún campo
+  await modal.getByRole('button', { name: /Guardar/i }).click();
+  await expect(modal).not.toBeVisible({ timeout: 10000 });
+
+  // Verificar que el proveedor vacío aparezca en la lista
+  const row = page.locator('tbody tr').first();
+  await expect(row).toBeVisible({ timeout: 10000 });
+
+  // Verificar que los campos estén vacíos
+  const cells = row.locator('td');
+  await expect(cells.nth(0)).toHaveText(''); // Empresa
+  await expect(cells.nth(1)).toHaveText(''); // Dirección
+  await expect(cells.nth(2)).toHaveText(''); // Teléfono
+
+  // Eliminar el proveedor vacío
+  page.once('dialog', async dialog => {
+    expect(dialog.type()).toBe('confirm');
+    expect(dialog.message()).toMatch(/¿Eliminar proveedor\?/);
+    await dialog.accept();
+  });
+  await row.getByRole('button', { name: /Eliminar/i }).click();
+
+  // Verificar que se eliminó
+  await expect(row).not.toBeVisible({ timeout: 10000 });
+});
+
 test('CRUD de proveedores', async ({ page }) => {
   // ---- LOGIN ----
   await page.goto('http://localhost/login');

@@ -9,7 +9,6 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: `${__dirname}/../../.env` });
 
 const USER = process.env.TEST_USER;
-
 const PASS = process.env.TEST_PASS;
 
 if (!USER || !PASS) {

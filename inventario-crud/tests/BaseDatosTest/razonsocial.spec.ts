@@ -16,6 +16,62 @@ if (!USER || !PASS) {
   throw new Error('TEST_USER and TEST_PASS environment variables must be set');
 }
 
+test("Crear razón social con campos vacíos", async ({ page }) => {
+  // ---- LOGIN ----
+  await page.goto("http://localhost/login");
+  await page.getByPlaceholder("Usuario").fill(USER);
+  await page.getByPlaceholder("Contraseña").fill(PASS);
+  await page.getByRole("button", { name: /Entrar/i }).click();
+  await page.waitForURL("**/dashboard", { timeout: 10000 }).catch(() => {});
+
+  // ---- IR A RAZONES SOCIALES ----
+  await page.goto("http://localhost/razones-sociales");
+  await page.waitForLoadState("networkidle");
+
+  // ---- AGREGAR RAZÓN SOCIAL VACÍA ----
+  const addButton = page.getByRole("button", { name: /Agregar Razón Social/i });
+  await expect(addButton).toBeVisible({ timeout: 10000 });
+  await addButton.click();
+
+  const modal = page.getByRole("dialog");
+  await expect(modal).toBeVisible({ timeout: 10000 });
+
+  // Guardar sin llenar ningún campo
+  await modal.getByRole("button", { name: /Guardar/i }).click();
+  
+  // El modal debe cerrarse (indica que se guardó correctamente)
+  await expect(modal).not.toBeVisible({ timeout: 10000 });
+
+  // Buscar la razón social vacía usando el buscador
+  const searchBar = page.getByPlaceholder("Buscar por nombre, RFC, email o dirección...");
+  // Limpiar el buscador para asegurarnos de que muestre todo
+  await searchBar.fill('');
+  await page.waitForTimeout(1000); // Esperar a que se actualice la lista
+
+  // Buscar la fila que tenga todos los campos vacíos
+  const row = page.locator("tbody tr").filter({
+    has: page.locator("td:nth-child(1):empty") // Busca una fila donde la primera celda esté vacía
+  }).first();
+  await expect(row).toBeVisible({ timeout: 10000 });
+
+  // Verificar que todos los campos estén vacíos
+  const cells = row.locator("td");
+  await expect(cells.nth(0)).toHaveText(''); // Nombre
+  await expect(cells.nth(1)).toHaveText(''); // RFC
+  await expect(cells.nth(2)).toHaveText(''); // Email empresa
+
+  // Eliminar la razón social vacía
+  page.once("dialog", async (dialog) => {
+    expect(dialog.type()).toBe("confirm");
+    expect(dialog.message()).toMatch(/¿Eliminar razón social\?/);
+    await dialog.accept();
+  });
+  await row.getByRole("button", { name: /Eliminar/i }).click();
+
+  // Verificar que se eliminó
+  await expect(row).not.toBeVisible({ timeout: 10000 });
+});
+
 test("CRUD de Razones Sociales", async ({ page }) => {
   // ---- LOGIN ----
   await page.goto("http://localhost/login");
