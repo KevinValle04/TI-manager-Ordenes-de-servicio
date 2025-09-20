@@ -86,15 +86,15 @@ const ColaboradorList: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const isAdminUser = localStorage.getItem('isAdmin') === 'true';
-    if (token) {
-      try {
-        const decodedToken = jwtDecode(token) as { isAdmin: boolean };
-        setIsAdmin(decodedToken.isAdmin || isAdminUser);
-      } catch (error) {
-        // Si hay un error al decodificar el token, usar el valor de localStorage
-        setIsAdmin(isAdminUser);
-      }
+    if (!token) {
+      setIsAdmin(false);
+      return;
+    }
+    try {
+      const payload = jwtDecode<{ isAdmin?: boolean }>(token);
+      setIsAdmin(!!payload?.isAdmin);
+    } catch {
+      setIsAdmin(false);
     }
   }, []);
   const [searchTerm, setSearchTerm] = useState('');
