@@ -5,6 +5,11 @@ import moment from 'moment';
 import React, { useState } from 'react';
 import './DocumentosList.css';
 
+// Asegura base URL con slash al final, igual que en ColaboradorList
+const urlServer = import.meta.env.VITE_API_URL.endsWith('/') 
+  ? import.meta.env.VITE_API_URL 
+  : import.meta.env.VITE_API_URL + '/';
+
 interface Documento {
   _id: string;
   nombre: string;
@@ -33,7 +38,7 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
     try {
       setLoading(true);
       const formData = new FormData();
-      
+
       if (values.documento && values.documento[0]) {
         const file = values.documento[0].originFileObj;
         formData.append('documento', file);
@@ -43,19 +48,15 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
 
       formData.append('nombre', values.nombre);
       formData.append('colaboradorId', colaboradorId);
-      
       if (values.fechaVencimiento) {
         formData.append('fechaVencimiento', values.fechaVencimiento.toISOString());
       }
 
+      // POST correcto (como en Papeleria.new)
       await axios.post(
-        `http://localhost:6051/api/documentos/colaborador/${colaboradorId}`,
+        `${urlServer}documentos`,
         formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }
+        { headers: { 'Content-Type': 'multipart/form-data' } }
       );
 
       message.success('Documento agregado correctamente');
@@ -99,7 +100,7 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
 
   const handleDeleteDocument = async (documentoId: string) => {
     try {
-      await axios.delete(`http://localhost:6051/api/documentos/${documentoId}`);
+      await axios.delete(`${urlServer}documentos/${documentoId}`);
       message.success('Documento eliminado correctamente');
       onDocumentosChange();
     } catch (error) {
@@ -242,7 +243,8 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
               block
               icon={<FileOutlined />}
               onClick={() => {
-                window.open(`http://localhost:6051/api/documentos/ver/${doc.url}`, '_blank');
+                // Usa la misma base para evitar /api/api
+                window.open(`${urlServer}documentos/ver/${doc.url}`, '_blank');
               }}
             >
               Ver documento
