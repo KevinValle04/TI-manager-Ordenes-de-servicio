@@ -78,7 +78,38 @@ export const obtenerSolicitudes = async (req: Request, res: Response) => {
 export const actualizarSolicitud = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const solicitud = await Solicitud.findByIdAndUpdate(id, req.body, { new: true });
+    const updateData = req.body;
+    const solicitud = await Solicitud.findByIdAndUpdate(id, updateData, { new: true });
+
+    // Si la solicitud fue aprobada, procesar la acción
+    if (updateData.estado === 'aprobada' && solicitud) {
+      const Herramienta = require('../models/Herramienta').default;
+      if (solicitud.tipo === 'herramienta') {
+        if (solicitud.accion === 'Agregar') {
+          // Crear la herramienta y asociarla al colaborador
+          const detalles = solicitud.detalles || {};
+          const nuevaHerramienta = new Herramienta({
+            nombre: detalles.nombre,
+            marca: detalles.marca,
+            modelo: detalles.modelo,
+            valor: detalles.valor,
+            serialNumber: detalles.serialNumber,
+            colaboradorId: solicitud.colaboradorId,
+            fechaAsignacion: new Date(),
+            activo: true
+          });
+          await nuevaHerramienta.save();
+          // Actualizar recursoId en la solicitud
+          solicitud.recursoId = nuevaHerramienta._id;
+          await solicitud.save();
+        } else if (solicitud.accion === 'Regresar') {
+          // Marcar la herramienta como inactiva
+          if (solicitud.recursoId) {
+            await Herramienta.findByIdAndUpdate(solicitud.recursoId, { activo: false });
+          }
+        }
+      }
+    }
     res.json(solicitud);
   } catch (err) {
     res.status(400).json({ error: 'Error al actualizar solicitud' });
