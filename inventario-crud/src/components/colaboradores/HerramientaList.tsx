@@ -2,6 +2,7 @@ import { DeleteOutlined, EditOutlined, FilePdfOutlined, PlusOutlined } from '@an
 import { Button, Card, Form, Input, InputNumber, message } from 'antd';
 import axios from 'axios';
 import React, { useState } from 'react';
+import { crearSolicitud } from '../../utils/solicitudesService';
 
 interface Herramienta {
   _id: string;
@@ -32,21 +33,26 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
   const handleAddOrEdit = async (values: any) => {
     try {
       if (editingHerramienta) {
-        // Actualizar herramienta existente
         await axios.put(`http://localhost:6051/api/herramientas/${editingHerramienta._id}`, {
           ...values,
           colaboradorId
         });
         message.success('Herramienta actualizada correctamente');
       } else {
-        // Crear nueva herramienta
-        await axios.post('http://localhost:6051/api/herramientas', {
-          ...values,
-          colaboradorId
+        // Crear solicitud para agregar herramienta
+        const resp = await crearSolicitud({
+          tipo: 'herramienta',
+          recursoId: '',
+          colaboradorId,
+          accion: 'Agregar',
+          detalles: { ...values }
         });
-        message.success('Herramienta agregada correctamente');
+        if (resp.status === 201) {
+          message.success('¡Solicitud enviada correctamente!');
+        } else {
+          message.info('Solicitud enviada, esperando confirmación.');
+        }
       }
-      
       setTimeout(() => {
         setModalVisible(false);
         form.resetFields();
@@ -60,8 +66,19 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
 
   const handleDelete = async (herramientaId: string) => {
     try {
-      await axios.delete(`http://localhost:6051/api/herramientas/${herramientaId}`);
-      message.success('Herramienta eliminada correctamente');
+      // Crear solicitud para eliminar herramienta
+      const resp = await crearSolicitud({
+        tipo: 'herramienta',
+        recursoId: herramientaId,
+        colaboradorId,
+        accion: 'Regresar',
+        detalles: {}
+      });
+      if (resp.status === 201) {
+        message.success('¡Solicitud enviada correctamente!');
+      } else {
+        message.info('Solicitud enviada, esperando confirmación.');
+      }
       onHerramientasChange();
     } catch (error) {
       message.error('Error al eliminar la herramienta');
