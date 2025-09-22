@@ -18,8 +18,16 @@ test('Crear proveedor con campos vacíos', async ({ page }) => {
   await modal.getByRole('button', { name: /Guardar/i }).click();
   await expect(modal).not.toBeVisible({ timeout: 10000 });
 
-  // Verificar que el proveedor vacío aparezca en la lista
-  const row = page.locator('tbody tr').first();
+  // Buscar el proveedor vacío usando el buscador
+  const searchBar = page.getByPlaceholder('Buscar por empresa, dirección o contacto...');
+  // Limpiar el buscador para asegurarnos de que muestre todo
+  await searchBar.fill('');
+  await page.waitForTimeout(1000); // Esperar a que se actualice la lista
+
+  // Buscar la fila que tenga todos los campos vacíos
+  const row = page.locator("tbody tr").filter({
+    has: page.locator("td:nth-child(1):empty") // Busca una fila donde la primera celda esté vacía
+  }).first();
   await expect(row).toBeVisible({ timeout: 10000 });
 
   // Verificar que los campos estén vacíos

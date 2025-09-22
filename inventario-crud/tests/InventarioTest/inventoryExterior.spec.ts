@@ -1,6 +1,76 @@
 import { expect, test } from '@playwright/test';
 import { login, navigateTo } from '../utils/test-utils';
 
+test('Crear y eliminar artículo vacío en inventario', async ({ page }) => {
+  // Login y navegación
+  await login(page);
+  await navigateTo(page, 'inventario');
+
+  // Esperar y hacer clic en botón agregar
+  const addButton = page.getByRole('button', { name: /Agregar Artículo/i });
+  await expect(addButton).toBeVisible({ timeout: 10000 });
+  await addButton.click();
+
+  // Verificar que el modal está visible
+  const modal = page.getByRole('dialog');
+  await expect(modal).toBeVisible();
+
+  // Hacer clic en guardar sin llenar campos
+  await page.getByRole('button', { name: /Guardar/i }).click();
+
+  // Esperar que el modal se cierre
+  await expect(modal).not.toBeVisible({ timeout: 10000 });
+
+  // Buscar el artículo vacío iterando por las filas
+  const rows = page.locator('tbody tr');
+  const rowCount = await rows.count();
+  let emptyRow = null;
+
+  for (let i = 0; i < rowCount; i++) {
+    const currentRow = rows.nth(i);
+    const cells = currentRow.locator('td');
+    const descripcion = await cells.nth(0).textContent();
+    const marca = await cells.nth(1).textContent();
+    const modelo = await cells.nth(2).textContent();
+    
+    // Verificar si los campos principales están vacíos
+    if (!descripcion?.trim() && !marca?.trim() && !modelo?.trim()) {
+      emptyRow = currentRow;
+      break;
+    }
+  }
+
+  // Verificar que encontramos una fila vacía
+  expect(emptyRow).not.toBeNull();
+  await expect(emptyRow!).toBeVisible();
+
+  // Verificar solo los campos que deberían estar vacíos
+  const cells = emptyRow!.locator('td');
+  await expect(cells.nth(0)).toHaveText(''); // descripción
+  await expect(cells.nth(1)).toHaveText(''); // marca
+  await expect(cells.nth(2)).toHaveText(''); // modelo
+  await expect(cells.nth(4)).toHaveText('0'); // cantidad
+  
+  // Verificar que el precio sea 0 en cualquier formato
+  const precioText = await cells.nth(5).textContent();
+  expect(['0', '$0.00', '0.00'].includes(precioText?.trim() || '')).toBeTruthy();
+
+  // Eliminar el artículo
+  const deleteButton = emptyRow!.getByRole('button', { name: /Eliminar/i });
+  
+  // Configurar el manejador del diálogo
+  page.once('dialog', async dialog => {
+    await dialog.accept();
+  });
+
+  await deleteButton.click();
+  await page.waitForTimeout(1000);
+
+  // Verificar que la fila ya no existe
+  const rowStillExists = await emptyRow!.isVisible().catch(() => false);
+  expect(rowStillExists).toBe(false);
+});
+
 test('CRUD de inventario exterior', async ({ page }) => {
   // Login y navegación usando las utilidades
   await login(page);
