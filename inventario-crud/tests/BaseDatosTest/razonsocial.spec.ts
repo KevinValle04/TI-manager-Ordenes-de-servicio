@@ -1,32 +1,10 @@
 import { expect, test } from "@playwright/test";
-import * as dotenv from 'dotenv';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-// Load .env file from project root
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-dotenv.config({ path: `${__dirname}/../../.env` });
-
-const USER = process.env.TEST_USER;
-
-const PASS = process.env.TEST_PASS;
-
-if (!USER || !PASS) {
-  throw new Error('TEST_USER and TEST_PASS environment variables must be set');
-}
+import { login, navigateTo } from '../utils/test-utils';
 
 test("Crear razón social con campos vacíos", async ({ page }) => {
-  // ---- LOGIN ----
-  await page.goto("http://localhost/login");
-  await page.getByPlaceholder("Usuario").fill(USER);
-  await page.getByPlaceholder("Contraseña").fill(PASS);
-  await page.getByRole("button", { name: /Entrar/i }).click();
-  await page.waitForURL("**/dashboard", { timeout: 10000 }).catch(() => {});
-
-  // ---- IR A RAZONES SOCIALES ----
-  await page.goto("http://localhost/razones-sociales");
-  await page.waitForLoadState("networkidle");
+  // Login y navegación usando las utilidades
+  await login(page);
+  await navigateTo(page, 'razones-sociales');
 
   // ---- AGREGAR RAZÓN SOCIAL VACÍA ----
   const addButton = page.getByRole("button", { name: /Agregar Razón Social/i });
@@ -73,16 +51,9 @@ test("Crear razón social con campos vacíos", async ({ page }) => {
 });
 
 test("CRUD de Razones Sociales", async ({ page }) => {
-  // ---- LOGIN ----
-  await page.goto("http://localhost/login");
-  await page.getByPlaceholder("Usuario").fill(USER);
-  await page.getByPlaceholder("Contraseña").fill(PASS);
-  await page.getByRole("button", { name: /Entrar/i }).click();
-  await page.waitForURL("**/dashboard", { timeout: 10000 }).catch(() => {});
-
-  // ---- IR A RAZONES SOCIALES ----
-  await page.goto("http://localhost/razones-sociales");
-  await page.waitForLoadState("networkidle");
+  // Login y navegación usando las utilidades
+  await login(page);
+  await navigateTo(page, 'razones-sociales');
 
   // ---- AGREGAR ----
   const addButton = page.getByRole("button", { name: /Agregar Razón Social/i });
@@ -92,14 +63,14 @@ test("CRUD de Razones Sociales", async ({ page }) => {
   const modal = page.getByRole("dialog");
   await expect(modal).toBeVisible({ timeout: 10000 });
 
-    // Campos principales (usar id para evitar ambigüedad)
-    await modal.locator('#razon-nombre').fill('Razón Social Test');
-    await modal.locator('#razon-rfc').fill('TEST123456ABC');
-    await modal.locator('#razon-emailEmpresa').fill('empresa@test.com');
-    await modal.locator('#razon-telEmpresa').fill('5551234567');
-    await modal.locator('#razon-celEmpresa').fill('5557654321');
-    await modal.locator('#razon-direccionEmpresa').fill('Calle Falsa 123');
-    await modal.locator('#razon-emailFacturacion').fill('facturacion@test.com');
+  // Campos principales (usar id para evitar ambigüedad)
+  await modal.locator('#razon-nombre').fill('Razón Social Test');
+  await modal.locator('#razon-rfc').fill('TEST123456ABC');
+  await modal.locator('#razon-emailEmpresa').fill('empresa@test.com');
+  await modal.locator('#razon-telEmpresa').fill('5551234567');
+  await modal.locator('#razon-celEmpresa').fill('5557654321');
+  await modal.locator('#razon-direccionEmpresa').fill('Calle Falsa 123');
+  await modal.locator('#razon-emailFacturacion').fill('facturacion@test.com');
 
   // Dirección de envío (usar placeholders)
   await modal.getByPlaceholder("Nombre de la dirección").fill("Sucursal Centro");
@@ -128,10 +99,10 @@ test("CRUD de Razones Sociales", async ({ page }) => {
   const editModal = page.getByRole("dialog");
   await expect(editModal).toBeVisible({ timeout: 10000 });
 
-    await editModal.locator('#razon-nombre').fill('Razón Social Editada');
-    await editModal.locator('#razon-rfc').fill('EDIT987654ZYX');
-    await editModal.locator('#razon-telEmpresa').fill('5554443322');
-    await editModal.locator('#razon-direccionEmpresa').fill('Calle Nueva 456');
+  await editModal.locator('#razon-nombre').fill('Razón Social Editada');
+  await editModal.locator('#razon-rfc').fill('EDIT987654ZYX');
+  await editModal.locator('#razon-telEmpresa').fill('5554443322');
+  await editModal.locator('#razon-direccionEmpresa').fill('Calle Nueva 456');
 
   // Editar dirección de envío
   await editModal.getByPlaceholder("Nombre de la dirección").fill("Sucursal Norte");

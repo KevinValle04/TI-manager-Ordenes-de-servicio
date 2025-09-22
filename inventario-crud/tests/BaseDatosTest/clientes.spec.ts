@@ -1,32 +1,10 @@
 import { expect, test } from '@playwright/test';
-import * as dotenv from 'dotenv';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-// Load .env file from project root
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-dotenv.config({ path: `${__dirname}/../../.env` });
-
-const USER = process.env.TEST_USER;
-
-const PASS = process.env.TEST_PASS;
-
-if (!USER || !PASS) {
-  throw new Error('TEST_USER and TEST_PASS environment variables must be set');
-}
+import { login, navigateTo } from '../utils/test-utils';
 
 test('Crear cliente con campos vacíos', async ({ page }) => {
-  // Login antes de acceder a clientes
-  await page.goto('http://localhost/login');
-  await page.getByPlaceholder('Usuario').fill(USER);
-  await page.getByPlaceholder('Contraseña').fill(PASS);
-  await page.getByRole('button', { name: /Entrar/i }).click();
-  await page.waitForURL('**/dashboard', { timeout: 10000 }).catch(() => {});
-
-  // Navega a clientes
-  await page.goto('http://localhost/clientes');
-  await page.waitForLoadState('networkidle');
+  // Login y navegación usando las utilidades
+  await login(page);
+  await navigateTo(page, 'clientes');
 
   // Abre el modal de nuevo cliente
   const addButton = page.getByRole('button', { name: /Agregar Cliente/i });
@@ -44,7 +22,6 @@ test('Crear cliente con campos vacíos', async ({ page }) => {
   await expect(modal).not.toBeVisible({ timeout: 10000 });
 
   // Verifica que el cliente vacío aparezca en la lista
-  // Como no hay empresa, buscamos por celda vacía
   const row = page.locator('tbody tr').first();
   await expect(row).toBeVisible({ timeout: 10000 });
 
@@ -67,16 +44,9 @@ test('Crear cliente con campos vacíos', async ({ page }) => {
 });
 
 test('CRUD de clientes', async ({ page }) => {
-  // Login antes de acceder a clientes
-  await page.goto('http://localhost/login');
-  await page.getByPlaceholder('Usuario').fill(USER);
-  await page.getByPlaceholder('Contraseña').fill(PASS);
-  await page.getByRole('button', { name: /Entrar/i }).click();
-  await page.waitForURL('**/dashboard', { timeout: 10000 }).catch(() => {});
-
-  // Navega a clientes
-  await page.goto('http://localhost/clientes');
-  await page.waitForLoadState('networkidle');
+  // Login y navegación usando las utilidades
+  await login(page);
+  await navigateTo(page, 'clientes');
 
   // Espera explícita por el botón para mayor robustez
   const addButton = page.getByRole('button', { name: /Agregar Cliente/i });
@@ -90,13 +60,13 @@ test('CRUD de clientes', async ({ page }) => {
   // Llenar campos del cliente
   await modal.getByLabel('Empresa').fill('Empresa Test');
   await modal.getByLabel('Dirección').fill('Dirección Test');
-  await modal.getByLabel('Teléfono', { exact: true }).first().fill('5551234567'); // Teléfono empresa
+  await modal.getByLabel('Teléfono', { exact: true }).first().fill('5551234567');
 
   // Contacto principal
   await modal.getByLabel('Nombre').fill('Contacto Test');
   await modal.getByLabel('Puesto').fill('Gerente');
   await modal.getByLabel('Correo').fill('contacto@test.com');
-  await modal.getByLabel('Teléfono').nth(1).fill('5559876543'); // Teléfono contacto
+  await modal.getByLabel('Teléfono').nth(1).fill('5559876543');
   await modal.getByLabel('Ext').fill('101');
 
   await modal.getByRole('button', { name: /Guardar/i }).click();
@@ -119,12 +89,12 @@ test('CRUD de clientes', async ({ page }) => {
 
   await modal.getByLabel('Empresa').fill('Empresa Editada');
   await modal.getByLabel('Dirección').fill('Dirección Editada');
-  await modal.getByLabel('Teléfono', { exact: true }).first().fill('5557654321'); // Teléfono empresa editado
+  await modal.getByLabel('Teléfono', { exact: true }).first().fill('5557654321');
 
   await modal.getByLabel('Nombre').fill('Contacto Editado');
   await modal.getByLabel('Puesto').fill('Director');
   await modal.getByLabel('Correo').fill('editado@test.com');
-  await modal.getByLabel('Teléfono').nth(1).fill('5551112222'); // Teléfono contacto editado
+  await modal.getByLabel('Teléfono').nth(1).fill('5551112222');
   await modal.getByLabel('Ext').fill('202');
 
   await modal.getByRole('button', { name: /Guardar/i }).click();

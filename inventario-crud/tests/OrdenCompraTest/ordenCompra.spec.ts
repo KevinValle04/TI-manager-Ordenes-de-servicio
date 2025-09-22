@@ -1,32 +1,12 @@
 import { expect, test } from "@playwright/test";
-import * as dotenv from 'dotenv';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-// Load .env file from project root
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-dotenv.config({ path: `${__dirname}/../../.env` });
-
-const USER = process.env.TEST_USER;
-
-const PASS = process.env.TEST_PASS;
-
-if (!USER || !PASS) {
-  throw new Error('TEST_USER and TEST_PASS environment variables must be set');
-}
+import { login, navigateTo } from '../utils/test-utils';
 
 test("CRUD de Orden de Compra", async ({ page }) => {
-  // --- Login ---
-  await page.goto("http://localhost/login");
-  await page.getByPlaceholder("Usuario").fill(USER);
-  await page.getByPlaceholder("Contraseña").fill(PASS);
-  await page.getByRole("button", { name: "Entrar" }).click();
-  await page.waitForURL("**/dashboard", { timeout: 10000 });
+  // Login y navegación usando las utilidades
+  await login(page);
 
   // --- Crear Proveedor solo si no existe ---
-  await page.goto("http://localhost/proveedores");
-  await page.waitForLoadState("networkidle");
+  await navigateTo(page, 'proveedores');
   const searchBarProv = page.getByPlaceholder('Buscar por empresa, dirección o contacto...');
   await searchBarProv.fill('SYSCOM');
   const rowProv = page.locator('tbody tr').filter({ has: page.getByText('SYSCOM') });
@@ -47,8 +27,7 @@ test("CRUD de Orden de Compra", async ({ page }) => {
   }
 
   // --- Crear Razón Social solo si no existe ---
-  await page.goto("http://localhost/razones-sociales");
-  await page.waitForLoadState("networkidle");
+  await navigateTo(page, 'razones-sociales');
   const searchBarRazon = page.getByPlaceholder("Buscar por nombre, RFC, email o dirección...");
   await searchBarRazon.fill("usuariorazonsocial");
   const rowRazon = page.locator("tbody tr").filter({ has: page.getByText("usuariorazonsocial") });
@@ -72,8 +51,7 @@ test("CRUD de Orden de Compra", async ({ page }) => {
   }
 
   // --- Navegar a Órdenes de Compra ---
-  await page.goto("http://localhost/ordenes-compra");
-  await page.waitForLoadState("networkidle");
+  await navigateTo(page, 'ordenes-compra');
 
   // --- Crear Nueva Orden ---
   await page.getByRole("button", { name: "Nueva Orden de Compra" }).click();
@@ -104,8 +82,7 @@ test("CRUD de Orden de Compra", async ({ page }) => {
   expect(response.ok()).toBeTruthy();
 
   // --- Verificar en la lista ---
-  await page.goto("http://localhost/ordenes-compra");
-  await page.waitForLoadState("networkidle");
+  await navigateTo(page, 'ordenes-compra');
   await expect(page.getByRole("cell", { name: /SYSCOM/i })).toBeVisible({ timeout: 15000 });
 
   // --- Editar ---
@@ -123,11 +100,10 @@ test("CRUD de Orden de Compra", async ({ page }) => {
   await pdfPage.screenshot({ path: 'orden-compra-visualizacion.png', fullPage: true });
 
   // --- Eliminar ---
-  await page.goto("http://localhost/ordenes-compra");
+  await navigateTo(page, 'ordenes-compra');
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: /^Eliminar/ }).first().click();
 
   // --- Verificar que ya no existe ---
   await expect(page.getByRole("cell", { name: /SYSCOM/i })).not.toBeVisible();
-
 });

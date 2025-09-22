@@ -1,33 +1,10 @@
 import { expect, test } from '@playwright/test';
-import * as dotenv from 'dotenv';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-// Load .env file from project root
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-dotenv.config({ path: `${__dirname}/../../.env` });
-
-const USER = process.env.TEST_USER;
-
-const PASS = process.env.TEST_PASS;
-
-if (!USER || !PASS) {
-  throw new Error('TEST_USER and TEST_PASS environment variables must be set');
-}
-
+import { login, navigateTo } from '../utils/test-utils';
 
 test('Crear proveedor con campos vacíos', async ({ page }) => {
-  // ---- LOGIN ----
-  await page.goto('http://localhost/login');
-  await page.getByPlaceholder('Usuario').fill(USER);
-  await page.getByPlaceholder('Contraseña').fill(PASS);
-  await page.getByRole('button', { name: /Entrar/i }).click();
-  await page.waitForURL('**/dashboard', { timeout: 10000 }).catch(() => {});
-
-  // ---- IR A PROVEEDORES ----
-  await page.goto('http://localhost/proveedores');
-  await page.waitForLoadState('networkidle');
+  // Login y navegación usando las utilidades
+  await login(page);
+  await navigateTo(page, 'proveedores');
 
   // ---- AGREGAR PROVEEDOR VACÍO ----
   const addButton = page.getByRole('button', { name: /Agregar Proveedor/i });
@@ -64,16 +41,9 @@ test('Crear proveedor con campos vacíos', async ({ page }) => {
 });
 
 test('CRUD de proveedores', async ({ page }) => {
-  // ---- LOGIN ----
-  await page.goto('http://localhost/login');
-  await page.getByPlaceholder('Usuario').fill(USER);
-  await page.getByPlaceholder('Contraseña').fill(PASS);
-  await page.getByRole('button', { name: /Entrar/i }).click();
-  await page.waitForURL('**/dashboard', { timeout: 10000 }).catch(() => {});
-
-  // ---- IR A PROVEEDORES ----
-  await page.goto('http://localhost/proveedores');
-  await page.waitForLoadState('networkidle');
+  // Login y navegación usando las utilidades
+  await login(page);
+  await navigateTo(page, 'proveedores');
 
   // ---- AGREGAR ----
   const addButton = page.getByRole('button', { name: /Agregar Proveedor/i });

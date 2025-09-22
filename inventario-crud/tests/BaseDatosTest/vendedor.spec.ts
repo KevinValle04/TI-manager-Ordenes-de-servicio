@@ -1,50 +1,27 @@
 import { expect, test } from "@playwright/test";
-import * as dotenv from 'dotenv';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-// Load .env file from project root
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-dotenv.config({ path: `${__dirname}/../../.env` });
-
-
-const USER = process.env.TEST_USER;
-
-const PASS = process.env.TEST_PASS;
-
-if (!USER || !PASS) {
-  throw new Error('TEST_USER and TEST_PASS environment variables must be set');
-}
+import { login, navigateTo } from '../utils/test-utils';
 
 test("CRUD de Vendedores", async ({ page }) => {
-  // ---- LOGIN ----
-  await page.goto("http://localhost/login");
-  await page.getByPlaceholder("Usuario").fill(USER);
-  await page.getByPlaceholder("Contraseña").fill(PASS);
-  await page.getByRole("button", { name: /Entrar/i }).click();
-  await page.waitForURL("**/dashboard", { timeout: 10000 }).catch(() => {});
-
-  // ---- IR A VENDEDORES ----
-  await page.goto("http://localhost/vendedores");
-  await page.waitForLoadState("networkidle");
+  // Login y navegación usando las utilidades
+  await login(page);
+  await navigateTo(page, 'vendedores');
 
   // ---- AGREGAR ----
-  const addButton = page.getByRole("button", { name: /Agregar Vendedor/i });
-  await expect(addButton).toBeVisible({ timeout: 10000 });
-  await addButton.click();
+  const btnAgregar = page.getByRole("button", { name: /Agregar Vendedor/i });
+  await expect(btnAgregar).toBeVisible({ timeout: 10000 });
+  await btnAgregar.click();
 
-  const modal = page.getByRole("dialog");
-  await expect(modal).toBeVisible({ timeout: 10000 });
+  const modalAgregar = page.getByRole("dialog");
+  await expect(modalAgregar).toBeVisible({ timeout: 10000 });
 
   // Campos principales (usar id para evitar ambigüedad)
-  await modal.locator('#vendedor-nombre').fill('Vendedor Test');
-  await modal.locator('#vendedor-correo').fill('vendedor@test.com');
-  await modal.locator('#vendedor-telefono').fill('5551234567');
+  await modalAgregar.locator('#vendedor-nombre').fill('Vendedor Test');
+  await modalAgregar.locator('#vendedor-correo').fill('vendedor@test.com');
+  await modalAgregar.locator('#vendedor-telefono').fill('5551234567');
 
   // Guardar
-  await modal.getByRole("button", { name: /Guardar/i }).click();
-  await expect(modal).not.toBeVisible({ timeout: 10000 });
+  await modalAgregar.getByRole("button", { name: /Guardar/i }).click();
+  await expect(modalAgregar).not.toBeVisible({ timeout: 10000 });
 
   // ---- VERIFICAR ----
   const searchBar = page.getByPlaceholder("Buscar por nombre, correo o teléfono...");

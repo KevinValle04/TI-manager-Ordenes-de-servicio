@@ -1,32 +1,10 @@
 import { expect, test } from "@playwright/test";
-import * as dotenv from 'dotenv';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-// Load .env file from project root
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-dotenv.config({ path: `${__dirname}/../../.env` });
-
-const USER = process.env.TEST_USER;
-
-const PASS = process.env.TEST_PASS;
-
-if (!USER || !PASS) {
-  throw new Error('TEST_USER and TEST_PASS environment variables must be set');
-}
+import { login, navigateTo } from '../utils/test-utils';
 
 test("Validación de campos vacíos en Material de Canalización", async ({ page }) => {
-  // ---- LOGIN ----
-  await page.goto("http://localhost/login");
-  await page.getByPlaceholder("Usuario").fill(USER);
-  await page.getByPlaceholder("Contraseña").fill(PASS);
-  await page.getByRole("button", { name: /Entrar/i }).click();
-  await page.waitForURL("**/dashboard", { timeout: 10000 }).catch(() => {});
-
-  // ---- IR A MATERIAL CANALIZACION ----
-  await page.goto("http://localhost/mat-elec");
-  await page.waitForLoadState("networkidle");
+  // Login y navegación usando las utilidades
+  await login(page);
+  await navigateTo(page, 'mat-elec');
 
   // Contar materiales antes de intentar crear uno vacío
   const initialRowCount = await page.locator('tbody tr').count();
@@ -59,16 +37,9 @@ test("Validación de campos vacíos en Material de Canalización", async ({ page
 });
 
 test("CRUD de Material de Canalización", async ({ page }) => {
-  // ---- LOGIN ----
-  await page.goto("http://localhost/login");
-  await page.getByPlaceholder("Usuario").fill(USER);
-  await page.getByPlaceholder("Contraseña").fill(PASS);
-  await page.getByRole("button", { name: /Entrar/i }).click();
-  await page.waitForURL("**/dashboard", { timeout: 10000 }).catch(() => {});
-
-  // ---- IR A MATERIAL CANALIZACION ----
-  await page.goto("http://localhost/mat-elec");
-  await page.waitForLoadState("networkidle");
+  // Login y navegación usando las utilidades
+  await login(page);
+  await navigateTo(page, 'mat-elec');
 
   // ---- AGREGAR ----
   const unique = Date.now();
@@ -86,7 +57,7 @@ test("CRUD de Material de Canalización", async ({ page }) => {
   const modal = page.getByRole("dialog");
   await expect(modal).toBeVisible({ timeout: 10000 });
 
-  // Campos principales (usar id para evitar ambigüedad)
+  // Campos principales
   await modal.locator('#material-tipo').fill(tipo);
   await modal.locator('#material-nombre').fill(nombre);
   await modal.locator('#material-medida').fill(medida);
@@ -101,10 +72,8 @@ test("CRUD de Material de Canalización", async ({ page }) => {
   // ---- VERIFICAR ----
   const searchBar = page.getByPlaceholder("Buscar por tipo, material, medida o proveedor...");
   await searchBar.fill(tipo);
-  await page.waitForTimeout(1200); // Espera para que la tabla se actualice
-  // (debug logging removed)
+  await page.waitForTimeout(1200);
 
-  // Buscar la fila por tipo y nombre (más robusto que usar el accessible name de la fila)
   const matches = page.locator('tbody tr').filter({ hasText: tipo }).filter({ hasText: nombre });
   await expect(matches).toHaveCount(1, { timeout: 15000 });
   const row = matches.first();
@@ -142,11 +111,8 @@ test("CRUD de Material de Canalización", async ({ page }) => {
 
   // ---- CONFIRMAR EDICIÓN ----
   await searchBar.fill(tipoEdit);
-  await page.waitForTimeout(1200); // Espera para que la tabla se actualice
+  await page.waitForTimeout(1200);
 
-  // (debug logging removed)
-
-  // Buscar la fila editada por tipo y nombre (método robusto, igual que en la fase de creación)
   const matchesEdit = page.locator('tbody tr').filter({ hasText: tipoEdit }).filter({ hasText: nombreEdit });
   await expect(matchesEdit).toHaveCount(1, { timeout: 15000 });
   const rowEdit = matchesEdit.first();
