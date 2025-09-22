@@ -1,5 +1,6 @@
 import { DeleteOutlined, EditOutlined, FilePdfOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Card, Form, Input, InputNumber, message } from 'antd';
+import { Button, Card, Form, Input, InputNumber } from 'antd';
+import { toast } from 'react-toastify';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { crearSolicitud } from '../../utils/solicitudesService';
@@ -47,11 +48,7 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
           accion: 'Agregar',
           detalles: { ...values }
         });
-        if (resp.status === 201) {
-          message.success('¡Solicitud enviada correctamente!');
-        } else {
-          message.info('Solicitud enviada, esperando confirmación.');
-        }
+  toast.success('¡Solicitud enviada!');
       }
       setTimeout(() => {
         setModalVisible(false);
@@ -74,11 +71,7 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
         accion: 'Regresar',
         detalles: {}
       });
-      if (resp.status === 201) {
-        message.success('¡Solicitud enviada correctamente!');
-      } else {
-        message.info('Solicitud enviada, esperando confirmación.');
-      }
+  toast.success('¡Solicitud enviada!');
       onHerramientasChange();
     } catch (error) {
       message.error('Error al eliminar la herramienta');
