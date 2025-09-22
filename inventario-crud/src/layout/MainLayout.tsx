@@ -58,7 +58,8 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
       label: "Solicitudes",
       icon: <FaFileAlt size={16} />,
       items: [
-        { path: "/solicitudes-inventario", label: "Solicitudes", icon: <FaFileAlt size={14} /> },
+        { path: "/solicitudes-inventario", label: "Solicitudes de Inventario", icon: <FaFileAlt size={14} /> },
+        { path: "/solicitudes-herramientas", label: "Solicitudes de Herramientas", icon: <FaTools size={14} /> },
       ],
     }] : []),
     // Colaboradores
