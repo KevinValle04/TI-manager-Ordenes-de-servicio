@@ -9,8 +9,8 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: `${__dirname}/../../.env` });
 
 // Aseguramos que las variables de entorno no sean undefined
-const USER = process.env.TEST_USER ?? '';
-const PASS = process.env.TEST_PASS ?? '';
+let USER = process.env.TEST_USER ?? '';
+let PASS = process.env.TEST_PASS ?? '';
 
 // Validación temprana de variables de entorno requeridas
 if (!USER || !PASS) {
@@ -18,6 +18,18 @@ if (!USER || !PASS) {
 }
 
 export async function login(page: Page) {
+  await page.goto("http://localhost/login");
+  await page.getByPlaceholder("Usuario").fill(USER);
+  await page.getByPlaceholder("Contraseña").fill(PASS);
+  await page.getByRole("button", { name: /Entrar/i }).click();
+  await page.waitForURL("**/dashboard", { timeout: 10000 }).catch(() => {});
+}
+
+export async function loginAdmin(page: Page) {
+
+  USER = process.env.TEST_USERADMIN ?? '';
+  PASS = process.env.TEST_PASSADMIN ?? '';
+
   await page.goto("http://localhost/login");
   await page.getByPlaceholder("Usuario").fill(USER);
   await page.getByPlaceholder("Contraseña").fill(PASS);
