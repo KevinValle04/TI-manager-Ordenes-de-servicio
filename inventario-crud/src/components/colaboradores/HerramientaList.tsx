@@ -34,21 +34,25 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
   const handleAddOrEdit = async (values: any) => {
     try {
       if (editingHerramienta) {
-        await axios.put(`http://localhost:6051/api/herramientas/${editingHerramienta._id}`, {
-          ...values,
-          colaboradorId
+        // Crear solicitud de modificación
+        await crearSolicitud({
+          tipo: 'herramienta',
+          recursoId: editingHerramienta._id,
+          colaboradorId,
+          accion: 'Modificar',
+          detalles: { ...values }
         });
-  toast.success('Herramienta actualizada correctamente');
+        toast.success('¡Solicitud de modificación enviada!');
       } else {
         // Crear solicitud para agregar herramienta
-        const resp = await crearSolicitud({
+        await crearSolicitud({
           tipo: 'herramienta',
           recursoId: '',
           colaboradorId,
           accion: 'Agregar',
           detalles: { ...values }
         });
-  toast.success('¡Solicitud enviada!');
+        toast.success('¡Solicitud enviada!');
       }
       setTimeout(() => {
         setModalVisible(false);
@@ -57,7 +61,7 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
       setEditingHerramienta(null);
       onHerramientasChange();
     } catch (error: any) {
-  toast.error(error.response?.data?.message || 'Error al procesar la herramienta');
+      toast.error(error.response?.data?.message || 'Error al procesar la herramienta');
     }
   };
 
