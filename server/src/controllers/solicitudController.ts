@@ -3,7 +3,18 @@ import { Request, Response } from 'express';
 
 export const crearSolicitud = async (req: Request, res: Response) => {
   try {
-    const solicitud = new Solicitud(req.body);
+    let body = { ...req.body };
+    // Si es una solicitud de modificación de herramienta, adjuntar los datos originales
+    if (body.tipo === 'herramienta' && body.accion === 'Modificar' && body.recursoId) {
+      const Herramienta = require('../models/Herramienta').default;
+      const herramientaOriginal = await Herramienta.findById(body.recursoId).lean();
+      if (herramientaOriginal) {
+        // Solo guardar los campos relevantes
+        const { nombre, marca, modelo, valor, serialNumber } = herramientaOriginal;
+        body.detallesOriginal = { nombre, marca, modelo, valor, serialNumber };
+      }
+    }
+    const solicitud = new Solicitud(body);
     await solicitud.save();
     res.status(201).json(solicitud);
   } catch (err) {
@@ -58,6 +69,9 @@ export const obtenerSolicitudes = async (req: Request, res: Response) => {
         valor = sol.detalles.valor || '';
       }
 
+      // Incluir detallesOriginal si existe (para solicitudes de modificación)
+      const detallesOriginal = sol.detallesOriginal || null;
+
       return {
         ...sol,
         colaboradorNombre,
@@ -66,7 +80,8 @@ export const obtenerSolicitudes = async (req: Request, res: Response) => {
         marca,
         modelo,
         serialNumber,
-        valor
+        valor,
+        detallesOriginal
       };
     });
     res.json(solicitudesConDatos);

@@ -29,7 +29,7 @@ function DataTable<T extends { _id?: string }>({
           {columns.map((col) => (
             <th key={col.key as string}>{col.label}</th>
           ))}
-          {actions && <th>Acciones</th>}
+          {actions && <th>Más</th>}
         </tr>
       </thead>
       <tbody>
