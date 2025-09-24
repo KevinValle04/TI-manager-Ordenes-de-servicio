@@ -559,7 +559,7 @@ const ColaboradorList: React.FC = () => {
                 </>
               )}
               <Button 
-                variant="info" 
+                variant="warning" 
                 size="sm" 
                 style={{ 
                   width: '40px', 
