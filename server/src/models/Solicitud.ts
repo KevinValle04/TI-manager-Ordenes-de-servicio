@@ -7,7 +7,8 @@ const solicitudSchema = new Schema({
   accion: { type: String, required: true }, // 'alta', 'baja', 'asignar', 'remover'
   estado: { type: String, default: 'pendiente' }, // 'pendiente', 'aprobada', 'rechazada'
   fecha: { type: Date, default: Date.now },
-  detalles: { type: Schema.Types.Mixed }
+  detalles: { type: Schema.Types.Mixed },
+  detallesOriginal: { type: Schema.Types.Mixed } // Para solicitudes de modificación
 });
 
 export default model('Solicitud', solicitudSchema);

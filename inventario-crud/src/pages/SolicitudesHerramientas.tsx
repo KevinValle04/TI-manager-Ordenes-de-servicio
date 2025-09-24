@@ -1,5 +1,6 @@
 // src/pages/SolicitudesHerramientas.tsx
 import React, { useEffect, useState } from "react";
+import { Modal, Descriptions } from "antd";
 import { Tabs } from "antd";
 import HistorialSolicitudesHerramientas from "./HistorialSolicitudesHerramientas";
 
@@ -18,6 +19,8 @@ import { obtenerSolicitudes, actualizarSolicitud } from "../utils/solicitudesSer
 const SolicitudesHerramientas: React.FC = () => {
   const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
   const [loading, setLoading] = useState(false);
+  const [detalleVisible, setDetalleVisible] = useState(false);
+  const [detalleSolicitud, setDetalleSolicitud] = useState<any>(null);
 
   const fetchSolicitudes = async () => {
     setLoading(true);
@@ -60,6 +63,13 @@ const SolicitudesHerramientas: React.FC = () => {
       <Tag color={estado === "pendiente" ? "orange" : estado === "aprobada" ? "green" : "red"}>{estado}</Tag>
     ) },
     {
+      title: "Detalles",
+      key: "detalles",
+      render: (_: any, record: any) => record.accion === "Modificar" && (
+        <Button size="small" onClick={() => { setDetalleSolicitud(record); setDetalleVisible(true); }}>Ver Detalles</Button>
+      )
+    },
+    {
       title: "Opciones",
       key: "opciones",
       render: (_: any, record: any) => record.estado === "pendiente" && (
@@ -86,6 +96,46 @@ const SolicitudesHerramientas: React.FC = () => {
               loading={loading}
               pagination={{ pageSize: 10 }}
             />
+            <Modal
+              open={detalleVisible}
+              onCancel={() => setDetalleVisible(false)}
+              footer={null}
+              title="Detalles de Modificación"
+              width={800}
+            >
+              {detalleSolicitud && detalleSolicitud.accion === 'Modificar' && detalleSolicitud.detalles ? (
+                <div style={{ display: 'flex', gap: 24 }}>
+                  <div style={{ flex: 1 }}>
+                    <h4 style={{ textAlign: 'center' }}>Original</h4>
+                    <Descriptions column={1} bordered size="small">
+                      {Object.entries(detalleSolicitud.detallesOriginal || {}).length > 0 ? (
+                        Object.entries(detalleSolicitud.detallesOriginal).map(([key, value]) => (
+                          <Descriptions.Item label={key} key={key}>{String(value)}</Descriptions.Item>
+                        ))
+                      ) : (
+                        <Descriptions.Item label="info">No disponible</Descriptions.Item>
+                      )}
+                    </Descriptions>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h4 style={{ textAlign: 'center' }}>Propuesta</h4>
+                    <Descriptions column={1} bordered size="small">
+                      {Object.entries(detalleSolicitud.detalles).map(([key, value]) => (
+                        <Descriptions.Item label={key} key={key}>{String(value)}</Descriptions.Item>
+                      ))}
+                    </Descriptions>
+                  </div>
+                </div>
+              ) : detalleSolicitud && detalleSolicitud.detalles ? (
+                <Descriptions column={1} bordered size="small">
+                  {Object.entries(detalleSolicitud.detalles).map(([key, value]) => (
+                    <Descriptions.Item label={key} key={key}>{String(value)}</Descriptions.Item>
+                  ))}
+                </Descriptions>
+              ) : (
+                <div>No hay detalles para mostrar.</div>
+              )}
+            </Modal>
           </>
         )
       }, {
