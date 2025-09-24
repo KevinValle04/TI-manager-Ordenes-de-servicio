@@ -1,4 +1,4 @@
-import { jwtDecode } from 'jwt-decode';
+
 // src/components/inventario/InventoryListExterior.tsx
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -6,6 +6,7 @@ import { IInventoryItem } from "../../types";
 import { Button, Modal, Form, Table, Row, Col } from "react-bootstrap";
 import SearchBar from "../common/SearchBar";
 import DataTable, { DataTableColumn } from "../common/DataTable";
+import { jwtDecode } from 'jwt-decode';
 import ExportExcelButton from "../common/ExportExcelButton";
 import PaginationCompact from "../common/PaginationCompact";
 import ItemModal from "../common/ItemModal";
@@ -421,43 +422,44 @@ const InventoryListExterior: React.FC = () => {
           boxShadow: "0 2px 8px rgba(0,0,0,0.03)",
         }}
       >
-        <DataTable
-          columns={columns}
-          data={paginatedItems}
-          actions={(item) => {
-            let isAdmin = false;
-            try {
-              const token = localStorage.getItem('token');
-              if (token) {
-                const decoded = jwtDecode(token);
-                isAdmin = (decoded as any).isAdmin === true;
-              }
-            } catch {}
-            if (!isAdmin) return null;
-            return (
-              <div className="d-flex flex-column flex-sm-row align-items-stretch gap-1">
-                <Button
-                  variant="warning"
-                  size="sm"
-                  className="w-100 w-sm-auto"
-                  onClick={() => handleEditItem(item)}
-                >
-                  Editar
-                </Button>
-                <Button
-                  variant="danger"
-                  size="sm"
-                  className="w-100 w-sm-auto"
-                  onClick={() => handleDelete(item._id!)}
-                >
-                  Eliminar
-                </Button>
-              </div>
-            );
-          }}
-          className="small"
-          style={{ marginBottom: 0 }}
-        />
+        {(() => {
+          let isAdmin = false;
+          try {
+            const token = localStorage.getItem('token');
+            if (token) {
+              const decoded = jwtDecode(token);
+              isAdmin = (decoded as any).isAdmin === true;
+            }
+          } catch {}
+          return (
+            <DataTable
+              columns={columns}
+              data={paginatedItems}
+              actions={isAdmin ? (item) => (
+                <div className="d-flex flex-column flex-sm-row align-items-stretch gap-1">
+                  <Button
+                    variant="warning"
+                    size="sm"
+                    className="w-100 w-sm-auto"
+                    onClick={() => handleEditItem(item)}
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    className="w-100 w-sm-auto"
+                    onClick={() => handleDelete(item._id!)}
+                  >
+                    Eliminar
+                  </Button>
+                </div>
+              ) : undefined}
+              className="small"
+              style={{ marginBottom: 0 }}
+            />
+          );
+        })()}
       </div>
       <div className="d-flex justify-content-center my-3">
         <PaginationCompact
