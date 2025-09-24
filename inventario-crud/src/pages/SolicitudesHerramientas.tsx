@@ -1,5 +1,7 @@
 // src/pages/SolicitudesHerramientas.tsx
 import React, { useEffect, useState } from "react";
+import { Tabs } from "antd";
+import HistorialSolicitudesHerramientas from "./HistorialSolicitudesHerramientas";
 
 interface Solicitud {
   _id: string;
@@ -12,6 +14,7 @@ interface Solicitud {
 import { Table, Button, message, Tag } from "antd";
 import { obtenerSolicitudes, actualizarSolicitud } from "../utils/solicitudesService";
 
+
 const SolicitudesHerramientas: React.FC = () => {
   const [solicitudes, setSolicitudes] = useState<Solicitud[]>([]);
   const [loading, setLoading] = useState(false);
@@ -20,7 +23,15 @@ const SolicitudesHerramientas: React.FC = () => {
     setLoading(true);
     try {
       const res = await obtenerSolicitudes();
-  setSolicitudes(res.data as Solicitud[]);
+      // Filtrar solo pendientes y ordenar por fecha descendente
+      const solicitudesOrdenadas = (res.data as Solicitud[])
+        .filter(s => s.estado === 'pendiente')
+        .sort((a, b) => {
+          const fechaA = (a as any).fecha ? new Date((a as any).fecha).getTime() : 0;
+          const fechaB = (b as any).fecha ? new Date((b as any).fecha).getTime() : 0;
+          return fechaB - fechaA;
+        });
+      setSolicitudes(solicitudesOrdenadas);
     } catch (err) {
       message.error("Error al cargar solicitudes");
     }
@@ -62,14 +73,26 @@ const SolicitudesHerramientas: React.FC = () => {
 
   return (
     <div>
-      <h2>Solicitudes de Herramientas</h2>
-      <Table
-        dataSource={solicitudes}
-        columns={columns}
-        rowKey="_id"
-        loading={loading}
-        pagination={{ pageSize: 10 }}
-      />
+      <Tabs defaultActiveKey="pendientes" items={[{
+        key: 'pendientes',
+        label: 'Solicitudes Pendientes',
+        children: (
+          <>
+            <h2>Solicitudes de Herramientas</h2>
+            <Table
+              dataSource={solicitudes}
+              columns={columns}
+              rowKey="_id"
+              loading={loading}
+              pagination={{ pageSize: 10 }}
+            />
+          </>
+        )
+      }, {
+        key: 'historial',
+        label: 'Historial de Solicitudes',
+        children: <HistorialSolicitudesHerramientas />
+      }]} />
     </div>
   );
 };
