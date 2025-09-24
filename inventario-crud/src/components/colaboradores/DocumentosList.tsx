@@ -25,6 +25,7 @@ interface DocumentosListProps {
   onDocumentosChange: () => void;
 }
 
+
 const DocumentosList: React.FC<DocumentosListProps> = ({
   colaboradorId,
   documentos,
@@ -33,43 +34,48 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [editingDoc, setEditingDoc] = useState<Documento | null>(null);
 
-  const handleAddDocument = async (values: { nombre: string; documento: any[]; fechaVencimiento?: moment.Moment }) => {
+  const handleAddOrEditDocument = async (values: { nombre: string; documento: any[]; fechaVencimiento?: moment.Moment }) => {
     try {
       setLoading(true);
       const formData = new FormData();
-
       if (values.documento && values.documento[0]) {
         const file = values.documento[0].originFileObj;
         formData.append('documento', file);
-      } else {
-        throw new Error('No se seleccionó ningún archivo');
       }
-
       formData.append('nombre', values.nombre);
       formData.append('colaboradorId', colaboradorId);
       if (values.fechaVencimiento) {
         formData.append('fechaVencimiento', values.fechaVencimiento.toISOString());
       }
 
-      // POST correcto (como en Papeleria.new)
-      await axios.post(
-        `${urlServer}documentos`,
-        formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      );
-
-      message.success('Documento agregado correctamente');
+      if (editingDoc) {
+        // PUT para editar
+        await axios.put(
+          `${urlServer}documentos/${editingDoc._id}`,
+          formData,
+          { headers: { 'Content-Type': 'multipart/form-data' } }
+        );
+        message.success('Documento editado correctamente');
+      } else {
+        // POST para agregar
+        if (!values.documento || !values.documento[0]) throw new Error('No se seleccionó ningún archivo');
+        await axios.post(
+          `${urlServer}documentos`,
+          formData,
+          { headers: { 'Content-Type': 'multipart/form-data' } }
+        );
+        message.success('Documento agregado correctamente');
+      }
       form.resetFields();
       setModalVisible(false);
+      setEditingDoc(null);
       onDocumentosChange();
     } catch (error: any) {
-      console.error('Error al agregar documento:', error);
-      
-      // Manejar diferentes tipos de errores
+      console.error('Error al guardar documento:', error);
       if (error && typeof error === 'object' && 'isAxiosError' in error) {
         if (error.response) {
-          // El servidor respondió con un estado de error
           console.error('Respuesta del servidor:', error.response);
           if (error.response.status === 404) {
             message.error('La ruta del servidor no fue encontrada. Por favor, verifique la configuración.');
@@ -80,22 +86,31 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
             );
           }
         } else if (error.request) {
-          // La solicitud se hizo pero no se recibió respuesta
           console.error('No se recibió respuesta del servidor');
           message.error('No se pudo conectar con el servidor. Por favor, verifique su conexión.');
         } else {
-          // Error al configurar la solicitud
           console.error('Error de configuración:', error.message);
           message.error('Error al configurar la solicitud: ' + error.message);
         }
       } else {
-        // Error que no es de Axios
         console.error('Error no relacionado con la red:', error);
-        message.error(error.message || 'Error desconocido al agregar el documento');
+        message.error(error.message || 'Error desconocido al guardar el documento');
       }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditDocument = (doc: Documento) => {
+    setEditingDoc(doc);
+    setModalVisible(true);
+    setTimeout(() => {
+      form.setFieldsValue({
+        nombre: doc.nombre,
+        fechaVencimiento: doc.fechaVencimiento ? moment(doc.fechaVencimiento) : null,
+        documento: [] // No se puede prellenar el archivo
+      });
+    }, 0);
   };
 
   const handleDeleteDocument = async (documentoId: string) => {
@@ -133,11 +148,11 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
         <Card
           size="small"
           style={{ marginBottom: 16 }}
-          title="Nuevo Documento"
+          title={editingDoc ? 'Editar Documento' : 'Nuevo Documento'}
         >
           <Form 
             form={form} 
-            onFinish={handleAddDocument}
+            onFinish={handleAddOrEditDocument}
             layout="vertical"
           >
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -187,7 +202,7 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
                 }
                 return e?.fileList;
               }}
-              rules={[{ required: true, message: 'Por favor selecciona un documento' }]}
+              rules={editingDoc ? [] : [{ required: true, message: 'Por favor selecciona un documento' }]}
             >
               <Upload.Dragger
                 name="documento"
@@ -210,8 +225,13 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
 
             <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
               <Button type="primary" htmlType="submit" loading={loading}>
-                Guardar Documento
+                {editingDoc ? 'Guardar Cambios' : 'Guardar Documento'}
               </Button>
+              {editingDoc && (
+                <Button style={{ marginLeft: 8 }} onClick={() => { setEditingDoc(null); setModalVisible(false); form.resetFields(); }}>
+                  Cancelar
+                </Button>
+              )}
             </Form.Item>
           </Form>
         </Card>
@@ -225,7 +245,14 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
             title={doc.nombre}
             className="documento-card"
             extra={
-              <div className="documento-actions">
+              <div className="documento-actions" style={{ display: 'flex', gap: 8 }}>
+                <Tooltip title="Editar">
+                  <Button
+                    type="text"
+                    icon={<FileOutlined />}
+                    onClick={() => handleEditDocument(doc)}
+                  />
+                </Tooltip>
                 <Tooltip title="Eliminar">
                   <Button
                     type="text"
@@ -243,7 +270,6 @@ const DocumentosList: React.FC<DocumentosListProps> = ({
               block
               icon={<FileOutlined />}
               onClick={() => {
-                // Usa la misma base para evitar /api/api
                 window.open(`${urlServer}documentos/ver/${doc.url}`, '_blank');
               }}
             >
