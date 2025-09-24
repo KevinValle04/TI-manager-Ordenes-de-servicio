@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { Alert, Button, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
 import { Vendedor } from "../../types";
@@ -57,6 +58,19 @@ const VendedorList: React.FC = () => {
   };
 
   const handleSave = async () => {
+    // Validación: nombre, correo y teléfono obligatorios
+    if (!newVendedor.nombre.trim()) {
+      toast.error("El nombre es obligatorio");
+      return;
+    }
+    if (!newVendedor.correo.trim()) {
+      toast.error("El correo es obligatorio");
+      return;
+    }
+    if (!newVendedor.telefono.trim()) {
+      toast.error("El teléfono es obligatorio");
+      return;
+    }
     try {
       if (editId) {
         await axios.put(urlServer + editId, newVendedor);
