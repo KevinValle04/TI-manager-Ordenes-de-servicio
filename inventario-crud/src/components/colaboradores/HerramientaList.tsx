@@ -3,7 +3,7 @@ import { Button, Card, Form, Input, InputNumber } from 'antd';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import React, { useState } from 'react';
-import { crearSolicitud } from '../../utils/solicitudesService';
+import { crearSolicitud, obtenerSolicitudes } from '../../utils/solicitudesService';
 
 interface Herramienta {
   _id: string;
@@ -38,7 +38,7 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
           ...values,
           colaboradorId
         });
-        message.success('Herramienta actualizada correctamente');
+  toast.success('Herramienta actualizada correctamente');
       } else {
         // Crear solicitud para agregar herramienta
         const resp = await crearSolicitud({
@@ -57,24 +57,42 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
       setEditingHerramienta(null);
       onHerramientasChange();
     } catch (error: any) {
-      message.error(error.response?.data?.message || 'Error al procesar la herramienta');
+  toast.error(error.response?.data?.message || 'Error al procesar la herramienta');
     }
   };
 
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const handleDelete = async (herramientaId: string) => {
+    if (deletingId === herramientaId) return;
+    setDeletingId(herramientaId);
     try {
+      // Verificar si ya existe una solicitud pendiente para esta herramienta
+      const solicitudesResp = await obtenerSolicitudes();
+  const solicitudes = Array.isArray(solicitudesResp.data) ? solicitudesResp.data : [];
+  const yaExiste = solicitudes.some((s: any) =>
+        s.tipo === 'herramienta' &&
+        s.recursoId === herramientaId &&
+        s.accion === 'Regresar' &&
+        s.estado === 'pendiente'
+      );
+      if (yaExiste) {
+        toast.info('Ya existe una solicitud para este movimiento');
+        return;
+      }
       // Crear solicitud para eliminar herramienta
-      const resp = await crearSolicitud({
+      await crearSolicitud({
         tipo: 'herramienta',
         recursoId: herramientaId,
         colaboradorId,
         accion: 'Regresar',
         detalles: {}
       });
-  toast.success('¡Solicitud enviada!');
+      toast.success('¡Solicitud enviada!');
       onHerramientasChange();
     } catch (error) {
-      message.error('Error al eliminar la herramienta');
+      toast.error('Error al eliminar la herramienta');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -248,6 +266,8 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
                   icon={<DeleteOutlined />}
                   danger
                   onClick={() => handleDelete(herramienta._id)}
+                  disabled={deletingId === herramienta._id}
+                  loading={deletingId === herramienta._id}
                 />
               </div>
             </div>

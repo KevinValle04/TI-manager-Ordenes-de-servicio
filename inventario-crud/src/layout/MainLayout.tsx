@@ -60,7 +60,6 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
       items: [
         { path: "/solicitudes-inventario", label: "Solicitudes de Inventario", icon: <FaFileAlt size={14} /> },
         { path: "/solicitudes-herramientas", label: "Solicitudes de Herramientas", icon: <FaTools size={14} /> },
-        { path: "/historial-solicitudes-herramientas", label: "Historial Solicitudes Herramientas", icon: <FaFileAlt size={14} /> },
       ],
     }] : []),
     // Colaboradores
