@@ -1,5 +1,7 @@
 // Componente principal de la lista de inventario
 import { useState, useEffect } from "react";
+import { jwtDecode } from 'jwt-decode';
+
 import axios from "../../utils/axios-config";
 import { IInventoryItem } from "../../types";
 import { Button, Modal, Form, Table, Row, Col } from "react-bootstrap";
@@ -445,26 +447,37 @@ const Inventario: React.FC = () => {
         <DataTable
           columns={columns}
           data={paginatedItems}
-          actions={(item) => (
-            <div className="d-flex flex-column flex-sm-row align-items-stretch gap-1">
-              <Button
-                variant="warning"
-                size="sm"
-                className="w-100 w-sm-auto"
-                onClick={() => handleEditItem(item)}
-              >
-                Editar
-              </Button>
-              <Button
-                variant="danger"
-                size="sm"
-                className="w-100 w-sm-auto"
-                onClick={() => handleDelete(item._id!)}
-              >
-                Eliminar
-              </Button>
-            </div>
-          )}
+          actions={(item) => {
+            let isAdmin = false;
+            try {
+              const token = localStorage.getItem('token');
+              if (token) {
+                const decoded = jwtDecode(token);
+                isAdmin = (decoded as any).isAdmin === true;
+              }
+            } catch {}
+            if (!isAdmin) return null;
+            return (
+              <div className="d-flex flex-column flex-sm-row align-items-stretch gap-1">
+                <Button
+                  variant="warning"
+                  size="sm"
+                  className="w-100 w-sm-auto"
+                  onClick={() => handleEditItem(item)}
+                >
+                  Editar
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  className="w-100 w-sm-auto"
+                  onClick={() => handleDelete(item._id!)}
+                >
+                  Eliminar
+                </Button>
+              </div>
+            );
+          }}
           className="small"
           style={{ marginBottom: 0 }}
         />
