@@ -1,3 +1,70 @@
+// ...existing code...
+
+import { RequestHandler } from 'express';
+
+export const obtenerMisSolicitudesHerramientas: RequestHandler = async (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    let solicitudes = await Solicitud.find({ tipo: 'herramienta' }).populate('colaboradorId', 'nombre').sort({ fecha: -1 });
+
+    // Populate manual para recursoId si es ObjectId válido y tipo herramienta
+    const Herramienta = require('../models/Herramienta').default;
+    solicitudes = await Promise.all(solicitudes.map(async (sol: any) => {
+      let recurso = null;
+      if (mongoose.Types.ObjectId.isValid(sol.recursoId)) {
+        recurso = await Herramienta.findById(sol.recursoId).select('nombre marca modelo serialNumber valor');
+      }
+      return { ...sol.toObject(), recurso };
+    }));
+
+    // Mapear para mostrar datos desde detalles si la herramienta aún no existe
+    const solicitudesConDatos = solicitudes.map((sol: any) => {
+      let colaboradorNombre = '';
+      if (sol.colaboradorId && typeof sol.colaboradorId === 'object' && 'nombre' in sol.colaboradorId) {
+        colaboradorNombre = (sol.colaboradorId as any).nombre;
+      } else if (typeof sol.colaboradorId === 'string') {
+        colaboradorNombre = sol.colaboradorId;
+      }
+
+      let recursoNombre = '';
+      let marca = '';
+      let modelo = '';
+      let serialNumber = '';
+      let valor = '';
+
+      if (sol.recurso) {
+        recursoNombre = sol.recurso.nombre;
+        marca = sol.recurso.marca;
+        modelo = sol.recurso.modelo;
+        serialNumber = sol.recurso.serialNumber;
+        valor = sol.recurso.valor;
+      } else if (sol.detalles) {
+        recursoNombre = sol.detalles.nombre || '';
+        marca = sol.detalles.marca || '';
+        modelo = sol.detalles.modelo || '';
+        serialNumber = sol.detalles.serialNumber || '';
+        valor = sol.detalles.valor || '';
+      }
+
+      const detallesOriginal = sol.detallesOriginal || null;
+
+      return {
+        ...sol,
+        colaboradorNombre,
+        accion: sol.accion,
+        recursoNombre,
+        marca,
+        modelo,
+        serialNumber,
+        valor,
+        detallesOriginal
+      };
+    });
+    res.json(solicitudesConDatos);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener solicitudes de herramientas' });
+  }
+};
 import Solicitud from '../models/Solicitud';
 import { Request, Response } from 'express';
 
