@@ -95,7 +95,7 @@ const SolicitudesHerramientas: React.FC = () => {
               rowKey="_id"
               loading={loading}
               pagination={{ pageSize: 10 }}
-            />
+            />  
             <Modal
               open={detalleVisible}
               onCancel={() => setDetalleVisible(false)}
@@ -106,7 +106,7 @@ const SolicitudesHerramientas: React.FC = () => {
               {detalleSolicitud && detalleSolicitud.accion === 'Modificar' && detalleSolicitud.detalles ? (
                 <div style={{ display: 'flex', gap: 24 }}>
                   <div style={{ flex: 1 }}>
-                    <h4 style={{ textAlign: 'center' }}>Original</h4>
+                    <h4 style={{ textAlign: 'center' }}>Actual</h4>
                     <Descriptions column={1} bordered size="small">
                       {Object.entries(detalleSolicitud.detallesOriginal || {}).length > 0 ? (
                         Object.entries(detalleSolicitud.detallesOriginal).map(([key, value]) => (
@@ -118,7 +118,7 @@ const SolicitudesHerramientas: React.FC = () => {
                     </Descriptions>
                   </div>
                   <div style={{ flex: 1 }}>
-                    <h4 style={{ textAlign: 'center' }}>Propuesta</h4>
+                    <h4 style={{ textAlign: 'center' }}>Actualizado</h4>
                     <Descriptions column={1} bordered size="small">
                       {Object.entries(detalleSolicitud.detalles).map(([key, value]) => (
                         <Descriptions.Item label={key} key={key}>{String(value)}</Descriptions.Item>

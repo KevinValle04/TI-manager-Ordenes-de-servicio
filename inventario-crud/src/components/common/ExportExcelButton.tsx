@@ -18,7 +18,16 @@ const ExportExcelButton: React.FC<ExportExcelButtonProps> = ({
   className = "",
 }) => {
   const handleExport = () => {
-    const ws = XLSX.utils.json_to_sheet(data);
+    // Procesar los datos para convertir arrays en strings
+    const processedData = data.map(item => ({
+      ...item,
+      // Si el item tiene numerosSerie, conviértelo a string
+      numerosSerie: item.numerosSerie ? item.numerosSerie.join(", ") : "",
+      // Si hay categorías, también las convertimos
+      categorias: item.categorias ? item.categorias.join(", ") : ""
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(processedData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, sheetName);
     XLSX.writeFile(wb, fileName);
