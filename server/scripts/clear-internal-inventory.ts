@@ -8,7 +8,7 @@ dotenv.config();
 async function clearInternalInventory() {
     try {
         // Conectar a la base de datos
-        await mongoose.connect(process.env.MONGODB_URI as string);
+        await mongoose.connect(process.env.MONGO_URI as string);
         console.log('Conectado a MongoDB');
 
         // Eliminar todos los movimientos de inventario

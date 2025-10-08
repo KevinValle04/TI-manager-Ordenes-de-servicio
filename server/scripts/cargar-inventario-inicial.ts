@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { InventoryItem } from '../src/models/InventoryItem';
 import { InventoryMovement } from '../src/models/InventoryMovement'; // Asegúrate de importar este modelo
-
 dotenv.config();
 
 // Asegurarse de que la variable de entorno MONGO_URI esté definida
@@ -20,7 +19,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 222.61,
         cantidad: 5,
-        numerosSerie: [],
+        numerosSerie: ["2311230024719"],
         categorias: ["46"]
     },
     {
@@ -31,7 +30,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 279.95,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["21090033692"],
         categorias: ["46"]
     },
     {
@@ -53,7 +52,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 7.83,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["34352026237"],
         categorias: ["46"]
     },
     {
@@ -97,7 +96,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 1223,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["CGIN193960357"],
         categorias: ["46"]
     },
     {
@@ -108,7 +107,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 1200,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["104557205"],
         categorias: ["46"]
     },
     {
@@ -119,7 +118,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 191.09,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["23060028776"],
         categorias: ["46"]
     },
     {
@@ -130,7 +129,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 688.51,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["23060042947"],
         categorias: ["46"]
     },
     {
@@ -141,7 +140,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 366.08,
         cantidad: 7,
-        numerosSerie: [],
+        numerosSerie: ["2404200026389"],
         categorias: ["46"]
     },
     {
@@ -152,7 +151,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 773.52,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["OP213071"],
         categorias: ["46"]
     },
     {
@@ -163,7 +162,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 499.62,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["2311230015184"],
         categorias: ["46"]
     },
     {
@@ -174,7 +173,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 300,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["7506215923040"],
         categorias: ["46"]
     },
     {
@@ -185,7 +184,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 303,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["7506215934657"],
         categorias: ["46"]
     },
     {
@@ -196,7 +195,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["7331021061071"],
         categorias: ["46"]
     },
     {
@@ -207,7 +206,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["B074XPB313"],
         categorias: ["46"]
     },
     {
@@ -218,7 +217,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 5,
-        numerosSerie: [],
+        numerosSerie: ["78269500697"],
         categorias: ["46"]
     },
     {
@@ -240,7 +239,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 293,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["01355-07-03085"],
         categorias: ["46"]
     },
     {
@@ -251,7 +250,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 1216.05,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["104515802"],
         categorias: ["46"]
     },
     {
@@ -262,7 +261,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 406,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["6923172546104"],
         categorias: ["46"]
     },
     {
@@ -273,7 +272,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 2009,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["6923169713434"],
         categorias: ["46"]
     },
     {
@@ -284,7 +283,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 470,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["6939554912313"],
         categorias: ["46"]
     },
     {
@@ -295,7 +294,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 1529,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["6939554980220"],
         categorias: ["46"]
     },
     {
@@ -306,7 +305,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 54,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["6939554999055"],
         categorias: ["46"]
     },
     {
@@ -317,7 +316,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 599,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["7290109981819"],
         categorias: ["46"]
     },
     {
@@ -328,7 +327,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 1144.6,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["820043000160"],
         categorias: ["46"]
     },
     {
@@ -339,7 +338,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 2209,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["820043000412"],
         categorias: ["46"]
     },
     {
@@ -350,7 +349,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 2439,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["82004300043"],
         categorias: ["46"]
     },
     {
@@ -361,7 +360,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["820043012040"],
         categorias: ["46"]
     },
     {
@@ -372,7 +371,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 40.48,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["676544007517"],
         categorias: ["46"]
     },
     {
@@ -383,7 +382,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 151.05,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["676544007623"],
         categorias: ["46"]
     },
     {
@@ -405,7 +404,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 50.62,
         cantidad: 3,
-        numerosSerie: [],
+        numerosSerie: ["697477291039"],
         categorias: ["46"]
     },
     {
@@ -427,7 +426,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 150.86,
         cantidad: 4,
-        numerosSerie: [],
+        numerosSerie: ["697477291065"],
         categorias: ["46"]
     },
     {
@@ -438,7 +437,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 132.6,
         cantidad: 3,
-        numerosSerie: [],
+        numerosSerie: ["697477291023"],
         categorias: ["46"]
     },
     {
@@ -449,7 +448,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 481,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["697477291015"],
         categorias: ["46"]
     },
     {
@@ -471,7 +470,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 4.16,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["34352025221"],
         categorias: ["46"]
     },
     {
@@ -482,7 +481,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 1997.79,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["854370082643"],
         categorias: ["46"]
     },
     {
@@ -493,7 +492,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["854370082608"],
         categorias: ["46"]
     },
     {
@@ -526,7 +525,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 975.73,
         cantidad: 12,
-        numerosSerie: [],
+        numerosSerie: ["783863000546"],
         categorias: ["46"]
     },
     {
@@ -537,7 +536,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["783008102784"],
         categorias: ["46"]
     },
     {
@@ -548,7 +547,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 1445.53,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["193175511607"],
         categorias: ["46"]
     },
     {
@@ -559,7 +558,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 192.51,
         cantidad: 4,
-        numerosSerie: [],
+        numerosSerie: ["6941264015864"],
         categorias: ["46"]
     },
     {
@@ -570,7 +569,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 564.47,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["6941264065647"],
         categorias: ["46"]
     },
     {
@@ -581,7 +580,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 577.18,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["6941264079965"],
         categorias: ["46"]
     },
     {
@@ -592,7 +591,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 154.47,
         cantidad: 4,
-        numerosSerie: [],
+        numerosSerie: ["6941264015871"],
         categorias: ["46"]
     },
     {
@@ -603,7 +602,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 501.7,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["6941264024712"],
         categorias: ["46"]
     },
     {
@@ -614,7 +613,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 291.68,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["6941264065654"],
         categorias: ["46"]
     },
     {
@@ -625,7 +624,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["3781-1007008"],
         categorias: ["46"]
     },
     {
@@ -636,7 +635,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 343.48,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["2030311585"],
         categorias: ["46"]
     },
     {
@@ -647,7 +646,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 252.95,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["6931847130114"],
         categorias: ["46"]
     },
     {
@@ -658,7 +657,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 35.93,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["6954273685652"],
         categorias: ["46"]
     },
     {
@@ -669,7 +668,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 952.53,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["6931847164393"],
         categorias: ["46"]
     },
     {
@@ -680,7 +679,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 158.16,
         cantidad: 4,
-        numerosSerie: [],
+        numerosSerie: ["6954273685720"],
         categorias: ["46"]
     },
     {
@@ -702,7 +701,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 275.64,
         cantidad: 4,
-        numerosSerie: [],
+        numerosSerie: ["695427635688"],
         categorias: ["46"]
     },
     {
@@ -735,7 +734,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 524.59,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["6954273635862"],
         categorias: ["46"]
     },
     {
@@ -746,7 +745,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 397.9,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["110120240805018"],
         categorias: ["46"]
     },
     {
@@ -757,7 +756,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 25.47,
         cantidad: 8,
-        numerosSerie: [],
+        numerosSerie: ["6941264033400"],
         categorias: ["46"]
     },
     {
@@ -768,7 +767,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 191,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["6941264044208"],
         categorias: ["46"]
     },
     {
@@ -790,7 +789,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 179.51,
         cantidad: 3,
-        numerosSerie: [],
+        numerosSerie: ["24090201"],
         categorias: ["46"]
     },
     {
@@ -801,7 +800,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 94.73,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["6954273636029"],
         categorias: ["46"]
     },
     {
@@ -812,7 +811,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 136.29,
         cantidad: 4,
-        numerosSerie: [],
+        numerosSerie: ["6954273672676"],
         categorias: ["46"]
     },
     {
@@ -823,7 +822,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 287.38,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["6954273611453"],
         categorias: ["46"]
     },
     {
@@ -856,7 +855,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 153,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["LGH1090002"],
         categorias: ["46"]
     },
     {
@@ -867,7 +866,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 389,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["76812480644"],
         categorias: ["46"]
     },
     {
@@ -878,7 +877,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 4,
-        numerosSerie: [],
+        numerosSerie: ["78477229927"],
         categorias: ["46"]
     },
     {
@@ -889,7 +888,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 190,
         cantidad: 66,
-        numerosSerie: [],
+        numerosSerie: ["40078477144655"],
         categorias: ["46"]
     },
     {
@@ -900,7 +899,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 151,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["78477170519"],
         categorias: ["46"]
     },
     {
@@ -911,7 +910,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 190,
         cantidad: 4,
-        numerosSerie: [],
+        numerosSerie: ["40078477144662"],
         categorias: ["46"]
     },
     {
@@ -922,7 +921,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 67.29,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["78477749331"],
         categorias: ["46"]
     },
     {
@@ -933,7 +932,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 172,
         cantidad: 15,
-        numerosSerie: [],
+        numerosSerie: ["40078477144617"],
         categorias: ["46"]
     },
     {
@@ -944,7 +943,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 170,
         cantidad: 15,
-        numerosSerie: [],
+        numerosSerie: ["40078477144594"],
         categorias: ["46"]
     },
     {
@@ -955,7 +954,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 87,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["78477749256"],
         categorias: ["46"]
     },
     {
@@ -966,7 +965,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 69,
         cantidad: 53,
-        numerosSerie: [],
+        numerosSerie: ["60078477978209"],
         categorias: ["46"]
     },
     {
@@ -977,7 +976,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 69,
         cantidad: 19,
-        numerosSerie: [],
+        numerosSerie: ["60078477978162"],
         categorias: ["46"]
     },
     {
@@ -999,7 +998,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 15.52,
         cantidad: 3,
-        numerosSerie: [],
+        numerosSerie: ["4007847766897"],
         categorias: ["46"]
     },
     {
@@ -1010,7 +1009,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 14.71,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["78477669174"],
         categorias: ["46"]
     },
     {
@@ -1032,7 +1031,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 14.71,
         cantidad: 10,
-        numerosSerie: [],
+        numerosSerie: ["78477669228"],
         categorias: ["46"]
     },
     {
@@ -1043,7 +1042,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 134,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["78477164532"],
         categorias: ["46"]
     },
     {
@@ -1054,7 +1053,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 13,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["78477292013"],
         categorias: ["46"]
     },
     {
@@ -1065,7 +1064,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 14,
         cantidad: 40,
-        numerosSerie: [],
+        numerosSerie: ["78477912522"],
         categorias: ["46"]
     },
     {
@@ -1076,40 +1075,40 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 1139,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["78477387979"],
         categorias: ["46"]
     },
     {
         marca: "LEVITON",
         modelo: "61110-RG6",
         descripcion: "Gato EXTREME™ Cat 6 QUICKPORT™, gris",
-        proveedor: "",
+        proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 169,
         cantidad: 16,
-        numerosSerie: [],
+        numerosSerie: ["78477144602"],
         categorias: ["46"]
     },
     {
         marca: "LEVITON",
         modelo: "6H460-3W",
         descripcion: "Cat 6 Latiguillo de alta flexibilidad de diámetro pequeño, 0,9 m (3 pies), blanco",
-        proveedor: "",
+        proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 10,
-        numerosSerie: [],
+        numerosSerie: ["40078477669219"],
         categorias: ["46"]
     },
     {
         marca: "LEVITON",
         modelo: "6H460-5W",
         descripcion: "Miniatura del producto Cat 6 Cable de conexión de alta flexibilidad de diámetro pequeño, 5 pies (1,5 m), blanco",
-        proveedor: "",
+        proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 21,
-        numerosSerie: [],
+        numerosSerie: ["78477669303"],
         categorias: ["46"]
     },
     {
@@ -1120,7 +1119,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 317.89,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["78477208403"],
         categorias: ["46"]
     },
     {
@@ -1131,7 +1130,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 178.94,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["78477208151"],
         categorias: ["46"]
     },
     {
@@ -1142,7 +1141,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["78477134047"],
         categorias: ["46"]
     },
     {
@@ -1153,18 +1152,18 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 3,
-        numerosSerie: [],
+        numerosSerie: ["78477413418"],
         categorias: ["46"]
     },
     {
         marca: "LEVITON",
         modelo: "6D460-3W",
         descripcion: "Cable de conexión UTP Cat 6, 3 pies, blanco",
-        proveedor: "",
+        proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 3,
-        numerosSerie: [],
+        numerosSerie: ["78477344835"],
         categorias: ["46"]
     },
     {
@@ -1186,7 +1185,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 17.37,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["39121704"],
         categorias: ["46"]
     },
     {
@@ -1197,7 +1196,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 50.14,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["34590026495"],
         categorias: ["46"]
     },
     {
@@ -1208,7 +1207,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 92.53,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["345970283456"],
         categorias: ["46"]
     },
     {
@@ -1237,7 +1236,7 @@ const inventarioInicial = [
         marca: "LINKEDPRO",
         modelo: "LP-FP-17",
         descripcion: "Placa de pared de 2 puertos, Keystone, Color Blanco",
-        proveedor: "",
+        proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 16.77,
         cantidad: 4,
@@ -1252,7 +1251,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 14.24,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["43223303"],
         categorias: ["46"]
     },
     {
@@ -1263,7 +1262,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 129.59,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["43223326"],
         categorias: ["46"]
     },
     {
@@ -1274,7 +1273,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 254.79,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["OP39642M"],
         categorias: ["46"]
     },
     {
@@ -1285,7 +1284,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 995.77,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["OP19240I"],
         categorias: ["46"]
     },
     {
@@ -1307,7 +1306,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 97,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["766623311731"],
         categorias: ["46"]
     },
     {
@@ -1318,7 +1317,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 49,
         cantidad: 3,
-        numerosSerie: [],
+        numerosSerie: ["766623306119"],
         categorias: ["46"]
     },
     {
@@ -1329,7 +1328,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 206,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["766623205153"],
         categorias: ["46"]
     },
     {
@@ -1340,7 +1339,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 154,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["766623771719"],
         categorias: ["46"]
     },
     {
@@ -1351,7 +1350,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 29,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["766623342650"],
         categorias: ["46"]
     },
     {
@@ -1362,7 +1361,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 177,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["766623322461"],
         categorias: ["46"]
     },
     {
@@ -1373,7 +1372,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 94,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["766623353465"],
         categorias: ["46"]
     },
     {
@@ -1384,7 +1383,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 83,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["766623340960"],
         categorias: ["46"]
     },
     {
@@ -1395,7 +1394,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 45,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["766623165211"],
         categorias: ["46"]
     },
     {
@@ -1406,7 +1405,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 30,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["766623701662"],
         categorias: ["46"]
     },
     {
@@ -1417,7 +1416,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 146,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["766623151993"],
         categorias: ["46"]
     },
     {
@@ -1428,7 +1427,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 143,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["766623311748"],
         categorias: ["46"]
     },
     {
@@ -1450,7 +1449,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 1007.61,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["45242476558"],
         categorias: ["46"]
     },
     {
@@ -1461,7 +1460,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 100,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["45242577644"],
         categorias: ["46"]
     },
     {
@@ -1472,7 +1471,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["215300034"],
         categorias: ["46"]
     },
     {
@@ -1494,7 +1493,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 5400,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["8887549708510"],
         categorias: ["46"]
     },
     {
@@ -1505,7 +1504,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 3453.68,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["5025232762224"],
         categorias: ["46"]
     },
     {
@@ -1516,7 +1515,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 7,
-        numerosSerie: [],
+        numerosSerie: ["74983438051"],
         categorias: ["46"]
     },
     {
@@ -1527,7 +1526,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 106.29,
         cantidad: 10,
-        numerosSerie: [],
+        numerosSerie: ["74983574698"],
         categorias: ["46"]
     },
     {
@@ -1538,7 +1537,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 106.29,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["74983574742"],
         categorias: ["46"]
     },
     {
@@ -1549,7 +1548,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 30.18,
         cantidad: 11,
-        numerosSerie: [],
+        numerosSerie: ["74983054497"],
         categorias: ["46"]
     },
     {
@@ -1560,7 +1559,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 52.85,
         cantidad: 7,
-        numerosSerie: [],
+        numerosSerie: ["74983033232"],
         categorias: ["46"]
     },
     {
@@ -1571,7 +1570,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 52.85,
         cantidad: 4,
-        numerosSerie: [],
+        numerosSerie: ["74983033433"],
         categorias: ["46"]
     },
     {
@@ -1582,7 +1581,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 5.74,
         cantidad: 11,
-        numerosSerie: [],
+        numerosSerie: ["74983586929"],
         categorias: ["46"]
     },
     {
@@ -1593,7 +1592,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 4.07,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["74983860371"],
         categorias: ["46"]
     },
     {
@@ -1604,7 +1603,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 59.55,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["74983712809"],
         categorias: ["46"]
     },
     {
@@ -1615,7 +1614,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 59.55,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["74983705269"],
         categorias: ["46"]
     },
     {
@@ -1626,7 +1625,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 106.29,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["74983438204"],
         categorias: ["46"]
     },
     {
@@ -1637,7 +1636,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 224.61,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["74983171132"],
         categorias: ["46"]
     },
     {
@@ -1648,7 +1647,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 205.47,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["74983170623"],
         categorias: ["46"]
     },
     {
@@ -1670,7 +1669,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 155.47,
         cantidad: 8,
-        numerosSerie: [],
+        numerosSerie: ["74983055456"],
         categorias: ["46"]
     },
     {
@@ -1681,7 +1680,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 201.21,
         cantidad: 3,
-        numerosSerie: [],
+        numerosSerie: ["74983651955"],
         categorias: ["46"]
     },
     {
@@ -1692,7 +1691,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 222.17,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["74983033676"],
         categorias: ["46"]
     },
     {
@@ -1703,7 +1702,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 2433.93,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["613056775848"],
         categorias: ["46"]
     },
     {
@@ -1714,7 +1713,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 787.42,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["74983376476"],
         categorias: ["46"]
     },
     {
@@ -1725,7 +1724,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 379.18,
         cantidad: 8,
-        numerosSerie: [],
+        numerosSerie: ["74983047482"],
         categorias: ["46"]
     },
     {
@@ -1736,7 +1735,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 216.75,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["74983395514"],
         categorias: ["46"]
     },
     {
@@ -1747,7 +1746,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 216.75,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["74983395538"],
         categorias: ["46"]
     },
     {
@@ -1758,7 +1757,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 261.74,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["74983539994"],
         categorias: ["46"]
     },
     {
@@ -1769,7 +1768,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 160,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["74983438235"],
         categorias: ["46"]
     },
     {
@@ -1780,7 +1779,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 52.52,
         cantidad: 6,
-        numerosSerie: [],
+        numerosSerie: ["74983033317"],
         categorias: ["46"]
     },
     {
@@ -1791,7 +1790,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 29.99,
         cantidad: 11,
-        numerosSerie: [],
+        numerosSerie: ["74983054534"],
         categorias: ["46"]
     },
     {
@@ -1802,7 +1801,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 26.63,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["74983525249"],
         categorias: ["46"]
     },
     {
@@ -1813,7 +1812,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 486.6,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["84769000278"],
         categorias: ["46"]
     },
     {
@@ -1835,7 +1834,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 919,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["619317411067"],
         categorias: ["46"]
     },
     {
@@ -1846,7 +1845,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 92,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["611355704040"],
         categorias: ["46"]
     },
     {
@@ -1857,7 +1856,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["68888901550"],
         categorias: ["46"]
     },
     {
@@ -1890,7 +1889,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 283,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["TVN083034"],
         categorias: ["46"]
     },
     {
@@ -1912,7 +1911,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 280.01,
         cantidad: 3,
-        numerosSerie: [],
+        numerosSerie: ["34598010902"],
         categorias: ["46"]
     },
     {
@@ -1923,7 +1922,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 483.99,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["34598017507"],
         categorias: ["46"]
     },
     {
@@ -1945,7 +1944,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 81.93,
         cantidad: 6,
-        numerosSerie: [],
+        numerosSerie: ["901240432A"],
         categorias: ["46"]
     },
     {
@@ -1978,7 +1977,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["42406052283"],
         categorias: ["46"]
     },
     {
@@ -1989,7 +1988,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 196.88,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["34598016461"],
         categorias: ["46"]
     },
     {
@@ -2000,7 +1999,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 305.08,
         cantidad: 5,
-        numerosSerie: [],
+        numerosSerie: ["78386048272"],
         categorias: ["46"]
     },
     {
@@ -2011,7 +2010,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 785.05,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["783863017599"],
         categorias: ["46"]
     },
     {
@@ -2022,7 +2021,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["783863058882"],
         categorias: ["46"]
     },
     {
@@ -2033,18 +2032,18 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 150,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["7501950030732"],
         categorias: ["46"]
     },
     {
         marca: "THORSMAN",
         modelo: "TMK-1020-EE",
-        descripcion: "Esquinero exterior blanco de PVC auto extinguible, para canaletas TMK1020, TMK1020SD, TMK1020CD (5110-02001",
+        descripcion: "Esquinero exterior blanco de PVC auto extinguible, para canaletas TMK1020, TMK1020SD, TMK1020CD (5110-02001)",
         proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 10.78,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["7501509900974"],
         categorias: ["46"]
     },
     {
@@ -2055,7 +2054,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 10.9,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["7501509900981"],
         categorias: ["46"]
     },
     {
@@ -2066,7 +2065,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 9.85,
         cantidad: 6,
-        numerosSerie: [],
+        numerosSerie: ["7501509900998"],
         categorias: ["46"]
     },
     {
@@ -2077,7 +2076,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 9.85,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["7501509905221"],
         categorias: ["46"]
     },
     {
@@ -2088,7 +2087,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 402.26,
         cantidad: 3,
-        numerosSerie: [],
+        numerosSerie: ["7506218111956"],
         categorias: ["46"]
     },
     {
@@ -2099,7 +2098,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 211,
         cantidad: 4,
-        numerosSerie: [],
+        numerosSerie: ["37332158093"],
         categorias: ["46"]
     },
     {
@@ -2110,7 +2109,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 45,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["7506240672449"],
         categorias: ["46"]
     },
     {
@@ -2121,7 +2120,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 39,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["7501206645413"],
         categorias: ["46"]
     },
     {
@@ -2132,7 +2131,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 165,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["7501206645390"],
         categorias: ["46"]
     },
     {
@@ -2143,7 +2142,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 22,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["7501206645420"],
         categorias: ["46"]
     },
     {
@@ -2154,7 +2153,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 2200,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["7506240673088"],
         categorias: ["46"]
     },
     {
@@ -2165,7 +2164,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 77,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["7506240616283"],
         categorias: ["46"]
     },
     {
@@ -2176,7 +2175,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 144.05,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["817882025133"],
         categorias: ["46"]
     },
     {
@@ -2187,7 +2186,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 348.25,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["810354023552"],
         categorias: ["46"]
     },
     {
@@ -2209,7 +2208,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 270.28,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["20114131900"],
         categorias: ["46"]
     },
     {
@@ -2231,7 +2230,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["CGZI192460002"],
         categorias: ["46"]
     },
     {
@@ -2253,7 +2252,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 1412.93,
         cantidad: 7,
-        numerosSerie: [],
+        numerosSerie: ["6941264071815"],
         categorias: ["46"]
     },
     {
@@ -2297,7 +2296,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["820909170174"],
         categorias: ["46"]
     },
     {
@@ -2330,7 +2329,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["820909913634"],
         categorias: ["46"]
     },
     {
@@ -2341,7 +2340,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["820909913641"],
         categorias: ["46"]
     },
     {
@@ -2473,7 +2472,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["45242546282"],
         categorias: ["46"]
     },
     {
@@ -2605,7 +2604,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["7501483191597"],
         categorias: ["46"]
     },
     {
@@ -2643,8 +2642,8 @@ const inventarioInicial = [
     },
     {
         marca: "DTKGLI",
-        modelo: "",
-        descripcion: "Ground Loop Isolator",
+        modelo: "Ground Loop Isolator",
+        descripcion: "",
         proveedor: "",
         unidad: "PZA",
         precioUnitario: 0,
@@ -2654,13 +2653,13 @@ const inventarioInicial = [
     },
     {
         marca: "PTR-102VP",
-        modelo: "",
-        descripcion: "Passive Video Balum With Power",
+        modelo: "Passive Video Balum With Power",
+        descripcion: "",
         proveedor: "",
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["17145836"],
         categorias: ["46"]
     },
     {
@@ -2682,7 +2681,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["75012483139193"],
         categorias: ["46"]
     },
     {
@@ -2704,7 +2703,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["76174004939"],
         categorias: ["46"]
     },
     {
@@ -2731,8 +2730,8 @@ const inventarioInicial = [
     },
     {
         marca: "HL-4131",
-        modelo: "",
-        descripcion: "LCD SCREEN CLEAN KIT",
+        modelo: "LCD SCREEN CLEAN KIT",
+        descripcion: "",
         proveedor: "",
         unidad: "PZA",
         precioUnitario: 0,
@@ -2775,8 +2774,8 @@ const inventarioInicial = [
     },
     {
         marca: "2240002833",
-        modelo: "",
-        descripcion: "CABLE HDMI",
+        modelo: "CABLE HDMI",
+        descripcion: "",
         proveedor: "",
         unidad: "PZA",
         precioUnitario: 0,
@@ -2786,8 +2785,8 @@ const inventarioInicial = [
     },
     {
         marca: "2246000839",
-        modelo: "",
-        descripcion: "CABLE USB A USB TIPO B 3.0",
+        modelo: "CABLE USB A USB TIPO B 3.0",
+        descripcion: "",
         proveedor: "",
         unidad: "PZA",
         precioUnitario: 0,
@@ -2797,8 +2796,8 @@ const inventarioInicial = [
     },
     {
         marca: "1243010365",
-        modelo: "",
-        descripcion: "CABLE DVI A DVI",
+        modelo: "CABLE DVI A DVI",
+        descripcion: "",
         proveedor: "",
         unidad: "PZA",
         precioUnitario: 0,
@@ -2808,8 +2807,8 @@ const inventarioInicial = [
     },
     {
         marca: "RAF10IWX",
-        modelo: "",
-        descripcion: "Conexión en ángulo recto \"L\", para uso con canaleta LD10, material ABS, Color Blanco Mate",
+        modelo: "Conexión en ángulo recto \"L\", para uso con canaleta LD10, material ABS, Color Blanco Mate",
+        descripcion: "",
         proveedor: "",
         unidad: "PZA",
         precioUnitario: 0,
@@ -2819,8 +2818,8 @@ const inventarioInicial = [
     },
     {
         marca: "ECF10IGX",
-        modelo: "",
-        descripcion: "Tapa Final, para uso con canaleta LD10, material ABS, Color Gris",
+        modelo: "Tapa Final, para uso con canaleta LD10, material ABS, Color Gris",
+        descripcion: "",
         proveedor: "",
         unidad: "PZA",
         precioUnitario: 0,
@@ -2847,7 +2846,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["7501206698266"],
         categorias: ["46"]
     },
     {
@@ -2869,12 +2868,12 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["7503033963579"],
         categorias: ["46"]
     },
     {
-        marca: "",
-        modelo: "CABLE DE-9",
+        marca: "CABLE DE-9",
+        modelo: "",
         descripcion: "",
         proveedor: "",
         unidad: "PZA",
@@ -2884,8 +2883,8 @@ const inventarioInicial = [
         categorias: ["46"]
     },
     {
-        marca: "",
-        modelo: "CABLE USB A USB TIPO B",
+        marca: "CABLE USB A USB TIPO B",
+        modelo: "",
         descripcion: "",
         proveedor: "",
         unidad: "PZA",
@@ -2895,8 +2894,8 @@ const inventarioInicial = [
         categorias: ["46"]
     },
     {
-        marca: "",
-        modelo: "CABLE ETHERNET RJ45",
+        marca: "CABLE ETHERNET RJ45",
+        modelo: "",
         descripcion: "",
         proveedor: "",
         unidad: "PZA",
@@ -2906,8 +2905,8 @@ const inventarioInicial = [
         categorias: ["46"]
     },
     {
-        marca: "",
-        modelo: "CAT-6 T568B",
+        marca: "CAT-6 T568B",
+        modelo: "",
         descripcion: "",
         proveedor: "",
         unidad: "PZA",
@@ -2917,8 +2916,8 @@ const inventarioInicial = [
         categorias: ["46"]
     },
     {
-        marca: "",
-        modelo: "CABLE RJ45 A DE-9",
+        marca: "CABLE RJ45 A DE-9",
+        modelo: "",
         descripcion: "",
         proveedor: "",
         unidad: "PZA",
@@ -2935,7 +2934,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["783008102784"],
         categorias: ["46"]
     },
     {
@@ -2957,7 +2956,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["17501509903255"],
         categorias: ["46"]
     },
     {
@@ -2990,7 +2989,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["887276056265"],
         categorias: ["46"]
     },
     {
@@ -3034,7 +3033,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 5,
-        numerosSerie: [],
+        numerosSerie: ["7877170328"],
         categorias: ["46"]
     },
     {
@@ -3056,7 +3055,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 5,
-        numerosSerie: [],
+        numerosSerie: ["40078477144594"],
         categorias: ["46"]
     },
     {
@@ -3111,7 +3110,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["27242763111"],
         categorias: ["46"]
     },
     {
@@ -3122,7 +3121,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["740617298697"],
         categorias: ["46"]
     },
     {
@@ -3199,7 +3198,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 7,
-        numerosSerie: [],
+        numerosSerie: ["6941264065593"],
         categorias: ["46"]
     },
     {
@@ -3221,7 +3220,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["104557205"],
         categorias: ["46"]
     },
     {
@@ -3237,8 +3236,8 @@ const inventarioInicial = [
     },
     {
         marca: "AC-HPAZUL45W",
-        modelo: "",
-        descripcion: "Cargador / Adaptador para Laptop GENERICO AC-HPAZUL45W de 45W 19.5V 2.31A (4.5*3.0)",
+        modelo: "Cargador / Adaptador para Laptop GENERICO AC-HPAZUL45W de 45W 19.5V 2.31A (4.5*3.0)",
+        descripcion: "",
         proveedor: "",
         unidad: "PZA",
         precioUnitario: 0,
@@ -3346,8 +3345,8 @@ const inventarioInicial = [
         categorias: ["46"]
     },
     {
-        marca: "",
-        modelo: "Stopwatch: Temporizador de cronómetro electrónico de plástico digital",
+        marca: "Stopwatch:",
+        modelo: "Temporizador de cronómetro electrónico de plástico digital",
         descripcion: "",
         proveedor: "",
         unidad: "PZA",
@@ -3430,7 +3429,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["676544007517"],
         categorias: ["46"]
     },
     {
@@ -3441,7 +3440,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 0,
         cantidad: 1,
-        numerosSerie: [],
+        numerosSerie: ["676544004882"],
         categorias: ["46"]
     },
     {
@@ -3567,6 +3566,7 @@ const inventarioInicial = [
     }
 ];
 
+
 async function cargarInventarioInicial() {
     try {
         await mongoose.connect(process.env.MONGO_URI as string);
@@ -3574,7 +3574,9 @@ async function cargarInventarioInicial() {
 
         // Limpiar la colección antes de insertar para evitar duplicados
         await InventoryItem.deleteMany({});
-        await InventoryMovement.deleteMany({ comentario: "Carga inicial de inventario" });
+        await InventoryMovement.deleteMany({
+            comentario: "Carga inicial de inventario"
+        });
         console.log('Colecciones limpiadas.');
 
         // Insertar todos los artículos
@@ -3590,7 +3592,7 @@ async function cargarInventarioInicial() {
             comentario: "Carga inicial de inventario",
             usuario: "SISTEMA"
         }));
-        
+
         if (movimientos.length > 0) {
             await InventoryMovement.insertMany(movimientos);
             console.log(`Se crearon ${movimientos.length} movimientos de inventario inicial.`);
