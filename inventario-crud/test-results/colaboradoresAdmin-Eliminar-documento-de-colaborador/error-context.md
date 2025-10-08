@@ -1,0 +1,224 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - region "Notifications Alt+T":
+      - alert [ref=e4]:
+        - img [ref=e6]
+        - text: Colaborador creado exitosamente
+        - button "close" [ref=e8] [cursor=pointer]:
+          - img [ref=e9] [cursor=pointer]
+        - progressbar "notification timer" [ref=e13]
+    - generic [ref=e14]:
+      - navigation [ref=e15]:
+        - generic [ref=e17]:
+          - generic [ref=e18]:
+            - img [ref=e19]
+            - generic [ref=e21]: admin
+          - button "Configuración de usuario" [ref=e22] [cursor=pointer]:
+            - img [ref=e23] [cursor=pointer]
+        - heading "Menú" [level=4] [ref=e25]
+        - list [ref=e26]:
+          - listitem [ref=e27]:
+            - link "Dashboard" [ref=e28] [cursor=pointer]:
+              - /url: /dashboard
+              - img [ref=e29] [cursor=pointer]
+              - generic [ref=e31] [cursor=pointer]: Dashboard
+          - listitem [ref=e32]:
+            - button "Solicitudes ▼" [ref=e34] [cursor=pointer]:
+              - generic [ref=e35] [cursor=pointer]:
+                - img [ref=e36] [cursor=pointer]
+                - generic [ref=e38] [cursor=pointer]: Solicitudes
+              - generic [ref=e39] [cursor=pointer]: ▼
+          - listitem [ref=e40]:
+            - link "Colaboradores" [ref=e41] [cursor=pointer]:
+              - /url: /colaboradores
+              - img [ref=e42] [cursor=pointer]
+              - generic [ref=e44] [cursor=pointer]: Colaboradores
+          - listitem [ref=e45]:
+            - link "Guías" [ref=e46] [cursor=pointer]:
+              - /url: /guias
+              - img [ref=e47] [cursor=pointer]
+              - generic [ref=e49] [cursor=pointer]: Guías
+          - listitem [ref=e50]:
+            - button "Proyectos ▼" [ref=e52] [cursor=pointer]:
+              - generic [ref=e53] [cursor=pointer]:
+                - img [ref=e54] [cursor=pointer]
+                - generic [ref=e56] [cursor=pointer]: Proyectos
+              - generic [ref=e57] [cursor=pointer]: ▼
+          - listitem [ref=e58]:
+            - button "Inventario ▼" [ref=e60] [cursor=pointer]:
+              - generic [ref=e61] [cursor=pointer]:
+                - img [ref=e62] [cursor=pointer]
+                - generic [ref=e64] [cursor=pointer]: Inventario
+              - generic [ref=e65] [cursor=pointer]: ▼
+          - listitem [ref=e66]:
+            - button "Bases de Datos ▼" [ref=e68] [cursor=pointer]:
+              - generic [ref=e69] [cursor=pointer]:
+                - img [ref=e70] [cursor=pointer]
+                - generic [ref=e72] [cursor=pointer]: Bases de Datos
+              - generic [ref=e73] [cursor=pointer]: ▼
+        - button "Cerrar sesión" [ref=e75] [cursor=pointer]
+      - main [ref=e76]:
+        - generic [ref=e79]:
+          - heading "Colaboradores" [level=2] [ref=e81]
+          - generic [ref=e82]:
+            - generic [ref=e83]:
+              - textbox "Buscar por número de empleado, nombre, NSS o puesto..." [ref=e84]
+              - button "Agregar Colaborador" [ref=e85] [cursor=pointer]
+            - table [ref=e87]:
+              - rowgroup [ref=e88]:
+                - row "No. Empleado Foto Nombre NSS Puesto Fecha Alta IMSS Razón Social Más" [ref=e89]:
+                  - cell "No. Empleado" [ref=e90]
+                  - cell "Foto" [ref=e91]
+                  - cell "Nombre" [ref=e92]
+                  - cell "NSS" [ref=e93]
+                  - cell "Puesto" [ref=e94]
+                  - cell "Fecha Alta IMSS" [ref=e95]
+                  - cell "Razón Social" [ref=e96]
+                  - cell "Más" [ref=e97]
+              - rowgroup [ref=e98]:
+                - row "128 Foto de colaborador colaborador 12312321123 tester 04/09/2025 usuariorazonsocial Editar Eliminar" [ref=e99]:
+                  - cell "128" [ref=e100]
+                  - cell "Foto de colaborador" [ref=e101]:
+                    - img "Foto de colaborador" [ref=e103] [cursor=pointer]
+                  - cell "colaborador" [ref=e104]
+                  - cell "12312321123" [ref=e105]
+                  - cell "tester" [ref=e106]
+                  - cell "04/09/2025" [ref=e107]
+                  - cell "usuariorazonsocial" [ref=e108]
+                  - cell "Editar Eliminar" [ref=e109]:
+                    - generic [ref=e110]:
+                      - button "Editar" [ref=e111] [cursor=pointer]
+                      - button "Eliminar" [ref=e112] [cursor=pointer]
+                      - button [ref=e113] [cursor=pointer]:
+                        - img [ref=e114] [cursor=pointer]
+                      - button [ref=e116] [cursor=pointer]:
+                        - img [ref=e117] [cursor=pointer]
+                - row "269 Foto de Colaborador-velohl-1758819925793 Colaborador-velohl-1758819925793 47373383949 Asistente Administrativo 07/09/2025 usuariorazonsocial Editar Eliminar" [ref=e119]:
+                  - cell "269" [ref=e120]
+                  - cell "Foto de Colaborador-velohl-1758819925793" [ref=e121]:
+                    - img "Foto de Colaborador-velohl-1758819925793" [ref=e123] [cursor=pointer]
+                  - cell "Colaborador-velohl-1758819925793" [ref=e124]
+                  - cell "47373383949" [ref=e125]
+                  - cell "Asistente Administrativo" [ref=e126]
+                  - cell "07/09/2025" [ref=e127]
+                  - cell "usuariorazonsocial" [ref=e128]
+                  - cell "Editar Eliminar" [ref=e129]:
+                    - generic [ref=e130]:
+                      - button "Editar" [ref=e131] [cursor=pointer]
+                      - button "Eliminar" [ref=e132] [cursor=pointer]
+                      - button [ref=e133] [cursor=pointer]:
+                        - img [ref=e134] [cursor=pointer]
+                      - button [ref=e136] [cursor=pointer]:
+                        - img [ref=e137] [cursor=pointer]
+                - row "272 Foto de Colaborador-858iih-1758820120187 Colaborador-858iih-1758820120187 22181538566 Asistente Administrativo 07/09/2025 usuariorazonsocial Editar Eliminar" [ref=e139]:
+                  - cell "272" [ref=e140]
+                  - cell "Foto de Colaborador-858iih-1758820120187" [ref=e141]:
+                    - img "Foto de Colaborador-858iih-1758820120187" [ref=e143] [cursor=pointer]
+                  - cell "Colaborador-858iih-1758820120187" [ref=e144]
+                  - cell "22181538566" [ref=e145]
+                  - cell "Asistente Administrativo" [ref=e146]
+                  - cell "07/09/2025" [ref=e147]
+                  - cell "usuariorazonsocial" [ref=e148]
+                  - cell "Editar Eliminar" [ref=e149]:
+                    - generic [ref=e150]:
+                      - button "Editar" [ref=e151] [cursor=pointer]
+                      - button "Eliminar" [ref=e152] [cursor=pointer]
+                      - button [ref=e153] [cursor=pointer]:
+                        - img [ref=e154] [cursor=pointer]
+                      - button [ref=e156] [cursor=pointer]:
+                        - img [ref=e157] [cursor=pointer]
+                - row "275 Foto de Colaborador-opy4sk-1758823652016 Colaborador-opy4sk-1758823652016 86828202288 Asistente Administrativo 07/09/2025 usuariorazonsocial Editar Eliminar" [ref=e159]:
+                  - cell "275" [ref=e160]
+                  - cell "Foto de Colaborador-opy4sk-1758823652016" [ref=e161]:
+                    - img "Foto de Colaborador-opy4sk-1758823652016" [ref=e163] [cursor=pointer]
+                  - cell "Colaborador-opy4sk-1758823652016" [ref=e164]
+                  - cell "86828202288" [ref=e165]
+                  - cell "Asistente Administrativo" [ref=e166]
+                  - cell "07/09/2025" [ref=e167]
+                  - cell "usuariorazonsocial" [ref=e168]
+                  - cell "Editar Eliminar" [ref=e169]:
+                    - generic [ref=e170]:
+                      - button "Editar" [ref=e171] [cursor=pointer]
+                      - button "Eliminar" [ref=e172] [cursor=pointer]
+                      - button [ref=e173] [cursor=pointer]:
+                        - img [ref=e174] [cursor=pointer]
+                      - button [ref=e176] [cursor=pointer]:
+                        - img [ref=e177] [cursor=pointer]
+                - row "276 Foto de Colaborador-kw1k9q-1758823660641 Colaborador-kw1k9q-1758823660641 86036728365 Gerente de Recursos Humanos 07/09/2025 usuariorazonsocial Editar Eliminar" [ref=e179]:
+                  - cell "276" [ref=e180]
+                  - cell "Foto de Colaborador-kw1k9q-1758823660641" [ref=e181]:
+                    - img "Foto de Colaborador-kw1k9q-1758823660641" [ref=e183] [cursor=pointer]
+                  - cell "Colaborador-kw1k9q-1758823660641" [ref=e184]
+                  - cell "86036728365" [ref=e185]
+                  - cell "Gerente de Recursos Humanos" [ref=e186]
+                  - cell "07/09/2025" [ref=e187]
+                  - cell "usuariorazonsocial" [ref=e188]
+                  - cell "Editar Eliminar" [ref=e189]:
+                    - generic [ref=e190]:
+                      - button "Editar" [ref=e191] [cursor=pointer]
+                      - button "Eliminar" [ref=e192] [cursor=pointer]
+                      - button [ref=e193] [cursor=pointer]:
+                        - img [ref=e194] [cursor=pointer]
+                      - button [ref=e196] [cursor=pointer]:
+                        - img [ref=e197] [cursor=pointer]
+                - row "277 Foto de Colaborador-o2smhb-1758823669194 Colaborador-o2smhb-1758823669194 60749431058 Coordinador de Proyectos 07/09/2025 usuariorazonsocial Editar Eliminar" [ref=e199]:
+                  - cell "277" [ref=e200]
+                  - cell "Foto de Colaborador-o2smhb-1758823669194" [ref=e201]:
+                    - img "Foto de Colaborador-o2smhb-1758823669194" [ref=e203] [cursor=pointer]
+                  - cell "Colaborador-o2smhb-1758823669194" [ref=e204]
+                  - cell "60749431058" [ref=e205]
+                  - cell "Coordinador de Proyectos" [ref=e206]
+                  - cell "07/09/2025" [ref=e207]
+                  - cell "usuariorazonsocial" [ref=e208]
+                  - cell "Editar Eliminar" [ref=e209]:
+                    - generic [ref=e210]:
+                      - button "Editar" [ref=e211] [cursor=pointer]
+                      - button "Eliminar" [ref=e212] [cursor=pointer]
+                      - button [ref=e213] [cursor=pointer]:
+                        - img [ref=e214] [cursor=pointer]
+                      - button [ref=e216] [cursor=pointer]:
+                        - img [ref=e217] [cursor=pointer]
+  - dialog [ref=e220]:
+    - generic [ref=e221]:
+      - generic [ref=e222]:
+        - generic [ref=e223]: Documentos - Colaborador-o2smhb-1758823669194
+        - button "Close" [ref=e224] [cursor=pointer]
+      - generic [ref=e226]:
+        - generic [ref=e227]:
+          - heading "Lista de Documentos" [level=3] [ref=e228]
+          - button "plus Cancelar" [ref=e229] [cursor=pointer]:
+            - img "plus" [ref=e231] [cursor=pointer]:
+              - img [ref=e232] [cursor=pointer]
+            - generic [ref=e235] [cursor=pointer]: Cancelar
+        - generic [ref=e236]:
+          - generic [ref=e239]: Nuevo Documento
+          - generic [ref=e241]:
+            - generic [ref=e242]:
+              - generic [ref=e244]:
+                - generic "Nombre del documento" [ref=e246]: "* Nombre del documento"
+                - textbox "* Nombre del documento" [active] [ref=e250]: Documento Temporal
+              - generic [ref=e252]:
+                - generic "Fecha de vencimiento (opcional)" [ref=e254]:
+                  - text: Fecha de vencimiento (opcional)
+                  - img "question-circle" [ref=e255]:
+                    - img [ref=e256]
+                - generic [ref=e263]:
+                  - textbox "Fecha de vencimiento (opcional) question-circle" [ref=e264]
+                  - generic:
+                    - img "calendar":
+                      - img
+            - generic [ref=e266]:
+              - generic "Documento" [ref=e268]: "* Documento"
+              - 'button "inbox Haga clic o arrastre un archivo a esta área Archivos permitidos: PDF, JPG, PNG, GIF, WEBP" [ref=e274] [cursor=pointer]':
+                - generic [ref=e276] [cursor=pointer]:
+                  - paragraph [ref=e277] [cursor=pointer]:
+                    - img "inbox" [ref=e278] [cursor=pointer]:
+                      - img [ref=e279] [cursor=pointer]
+                  - paragraph [ref=e281] [cursor=pointer]: Haga clic o arrastre un archivo a esta área
+                  - paragraph [ref=e282] [cursor=pointer]: "Archivos permitidos: PDF, JPG, PNG, GIF, WEBP"
+            - button "Guardar Documento" [ref=e288] [cursor=pointer]:
+              - generic [ref=e289] [cursor=pointer]: Guardar Documento
+```
