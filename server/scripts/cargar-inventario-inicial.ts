@@ -1,14 +1,10 @@
+
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { InventoryItem } from '../src/models/InventoryItem';
-import { InventoryMovement } from '../src/models/InventoryMovement'; // Asegúrate de importar este modelo
-dotenv.config();
+import { InventoryMovement } from '../src/models/InventoryMovement'; // Asegúrate de que este modelo exista
 
-// Asegurarse de que la variable de entorno MONGO_URI esté definida
-if (!process.env.MONGO_URI) {
-    console.error('La variable de entorno MONGO_URI no está definida en el archivo .env');
-    process.exit(1);
-}
+dotenv.config();
 
 const inventarioInicial = [
     {
@@ -94,7 +90,7 @@ const inventarioInicial = [
         descripcion: "Lector esclavo / Huella Digital / Lector de Tarjetas de Proximidad / RS-485 /",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 1223,
+        precioUnitario: 1223.00,
         cantidad: 1,
         numerosSerie: ["CGIN193960357"],
         categorias: ["46"]
@@ -105,7 +101,7 @@ const inventarioInicial = [
         descripcion: "Lector de Tarjeta de Proximidad con Teclado PRO-KEYPAD-SV2, Wiegand, 1100 Usuarios",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 1200,
+        precioUnitario: 1200.00,
         cantidad: 1,
         numerosSerie: ["104557205"],
         categorias: ["46"]
@@ -171,7 +167,7 @@ const inventarioInicial = [
         descripcion: "Acteck Adaptador USB-C Macho - HDMI Hembra, 15cm, Negro",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 300,
+        precioUnitario: 300.00,
         cantidad: 2,
         numerosSerie: ["7506215923040"],
         categorias: ["46"]
@@ -182,7 +178,7 @@ const inventarioInicial = [
         descripcion: "Acteck Adaptador USB-C Macho - HDMI/VGA Hembra, 10cm",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 303,
+        precioUnitario: 303.00,
         cantidad: 1,
         numerosSerie: ["7506215934657"],
         categorias: ["46"]
@@ -193,7 +189,7 @@ const inventarioInicial = [
         descripcion: "Extensor PoE para exteriores",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 7005.00,
         cantidad: 1,
         numerosSerie: ["7331021061071"],
         categorias: ["46"]
@@ -204,7 +200,7 @@ const inventarioInicial = [
         descripcion: "BAOFENG UV-5R 5W Dual Band Radio",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 344.44,
         cantidad: 2,
         numerosSerie: ["B074XPB313"],
         categorias: ["46"]
@@ -215,7 +211,7 @@ const inventarioInicial = [
         descripcion: "Barrera de deteccion de humo / Cobertura 107 METROS. Tipo: De Proyectos Etapa: Ofertas AAA",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 14867.96,
         cantidad: 5,
         numerosSerie: ["78269500697"],
         categorias: ["46"]
@@ -237,7 +233,7 @@ const inventarioInicial = [
         descripcion: "NETCONNECT® Cat 6 U/UTP RJ45 Patch Cord, Non-Plenum",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 293,
+        precioUnitario: 293.00,
         cantidad: 2,
         numerosSerie: ["01355-07-03085"],
         categorias: ["46"]
@@ -259,7 +255,7 @@ const inventarioInicial = [
         descripcion: "Cámara Domo Full Color de 2 MP. Lente fijo 2.8 mm con ángulo de 103°, micrófono integrado, iluminación LED de 20 m, tecnología Starlight para excelente desempeño en baja luz, DWDR, certificación IP67 y fácil instalación.",
         proveedor: "TVC",
         unidad: "PZA",
-        precioUnitario: 406,
+        precioUnitario: 406.00,
         cantidad: 1,
         numerosSerie: ["6923172546104"],
         categorias: ["46"]
@@ -270,7 +266,7 @@ const inventarioInicial = [
         descripcion: "Control de Acceso con Reconocimiento Facial/ Pantalla de 4.3 Pulgadas/ Soporta 3000 Rostros, Usuarios y Passwords/ 5,000 Tarjetas Mifare (IC Card)/ 50 Administradores/ 300,000 Registros/ 99.99% de Presición/ FACT",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 2009,
+        precioUnitario: 2009.00,
         cantidad: 1,
         numerosSerie: ["6923169713434"],
         categorias: ["46"]
@@ -281,7 +277,7 @@ const inventarioInicial = [
         descripcion: "Switch poe de 4 puertos - capa 2, 1 puerto 10/100 base t, 4 puertos poe 10/100, 36 watts totales, switching 1 gbps",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 470,
+        precioUnitario: 470.00,
         cantidad: 1,
         numerosSerie: ["6939554912313"],
         categorias: ["46"]
@@ -289,10 +285,10 @@ const inventarioInicial = [
     {
         marca: "DAHUA",
         modelo: "DH-PFM904",
-        descripcion: "Monitor 4.3\" para Videovigilancia PFM904, 480 x 272 Pixeles, Negro",
+        descripcion: "Monitor 4.3\"\" para Videovigilancia PFM904, 480 x 272 Pixeles, Negro",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 1529,
+        precioUnitario: 1529.00,
         cantidad: 1,
         numerosSerie: ["6939554980220"],
         categorias: ["46"]
@@ -303,7 +299,7 @@ const inventarioInicial = [
         descripcion: "Transceptores pasivos 4K que transmiten video de hasta 8MP a 200 metros. Compatibles con resoluciones 720P, 1080P, 4MP, 5MP y 4K en formatos HDCVI, TVI, AHD y CVBS. Ideales para vigilancia en alta resolución y largas distancias. Tipo: Más Vendidos Etapa: De Línea",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 54,
+        precioUnitario: 54.00,
         cantidad: 1,
         numerosSerie: ["6939554999055"],
         categorias: ["46"]
@@ -314,7 +310,7 @@ const inventarioInicial = [
         descripcion: "PowerG Inalámbrico Puerta/Ventana Contacto Magnético",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 599,
+        precioUnitario: 599.00,
         cantidad: 1,
         numerosSerie: ["7290109981819"],
         categorias: ["46"]
@@ -325,7 +321,7 @@ const inventarioInicial = [
         descripcion: "Módulo Expansor de 8 Zonas Cableadas compatible con panel Power Series",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 1144.6,
+        precioUnitario: 1144.60,
         cantidad: 1,
         numerosSerie: ["820043000160"],
         categorias: ["46"]
@@ -336,7 +332,7 @@ const inventarioInicial = [
         descripcion: "Teclado Cableado LCD Alfanumérico de 32 caracteres admite 128 zonas compatible con NEO",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 2209,
+        precioUnitario: 2209.00,
         cantidad: 2,
         numerosSerie: ["820043000412"],
         categorias: ["46"]
@@ -347,7 +343,7 @@ const inventarioInicial = [
         descripcion: "Teclado Cableado LCD Alfanumérico con Transceptor integrado de 32 caracteres admite 128 zonas compatible con NEO",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 2439,
+        precioUnitario: 2439.00,
         cantidad: 1,
         numerosSerie: ["82004300043"],
         categorias: ["46"]
@@ -358,7 +354,7 @@ const inventarioInicial = [
         descripcion: "Sirena Cableada para Interior 12 VCD 15W 2 tonos 85 dB #LosPrincipales",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 165.45,
         cantidad: 2,
         numerosSerie: ["820043012040"],
         categorias: ["46"]
@@ -383,17 +379,6 @@ const inventarioInicial = [
         precioUnitario: 151.05,
         cantidad: 2,
         numerosSerie: ["676544007623"],
-        categorias: ["46"]
-    },
-    {
-        marca: "EPCOM INDUSTRIAL",
-        modelo: "GOF01XTV2",
-        descripcion: "Gabinete para baterías, compatible con tablillas ELKP624U-ELKP624, AL624, SMP3 y SMP5",
-        proveedor: "",
-        unidad: "PZA",
-        precioUnitario: 173.68,
-        cantidad: 2,
-        numerosSerie: [],
         categorias: ["46"]
     },
     {
@@ -435,7 +420,7 @@ const inventarioInicial = [
         descripcion: "Transformador 16 Vca 40 VA",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 132.6,
+        precioUnitario: 132.60,
         cantidad: 3,
         numerosSerie: ["697477291023"],
         categorias: ["46"]
@@ -446,7 +431,7 @@ const inventarioInicial = [
         descripcion: "Fuente de poder 12v 5a",
         proveedor: "Syscom",
         unidad: "PZA",
-        precioUnitario: 481,
+        precioUnitario: 481.00,
         cantidad: 1,
         numerosSerie: ["697477291015"],
         categorias: ["46"]
@@ -490,7 +475,7 @@ const inventarioInicial = [
         descripcion: "Kit extensor KVM (HDMI y USB) 40m 4k@30Hz 40m 1080P@60Hz",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 1205.43,
         cantidad: 1,
         numerosSerie: ["854370082608"],
         categorias: ["46"]
@@ -509,7 +494,7 @@ const inventarioInicial = [
     {
         marca: "FIRE-LITE",
         modelo: "SD-365",
-        descripcion: "Detector de humo fotoeléctrico direccionable, color blanco, incluye base de montaje 6\"",
+        descripcion: "Detector de humo fotoeléctrico direccionable, color blanco, incluye base de montaje 6\"\"\"",
         proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 969.24,
@@ -534,7 +519,7 @@ const inventarioInicial = [
         descripcion: "Caja de Montaje Para Estación Manual de Emergencia BG-12LX y BG-12L",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 295.86,
         cantidad: 1,
         numerosSerie: ["783008102784"],
         categorias: ["46"]
@@ -600,7 +585,7 @@ const inventarioInicial = [
         descripcion: "Expansor de 8 Zonas Inalámbricas",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 501.7,
+        precioUnitario: 501.70,
         cantidad: 1,
         numerosSerie: ["6941264024712"],
         categorias: ["46"]
@@ -622,7 +607,7 @@ const inventarioInicial = [
         descripcion: "Botón de pánico inalámbrico",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 35.93,
         cantidad: 1,
         numerosSerie: ["3781-1007008"],
         categorias: ["46"]
@@ -684,17 +669,6 @@ const inventarioInicial = [
     },
     {
         marca: "HIKVISION",
-        modelo: "8839-433",
-        descripcion: "Manual del usuario del transmisor de llave inalámbrico",
-        proveedor: "SYSCOM",
-        unidad: "PZA",
-        precioUnitario: 0,
-        cantidad: 1,
-        numerosSerie: [],
-        categorias: ["46"]
-    },
-    {
-        marca: "HIKVISION",
         modelo: "DS-K1101MK",
         descripcion: "Lector de Tarjetas MIFARE y Contraseñas / Conexión Wiegand y RS-485 / Estético y Fácil de Utilizar",
         proveedor: "SYSCOM",
@@ -710,7 +684,7 @@ const inventarioInicial = [
         descripcion: "Punto intermedio PoE",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 522.91,
         cantidad: 3,
         numerosSerie: [],
         categorias: ["46"]
@@ -743,7 +717,7 @@ const inventarioInicial = [
         descripcion: "Sensor de Masa de 1 Canal / Detección de Presencia o Pulso",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 397.9,
+        precioUnitario: 397.90,
         cantidad: 1,
         numerosSerie: ["110120240805018"],
         categorias: ["46"]
@@ -765,7 +739,7 @@ const inventarioInicial = [
         descripcion: "Detector PIR Cableado para Interior / Inmunidad a Mascotas / Rango de Detección de 18 mts",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 191,
+        precioUnitario: 191.00,
         cantidad: 1,
         numerosSerie: ["6941264044208"],
         categorias: ["46"]
@@ -778,7 +752,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 158.66,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["0"],
         categorias: ["46"]
     },
     {
@@ -853,7 +827,7 @@ const inventarioInicial = [
         descripcion: "Estrobo Color Rojo / 90 Destellos por minuto compatible con paneles",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 153,
+        precioUnitario: 153.00,
         cantidad: 1,
         numerosSerie: ["LGH1090002"],
         categorias: ["46"]
@@ -864,7 +838,7 @@ const inventarioInicial = [
         descripcion: "PINZA ARTICULADA, 10 PLG",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 389,
+        precioUnitario: 389.00,
         cantidad: 1,
         numerosSerie: ["76812480644"],
         categorias: ["46"]
@@ -875,7 +849,7 @@ const inventarioInicial = [
         descripcion: "Latiguillo industrial DURAPORT™ Cat 6, enchufe industrial a enchufe RJ-45, 10 pies, negro",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 0.00,
         cantidad: 4,
         numerosSerie: ["78477229927"],
         categorias: ["46"]
@@ -886,8 +860,8 @@ const inventarioInicial = [
         descripcion: "EXTREME™ Cat 6 QUICKPORT™ Jack, Blue",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 190,
-        cantidad: 66,
+        precioUnitario: 190.00,
+        cantidad: 121,
         numerosSerie: ["40078477144655"],
         categorias: ["46"]
     },
@@ -897,7 +871,7 @@ const inventarioInicial = [
         descripcion: "GIGAMAX™ Cat 5e QUICKPORT™ Jack, Blue",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 151,
+        precioUnitario: 151.00,
         cantidad: 1,
         numerosSerie: ["78477170519"],
         categorias: ["46"]
@@ -908,7 +882,7 @@ const inventarioInicial = [
         descripcion: "Conector EXTREME™ Cat 6 QUICKPORT™, amarillo",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 190,
+        precioUnitario: 190.00,
         cantidad: 4,
         numerosSerie: ["40078477144662"],
         categorias: ["46"]
@@ -930,7 +904,7 @@ const inventarioInicial = [
         descripcion: "EXTREME™ Cat 6 QUICKPORT™ Jack, Black",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 172,
+        precioUnitario: 172.00,
         cantidad: 15,
         numerosSerie: ["40078477144617"],
         categorias: ["46"]
@@ -941,7 +915,7 @@ const inventarioInicial = [
         descripcion: "EXTREME™ Cat 6 QUICKPORT™ Jack, White",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 170,
+        precioUnitario: 170.00,
         cantidad: 15,
         numerosSerie: ["40078477144594"],
         categorias: ["46"]
@@ -952,7 +926,7 @@ const inventarioInicial = [
         descripcion: "Blank QUICKPORT™ Insert, Black (pack of 10)",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 87,
+        precioUnitario: 87.00,
         cantidad: 2,
         numerosSerie: ["78477749256"],
         categorias: ["46"]
@@ -963,8 +937,8 @@ const inventarioInicial = [
         descripcion: "Placa de pared QUICKPORT™ de un solo elemento con ventanas de identificación, 2 puertos, blanco",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 69,
-        cantidad: 53,
+        precioUnitario: 69.00,
+        cantidad: 46,
         numerosSerie: ["60078477978209"],
         categorias: ["46"]
     },
@@ -974,7 +948,7 @@ const inventarioInicial = [
         descripcion: "Placa de pared QUICKPORT™ de un solo elemento con ventana de identificación, 1 puerto, blanco",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 69,
+        precioUnitario: 69.00,
         cantidad: 19,
         numerosSerie: ["60078477978162"],
         categorias: ["46"]
@@ -1019,7 +993,7 @@ const inventarioInicial = [
         proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 317.89,
-        cantidad: 1,
+        cantidad: 0.08,
         numerosSerie: [],
         categorias: ["46"]
     },
@@ -1040,7 +1014,7 @@ const inventarioInicial = [
         descripcion: "Latiguillo UTP Cat 5e, 3 pies, blanco",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 134,
+        precioUnitario: 134.00,
         cantidad: 2,
         numerosSerie: ["78477164532"],
         categorias: ["46"]
@@ -1051,7 +1025,7 @@ const inventarioInicial = [
         descripcion: "TERMINADO",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 13,
+        precioUnitario: 13.00,
         cantidad: 2,
         numerosSerie: ["78477292013"],
         categorias: ["46"]
@@ -1062,7 +1036,7 @@ const inventarioInicial = [
         descripcion: "Cat 6 Latiguillo de alta flexibilidad de diámetro pequeño, 1,2 m (4 pies), negro",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 14,
+        precioUnitario: 14.00,
         cantidad: 40,
         numerosSerie: ["78477912522"],
         categorias: ["46"]
@@ -1073,7 +1047,7 @@ const inventarioInicial = [
         descripcion: "Quickport Patch Panel 24 Port 1RU w Cable Management Bar",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 1139,
+        precioUnitario: 1139.00,
         cantidad: 1,
         numerosSerie: ["78477387979"],
         categorias: ["46"]
@@ -1084,7 +1058,7 @@ const inventarioInicial = [
         descripcion: "Gato EXTREME™ Cat 6 QUICKPORT™, gris",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 169,
+        precioUnitario: 169.00,
         cantidad: 16,
         numerosSerie: ["78477144602"],
         categorias: ["46"]
@@ -1095,7 +1069,7 @@ const inventarioInicial = [
         descripcion: "Cat 6 Latiguillo de alta flexibilidad de diámetro pequeño, 0,9 m (3 pies), blanco",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 0.00,
         cantidad: 10,
         numerosSerie: ["40078477669219"],
         categorias: ["46"]
@@ -1106,7 +1080,7 @@ const inventarioInicial = [
         descripcion: "Miniatura del producto Cat 6 Cable de conexión de alta flexibilidad de diámetro pequeño, 5 pies (1,5 m), blanco",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 0.00,
         cantidad: 21,
         numerosSerie: ["78477669303"],
         categorias: ["46"]
@@ -1118,7 +1092,7 @@ const inventarioInicial = [
         proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 317.89,
-        cantidad: 1,
+        cantidad: 0.16,
         numerosSerie: ["78477208403"],
         categorias: ["46"]
     },
@@ -1139,7 +1113,7 @@ const inventarioInicial = [
         descripcion: "CABLE DE CONEXIÓN EXTREME 6+, CAT6 COLOR NEGRO, 7 PIES DE LARGO",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 0.00,
         cantidad: 1,
         numerosSerie: ["78477134047"],
         categorias: ["46"]
@@ -1150,7 +1124,7 @@ const inventarioInicial = [
         descripcion: "Herramienta de terminación de la palma de la mano",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 0.00,
         cantidad: 3,
         numerosSerie: ["78477413418"],
         categorias: ["46"]
@@ -1161,7 +1135,7 @@ const inventarioInicial = [
         descripcion: "Cable de conexión UTP Cat 6, 3 pies, blanco",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 0.00,
         cantidad: 3,
         numerosSerie: ["78477344835"],
         categorias: ["46"]
@@ -1172,7 +1146,7 @@ const inventarioInicial = [
         descripcion: "LinkedPro Kit de 4 tornillos y 4 Arandelas para Rack, Negro",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 35,
+        precioUnitario: 35.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -1227,7 +1201,7 @@ const inventarioInicial = [
         descripcion: "Módulo Jack 110 Cat6, Keystone para faceplate - Color Azul",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 21.3,
+        precioUnitario: 21.30,
         cantidad: 20,
         numerosSerie: [],
         categorias: ["46"]
@@ -1268,7 +1242,7 @@ const inventarioInicial = [
     {
         marca: "LINKEDPRO BY EPCOM",
         modelo: "LPCM-042U",
-        descripcion: "Organizador de Cables Horizontal de 2U para Rack de 19\" con Cubierta Metálica",
+        descripcion: "Organizador de Cables Horizontal de 2U para Rack de 19\"\" con Cubierta Metálica",
         proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 254.79,
@@ -1290,7 +1264,7 @@ const inventarioInicial = [
     {
         marca: "LINKEDPRO BY EPCOM",
         modelo: "S-CH-19X19.6",
-        descripcion: "Charola para Rack de 19\", 50 cm de Profundidad, 3UR. Capacidad carga: 30 Kg",
+        descripcion: "Charola para Rack de 19\"\", 50 cm de Profundidad, 3UR. Capacidad carga: 30 Kg",
         proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 587.06,
@@ -1304,7 +1278,7 @@ const inventarioInicial = [
         descripcion: "Cable para Monitor SVGA 8mm, VGA (D-Sub) Macho - VGA (D-Sub) Macho, 1.8 Metros",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 97,
+        precioUnitario: 97.00,
         cantidad: 1,
         numerosSerie: ["766623311731"],
         categorias: ["46"]
@@ -1315,7 +1289,7 @@ const inventarioInicial = [
         descripcion: "Cable HDMI de Alta Velocidad HDMI Macho a HDMI Macho, Blindado, Negro, 1.8 m (6 ft.)",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 49,
+        precioUnitario: 49.00,
         cantidad: 3,
         numerosSerie: ["766623306119"],
         categorias: ["46"]
@@ -1326,7 +1300,7 @@ const inventarioInicial = [
         descripcion: "Convertidor Serial a USB",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 206,
+        precioUnitario: 206.00,
         cantidad: 1,
         numerosSerie: ["766623205153"],
         categorias: ["46"]
@@ -1337,7 +1311,7 @@ const inventarioInicial = [
         descripcion: "Placa de pared HDMI de un puerto",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 154,
+        precioUnitario: 154.00,
         cantidad: 2,
         numerosSerie: ["766623771719"],
         categorias: ["46"]
@@ -1348,7 +1322,7 @@ const inventarioInicial = [
         descripcion: "Cable USB A - USB B, 1.8 Metros, Negro",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 29,
+        precioUnitario: 29.00,
         cantidad: 1,
         numerosSerie: ["766623342650"],
         categorias: ["46"]
@@ -1359,7 +1333,7 @@ const inventarioInicial = [
         descripcion: "Adaptador Pasivo de Mini DisplayPort a HDMI",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 177,
+        precioUnitario: 177.00,
         cantidad: 2,
         numerosSerie: ["766623322461"],
         categorias: ["46"]
@@ -1370,7 +1344,7 @@ const inventarioInicial = [
         descripcion: "Cople HDMI",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 94,
+        precioUnitario: 94.00,
         cantidad: 2,
         numerosSerie: ["766623353465"],
         categorias: ["46"]
@@ -1381,7 +1355,7 @@ const inventarioInicial = [
         descripcion: "Cable de Extensión USB",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 83,
+        precioUnitario: 83.00,
         cantidad: 1,
         numerosSerie: ["766623340960"],
         categorias: ["46"]
@@ -1392,7 +1366,7 @@ const inventarioInicial = [
         descripcion: "Cable de Extensión USB",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 45,
+        precioUnitario: 45.00,
         cantidad: 2,
         numerosSerie: ["766623165211"],
         categorias: ["46"]
@@ -1403,7 +1377,7 @@ const inventarioInicial = [
         descripcion: "Pasta Térmica para CPU",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 30,
+        precioUnitario: 30.00,
         cantidad: 2,
         numerosSerie: ["766623701662"],
         categorias: ["46"]
@@ -1414,7 +1388,7 @@ const inventarioInicial = [
         descripcion: "Adaptador DisplayPort a HDMI Pasivo",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 146,
+        precioUnitario: 146.00,
         cantidad: 2,
         numerosSerie: ["766623151993"],
         categorias: ["46"]
@@ -1425,7 +1399,7 @@ const inventarioInicial = [
         descripcion: "Cable para monitor SVGA",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 143,
+        precioUnitario: 143.00,
         cantidad: 1,
         numerosSerie: ["766623311748"],
         categorias: ["46"]
@@ -1436,7 +1410,7 @@ const inventarioInicial = [
         descripcion: "Fuente de poder 48Vcc 150W 3.2A industrial",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 1122.23,
         cantidad: 3,
         numerosSerie: [],
         categorias: ["46"]
@@ -1455,10 +1429,10 @@ const inventarioInicial = [
     {
         marca: "MILWAUKEE",
         modelo: "48-20-6031",
-        descripcion: "Broca SDS-PLUS 2CT 1/4\" X 4\" X 6\" MilwaukeeTool 48-20-6031",
+        descripcion: "Broca SDS-PLUS 2CT 1/4\"\" X 4\"\" X 6\"\" MilwaukeeTool 48-20-6031",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 100,
+        precioUnitario: 100.00,
         cantidad: 1,
         numerosSerie: ["45242577644"],
         categorias: ["46"]
@@ -1469,7 +1443,7 @@ const inventarioInicial = [
         descripcion: "Convertidor de Medios SC Gigabit Ethernet SM 1310nm, 20km",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 453.39,
         cantidad: 1,
         numerosSerie: ["215300034"],
         categorias: ["46"]
@@ -1480,7 +1454,7 @@ const inventarioInicial = [
         descripcion: "Organizador Horizontal para Sujeción de cable trasero de 1UR",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 348.79,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -1491,7 +1465,7 @@ const inventarioInicial = [
         descripcion: "TELÉFONO HÍBRIDO PANASONIC",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 5400,
+        precioUnitario: 5400.00,
         cantidad: 1,
         numerosSerie: ["8887549708510"],
         categorias: ["46"]
@@ -1513,7 +1487,7 @@ const inventarioInicial = [
         descripcion: "Conector Jack Estilo TP, Tipo Keystone, Categoría 6, de 8 posiciones y 8 cables, Color Blanco Mate",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 103.38,
         cantidad: 7,
         numerosSerie: ["74983438051"],
         categorias: ["46"]
@@ -1591,7 +1565,7 @@ const inventarioInicial = [
         proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 4.07,
-        cantidad: 1,
+        cantidad: 0.4,
         numerosSerie: ["74983860371"],
         categorias: ["46"]
     },
@@ -1766,7 +1740,7 @@ const inventarioInicial = [
         descripcion: "Netkey Cat 6,8Pos, Conector universal de 8 hilos",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 160,
+        precioUnitario: 160.00,
         cantidad: 1,
         numerosSerie: ["74983438235"],
         categorias: ["46"]
@@ -1810,7 +1784,7 @@ const inventarioInicial = [
         descripcion: "Switch de Escritorio No Administrable, 8 Puertos Gigabit 10/100/1000 Mbps",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 486.6,
+        precioUnitario: 486.60,
         cantidad: 1,
         numerosSerie: ["84769000278"],
         categorias: ["46"]
@@ -1832,7 +1806,7 @@ const inventarioInicial = [
         descripcion: "Cámara Bala Marca Provisión (I2350A28) Cámara bala AHD 5 MP TVI 5 MP Lente Fijo 2.8 (91°) mm TL1",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 919,
+        precioUnitario: 919.00,
         cantidad: 1,
         numerosSerie: ["619317411067"],
         categorias: ["46"]
@@ -1843,7 +1817,7 @@ const inventarioInicial = [
         descripcion: "Fuente de alimentación de 12V 1A – 1 enchufe de CC.",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 92,
+        precioUnitario: 92.00,
         cantidad: 2,
         numerosSerie: ["611355704040"],
         categorias: ["46"]
@@ -1854,7 +1828,7 @@ const inventarioInicial = [
         descripcion: "Mini amplificador de potencia estéreo: 2 x 40 vatios con entradas USB, SD, FM, Bluetooth, AUX, CD y micrófono",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 1551.00,
         cantidad: 1,
         numerosSerie: ["68888901550"],
         categorias: ["46"]
@@ -1865,7 +1839,7 @@ const inventarioInicial = [
         descripcion: "Tamper Switch",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 18,
+        precioUnitario: 18.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -1878,7 +1852,7 @@ const inventarioInicial = [
         unidad: "PZA",
         precioUnitario: 647.86,
         cantidad: 2,
-        numerosSerie: [],
+        numerosSerie: ["0"],
         categorias: ["46"]
     },
     {
@@ -1887,7 +1861,7 @@ const inventarioInicial = [
         descripcion: "Fuente de Poder Regulada de 12 Vcc a 5 Amperes/ Ideal para Equipos de Alto Consumo de Corriente/ Para Usos Multiples: Sistemas de CCTV, Acceso, Asistencia, etc/ Certificación UL/",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 283,
+        precioUnitario: 283.00,
         cantidad: 1,
         numerosSerie: ["TVN083034"],
         categorias: ["46"]
@@ -1898,7 +1872,7 @@ const inventarioInicial = [
         descripcion: "Tarjeta de gestión de red APC 3 con apagado de red Powerchute - Adaptador de gestión remota",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 7309,
+        precioUnitario: 7309.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -1975,7 +1949,7 @@ const inventarioInicial = [
         descripcion: "Micrófono de cuello de cisne estándar Microflex",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 4664.00,
         cantidad: 1,
         numerosSerie: ["42406052283"],
         categorias: ["46"]
@@ -2016,10 +1990,10 @@ const inventarioInicial = [
     {
         marca: "SYSTEM SENSOR",
         modelo: "P2RLEDSP",
-        descripcion: "rena con Lampara LED Estroboscópica / 2 hilos / Montaje en Pared / Color Rojo / Configuración Estroboscópica Seleccionable",
+        descripcion: "Rena con Lampara LED Estroboscópica / 2 hilos / Montaje en Pared / Color Rojo / Configuración Estroboscópica Seleccionable",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 776.64,
         cantidad: 1,
         numerosSerie: ["783863058882"],
         categorias: ["46"]
@@ -2030,7 +2004,7 @@ const inventarioInicial = [
         descripcion: "TECLADO CON MOUSE",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 150,
+        precioUnitario: 150.00,
         cantidad: 1,
         numerosSerie: ["7501950030732"],
         categorias: ["46"]
@@ -2038,7 +2012,7 @@ const inventarioInicial = [
     {
         marca: "THORSMAN",
         modelo: "TMK-1020-EE",
-        descripcion: "Esquinero exterior blanco de PVC auto extinguible, para canaletas TMK1020, TMK1020SD, TMK1020CD (5110-02001)",
+        descripcion: "Esquinero exterior blanco de PVC auto extinguible, para canaletas TMK1020, TMK1020SD, TMK1020CD (5110-02001",
         proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 10.78,
@@ -2052,7 +2026,7 @@ const inventarioInicial = [
         descripcion: "Sección en \"L\" blanco de PVC auto extinguible, para canaletas TMK1020, TMK1020SD, TMK1020CD (5130-02001)",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 10.9,
+        precioUnitario: 10.90,
         cantidad: 2,
         numerosSerie: ["7501509900981"],
         categorias: ["46"]
@@ -2096,7 +2070,7 @@ const inventarioInicial = [
         descripcion: "USB 3.0 SuperSpeed Cable de extensión A macho a hembra 10 pies",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 211,
+        precioUnitario: 211.00,
         cantidad: 4,
         numerosSerie: ["37332158093"],
         categorias: ["46"]
@@ -2104,10 +2078,10 @@ const inventarioInicial = [
     {
         marca: "TRUPER",
         modelo: "12146",
-        descripcion: "Estuche con 5 puntas de cruz PH1 largo 2\", Truper Expert",
+        descripcion: "Estuche con 5 puntas de cruz PH1 largo 2\"\", Truper Expert",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 45,
+        precioUnitario: 45.00,
         cantidad: 2,
         numerosSerie: ["7506240672449"],
         categorias: ["46"]
@@ -2118,7 +2092,7 @@ const inventarioInicial = [
         descripcion: "Blíster con 12 barras de silicón de repuesto para PIPE-1/2",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 39,
+        precioUnitario: 39.00,
         cantidad: 1,
         numerosSerie: ["7501206645413"],
         categorias: ["46"]
@@ -2129,7 +2103,7 @@ const inventarioInicial = [
         descripcion: "Pistola eléctrica de 40W para silicón de 1/2, 127V, T",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 165,
+        precioUnitario: 165.00,
         cantidad: 2,
         numerosSerie: ["7501206645390"],
         categorias: ["46"]
@@ -2140,7 +2114,7 @@ const inventarioInicial = [
         descripcion: "Blíster con 12 barras de silicón de repuesto para PIPE-5/16",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 22,
+        precioUnitario: 22.00,
         cantidad: 1,
         numerosSerie: ["7501206645420"],
         categorias: ["46"]
@@ -2151,7 +2125,7 @@ const inventarioInicial = [
         descripcion: "Estuche con 5 extensiones de 60 mm, magnéticas, EXPERT",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 2200,
+        precioUnitario: 2200.00,
         cantidad: 1,
         numerosSerie: ["7506240673088"],
         categorias: ["46"]
@@ -2162,7 +2136,7 @@ const inventarioInicial = [
         descripcion: "Juego de 3 mini cepillos de alambre 28 pinceles, Truper Ir a página del catálogo",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 77,
+        precioUnitario: 77.00,
         cantidad: 1,
         numerosSerie: ["7506240616283"],
         categorias: ["46"]
@@ -2217,7 +2191,7 @@ const inventarioInicial = [
         descripcion: "adaptador USB C hembra a USB macho (paquete de 2), adaptador USB A a C 3.1,",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 171,
+        precioUnitario: 171.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2228,7 +2202,7 @@ const inventarioInicial = [
         descripcion: "Enrolador de Huella Digital y Tarjetas ID 125Khz / Conexión USB",
         proveedor: "SYSCOM",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 1116.04,
         cantidad: 1,
         numerosSerie: ["CGZI192460002"],
         categorias: ["46"]
@@ -2245,10 +2219,10 @@ const inventarioInicial = [
         categorias: ["46"]
     },
     {
-        marca: "DS-2CE10UF3T-E",
-        modelo: "4K ColorVu PoC Mini Cámara Bullet Fija",
+        marca: "",
+        modelo: "DS-2CE10UF3T-E",
         descripcion: "4K ColorVu PoC Mini Cámara Bullet Fija",
-        proveedor: "",
+        proveedor: "4K ColorVu PoC Mini Cámara Bullet Fija",
         unidad: "PZA",
         precioUnitario: 1412.93,
         cantidad: 7,
@@ -2261,7 +2235,7 @@ const inventarioInicial = [
         descripcion: "Lentes de Proteccion Transparentes",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 31.97,
         cantidad: 7,
         numerosSerie: [],
         categorias: ["46"]
@@ -2272,7 +2246,7 @@ const inventarioInicial = [
         descripcion: "Juego de Desarmadores",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 219.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2283,7 +2257,7 @@ const inventarioInicial = [
         descripcion: "Pinza Articulada",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 365.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2294,7 +2268,7 @@ const inventarioInicial = [
         descripcion: "LLave Perica 10 plg",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 239.00,
         cantidad: 1,
         numerosSerie: ["820909170174"],
         categorias: ["46"]
@@ -2305,7 +2279,7 @@ const inventarioInicial = [
         descripcion: "Juego de Accesorios 20 pzs",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 479.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2316,7 +2290,7 @@ const inventarioInicial = [
         descripcion: "Borboquejo con Menton",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 36.00,
         cantidad: 4,
         numerosSerie: [],
         categorias: ["46"]
@@ -2327,7 +2301,7 @@ const inventarioInicial = [
         descripcion: "Linesman Plierststripper",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 459.32,
         cantidad: 1,
         numerosSerie: ["820909913634"],
         categorias: ["46"]
@@ -2338,7 +2312,7 @@ const inventarioInicial = [
         descripcion: "Insulated Screwdrivers 3 pzas",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 422.55,
         cantidad: 1,
         numerosSerie: ["820909913641"],
         categorias: ["46"]
@@ -2349,7 +2323,7 @@ const inventarioInicial = [
         descripcion: "Pinzas de Corte Punta",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 34.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2360,7 +2334,7 @@ const inventarioInicial = [
         descripcion: "Acoplador LC Multimodo Duplex Color Aqua",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 91.98,
         cantidad: 12,
         numerosSerie: [],
         categorias: ["46"]
@@ -2371,7 +2345,7 @@ const inventarioInicial = [
         descripcion: "Jumper LC-LC Multimodo 50/125 OM3 Duplex de 1m Riser de 2mm",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 185.96,
         cantidad: 3,
         numerosSerie: [],
         categorias: ["46"]
@@ -2382,7 +2356,7 @@ const inventarioInicial = [
         descripcion: "Jumper LC/UPC-LC/UPC Monomodo 9/125 Duplex de 2m Riser de 2mm",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 186.33,
         cantidad: 8,
         numerosSerie: [],
         categorias: ["46"]
@@ -2393,7 +2367,7 @@ const inventarioInicial = [
         descripcion: "Pigtail LC Multimodo 50/125 OM3 de 2m Riser de 900um",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 47.46,
         cantidad: 8,
         numerosSerie: [],
         categorias: ["46"]
@@ -2404,7 +2378,7 @@ const inventarioInicial = [
         descripcion: "Jumper LC-LC Multimodo 50/125 OM4 Duplex de 10m Cero Halogeno de 2mm",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 341.93,
         cantidad: 3,
         numerosSerie: [],
         categorias: ["46"]
@@ -2415,7 +2389,7 @@ const inventarioInicial = [
         descripcion: "Jumper Fibra Óptica Multimodo Sc-sc 62.5/125 Dúplex 2m 2mm",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 287.12,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2426,7 +2400,7 @@ const inventarioInicial = [
         descripcion: "Pigtail LC Multimodo 62.5/125 OM1 de 1m Riser de 900um en Set de 6 colores",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 0.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2437,7 +2411,7 @@ const inventarioInicial = [
         descripcion: "Pigtail LC Multimodo 50/125 OM3 de 2m Riser de 900um en Set de 6 Colores",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 256.49,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2448,7 +2422,7 @@ const inventarioInicial = [
         descripcion: "Pigtail SC/UPC Monomodo 9/125 de 2m Riser de 900um en Set de 12 Colores",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 632.31,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2459,7 +2433,7 @@ const inventarioInicial = [
         descripcion: "Jumper SC-SC Multimodo 50/125 OM3 Duplex de 1m Riser de 2mm",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 252.81,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2470,7 +2444,7 @@ const inventarioInicial = [
         descripcion: "Broca de Carburo para Taladro para Taladro Percutor",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 170.00,
         cantidad: 1,
         numerosSerie: ["45242546282"],
         categorias: ["46"]
@@ -2481,7 +2455,7 @@ const inventarioInicial = [
         descripcion: "Cinta Sella Roscas",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 16.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2492,7 +2466,7 @@ const inventarioInicial = [
         descripcion: "Pegamento pegathor",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 30.64,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2503,7 +2477,7 @@ const inventarioInicial = [
         descripcion: "Juego de Coples y Connectores",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 90.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2514,7 +2488,7 @@ const inventarioInicial = [
         descripcion: "DRAM Module 1 GB",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 245.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2525,7 +2499,7 @@ const inventarioInicial = [
         descripcion: "RAM 256 GB",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 395.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2536,7 +2510,7 @@ const inventarioInicial = [
         descripcion: "NEXODE USB-C PD CHARGER",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 219.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2547,7 +2521,7 @@ const inventarioInicial = [
         descripcion: "HDD O SSD CASE",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 209.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2558,7 +2532,7 @@ const inventarioInicial = [
         descripcion: "Tinta Amarilla P/ Impresora",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 205.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2569,7 +2543,7 @@ const inventarioInicial = [
         descripcion: "Tinta Negra P/ Impresora",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 299.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2580,7 +2554,7 @@ const inventarioInicial = [
         descripcion: "Tinta Rosa P/ Impresora",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 205.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2591,7 +2565,7 @@ const inventarioInicial = [
         descripcion: "Tinta Azul P/ Impresora",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 198.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2602,7 +2576,7 @@ const inventarioInicial = [
         descripcion: "Interruptor Magnetico de Alarmas",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 79.00,
         cantidad: 1,
         numerosSerie: ["7501483191597"],
         categorias: ["46"]
@@ -2613,7 +2587,7 @@ const inventarioInicial = [
         descripcion: "Label Cassette",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 616.27,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2624,7 +2598,7 @@ const inventarioInicial = [
         descripcion: "Pila Litio Circular 3V",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 19.00,
         cantidad: 0.5,
         numerosSerie: [],
         categorias: ["46"]
@@ -2635,29 +2609,29 @@ const inventarioInicial = [
         descripcion: "12 BATERIAS Alcalinas AA",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 129.00,
         cantidad: 0.5,
         numerosSerie: [],
         categorias: ["46"]
     },
     {
-        marca: "DTKGLI",
-        modelo: "Ground Loop Isolator",
-        descripcion: "",
+        marca: "",
+        modelo: "DTKGLI",
+        descripcion: "Ground Loop Isolator",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 399.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
     },
     {
-        marca: "PTR-102VP",
-        modelo: "Passive Video Balum With Power",
-        descripcion: "",
+        marca: "",
+        modelo: "PTR-102VP",
+        descripcion: "Passive Video Balum With Power",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 0.00,
         cantidad: 1,
         numerosSerie: ["17145836"],
         categorias: ["46"]
@@ -2668,7 +2642,7 @@ const inventarioInicial = [
         descripcion: "RCI 909 Rocker Switch",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 494.50,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2679,7 +2653,7 @@ const inventarioInicial = [
         descripcion: "Adaptador USB a Serial D09",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 249.00,
         cantidad: 1,
         numerosSerie: ["75012483139193"],
         categorias: ["46"]
@@ -2687,10 +2661,10 @@ const inventarioInicial = [
     {
         marca: "DIABLO",
         modelo: "DS0614BFS",
-        descripcion: "Recipro Catina Blades 6\"",
+        descripcion: "Recipro Catina Blades 6\"\"\"",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 72.99,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2701,7 +2675,7 @@ const inventarioInicial = [
         descripcion: "Cuchillas Multiuso",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 169.29,
         cantidad: 1,
         numerosSerie: ["76174004939"],
         categorias: ["46"]
@@ -2712,7 +2686,7 @@ const inventarioInicial = [
         descripcion: "ADEMCO SIM W/ ALID",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 190.77,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2723,18 +2697,18 @@ const inventarioInicial = [
         descripcion: "Caja de Contactos Raceway",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 26.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
     },
     {
-        marca: "HL-4131",
-        modelo: "LCD SCREEN CLEAN KIT",
-        descripcion: "",
+        marca: "",
+        modelo: "HL-4131",
+        descripcion: "LCD SCREEN CLEAN KIT",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 107.30,
         cantidad: 2,
         numerosSerie: [],
         categorias: ["46"]
@@ -2745,7 +2719,7 @@ const inventarioInicial = [
         descripcion: "MAGNETIC CONTACTS",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 187.84,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2756,7 +2730,7 @@ const inventarioInicial = [
         descripcion: "VGA MALE TO MALE MINI",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 389.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2767,62 +2741,62 @@ const inventarioInicial = [
         descripcion: "NPC CAT 6 7FT",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 159.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
     },
     {
-        marca: "2240002833",
-        modelo: "CABLE HDMI",
-        descripcion: "",
+        marca: "",
+        modelo: "2240002833",
+        descripcion: "CABLE HDMI",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 199.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
     },
     {
-        marca: "2246000839",
-        modelo: "CABLE USB A USB TIPO B 3.0",
-        descripcion: "",
+        marca: "",
+        modelo: "2246000839",
+        descripcion: "CABLE USB A USB TIPO B 3.0",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 159.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
     },
     {
-        marca: "1243010365",
-        modelo: "CABLE DVI A DVI",
-        descripcion: "",
+        marca: "",
+        modelo: "1243010365",
+        descripcion: "CABLE DVI A DVI",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 148.00,
         cantidad: 2,
         numerosSerie: [],
         categorias: ["46"]
     },
     {
-        marca: "RAF10IWX",
-        modelo: "Conexión en ángulo recto \"L\", para uso con canaleta LD10, material ABS, Color Blanco Mate",
-        descripcion: "",
+        marca: "",
+        modelo: "RAF10IWX",
+        descripcion: "Conexión en ángulo recto \"L\", para uso con canaleta LD10, material ABS, Color Blanco Mate",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 23.06,
         cantidad: 5,
         numerosSerie: [],
         categorias: ["46"]
     },
     {
-        marca: "ECF10IGX",
-        modelo: "Tapa Final, para uso con canaleta LD10, material ABS, Color Gris",
-        descripcion: "",
+        marca: "",
+        modelo: "ECF10IGX",
+        descripcion: "Tapa Final, para uso con canaleta LD10, material ABS, Color Gris",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 15.61,
         cantidad: 3,
         numerosSerie: [],
         categorias: ["46"]
@@ -2833,7 +2807,7 @@ const inventarioInicial = [
         descripcion: "CAT 5E JACK",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 42.01,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2844,7 +2818,7 @@ const inventarioInicial = [
         descripcion: "CASCO AZUL",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 74.69,
         cantidad: 1,
         numerosSerie: ["7501206698266"],
         categorias: ["46"]
@@ -2855,7 +2829,7 @@ const inventarioInicial = [
         descripcion: "100 ft. Fiberglass Fish Tape",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 625.07,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2866,62 +2840,62 @@ const inventarioInicial = [
         descripcion: "Convertidor USB Brobotix 963579 - USB 2.0 a Serial DB9",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 219.45,
         cantidad: 1,
         numerosSerie: ["7503033963579"],
         categorias: ["46"]
     },
     {
-        marca: "CABLE DE-9",
+        marca: "",
         modelo: "",
-        descripcion: "",
+        descripcion: "CABLE DE-9",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 119.00,
         cantidad: 2,
         numerosSerie: [],
         categorias: ["46"]
     },
     {
-        marca: "CABLE USB A USB TIPO B",
+        marca: "",
         modelo: "",
-        descripcion: "",
+        descripcion: "CABLE USB A USB TIPO B",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 29.00,
         cantidad: 2,
         numerosSerie: [],
         categorias: ["46"]
     },
     {
-        marca: "CABLE ETHERNET RJ45",
+        marca: "",
         modelo: "",
-        descripcion: "",
+        descripcion: "CABLE ETHERNET RJ45",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 56.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
     },
     {
-        marca: "CAT-6 T568B",
+        marca: "",
         modelo: "",
-        descripcion: "",
+        descripcion: "CAT-6 T568B",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 299.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
     },
     {
-        marca: "CABLE RJ45 A DE-9",
+        marca: "",
         modelo: "",
-        descripcion: "",
+        descripcion: "CABLE RJ45 A DE-9",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 110.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2932,7 +2906,7 @@ const inventarioInicial = [
         descripcion: "Caja de superficie interior/exterior SB-I10",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 0.00,
         cantidad: 1,
         numerosSerie: ["783008102784"],
         categorias: ["46"]
@@ -2943,7 +2917,7 @@ const inventarioInicial = [
         descripcion: "Sensor De Temperatura Direccionable",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 998.44,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2954,7 +2928,7 @@ const inventarioInicial = [
         descripcion: "Thorsman Flexiducthogy (9300-01253)",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 232.76,
         cantidad: 1,
         numerosSerie: ["17501509903255"],
         categorias: ["46"]
@@ -2965,7 +2939,7 @@ const inventarioInicial = [
         descripcion: "charola de acero para gabiente sencillo",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 275.16,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -2976,7 +2950,7 @@ const inventarioInicial = [
         descripcion: "Charola fija gabinete de pared",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 312.70,
         cantidad: 2,
         numerosSerie: [],
         categorias: ["46"]
@@ -2987,7 +2961,7 @@ const inventarioInicial = [
         descripcion: "SE-208GB Quemador de DVD, DVD-R 8x / DVD+RW 8x, USB 2.0, Externo, Blanco",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 559.00,
         cantidad: 1,
         numerosSerie: ["887276056265"],
         categorias: ["46"]
@@ -2998,7 +2972,7 @@ const inventarioInicial = [
         descripcion: "Filtro De Aire Fram Ca9511",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 149.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3009,7 +2983,7 @@ const inventarioInicial = [
         descripcion: "TRIPOD",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 100.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3020,7 +2994,7 @@ const inventarioInicial = [
         descripcion: "Conector Jack RJ45 Estilo TG con Ventana, Mini-Com, Categoría 6, de 8 posiciones y 8 cables, Color Azul",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 216.28,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3031,7 +3005,7 @@ const inventarioInicial = [
         descripcion: "Conector CAT 5e QUICKPORT™ GIGAMAX™, blanco",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 0.00,
         cantidad: 5,
         numerosSerie: ["7877170328"],
         categorias: ["46"]
@@ -3042,7 +3016,7 @@ const inventarioInicial = [
         descripcion: "Conector CAT 5e QUICKPORT™ GIGAMAX™, negro",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 0.00,
         cantidad: 2,
         numerosSerie: [],
         categorias: ["46"]
@@ -3053,7 +3027,7 @@ const inventarioInicial = [
         descripcion: "Conector CAT 6 QUICKPORT™ EXTREME™, blanco",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 0.00,
         cantidad: 5,
         numerosSerie: ["40078477144594"],
         categorias: ["46"]
@@ -3064,7 +3038,7 @@ const inventarioInicial = [
         descripcion: "Conector Jack RJ45 Estilo TG, Mini-Com, Categoría 6A, de 8 posiciones y 8 cables, Color Blanco",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 216.28,
         cantidad: 4,
         numerosSerie: [],
         categorias: ["46"]
@@ -3075,7 +3049,7 @@ const inventarioInicial = [
         descripcion: "Kit de 10 Dispositivos para Bloquear Puertos Jack RJ45, Color Negro, Incluye Llave de Extracción",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 442.97,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3086,7 +3060,7 @@ const inventarioInicial = [
         descripcion: "Kit de 10 Dispositivos Recubiertos para Impedir Desconexión de Plug RJ45",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 774.64,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3097,7 +3071,7 @@ const inventarioInicial = [
         descripcion: "Conector CAT 6A QUICKPORT™ EXTREME™, Clasificado por canales, Azul",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 190.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3108,7 +3082,7 @@ const inventarioInicial = [
         descripcion: "Sony DCR-DVD650 DVD Handycam Videocámara con zoom óptico 40x",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 4963.05,
         cantidad: 1,
         numerosSerie: ["27242763111"],
         categorias: ["46"]
@@ -3119,7 +3093,7 @@ const inventarioInicial = [
         descripcion: "Kingston Technology Canvas Select Tarjeta micSDHC Plus 100R A1 C10 de 64 GB + ADP",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 136.60,
         cantidad: 1,
         numerosSerie: ["740617298697"],
         categorias: ["46"]
@@ -3127,10 +3101,10 @@ const inventarioInicial = [
     {
         marca: "PANDUIT",
         modelo: "MP300",
-        descripcion: "Impresora de etiquetas móvil PXE™ MP300, 1.5\" de ancho",
+        descripcion: "Impresora de etiquetas móvil PXE™ MP300, 1.5\"\" de ancho",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 8471.57,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3141,7 +3115,7 @@ const inventarioInicial = [
         descripcion: "Impresora portátil de transferencia térmica PanTher™ con teclado QWERTY",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 9116.70,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3152,7 +3126,7 @@ const inventarioInicial = [
         descripcion: "Alcoholímetro AL6000: permite pruebas con o sin boquillas y no requiere de calibración",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 2663.43,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3163,7 +3137,7 @@ const inventarioInicial = [
         descripcion: "DAHUA HAC-HDW1200TQ-A-Cámara domo Dahua de 2 MP con lente de 2.8 mm, ángulo de 102 grados, IR de 40 m, micrófono integrado, instalación rápida, DWDR, IP67, y diseño en metal y policarbonato.",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 355.73,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3174,7 +3148,7 @@ const inventarioInicial = [
         descripcion: "Videoportero inalámbrico con timbre",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 2262.14,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3185,7 +3159,7 @@ const inventarioInicial = [
         descripcion: "Lector de Proximidad EM 125 kHz / Wiegand",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 190.77,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3196,7 +3170,7 @@ const inventarioInicial = [
         descripcion: "(AX PRO) CÁMARA Inalámbrica + PIR / 6 Años de Batería / Inmunidad a Mascotas / Rango de Detección de 12 mts / Angulo de 85.9° de Cobertura / Uso Interior",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 1161.22,
         cantidad: 7,
         numerosSerie: ["6941264065593"],
         categorias: ["46"]
@@ -3207,7 +3181,7 @@ const inventarioInicial = [
         descripcion: "Kit de Videoportero IP PoE Estandar con llamada a App de Smartphone (Hik-Connect) / Apertura con Tarjeta MIFARE / Frente de calle IK08 & IP65 / Soporta 2 puertas",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 3712.32,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3218,7 +3192,7 @@ const inventarioInicial = [
         descripcion: "Teclado Industrial Autónomo con Lector de Proximidad Integrado para interior.",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 592.85,
         cantidad: 1,
         numerosSerie: ["104557205"],
         categorias: ["46"]
@@ -3229,18 +3203,18 @@ const inventarioInicial = [
         descripcion: "6 o 12 o 24 Vcc @ 1.5 A / Fuente tipo tarjeta/ 1 salida / requiere transformador de entrada / capacidad de baterías / baterías no incluidas.",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 142.71,
         cantidad: 3,
         numerosSerie: [],
         categorias: ["46"]
     },
     {
-        marca: "AC-HPAZUL45W",
-        modelo: "Cargador / Adaptador para Laptop GENERICO AC-HPAZUL45W de 45W 19.5V 2.31A (4.5*3.0)",
-        descripcion: "",
+        marca: "",
+        modelo: "AC-HPAZUL45W",
+        descripcion: "Cargador / Adaptador para Laptop GENERICO AC-HPAZUL45W de 45W 19.5V 2.31A (4.5*3.0)",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 194.76,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3251,7 +3225,7 @@ const inventarioInicial = [
         descripcion: "Montaje de techo tipo tubo de (30 cm) de largo",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 305.14,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3262,7 +3236,7 @@ const inventarioInicial = [
         descripcion: "Detector de Movimiento infrarrojo cableado Antimascotas hasta 25 kg Normalmente Cerrado 15 m",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 189.60,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3273,7 +3247,7 @@ const inventarioInicial = [
         descripcion: "Disco Duro WESTERN DIGITAL WD101EFBX",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 4149.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3284,9 +3258,9 @@ const inventarioInicial = [
         descripcion: "Receptor Inalámbrico Externo de 2 Canales Para Controles AccessPRO / Soporta Hasta 400 Controles de Un Botón",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 241.44,
         cantidad: 3,
-        numerosSerie: [],
+        numerosSerie: ["0"],
         categorias: ["46"]
     },
     {
@@ -3295,7 +3269,7 @@ const inventarioInicial = [
         descripcion: "Placa de Pared IndustrialNet™, Para 1 Conector Industrial, de Acero Inoxidable",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 247.32,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3306,7 +3280,7 @@ const inventarioInicial = [
         descripcion: "Detector de temperatura fija de 57 °C Normalmente Cerrado",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 463.62,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3317,7 +3291,7 @@ const inventarioInicial = [
         descripcion: "SELLADOR ELÁSTICO SIKA SIKASIL NEGRO 280 ML",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 109.00,
         cantidad: 2,
         numerosSerie: [],
         categorias: ["46"]
@@ -3328,7 +3302,7 @@ const inventarioInicial = [
         descripcion: "2.4GHz 5dBi Antena de escritorio omnidireccional para interiores",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 460.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3339,18 +3313,18 @@ const inventarioInicial = [
         descripcion: "Detector de temperatura fija de 57 °C Normalmente Abierto",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 319.32,
         cantidad: 2,
         numerosSerie: [],
         categorias: ["46"]
     },
     {
-        marca: "Stopwatch:",
-        modelo: "Temporizador de cronómetro electrónico de plástico digital",
-        descripcion: "",
+        marca: "",
+        modelo: "Stopwatch:",
+        descripcion: "Temporizador de cronómetro electrónico de plástico digital",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 66.00,
         cantidad: 10,
         numerosSerie: [],
         categorias: ["46"]
@@ -3361,7 +3335,7 @@ const inventarioInicial = [
         descripcion: "4GB RAM DDR3 1600MHz",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 289.00,
         cantidad: 3,
         numerosSerie: [],
         categorias: ["46"]
@@ -3372,7 +3346,7 @@ const inventarioInicial = [
         descripcion: "1GB RAM DDR3 1600MHz",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 434.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3383,7 +3357,7 @@ const inventarioInicial = [
         descripcion: "8GB RAM DDR3 1600MHz",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 447.14,
         cantidad: 2,
         numerosSerie: [],
         categorias: ["46"]
@@ -3394,7 +3368,7 @@ const inventarioInicial = [
         descripcion: "La Orbit 1BC es un 1 luz cubierta impermeable con un acabado sin pintar. Es una cubierta en blanco y se monta en el dispositivo. Esta Orbit 1 Gang en blanco, está hecha de un material duradero de aluminio.",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 600.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3405,7 +3379,7 @@ const inventarioInicial = [
         descripcion: "Adaptador \"Y\" de plug 3,5 mm a 2 jacks 3,5 mm, negro",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 69.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3416,7 +3390,7 @@ const inventarioInicial = [
         descripcion: "Bote con 100 Piezas de Plug Modular RJ45 Cat6A chapado de oro a 30 micras para durabilidad extrema",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 465.89,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3427,7 +3401,7 @@ const inventarioInicial = [
         descripcion: "Tamper switch para circuito cerrado",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 40.69,
         cantidad: 1,
         numerosSerie: ["676544007517"],
         categorias: ["46"]
@@ -3438,7 +3412,7 @@ const inventarioInicial = [
         descripcion: "Luz estroboscópica, 6~24 V CC, roja",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 412.84,
         cantidad: 1,
         numerosSerie: ["676544004882"],
         categorias: ["46"]
@@ -3449,7 +3423,7 @@ const inventarioInicial = [
         descripcion: "Detector PIR Cableado Interior de Doble Tecnología PIR y Microondas / Inmunidad a Mascotas 30 Kg / Detección de 12 mts / Ángulo de 85.9° de Cobertura",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 394.36,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3460,18 +3434,7 @@ const inventarioInicial = [
         descripcion: "Probador de Cable de Red para UTP, STP y Cable Coaxial",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
-        cantidad: 1,
-        numerosSerie: [],
-        categorias: ["46"]
-    },
-    {
-        marca: "STEREN",
-        modelo: "",
-        descripcion: "Convertidor HDMI a VGA",
-        proveedor: "",
-        unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 1662.88,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3482,7 +3445,7 @@ const inventarioInicial = [
         descripcion: "Caja de TV X6 Pro Android funciona con Allwinner H6 Quad Core Cortex-A53 CPU de frecuencia ultra alta con Mali-T720 GPU",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 0.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3493,7 +3456,7 @@ const inventarioInicial = [
         descripcion: "M112 Tipo caja para montaje en superficie, doce puertos, color blanco",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 733.41,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3501,10 +3464,10 @@ const inventarioInicial = [
     {
         marca: "ACER",
         modelo: "X203H",
-        descripcion: "Monitor LCD panorámico de 20\" para computadora Acer X203H bd",
+        descripcion: "Monitor LCD panorámico de 20\"\" para computadora Acer X203H bd",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 957.09,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3512,10 +3475,10 @@ const inventarioInicial = [
     {
         marca: "NB-EPCOM",
         modelo: "SP5-NB",
-        descripcion: "Montaje de Pared Universal Giratorio para Monitores de 75-110 \" / Soporta hasta 90.9 Kg / Vesa 800 x 600 / 400 x 400 / Acero / 10° de Inclinación",
+        descripcion: "Montaje de Pared Universal Giratorio para Monitores de 75-110 \"\" / Soporta hasta 90.9 Kg / Vesa 800 x 600 / 400 x 400 / Acero / 10° de Inclinación",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 1414.80,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3526,18 +3489,18 @@ const inventarioInicial = [
         descripcion: "Charola de Empalme para Fibra Óptica, Para Protección de 24 Empalmes de Fusión o Mecánicos, Compatible con los Paneles FCEU",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 629.73,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
     },
     {
         marca: "GRUPO IMLOYA",
-        modelo: "",
+        modelo: "9005",
         descripcion: "Kit foco led Imloya Premium 24mil lumens R4 12-24v",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 1054.00,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3548,7 +3511,7 @@ const inventarioInicial = [
         descripcion: "Charola para Soportar Equipos en Rack de 19, Profundidad de 34 cm, Color Negro, 1U",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 365.23,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
@@ -3559,31 +3522,32 @@ const inventarioInicial = [
         descripcion: "Cables de Ethernet / Cables de conexión de red Patch Cord, IndustrialNET, Cat5e, Shielded, 600V, RJ45 plug to RJ45 plug, Teal, 1 meter",
         proveedor: "",
         unidad: "PZA",
-        precioUnitario: 0,
+        precioUnitario: 1150.35,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
     }
 ];
 
-
 async function cargarInventarioInicial() {
     try {
+        if (!process.env.MONGO_URI) {
+            throw new Error("La variable de entorno MONGO_URI no está definida en tu archivo .env");
+        }
         await mongoose.connect(process.env.MONGO_URI as string);
         console.log('Conectado a MongoDB');
 
-        // Limpiar la colección antes de insertar para evitar duplicados
-        await InventoryItem.deleteMany({});
-        await InventoryMovement.deleteMany({
-            comentario: "Carga inicial de inventario"
-        });
-        console.log('Colecciones limpiadas.');
+        // Opcional: Limpiar colecciones para evitar duplicados si se ejecuta el script varias veces.
+        // await InventoryItem.deleteMany({});
+        // await InventoryMovement.deleteMany({});
+        // console.log('Colecciones de inventario y movimientos limpiadas.');
 
+        console.log(`Iniciando la inserción de ${inventarioInicial.length} artículos...`);
         // Insertar todos los artículos
-        const resultado = await InventoryItem.insertMany(inventarioInicial);
-        console.log(`Se insertaron ${resultado.length} artículos correctamente`);
+        const resultado = await InventoryItem.insertMany(inventarioInicial, { ordered: false });
+        console.log(`Se insertaron ${resultado.length} artículos correctamente.`);
 
-        // También crear los movimientos de entrada inicial
+        // Crear los movimientos de entrada inicial
         const movimientos = resultado.map(item => ({
             itemId: item._id,
             tipo: "entrada",
@@ -3595,10 +3559,10 @@ async function cargarInventarioInicial() {
 
         if (movimientos.length > 0) {
             await InventoryMovement.insertMany(movimientos);
-            console.log(`Se crearon ${movimientos.length} movimientos de inventario inicial.`);
+            console.log(`Se crearon ${movimientos.length} movimientos de inventario iniciales.`);
         }
 
-        console.log('Proceso completado exitosamente');
+        console.log('Proceso completado exitosamente.');
     } catch (error) {
         console.error('Error al cargar el inventario:', error);
     } finally {
