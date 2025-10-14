@@ -261,7 +261,7 @@ export const procesarPdf = async (req: Request, res: Response) => {
       // Ejecutar el script Python
       console.log(`Ejecutando script: ${scriptPath} con archivo: ${rutaArchivo}`);
 
-      const { stdout, stderr } = await execFileAsync('py', [scriptPath, rutaArchivo], {
+      const { stdout, stderr } = await execFileAsync('python', [scriptPath, rutaArchivo], {
         timeout: 30000 // 30 segundos de timeout
       });
 
@@ -835,7 +835,7 @@ export const crearOrdenDesdePdf = async (req: Request, res: Response) => {
       // Ejecutar el script Python para extraer datos del PDF
       console.log(`Ejecutando script: ${scriptPath} con archivo: ${rutaArchivo}`);
       
-      const { stdout, stderr } = await execFileAsync('py', [scriptPath, rutaArchivo], {
+      const { stdout, stderr } = await execFileAsync('python', [scriptPath, rutaArchivo], {
         timeout: 30000 // 30 segundos de timeout
       });
 

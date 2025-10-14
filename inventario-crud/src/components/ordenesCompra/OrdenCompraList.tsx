@@ -46,12 +46,21 @@ const OrdenCompraList: React.FC = () => {
 
     const lower = value.toLowerCase();
     setFilteredOrdenes(
-      ordenesCompra.filter(orden =>
-        orden.numeroOrden.toLowerCase().includes(lower) ||
-        (orden.numeroCotizacion && orden.numeroCotizacion.toLowerCase().includes(lower)) ||
-        (typeof orden.proveedor === "object" && orden.proveedor.empresa.toLowerCase().includes(lower)) ||
-        (typeof orden.razonSocial === "object" && orden.razonSocial.nombre.toLowerCase().includes(lower))
-      )
+      ordenesCompra.filter(orden => {
+        const numeroOrden = orden.numeroOrden?.toLowerCase() || '';
+        const numeroCotizacion = orden.numeroCotizacion?.toLowerCase() || '';
+        const proveedor = typeof orden.proveedor === "object" && orden.proveedor ? 
+          orden.proveedor.empresa?.toLowerCase() || '' : 
+          String(orden.proveedor || '').toLowerCase();
+        const razonSocial = typeof orden.razonSocial === "object" && orden.razonSocial ? 
+          orden.razonSocial.nombre?.toLowerCase() || '' : 
+          String(orden.razonSocial || '').toLowerCase();
+
+        return numeroOrden.includes(lower) ||
+          numeroCotizacion.includes(lower) ||
+          proveedor.includes(lower) ||
+          razonSocial.includes(lower);
+      })
     );
   };
 
@@ -112,8 +121,22 @@ const OrdenCompraList: React.FC = () => {
     { key: "numeroOrden", label: "Número de Orden" },
     { key: "numeroCotizacion", label: "Número de Cotización", render: o => o.numeroCotizacion || "N/A" },
     { key: "fecha", label: "Fecha", render: o => new Date(o.fecha).toLocaleDateString() },
-    { key: "proveedor", label: "Proveedor", render: o => typeof o.proveedor === "object" ? o.proveedor.empresa : o.proveedor },
-    { key: "razonSocial", label: "Razón Social", render: o => typeof o.razonSocial === "object" ? o.razonSocial.nombre : o.razonSocial },
+    { 
+      key: "proveedor", 
+      label: "Proveedor", 
+      render: o => {
+        if (!o.proveedor) return "N/A";
+        return typeof o.proveedor === "object" && o.proveedor !== null ? o.proveedor.empresa : o.proveedor.toString();
+      }
+    },
+    { 
+      key: "razonSocial", 
+      label: "Razón Social", 
+      render: o => {
+        if (!o.razonSocial) return "N/A";
+        return typeof o.razonSocial === "object" && o.razonSocial !== null ? o.razonSocial.nombre : o.razonSocial.toString();
+      }
+    },
   ];
 
   // Paginación
