@@ -1,10 +1,11 @@
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import path from 'path';
 import { InventoryItem } from '../src/models/InventoryItem';
 import { InventoryMovement } from '../src/models/InventoryMovement';
 
-dotenv.config();
-
+// Cargar el .env desde la carpeta server
+dotenv.config({ path: path.join(__dirname, '../.env') });
 async function clearInternalInventory() {
     try {
         // Conectar a la base de datos

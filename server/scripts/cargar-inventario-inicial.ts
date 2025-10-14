@@ -1,10 +1,11 @@
-
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import path from 'path';
 import { InventoryItem } from '../src/models/InventoryItem';
-import { InventoryMovement } from '../src/models/InventoryMovement'; // Asegúrate de que este modelo exista
+import { InventoryMovement } from '../src/models/InventoryMovement';
 
-dotenv.config();
+// Cargar el .env desde la carpeta server
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const inventarioInicial = [
     {
@@ -861,7 +862,7 @@ const inventarioInicial = [
         proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 190.00,
-        cantidad: 121,
+        cantidad: 57,
         numerosSerie: ["40078477144655"],
         categorias: ["46"]
     },
@@ -878,17 +879,6 @@ const inventarioInicial = [
     },
     {
         marca: "LEVITON",
-        modelo: "61110-RY6",
-        descripcion: "Conector EXTREME™ Cat 6 QUICKPORT™, amarillo",
-        proveedor: "SYSCOM",
-        unidad: "PZA",
-        precioUnitario: 190.00,
-        cantidad: 4,
-        numerosSerie: ["40078477144662"],
-        categorias: ["46"]
-    },
-    {
-        marca: "LEVITON",
         modelo: "41084-BW",
         descripcion: "Blank QUICKPORT™ Insert, White (pack of 10)",
         proveedor: "SYSCOM",
@@ -900,23 +890,12 @@ const inventarioInicial = [
     },
     {
         marca: "LEVITON",
-        modelo: "61110-RE6",
-        descripcion: "EXTREME™ Cat 6 QUICKPORT™ Jack, Black",
-        proveedor: "SYSCOM",
-        unidad: "PZA",
-        precioUnitario: 172.00,
-        cantidad: 15,
-        numerosSerie: ["40078477144617"],
-        categorias: ["46"]
-    },
-    {
-        marca: "LEVITON",
         modelo: "61110-RW6",
         descripcion: "EXTREME™ Cat 6 QUICKPORT™ Jack, White",
         proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 170.00,
-        cantidad: 15,
+        cantidad: 9,
         numerosSerie: ["40078477144594"],
         categorias: ["46"]
     },
@@ -938,7 +917,7 @@ const inventarioInicial = [
         proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 69.00,
-        cantidad: 46,
+        cantidad: 8,
         numerosSerie: ["60078477978209"],
         categorias: ["46"]
     },
@@ -955,39 +934,6 @@ const inventarioInicial = [
     },
     {
         marca: "LEVITON",
-        modelo: "6H460-4L",
-        descripcion: "Cat 6 Cable de conexión de alta flexibilidad de diámetro pequeño, 1,2 m (4 pies), azul",
-        proveedor: "SYSCOM",
-        unidad: "PZA",
-        precioUnitario: 283.67,
-        cantidad: 30,
-        numerosSerie: [],
-        categorias: ["46"]
-    },
-    {
-        marca: "LEVITON",
-        modelo: "6H460-5L",
-        descripcion: "Cat 6 Cable de conexión de alta flexibilidad de diámetro pequeño, 1,5 m (5 pies), azul",
-        proveedor: "SYSCOM",
-        unidad: "PZA",
-        precioUnitario: 15.52,
-        cantidad: 3,
-        numerosSerie: ["4007847766897"],
-        categorias: ["46"]
-    },
-    {
-        marca: "LEVITON",
-        modelo: "6H460-4Y",
-        descripcion: "Cat 6 Cable de conexión de alta flexibilidad de diámetro pequeño, 4 pies (1,2 m), amarillo",
-        proveedor: "SYSCOM",
-        unidad: "PZA",
-        precioUnitario: 14.71,
-        cantidad: 1,
-        numerosSerie: ["78477669174"],
-        categorias: ["46"]
-    },
-    {
-        marca: "LEVITON",
         modelo: "61110-BG6",
         descripcion: "EXTREME™ Cat 6 QUICKPORT™ Jack QUICKPACK™, paquete de 25, gris",
         proveedor: "SYSCOM",
@@ -995,17 +941,6 @@ const inventarioInicial = [
         precioUnitario: 317.89,
         cantidad: 0.08,
         numerosSerie: [],
-        categorias: ["46"]
-    },
-    {
-        marca: "LEVITON",
-        modelo: "6H460-4W",
-        descripcion: "Cat 6 Latiguillo de alta flexibilidad de diámetro pequeño, 1,2 m (4 pies), blanco",
-        proveedor: "SYSCOM",
-        unidad: "PZA",
-        precioUnitario: 14.71,
-        cantidad: 10,
-        numerosSerie: ["78477669228"],
         categorias: ["46"]
     },
     {
@@ -1037,7 +972,7 @@ const inventarioInicial = [
         proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 14.00,
-        cantidad: 40,
+        cantidad: 16,
         numerosSerie: ["78477912522"],
         categorias: ["46"]
     },
@@ -1072,17 +1007,6 @@ const inventarioInicial = [
         precioUnitario: 0.00,
         cantidad: 10,
         numerosSerie: ["40078477669219"],
-        categorias: ["46"]
-    },
-    {
-        marca: "LEVITON",
-        modelo: "6H460-5W",
-        descripcion: "Miniatura del producto Cat 6 Cable de conexión de alta flexibilidad de diámetro pequeño, 5 pies (1,5 m), blanco",
-        proveedor: "SYSCOM",
-        unidad: "PZA",
-        precioUnitario: 0.00,
-        cantidad: 21,
-        numerosSerie: ["78477669303"],
         categorias: ["46"]
     },
     {
@@ -2407,33 +2331,11 @@ const inventarioInicial = [
     },
     {
         marca: "OPTRONICS",
-        modelo: "OPPILCP55B0020RI9S06",
-        descripcion: "Pigtail LC Multimodo 50/125 OM3 de 2m Riser de 900um en Set de 6 Colores",
-        proveedor: "",
-        unidad: "PZA",
-        precioUnitario: 256.49,
-        cantidad: 1,
-        numerosSerie: [],
-        categorias: ["46"]
-    },
-    {
-        marca: "OPTRONICS",
         modelo: "OPPISCU09B0020RI9S12",
         descripcion: "Pigtail SC/UPC Monomodo 9/125 de 2m Riser de 900um en Set de 12 Colores",
         proveedor: "",
         unidad: "PZA",
         precioUnitario: 632.31,
-        cantidad: 1,
-        numerosSerie: [],
-        categorias: ["46"]
-    },
-    {
-        marca: "OPTRONICS",
-        modelo: "OPJUSCPSCP55D0010RI2",
-        descripcion: "Jumper SC-SC Multimodo 50/125 OM3 Duplex de 1m Riser de 2mm",
-        proveedor: "",
-        unidad: "PZA",
-        precioUnitario: 252.81,
         cantidad: 1,
         numerosSerie: [],
         categorias: ["46"]
