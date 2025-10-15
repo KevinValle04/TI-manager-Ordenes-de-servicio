@@ -1,9 +1,10 @@
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import path from 'path';
 import Proveedor from '../src/models/Proveedor';
 
-// Cargar variables de entorno
-dotenv.config();
+// Cargar variables de entorno desde el directorio padre (server)
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 // Datos de los proveedores
 const proveedores = [

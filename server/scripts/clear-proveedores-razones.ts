@@ -1,16 +1,25 @@
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import path from 'path';
 import Proveedor from '../src/models/Proveedor';
 import RazonSocial from '../src/models/RazonSocial';
 
-// Cargar variables de entorno
-dotenv.config();
+// Cargar variables de entorno desde el directorio padre (server)
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 // Función principal
 async function clearProveedoresYRazones() {
     try {
+        // Verificar que la URI de MongoDB esté configurada
+        const mongoUri = process.env.MONGO_URI;
+        if (!mongoUri) {
+            throw new Error('MONGO_URI no está configurada en las variables de entorno');
+        }
+        
+        console.log('Conectando a MongoDB:', mongoUri);
+        
         // Conectar a MongoDB
-        await mongoose.connect(process.env.MONGO_URI || '');
+        await mongoose.connect(mongoUri);
         console.log('Conectado a MongoDB');
 
         // Eliminar todos los proveedores
