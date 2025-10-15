@@ -11,6 +11,7 @@ interface Herramienta {
   marca: string;
   modelo: string;
   valor: number;
+  cantidad: number;
   serialNumber: string;
   fechaAsignacion: string;
 }
@@ -232,12 +233,24 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
               </Form.Item>
 
               <Form.Item
+                name="cantidad"
+                label="Cantidad"
+                rules={[{ required: true, message: 'Por favor ingresa la cantidad' }]}
+                initialValue={1}
+              >
+                <InputNumber<number>
+                  style={{ width: '100%' }}
+                  min={1}
+                  placeholder="Ingrese la cantidad"
+                />
+              </Form.Item>
+
+              <Form.Item
                 name="serialNumber"
                 label="Número de Serie (S/N)"
-                rules={[{ required: true, message: 'Por favor ingresa el número de serie' }]}
               >
                 <Input 
-                  placeholder="Ingrese el número de serie"
+                  placeholder="Ingrese el número de serie (opcional)"
                   allowClear
                   autoComplete="off"
                 />
@@ -262,6 +275,7 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
           <span style={{ width: '200px', fontWeight: 'bold' }}>Nombre</span>
           <span style={{ width: '150px', fontWeight: 'bold' }}>Marca</span>
           <span style={{ width: '150px', fontWeight: 'bold' }}>Modelo</span>
+          <span style={{ width: '100px', fontWeight: 'bold' }}>Cantidad</span>
           <span style={{ width: '120px', fontWeight: 'bold' }}>Valor</span>
           <span style={{ width: '150px', fontWeight: 'bold' }}>Número de Serie</span>
           <span style={{ width: '150px', fontWeight: 'bold' }}>Fecha de Asignación</span>
@@ -281,6 +295,7 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
                 <span style={{ width: '200px' }}><strong>{herramienta.nombre}</strong></span>
                 <span style={{ width: '150px' }}>{herramienta.marca}</span>
                 <span style={{ width: '150px' }}>{herramienta.modelo}</span>
+                <span style={{ width: '100px' }}>{herramienta.cantidad}</span>
                 <span style={{ width: '120px' }}>${herramienta.valor.toFixed(2)}</span>
                 <span style={{ width: '150px' }}>S/N: {herramienta.serialNumber}</span>
                 <span style={{ width: '150px' }}>{new Date(herramienta.fechaAsignacion).toLocaleDateString()}</span>
