@@ -862,7 +862,7 @@ const inventarioInicial = [
         proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 190.00,
-        cantidad: 57,
+        cantidad: 61,
         numerosSerie: ["40078477144655"],
         categorias: ["46"]
     },
@@ -917,7 +917,7 @@ const inventarioInicial = [
         proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 69.00,
-        cantidad: 8,
+        cantidad: 10,
         numerosSerie: ["60078477978209"],
         categorias: ["46"]
     },
@@ -1456,7 +1456,7 @@ const inventarioInicial = [
         proveedor: "SYSCOM",
         unidad: "PZA",
         precioUnitario: 52.85,
-        cantidad: 7,
+        cantidad: 8,
         numerosSerie: ["74983033232"],
         categorias: ["46"]
     },
@@ -1643,7 +1643,7 @@ const inventarioInicial = [
         proveedor: "",
         unidad: "PZA",
         precioUnitario: 216.75,
-        cantidad: 1,
+        cantidad: 2,
         numerosSerie: ["74983395538"],
         categorias: ["46"]
     },
