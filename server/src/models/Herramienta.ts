@@ -5,6 +5,7 @@ export interface IHerramienta extends Document {
   marca: string;
   modelo: string;
   valor: number;
+  cantidad: number;
   serialNumber: string;
   colaboradorId: mongoose.Types.ObjectId;
   fechaAsignacion: Date;
@@ -28,10 +29,16 @@ const HerramientaSchema: Schema = new Schema({
     type: Number, 
     required: true 
   },
+  cantidad: {
+    type: Number,
+    required: true,
+    default: 1
+  },
   serialNumber: { 
     type: String, 
-    required: true,
-    unique: true
+    required: false,
+    unique: true,
+    sparse: true
   },
   colaboradorId: { 
     type: Schema.Types.ObjectId, 

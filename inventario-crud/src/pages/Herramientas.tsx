@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Collapse, message } from 'antd';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import HerramientaList from '../components/colaboradores/HerramientaList';
 
 interface Colaborador {
@@ -23,6 +24,21 @@ interface Herramienta {
 const Herramientas: React.FC = () => {
   const [colaboradores, setColaboradores] = useState<Colaborador[]>([]);
   const [herramientas, setHerramientas] = useState<{ [key: string]: Herramienta[] }>({});
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setIsAdmin(false);
+      return;
+    }
+    try {
+      const payload = jwtDecode<{ isAdmin?: boolean }>(token);
+      setIsAdmin(!!payload?.isAdmin);
+    } catch {
+      setIsAdmin(false);
+    }
+  }, []);
 
   const fetchColaboradores = async () => {
     try {
@@ -100,6 +116,7 @@ const Herramientas: React.FC = () => {
                 colaboradorId={colaborador._id}
                 herramientas={herramientas[colaborador._id] || []}
                 onHerramientasChange={() => fetchHerramientas(colaborador._id)}
+                isAdmin={isAdmin}
               />
             )
           }))}
