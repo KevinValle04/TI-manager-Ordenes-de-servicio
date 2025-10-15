@@ -20,6 +20,7 @@ interface Herramienta {
   marca: string;
   modelo: string;
   valor: number;
+  cantidad: number;
   serialNumber: string;
   fechaAsignacion: string;
 }
