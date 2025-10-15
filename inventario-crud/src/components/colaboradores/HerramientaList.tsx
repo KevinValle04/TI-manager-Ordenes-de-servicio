@@ -19,12 +19,14 @@ interface HerramientaListProps {
   colaboradorId: string;
   herramientas: Herramienta[];
   onHerramientasChange: () => void;
+  isAdmin?: boolean;
 }
 
 const HerramientaList: React.FC<HerramientaListProps> = ({ 
   colaboradorId, 
   herramientas, 
-  onHerramientasChange 
+  onHerramientasChange,
+  isAdmin = false
 }) => {
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -33,26 +35,44 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
 
   const handleAddOrEdit = async (values: any) => {
     try {
-      if (editingHerramienta) {
-        // Crear solicitud de modificación
-        await crearSolicitud({
-          tipo: 'herramienta',
-          recursoId: editingHerramienta._id,
-          colaboradorId,
-          accion: 'Modificar',
-          detalles: { ...values }
-        });
-        toast.success('¡Solicitud de modificación enviada!');
+      if (isAdmin) {
+        // Los administradores hacen cambios directamente
+        if (editingHerramienta) {
+          await axios.put(`${import.meta.env.VITE_API_URL}herramientas/${editingHerramienta._id}`, {
+            ...values,
+            colaboradorId
+          });
+          toast.success('Herramienta actualizada correctamente');
+        } else {
+          await axios.post(`${import.meta.env.VITE_API_URL}herramientas`, {
+            ...values,
+            colaboradorId
+          });
+          toast.success('Herramienta agregada correctamente');
+        }
       } else {
-        // Crear solicitud para agregar herramienta
-        await crearSolicitud({
-          tipo: 'herramienta',
-          recursoId: '',
-          colaboradorId,
-          accion: 'Agregar',
-          detalles: { ...values }
-        });
-        toast.success('¡Solicitud enviada!');
+        // Los usuarios no admin crean solicitudes
+        if (editingHerramienta) {
+          // Crear solicitud de modificación
+          await crearSolicitud({
+            tipo: 'herramienta',
+            recursoId: editingHerramienta._id,
+            colaboradorId,
+            accion: 'Modificar',
+            detalles: { ...values }
+          });
+          toast.success('¡Solicitud de modificación enviada!');
+        } else {
+          // Crear solicitud para agregar herramienta
+          await crearSolicitud({
+            tipo: 'herramienta',
+            recursoId: '',
+            colaboradorId,
+            accion: 'Agregar',
+            detalles: { ...values }
+          });
+          toast.success('¡Solicitud enviada!');
+        }
       }
       setTimeout(() => {
         setModalVisible(false);
@@ -70,31 +90,37 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
     if (deletingId === herramientaId) return;
     setDeletingId(herramientaId);
     try {
-      // Verificar si ya existe una solicitud pendiente para esta herramienta
-      const solicitudesResp = await obtenerSolicitudes();
-  const solicitudes = Array.isArray(solicitudesResp.data) ? solicitudesResp.data : [];
-  const yaExiste = solicitudes.some((s: any) =>
-        s.tipo === 'herramienta' &&
-        s.recursoId === herramientaId &&
-        s.accion === 'Regresar' &&
-        s.estado === 'pendiente'
-      );
-      if (yaExiste) {
-        toast.info('Ya existe una solicitud para este movimiento');
-        return;
+      if (isAdmin) {
+        // Los administradores eliminan directamente
+        await axios.delete(`${import.meta.env.VITE_API_URL}herramientas/${herramientaId}`);
+        toast.success('Herramienta eliminada correctamente');
+      } else {
+        // Para usuarios no admin, verificar solicitudes existentes
+        const solicitudesResp = await obtenerSolicitudes();
+        const solicitudes = Array.isArray(solicitudesResp.data) ? solicitudesResp.data : [];
+        const yaExiste = solicitudes.some((s: any) =>
+          s.tipo === 'herramienta' &&
+          s.recursoId === herramientaId &&
+          s.accion === 'Regresar' &&
+          s.estado === 'pendiente'
+        );
+        if (yaExiste) {
+          toast.info('Ya existe una solicitud para este movimiento');
+          return;
+        }
+        // Crear solicitud para eliminar herramienta
+        await crearSolicitud({
+          tipo: 'herramienta',
+          recursoId: herramientaId,
+          colaboradorId,
+          accion: 'Regresar',
+          detalles: {}
+        });
+        toast.success('¡Solicitud enviada!');
       }
-      // Crear solicitud para eliminar herramienta
-      await crearSolicitud({
-        tipo: 'herramienta',
-        recursoId: herramientaId,
-        colaboradorId,
-        accion: 'Regresar',
-        detalles: {}
-      });
-      toast.success('¡Solicitud enviada!');
       onHerramientasChange();
     } catch (error) {
-      toast.error('Error al eliminar la herramienta');
+      toast.error('Error al procesar la operación');
     } finally {
       setDeletingId(null);
     }

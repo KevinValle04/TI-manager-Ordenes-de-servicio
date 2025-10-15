@@ -831,6 +831,7 @@ const ColaboradorList: React.FC = () => {
               colaboradorId={selectedColaborador._id!}
               herramientas={herramientas[selectedColaborador._id!] || []}
               onHerramientasChange={() => fetchHerramientas(selectedColaborador._id!)}
+              isAdmin={isAdmin}
             />
           )}
         </Modal.Body>

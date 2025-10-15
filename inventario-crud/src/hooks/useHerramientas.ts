@@ -20,6 +20,7 @@ interface ApiError {
 interface UseHerramientasProps {
   colaboradorId: string;
   onHerramientasChange: () => void;
+  isAdmin?: boolean; // Nuevo prop para identificar si el usuario es admin
 }
 
 interface HerramientaFormData {
@@ -30,7 +31,7 @@ interface HerramientaFormData {
   serialNumber: string;
 }
 
-export const useHerramientas = ({ colaboradorId, onHerramientasChange }: UseHerramientasProps) => {
+export const useHerramientas = ({ colaboradorId, onHerramientasChange, isAdmin = false }: UseHerramientasProps) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingHerramienta, setEditingHerramienta] = useState<Herramienta | null>(null);
   const [form] = Form.useForm();
@@ -39,18 +40,32 @@ export const useHerramientas = ({ colaboradorId, onHerramientasChange }: UseHerr
   const handleAddOrEdit = async (values: Partial<Herramienta>) => {
     setLoading(true);
     try {
-      if (editingHerramienta) {
-        await axios.put(`http://localhost:6051/api/herramientas/${editingHerramienta._id}`, {
-          ...values,
-          colaboradorId
-        });
-        message.success('Herramienta actualizada correctamente');
+      if (isAdmin) {
+        // Los administradores pueden hacer cambios directamente
+        if (editingHerramienta) {
+          await axios.put(`${import.meta.env.VITE_API_URL}herramientas/${editingHerramienta._id}`, {
+            ...values,
+            colaboradorId
+          });
+          message.success('Herramienta actualizada correctamente');
+        } else {
+          await axios.post(`${import.meta.env.VITE_API_URL}herramientas`, {
+            ...values,
+            colaboradorId
+          });
+          message.success('Herramienta agregada correctamente');
+        }
       } else {
-        await axios.post('http://localhost:6051/api/herramientas', {
-          ...values,
-          colaboradorId
+        // Los usuarios normales crean una solicitud
+        await axios.post(`${import.meta.env.VITE_API_URL}solicitudes`, {
+          tipo: 'herramienta',
+          accion: editingHerramienta ? 'Modificar' : 'Agregar',
+          colaboradorId,
+          recursoId: editingHerramienta?._id,
+          detalles: values,
+          estado: 'pendiente'
         });
-        message.success('Herramienta agregada correctamente');
+        message.success('Solicitud enviada correctamente');
       }
       
       closeModal();
@@ -64,11 +79,24 @@ export const useHerramientas = ({ colaboradorId, onHerramientasChange }: UseHerr
 
   const handleDelete = async (herramientaId: string) => {
     try {
-      await axios.delete(`http://localhost:6051/api/herramientas/${herramientaId}`);
-      message.success('Herramienta eliminada correctamente');
+      if (isAdmin) {
+        // Los administradores pueden eliminar directamente
+        await axios.delete(`${import.meta.env.VITE_API_URL}herramientas/${herramientaId}`);
+        message.success('Herramienta eliminada correctamente');
+      } else {
+        // Los usuarios normales crean una solicitud de eliminación
+        await axios.post(`${import.meta.env.VITE_API_URL}solicitudes`, {
+          tipo: 'herramienta',
+          accion: 'Regresar',
+          colaboradorId,
+          recursoId: herramientaId,
+          estado: 'pendiente'
+        });
+        message.success('Solicitud de eliminación enviada correctamente');
+      }
       onHerramientasChange();
     } catch (error) {
-      message.error('Error al eliminar la herramienta');
+      message.error('Error al procesar la operación');
     }
   };
 
