@@ -1,9 +1,10 @@
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import path from 'path';
 import RazonSocial from '../src/models/RazonSocial';
 
-// Cargar variables de entorno
-dotenv.config();
+// Cargar variables de entorno desde el directorio padre (server)
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 // Datos de las razones sociales
 const razonesSociales = [
