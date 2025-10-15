@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Array de herramientas a cargar
-const herramientas = [
+export const herramientas = [
     {
         nombre: "TALADRO",
         marca: "MILWAKEE",

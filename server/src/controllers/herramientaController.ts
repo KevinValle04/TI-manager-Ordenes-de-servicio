@@ -157,6 +157,9 @@ export const generateHerramientasPDF = async (req: Request, res: Response) => {
       console.warn('No se pudo cargar el logo:', error);
     }
     
+    // Calcular el total de valores
+    const totalValores = herramientas.reduce((sum, h) => sum + h.valor, 0);
+    
     const templateData = {
       fecha: `${dia} de ${mes} del ${año}`,
       logoPath: logoBase64,
@@ -166,7 +169,8 @@ export const generateHerramientasPDF = async (req: Request, res: Response) => {
         ...h,
         valor: h.valor.toFixed(2),
         fechaAsignacion: new Date(h.fechaAsignacion).toLocaleDateString('es-MX')
-      }))
+      })),
+      totalValores: totalValores.toFixed(2)
     };
 
     // Generar el PDF
