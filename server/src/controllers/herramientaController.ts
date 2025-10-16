@@ -114,9 +114,11 @@ export const deleteHerramienta = async (req: Request, res: Response) => {
 export const generateHerramientasPDF = async (req: Request, res: Response) => {
   try {
     const { colaboradorId } = req.params;
+    console.log('Generando PDF para colaborador ID:', colaboradorId);
 
     // Verificar que el ID sea válido
     if (!mongoose.Types.ObjectId.isValid(colaboradorId)) {
+      console.log('ID de colaborador inválido:', colaboradorId);
       return res.status(400).json({ message: 'ID de colaborador inválido' });
     }
 
@@ -128,9 +130,11 @@ export const generateHerramientasPDF = async (req: Request, res: Response) => {
 
     // Obtener información del colaborador
     const Colaborador = mongoose.model<IColaborador>('Colaborador');
-    const colaborador = await Colaborador.findById(colaboradorId).lean() as IColaborador;
+    const colaborador = await Colaborador.findById(colaboradorId).lean();
+    console.log('Resultado de búsqueda de colaborador:', colaborador);
 
     if (!colaborador) {
+      console.log('Colaborador no encontrado para el ID:', colaboradorId);
       return res.status(404).json({ message: 'Colaborador no encontrado' });
     }
 
@@ -157,6 +161,9 @@ export const generateHerramientasPDF = async (req: Request, res: Response) => {
       console.warn('No se pudo cargar el logo:', error);
     }
     
+    // Calcular el total de valores
+    const totalValores = herramientas.reduce((sum, h) => sum + h.valor, 0);
+    
     const templateData = {
       fecha: `${dia} de ${mes} del ${año}`,
       logoPath: logoBase64,
@@ -166,7 +173,8 @@ export const generateHerramientasPDF = async (req: Request, res: Response) => {
         ...h,
         valor: h.valor.toFixed(2),
         fechaAsignacion: new Date(h.fechaAsignacion).toLocaleDateString('es-MX')
-      }))
+      })),
+      totalValores: totalValores.toFixed(2)
     };
 
     // Generar el PDF

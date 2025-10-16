@@ -19,11 +19,13 @@ const HerramientaSchema: Schema = new Schema({
   },
   marca: { 
     type: String, 
-    required: true 
+    required: false,
+    default: ""
   },
   modelo: { 
     type: String, 
-    required: true 
+    required: false,
+    default: ""
   },
   valor: { 
     type: Number, 
@@ -37,8 +39,7 @@ const HerramientaSchema: Schema = new Schema({
   serialNumber: { 
     type: String, 
     required: false,
-    unique: true,
-    sparse: true
+    default: ""
   },
   colaboradorId: { 
     type: Schema.Types.ObjectId, 
