@@ -1,0 +1,125 @@
+{
+  "folioOriginal": "45004530",
+  "fecha": "2025-02-28",
+  "productos": [
+    {
+      "cantidad": 1,
+      "unidad": "",
+      "codigo": "DSC2480043",
+      "descripcion": "DSC NEO RF ALFA - Kit Neo 32 Zonas Inalámbricas Panel HS2032/ / Teclado Alfanumerico HS2LCDRF9N/ Fuente PTC1640U / Gabinete GMX003 #HSDSC",
+      "precioLista": 5586.86,
+      "descuentos": "-43.30%",
+      "precioUnitario": 3167.75,
+      "importe": 3167.75
+    },
+    {
+      "cantidad": 1,
+      "unidad": "",
+      "codigo": "DSC1170007",
+      "descripcion": "DSC HS2LCDN - Teclado Cableado LCD Alfanumérico de 32 caracteres admite 128 zonas compatible con NEO",
+      "precioLista": 3013.64,
+      "descuentos": "-43.30%",
+      "precioUnitario": 1708.74,
+      "importe": 1708.74
+    },
+    {
+      "cantidad": 2,
+      "unidad": "",
+      "codigo": "DSC1200004",
+      "descripcion": "DSC HSM2108 - Módulo Expansor de 8 Zonas Cableadas compatible con panel NEO, PRO #cer #LosPrincipales #PLANDEBENEFICIOS",
+      "precioLista": 1113.29,
+      "descuentos": "-43.30%",
+      "precioUnitario": 631.24,
+      "importe": 1262.48
+    },
+    {
+      "cantidad": 5,
+      "unidad": "",
+      "codigo": "SEC1180002",
+      "descripcion": "Seco-Larm SM433TQW - Contacto magnetico BLANCO de sobreponer 1-1/4\" (31mm) Gap Compatible paneles DSC / RISCO / BOSCH #CER",
+      "precioLista": 54.85,
+      "descuentos": "-37.00%",
+      "precioUnitario": 34.55,
+      "importe": 172.75
+    },
+    {
+      "cantidad": 2,
+      "unidad": "",
+      "codigo": "SEC1180001",
+      "descripcion": "Seco-Larm SM226LQ - Contacto metalico para cortina (overhead) Compatible paneles DSC / RISCO / BOSCH",
+      "precioLista": 390.88,
+      "descuentos": "-37.00%",
+      "precioUnitario": 246.25,
+      "importe": 492.5
+    },
+    {
+      "cantidad": 7,
+      "unidad": "",
+      "codigo": "DSC1180008",
+      "descripcion": "DSC BV600 - Detector de Movimiento infrarrojo de Doble Elemento PIR cableado Inmune a Mascotas",
+      "precioLista": 1092.9,
+      "descuentos": "-43.30%",
+      "precioUnitario": 619.68,
+      "importe": 4337.76
+    },
+    {
+      "cantidad": 2,
+      "unidad": "",
+      "codigo": "DSC1190016",
+      "descripcion": "DSC S30WGPAQTT - Paquete Sirena Exterior 30W con Gabinete GS001 TT001",
+      "precioLista": 1048.05,
+      "descuentos": "-43.30%",
+      "precioUnitario": 594.24,
+      "importe": 1188.48
+    },
+    {
+      "cantidad": 2,
+      "unidad": "",
+      "codigo": "TVN083034",
+      "descripcion": "SAXXON PSU1205D - Fuente de Poder Regulada de 12 Vcc a 5 Amperes/ Ideal para Equipos de Alto Consumo de Corriente/ Para Usos Multiples: Sistemas de CCTV, Acceso, Asistencia, etc/ Certificación UL/",
+      "precioLista": 334.4,
+      "descuentos": "-15.00% -37.00%",
+      "precioUnitario": 179.07,
+      "importe": 358.14
+    },
+    {
+      "cantidad": 5,
+      "unidad": "",
+      "codigo": "DSC1190003",
+      "descripcion": "DSC SD15W - Sirena Cableada para Interior 12 VCD 15W 2 tonos 85 dB #LosPrincipales",
+      "precioLista": 263.03,
+      "descuentos": "-43.30%",
+      "precioUnitario": 149.14,
+      "importe": 745.7
+    },
+    {
+      "cantidad": 5,
+      "unidad": "",
+      "codigo": "SEC1190001",
+      "descripcion": "Seco-Larm SL126QR - Luz Estroboscópica Alámbrica, 6-12VDC, Roja Compatible IHORN / RISCO / DSC / BOSCH",
+      "precioLista": 580.5,
+      "descuentos": "-37.00%",
+      "precioUnitario": 365.72,
+      "importe": 1828.6
+    },
+    {
+      "cantidad": 4,
+      "unidad": "",
+      "codigo": "SXN1570002",
+      "descripcion": "SAXXON OWA4305JF- Cable de alarma de 4 conductores/ CCA/ Calibre 22 AWG/ 305 metros/ Retardante a la llama/ Recomendable para control de acceso/ Videoportero/ Audio",
+      "precioLista": 1446.47,
+      "descuentos": "-5.00% -37.00%",
+      "precioUnitario": 865.71,
+      "importe": 3462.84
+    }
+  ],
+  "totales": {
+    "Subtotal": 18725.74,
+    "Envío": 0.0,
+    "Envío Volumétrico": 0.0,
+    "Flat Rate": 0.0,
+    "Comisiones": 0.0,
+    "IVA": 1498.06,
+    "Total": 20223.8
+  }
+}

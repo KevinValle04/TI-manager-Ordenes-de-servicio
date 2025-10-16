@@ -1,4 +1,4 @@
-import { execFile } from 'child_process';
+import { exec, execFile } from 'child_process';
 import { Request, Response } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -233,6 +233,54 @@ export const getOrdenesByDateRange = async (req: Request, res: Response) => {
   }
 };
 
+// Función para ejecutar el script universal de DeepSeek
+function ejecutarScriptUniversal(rutaPDF: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+      const scriptPath = path.join(__dirname, '..', '..', 'scripts', 'extraer_datos_universal_deepseek.py');
+      const pythonPath = path.join(__dirname, '..', '..', '..', '.venv', 'Scripts', 'python.exe');
+      
+      const comando = `"${pythonPath}" "${scriptPath}" "${rutaPDF}"`;
+      
+      console.log('🤖 Ejecutando script universal DeepSeek:', comando);
+      
+      exec(comando, { 
+          maxBuffer: 1024 * 1024 * 10, // 10MB buffer
+          timeout: 300000 // 5 minutos timeout
+      }, (error, stdout, stderr) => {
+          
+          if (error) {
+              console.error('❌ Error ejecutando script universal:', error);
+              console.error('📄 Stderr:', stderr);
+              reject(error);
+              return;
+          }
+          
+          console.log('📄 Logs del script:', stderr);
+          
+          try {
+              // Limpiar posibles marcadores de código que puedan quedar
+              let jsonLimpio = stdout.trim();
+              if (jsonLimpio.startsWith('```json')) {
+                  jsonLimpio = jsonLimpio.replace(/```json\s*/, '').replace(/\s*```$/, '');
+              }
+              
+              const datosExtraidos = JSON.parse(jsonLimpio);
+              
+              console.log('✅ JSON parseado exitosamente');
+              console.log('📋 Folio detectado:', datosExtraidos.folioOriginal);
+              console.log('📊 Productos encontrados:', datosExtraidos.productos?.length || 0);
+              
+              resolve(datosExtraidos);
+              
+          } catch (parseError) {
+              console.error('❌ Error parseando JSON del script universal:', parseError);
+              console.error('📄 Stdout recibido:', stdout);
+              reject(parseError);
+          }
+      });
+  });
+}
+
 export const procesarPdf = async (req: Request, res: Response) => {
   try {
     // Verificar que se subió un archivo
@@ -240,59 +288,170 @@ export const procesarPdf = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'No se proporcionó ningún archivo PDF' });
     }
 
-    // Obtener el proveedor desde el body
-    const { proveedor } = req.body;
-    if (!proveedor) {
-      return res.status(400).json({ error: 'Debe especificar el proveedor' });
+    console.log('📄 Procesando PDF con script universal:', req.file.originalname);
+    
+    // Usar script universal en lugar de scripts específicos
+    const datosExtraidos = await ejecutarScriptUniversal(req.file.path);
+    
+    // Limpiar archivo temporal
+    fs.unlinkSync(req.file.path);
+    
+    res.json({
+      success: true,
+      message: 'PDF procesado exitosamente con DeepSeek',
+      datosExtraidos: datosExtraidos, // Cambiar de 'datos' a 'datosExtraidos' para compatibilidad con frontend
+      proveedor: 'Detectado automáticamente', // El script ya detecta el proveedor
+      folio: datosExtraidos.folioOriginal
+    });
+    
+  } catch (error: any) {
+    console.error('❌ Error procesando PDF:', error);
+    
+    // Limpiar archivo si existe
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    
+    res.status(500).json({ 
+      error: 'Error procesando PDF con script universal', 
+      details: error.message 
+    });
+  }
+};
+
+export const crearOrdenDesdePdf = async (req: Request, res: Response) => {
+  try {
+    // Verificar que se subió un archivo
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se proporcionó ningún archivo PDF' });
+    }
+
+    const { 
+      proveedor: proveedorId, 
+      razonSocial: razonSocialId, 
+      vendedor: vendedorId,
+      direccionEnvio,
+      datosAdicionales 
+    } = req.body;
+
+    // Validar que se proporcionaron los datos mínimos
+    if (!proveedorId || !razonSocialId) {
+      return res.status(400).json({ 
+        error: 'Se requieren proveedor y razón social para crear la orden' 
+      });
+    }
+
+    console.log('📄 Creando orden desde PDF:', req.file.originalname);
+    
+    // Validar que el proveedor existe
+    const proveedorData = await Proveedor.findById(proveedorId);
+    if (!proveedorData) {
+      return res.status(400).json({ error: 'El proveedor especificado no existe' });
+    }
+    
+    // Validar que la razón social existe
+    const razonSocialData = await RazonSocial.findById(razonSocialId);
+    if (!razonSocialData) {
+      return res.status(400).json({ error: 'La razón social especificada no existe' });
+    }
+
+    // Validar vendedor si se proporciona
+    let vendedorData = null;
+    if (vendedorId) {
+      vendedorData = await Vendedor.findById(vendedorId);
+      if (!vendedorData) {
+        return res.status(400).json({ error: 'El vendedor especificado no existe' });
+      }
     }
 
     const rutaArchivo = req.file.path;
     
     try {
-      // Determinar qué script usar según el proveedor
-      const scriptPath = await getScriptPath(proveedor);
+      // 1. Procesar con script universal
+      const datosExtraidos = await ejecutarScriptUniversal(rutaArchivo);
       
-      if (!scriptPath) {
-        return res.status(400).json({ 
-          error: `No hay script de procesamiento disponible para el proveedor: ${proveedor}` 
-        });
-      }
-
-      // Ejecutar el script Python
-      console.log(`Ejecutando script: ${scriptPath} con archivo: ${rutaArchivo}`);
-
-      const { stdout, stderr } = await execFileAsync('python', [scriptPath, rutaArchivo], {
-        timeout: 30000 // 30 segundos de timeout
+      // Generar número de orden único
+      const timestamp = DateUtils.formatDateForInput().replace(/-/g, '');
+      const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+      const numeroOrden = `OC-${timestamp}-${random}`;
+      
+      // 2. Crear orden de compra con los datos extraídos y las relaciones
+      const ordenCompra = new OrdenCompra({
+        numeroOrden: numeroOrden,
+        numeroCotizacion: datosExtraidos.folioOriginal || undefined,
+        fecha: datosExtraidos.fecha ? DateUtils.parseToMexicaliDate(datosExtraidos.fecha) : DateUtils.getCurrentDateInMexicali(),
+        proveedor: proveedorId,
+        razonSocial: razonSocialId,
+        vendedor: vendedorId || undefined,
+        datosOrden: {
+          direccionEnvio: direccionEnvio ? JSON.parse(direccionEnvio) : undefined,
+          productos: datosExtraidos.productos || [],
+          totalesCalculados: datosExtraidos.totales || {},
+          datosPdf: {
+            datosExtraidos: datosExtraidos,
+            archivoOriginal: req.file.originalname
+          },
+          moneda: 'MXN',
+          porcentajeIvaSimbolico: '16'
+        }
       });
+      
+      await ordenCompra.save();
 
-      if (stderr) {
-        console.warn('Warning del script Python:', stderr);
+      // Preparar datos para generar PDF
+      const datosParaPdf = {
+        numeroOrden: numeroOrden,
+        fecha: DateUtils.formatForOrdenCompra(),
+        proveedor: proveedorData.toObject(),
+        razonSocial: razonSocialData.toObject(),
+        vendedor: vendedorData ? vendedorData.toObject() : undefined,
+        direccionEnvio: direccionEnvio ? JSON.parse(direccionEnvio) : undefined,
+        productos: datosExtraidos.productos || [],
+        totalesCalculados: datosExtraidos.totales || {},
+        datosPdf: {
+          datosExtraidos: datosExtraidos,
+          archivoOriginal: req.file.originalname
+        },
+        moneda: 'MXN',
+        porcentajeIvaSimbolico: '16'
+      };
+
+      // Generar el PDF de la orden de compra
+      const pdfBuffer = await pdfGenerator.generarPdfOrdenCompra(datosParaPdf);
+      
+      // Crear directorio para PDFs si no existe
+      const pdfDir = path.join(__dirname, '..', '..', 'pdfs');
+      if (!fs.existsSync(pdfDir)) {
+        fs.mkdirSync(pdfDir, { recursive: true });
       }
+      
+      // Guardar el PDF en el servidor
+      const nombreArchivoPdf = `OrdenCompra-${numeroOrden}-${Date.now()}.pdf`;
+      const rutaPdf = path.join(pdfDir, nombreArchivoPdf);
+      fs.writeFileSync(rutaPdf, pdfBuffer);
+      
+      // Actualizar la orden con la ruta del PDF
+      ordenCompra.rutaPdf = `pdfs/${nombreArchivoPdf}`;
+      await ordenCompra.save();
+      
+      // Devolver la orden creada con los datos poblados
+      const ordenCreada = await OrdenCompra.findById(ordenCompra._id)
+        .populate('proveedor', 'empresa')
+        .populate('razonSocial', 'nombre rfc')
+        .populate('vendedor', 'nombre correo telefono');
 
-      // Parsear el resultado JSON
-      let datosExtraidos;
-      try {
-        datosExtraidos = JSON.parse(stdout);
-      } catch (parseError) {
-        console.error('Error al parsear JSON del script:', parseError);
-        console.error('Salida del script:', stdout);
-        return res.status(500).json({ 
-          error: 'Error al procesar la respuesta del script de extracción' 
-        });
-      }
-
-      // Retornar los datos extraídos
-      res.json({
+      res.status(201).json({
         success: true,
-        proveedor: proveedor,
-        archivo: req.file.originalname,
+        mensaje: 'Orden de compra creada exitosamente desde PDF',
+        orden: ordenCreada,
         datosExtraidos: datosExtraidos,
+        archivoOriginal: req.file.originalname,
         timestamp: new Date().toISOString()
       });
 
     } catch (error) {
-      console.error('Error al ejecutar script:', error);
-      res.status(500).json({ 
+      console.error('Error al procesar PDF:', error);
+      return res.status(500).json({ 
         error: 'Error al procesar el archivo PDF',
         detalles: error instanceof Error ? error.message : 'Error desconocido'
       });
@@ -307,67 +466,13 @@ export const procesarPdf = async (req: Request, res: Response) => {
     }
 
   } catch (error) {
-    console.error('Error general en procesarPdf:', error);
+    console.error('Error general en crearOrdenDesdePdf:', error);
     res.status(500).json({ 
       error: 'Error interno del servidor',
       detalles: error instanceof Error ? error.message : 'Error desconocido'
     });
   }
 };
-
-/**
- * Determina qué script usar según el proveedor
- * Acepta tanto el nombre de la empresa como un ID de proveedor
- */
-async function getScriptPath(proveedorInfo: string): Promise<string | null> {
-  const scriptsDir = path.join(__dirname, '..', '..', 'scripts');
-  
-  let nombreProveedor = proveedorInfo;
-  
-  // Si el parámetro parece ser un ID de MongoDB, buscar el proveedor en la BD
-  if (proveedorInfo.match(/^[0-9a-fA-F]{24}$/)) {
-    try {
-      const proveedor = await Proveedor.findById(proveedorInfo);
-      if (proveedor) {
-        nombreProveedor = proveedor.empresa;
-      }
-    } catch (error) {
-      console.warn('Error al buscar proveedor por ID:', error);
-    }
-  }
-  
-  // Normalizar nombre del proveedor para comparación
-  const proveedorNormalizado = nombreProveedor.toLowerCase().trim();
-  
-  // Mapeo de proveedores a scripts (incluyendo variaciones del nombre)
-  const scriptMap: { [key: string]: string } = {
-    'syscom': 'extraer_datos_syscom.py',
-    'portenntum': 'script_auto_portenntum.py',
-    'tvc': 'extraer_datos_tvc.py',
-    'grupo dice': 'extraer_datos_grupo_dice.py',
-  };
-
-  // Buscar coincidencia exacta primero
-  if (scriptMap[proveedorNormalizado]) {
-    const scriptPath = path.join(scriptsDir, scriptMap[proveedorNormalizado]);
-    if (fs.existsSync(scriptPath)) {
-      return scriptPath;
-    }
-  }
-
-  // Buscar coincidencia parcial (el nombre del proveedor contiene alguna clave)
-  for (const [key, scriptName] of Object.entries(scriptMap)) {
-    if (proveedorNormalizado.includes(key) || key.includes(proveedorNormalizado)) {
-      const scriptPath = path.join(scriptsDir, scriptName);
-      if (fs.existsSync(scriptPath)) {
-        return scriptPath;
-      }
-    }
-  }
-
-  console.warn(`No se encontró script para el proveedor: ${nombreProveedor} (original: ${proveedorInfo})`);
-  return null;
-}
 
 /**
  * Generar PDF de orden de compra
@@ -770,187 +875,6 @@ export const descargarPdfOrdenCompra = async (req: Request, res: Response) => {
     res.status(500).json({ 
       error: 'Error al descargar PDF de orden de compra',
       detalles: err.message
-    });
-  }
-};
-
-/**
- * Crear orden de compra desde PDF con detección automática del proveedor
- */
-export const crearOrdenDesdePdf = async (req: Request, res: Response) => {
-  try {
-    // Verificar que se subió un archivo
-    if (!req.file) {
-      return res.status(400).json({ error: 'No se proporcionó ningún archivo PDF' });
-    }
-
-    const { 
-      proveedor: proveedorId, 
-      razonSocial: razonSocialId, 
-      vendedor: vendedorId,
-      direccionEnvio,
-      datosAdicionales 
-    } = req.body;
-
-    // Validar que se proporcionaron los datos mínimos
-    if (!proveedorId || !razonSocialId) {
-      return res.status(400).json({ 
-        error: 'Debe especificar el proveedor y la razón social' 
-      });
-    }
-
-    // Validar que el proveedor existe
-    const proveedorData = await Proveedor.findById(proveedorId);
-    if (!proveedorData) {
-      return res.status(400).json({ error: 'El proveedor especificado no existe' });
-    }
-    
-    // Validar que la razón social existe
-    const razonSocialData = await RazonSocial.findById(razonSocialId);
-    if (!razonSocialData) {
-      return res.status(400).json({ error: 'La razón social especificada no existe' });
-    }
-
-    // Validar vendedor si se proporciona
-    let vendedorData = null;
-    if (vendedorId) {
-      vendedorData = await Vendedor.findById(vendedorId);
-      if (!vendedorData) {
-        return res.status(400).json({ error: 'El vendedor especificado no existe' });
-      }
-    }
-
-    const rutaArchivo = req.file.path;
-    
-    try {
-      // Determinar qué script usar según el proveedor
-      const scriptPath = await getScriptPath(proveedorData.empresa);
-      
-      if (!scriptPath) {
-        return res.status(400).json({ 
-          error: `No hay script de procesamiento disponible para el proveedor: ${proveedorData.empresa}` 
-        });
-      }
-
-      // Ejecutar el script Python para extraer datos del PDF
-      console.log(`Ejecutando script: ${scriptPath} con archivo: ${rutaArchivo}`);
-      
-      const { stdout, stderr } = await execFileAsync('python', [scriptPath, rutaArchivo], {
-        timeout: 30000 // 30 segundos de timeout
-      });
-
-      if (stderr) {
-        console.warn('Warning del script Python:', stderr);
-      }
-
-      // Parsear el resultado JSON
-      let datosExtraidos;
-      try {
-        datosExtraidos = JSON.parse(stdout);
-      } catch (parseError) {
-        console.error('Error al parsear JSON del script:', parseError);
-        console.error('Salida del script:', stdout);
-        return res.status(500).json({ 
-          error: 'Error al procesar la respuesta del script de extracción' 
-        });
-      }
-
-      // Generar número de orden único
-      const timestamp = DateUtils.formatDateForInput().replace(/-/g, '');
-      const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-      const numeroOrden = `OC-${proveedorData.empresa.substring(0, 3).toUpperCase()}-${timestamp}-${random}`;
-
-      // Crear la orden de compra en la base de datos
-      const ordenCompra = new OrdenCompra({
-        numeroOrden,
-        numeroCotizacion: datosExtraidos?.folio || undefined, // Extraer número de cotización del PDF
-        fecha: DateUtils.getCurrentDateInMexicali(),
-        proveedor: proveedorId,
-        razonSocial: razonSocialId,
-        vendedor: vendedorId || undefined,
-        datosOrden: {
-          direccionEnvio,
-          productos: datosExtraidos.productos || [],
-          totalesCalculados: datosExtraidos.totales || {},
-          datosPdf: datosExtraidos,
-          datosAdicionales,
-          moneda: 'MXN', // Valor por defecto
-          porcentajeIvaSimbolico: '16' // Valor por defecto
-        }
-      });
-      
-      await ordenCompra.save();
-      
-      // Preparar datos para generar PDF de orden de compra
-      const datosParaPdf = {
-        numeroOrden,
-        fecha: DateUtils.formatForOrdenCompra(),
-        proveedor: proveedorData.toObject(),
-        razonSocial: razonSocialData.toObject(),
-        vendedor: vendedorData ? vendedorData.toObject() : undefined,
-        direccionEnvio,
-        productos: datosExtraidos.productos || [],
-        totalesCalculados: datosExtraidos.totales || {},
-        datosPdf: datosExtraidos,
-        datosAdicionales,
-        moneda: 'MXN', // Valor por defecto
-        porcentajeIvaSimbolico: '16' // Valor por defecto
-      };
-      
-      // Generar el PDF de la orden de compra
-      const pdfBuffer = await pdfGenerator.generarPdfOrdenCompra(datosParaPdf);
-      
-      // Crear directorio para PDFs si no existe
-      const pdfDir = path.join(__dirname, '..', '..', 'pdfs');
-      if (!fs.existsSync(pdfDir)) {
-        fs.mkdirSync(pdfDir, { recursive: true });
-      }
-      
-      // Guardar el PDF en el servidor
-      const nombreArchivoPdf = `OrdenCompra-${numeroOrden}-${Date.now()}.pdf`;
-      const rutaPdf = path.join(pdfDir, nombreArchivoPdf);
-      fs.writeFileSync(rutaPdf, pdfBuffer);
-      
-      // Actualizar la orden con la ruta del PDF
-      ordenCompra.rutaPdf = `pdfs/${nombreArchivoPdf}`;
-      await ordenCompra.save();
-      
-      // Devolver la orden creada con los datos poblados
-      const ordenCreada = await OrdenCompra.findById(ordenCompra._id)
-        .populate('proveedor', 'empresa')
-        .populate('razonSocial', 'nombre rfc')
-        .populate('vendedor', 'nombre correo telefono');
-
-      res.status(201).json({
-        success: true,
-        mensaje: 'Orden de compra creada exitosamente desde PDF',
-        orden: ordenCreada,
-        datosExtraidos: datosExtraidos,
-        archivoOriginal: req.file.originalname,
-        timestamp: new Date().toISOString()
-      });
-
-    } catch (error) {
-      console.error('Error al procesar PDF:', error);
-      return res.status(500).json({ 
-        error: 'Error al procesar el archivo PDF',
-        detalles: error instanceof Error ? error.message : 'Error desconocido'
-      });
-    } finally {
-      // Limpiar archivo temporal
-      try {
-        fs.unlinkSync(rutaArchivo);
-        console.log(`Archivo temporal eliminado: ${rutaArchivo}`);
-      } catch (unlinkError) {
-        console.warn('No se pudo eliminar archivo temporal:', unlinkError);
-      }
-    }
-
-  } catch (error) {
-    console.error('Error general en crearOrdenDesdePdf:', error);
-    res.status(500).json({ 
-      error: 'Error interno del servidor',
-      detalles: error instanceof Error ? error.message : 'Error desconocido'
     });
   }
 };

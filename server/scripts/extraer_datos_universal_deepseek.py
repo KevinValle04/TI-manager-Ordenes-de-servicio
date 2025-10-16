@@ -116,6 +116,11 @@ Extrae la siguiente información:
   * Si hay 37 productos, el JSON debe tener 37 productos
   * Verificar que llegues hasta el ÚLTIMO producto de la tabla
   * Campos comunes: cantidad, unidad, codigo, descripcion, precioLista, descuentos, precioUnitario, importe
+  * ¡IMPORTANTE! Para campos numéricos (precios, cantidades, importes): usar SOLO números decimales sin comas ni símbolos de moneda
+  * Ejemplo: usar 5303.90 en lugar de "5,303.90" o "$5,303.90"
+  * Si hay descuentos, mantener el formato de texto original (ej: "10.8557% 24% 23%")
+  * ¡CRÍTICO! Si no encuentras "precioUnitario", buscar "precio", "precioNeto", "precioFinal", o cualquier precio disponible
+  * Si un producto no tiene precio visible, poner 0 pero NO omitir el producto
 - totales: usar nombres exactos (Subtotal, IVA, Total, etc.)
 
 REGLAS CRÍTICAS:
@@ -125,6 +130,18 @@ REGLAS CRÍTICAS:
 4. NO agregar campos inexistentes
 5. Si tienes límite de espacio, prioriza completar la lista de productos
 6. Es mejor un JSON con todos los productos que uno incompleto
+
+ESTRUCTURA ESPERADA para productos:
+{
+  "cantidad": 1,
+  "unidad": "PIEZA", 
+  "codigo": "ABC123",
+  "descripcion": "DESCRIPCION DEL PRODUCTO",
+  "precioLista": 1000.50,
+  "descuentos": "10% 5%",
+  "precioUnitario": 850.25,
+  "importe": 850.25
+}
 
 IMPORTANTE: Responde ÚNICAMENTE con el JSON válido, SIN marcadores de código como ```json o ```. Solo el JSON puro."""
 
