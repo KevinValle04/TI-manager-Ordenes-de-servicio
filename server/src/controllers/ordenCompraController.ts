@@ -237,7 +237,7 @@ export const getOrdenesByDateRange = async (req: Request, res: Response) => {
 function ejecutarScriptUniversal(rutaPDF: string): Promise<any> {
   return new Promise((resolve, reject) => {
       const scriptPath = path.join(__dirname, '..', '..', 'scripts', 'extraer_datos_universal_deepseek.py');
-      const pythonPath = path.join(__dirname, '..', '..', '..', '.venv', 'Scripts', 'python.exe');
+      const pythonPath = 'C:/Users/sopor/AppData/Local/Programs/Python/Python314/python.exe';
       
       const comando = `"${pythonPath}" "${scriptPath}" "${rutaPDF}"`;
       
@@ -247,11 +247,24 @@ function ejecutarScriptUniversal(rutaPDF: string): Promise<any> {
           maxBuffer: 1024 * 1024 * 10, // 10MB buffer
           timeout: 300000 // 5 minutos timeout
       }, (error, stdout, stderr) => {
+          console.log('📄 Stderr:', stderr); // Log stderr siempre, puede contener información útil
           
           if (error) {
               console.error('❌ Error ejecutando script universal:', error);
-              console.error('📄 Stderr:', stderr);
-              reject(error);
+              
+              // Intentar extraer mensaje de error JSON del stdout
+              try {
+                  const errorJson = JSON.parse(stdout);
+                  if (errorJson.error) {
+                      reject(new Error(errorJson.error));
+                      return;
+                  }
+              } catch (parseError) {
+                  // Si no es JSON, usar el mensaje de error original
+                  console.error('No se pudo parsear respuesta como JSON');
+              }
+              
+              reject(new Error(`Error al procesar el PDF: ${stderr || error.message}`));
               return;
           }
           

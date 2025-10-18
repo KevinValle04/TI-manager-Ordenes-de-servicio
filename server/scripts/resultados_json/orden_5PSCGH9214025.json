@@ -7,8 +7,6 @@
       "unidad": "PIEZA",
       "codigo": "E45RUBKIT",
       "descripcion": "RACK/RUNWAY KIT 45RU BLK 54IN MTYC",
-      "precioLista": 5303.9,
-      "descuentos": "10.8557% 24% 23%",
       "precioUnitario": 2766.9,
       "importe": 2766.9
     },
@@ -16,9 +14,7 @@
       "cantidad": 1,
       "unidad": "PIEZA",
       "codigo": "EPB350DTB",
-      "descripcion": "AMPLIFICADOR MEZCLADOR CLASE D, 350 W, CON JRZ MULTIMEDIA, 1 ENTRADA EMC, 2 ENTRADAS AUX, 4 ENTRADAS MIC (BALANCEADAS)",
-      "precioLista": 14090.58,
-      "descuentos": "8.4191% 25% 20%",
+      "descripcion": "AMPLIFICADOR MEZCLADOR CLASE D, 350 W, CON MULTIMEDIA, 1 ENTRADA EMC, 2 ENTRADAS AUX, 4 ENTRADAS MIC (BALANCEADAS)",
       "precioUnitario": 7742.56,
       "importe": 7742.56
     },
@@ -26,9 +22,7 @@
       "cantidad": 6,
       "unidad": "PIEZA",
       "codigo": "EP865CF",
-      "descripcion": "ALTAVOZ DE PARED INTERIOR 5.25'' 50W COLOR TPZ BLANCO",
-      "precioLista": 4681.03,
-      "descuentos": "10.0000% 20% 20%",
+      "descripcion": "ALTAVOZ DE PARED INTERIOR 5.25'' 50W COLOR BLANCO",
       "precioUnitario": 2696.27,
       "importe": 16177.62
     },
@@ -36,9 +30,7 @@
       "cantidad": 1,
       "unidad": "PIEZA",
       "codigo": "54755501/500",
-      "descripcion": "CARRETE 152M D/CABLE CMR 2/14AWG BLANCO TIJ P/APLICACIONES D/VOCEO",
-      "precioLista": 4932.46,
-      "descuentos": "0.9509% 22% 20%",
+      "descripcion": "CARRETE 152M D/CABLE CMR 2/14AWG BLANCO P/APLICACIONES D/VOCEO",
       "precioUnitario": 3048.58,
       "importe": 3048.58
     },
@@ -46,9 +38,7 @@
       "cantidad": 2,
       "unidad": "PIEZA",
       "codigo": "DSK1T342MFWX",
-      "descripcion": "TERMINAL DE RECONOCIMIENTO FACIAL / TIJ E1 PANTALLA TACTIL 4.3 INCHES / 2 MP / 1500 ROSTROS / 3000 TARJETAS MIFARE",
-      "precioLista": 4671.54,
-      "descuentos": "10.0000% 25% 20%",
+      "descripcion": "TERMINAL DE RECONOCIMIENTO FACIAL / E1 PANTALLA TACTIL 4.3 INCHES / 2 MP / 1500 ROSTROS / 3000 TARJETAS MIFARE",
       "precioUnitario": 2522.62,
       "importe": 5045.24
     },
@@ -57,8 +47,6 @@
       "unidad": "KIT",
       "codigo": "KIT16B3LK5",
       "descripcion": "KIT D/FTE D/ALIMENT. (PLB3) C/TRANSF. RT1640 / BAT D/RESPALDO LK5.512 Y GABINETE",
-      "precioLista": 1487.29,
-      "descuentos": "34.2185% 25% 22%",
       "precioUnitario": 572.34,
       "importe": 1144.68
     },
@@ -66,29 +54,23 @@
       "cantidad": 2,
       "unidad": "PIEZA",
       "codigo": "KITRS6",
-      "descripcion": "KIT D/4 SOPORTES D/PLAST P/PCB TIJ",
-      "precioLista": 0,
-      "descuentos": "",
-      "precioUnitario": 0,
-      "importe": 0
+      "descripcion": "KIT D/4 SOPORTES D/PLAST P/PCB",
+      "precioUnitario": null,
+      "importe": null
     },
     {
       "cantidad": 2,
       "unidad": "PIEZA",
       "codigo": "RT1640LS",
-      "descripcion": "TRANSFORMADOR 16 VCA 40VA TIJ",
-      "precioLista": 0,
-      "descuentos": "",
-      "precioUnitario": 0,
-      "importe": 0
+      "descripcion": "TRANSFORMADOR 16 VCA 40VA",
+      "precioUnitario": null,
+      "importe": null
     },
     {
       "cantidad": 2,
       "unidad": "PIEZA",
       "codigo": "GOF01XTV2",
       "descripcion": "GAB. ACERO P/FTE SYSRMTXT / SP4000S JRZ",
-      "precioLista": 0,
-      "descuentos": "",
       "precioUnitario": 0,
       "importe": 0
     },
@@ -97,8 +79,6 @@
       "unidad": "PIEZA",
       "codigo": "LK5.512",
       "descripcion": "BATERIA AGM/VRLA, 12 VCD; 5.5 AH. P/SISTEMAS TIJ D/RESPALDO D/ENERGIA EN SISTEMAS DE SEG ELN",
-      "precioLista": 0,
-      "descuentos": "",
       "precioUnitario": 0,
       "importe": 0
     },
@@ -107,8 +87,6 @@
       "unidad": "PIEZA",
       "codigo": "PLB3",
       "descripcion": "6 O 12 O 24 VCC @ 4 A / FUENTE TIPO TARJETA/ 1 TIJ SALIDA / REQUIERE TRANSFORMADOR DE ENTRADA",
-      "precioLista": 0,
-      "descuentos": "",
       "precioUnitario": 0,
       "importe": 0
     },
@@ -116,9 +94,7 @@
       "cantidad": 2,
       "unidad": "PIEZA",
       "codigo": "CBRNF1P30D",
-      "descripcion": "PAQUETE DÃšO: CABLE ROJO Y NEGRO DE 30 CM GDL CADA UNO, CON TERMINAL F1 EN UN EXTREMO Y PUNTAS LIBRES EN EL OTRO,",
-      "precioLista": 0,
-      "descuentos": "",
+      "descripcion": "PAQUETE DÚO: CABLE ROJO Y NEGRO DE 30 CM GDL CADA UNO, CON TERMINAL F1 EN UN EXTREMO Y PUNTAS LIBRES EN EL OTRO,",
       "precioUnitario": 0,
       "importe": 0
     },
@@ -127,8 +103,6 @@
       "unidad": "PIEZA",
       "codigo": "ACCESSK1",
       "descripcion": "BOTON D/SALIDA SIN CONTACTO TIJ",
-      "precioLista": 207.56,
-      "descuentos": "3.8426% 28% 20%",
       "precioUnitario": 114.95,
       "importe": 229.9
     },
@@ -137,8 +111,6 @@
       "unidad": "PIEZA",
       "codigo": "DS9664NIM8",
       "descripcion": "NVR 8K / 64 CANALES / SOP. 8 HDD (NO INC) / TIJ H.265+ / RAID",
-      "precioLista": 57748.59,
-      "descuentos": "28% 25%",
       "precioUnitario": 31184.23,
       "importe": 31184.23
     },
@@ -146,9 +118,7 @@
       "cantidad": 1,
       "unidad": "PIEZA",
       "codigo": "DS3E1552PSI",
-      "descripcion": "SWITCH POE 48 PUERTOS POE 2 PUERTO UPLINK CUL 2 PUERTOS SFP 300 METROS MODO EXTENDIDO",
-      "precioLista": 17012.19,
-      "descuentos": "0.9834% 25% 20%",
+      "descripcion": "SWITCH POE 48 PUERTOS POE 2 PUERTO UPLINK CUL 2 PUERTOS SFP 300 METROS MODO EXTENDIDO **tiempo de entrega de 3 a 5 dias habiles**",
       "precioUnitario": 10106.92,
       "importe": 10106.92
     },
@@ -156,9 +126,7 @@
       "cantidad": 44,
       "unidad": "PIEZA",
       "codigo": "DS2CD2363G2LI2",
-      "descripcion": "TURRET IP 6 MP / LENTE 2.8 MM / ACUSENSE / 2 JRZ U MIC INTEGRADO / DUAL LIGHT (30 MTS IR EXIR + 30 MTS LUZ BLANCA) / POE / IP67",
-      "precioLista": 3114.36,
-      "descuentos": "23% 20%",
+      "descripcion": "TURRET IP 6 MP / LENTE 2.8 MM / ACUSENSE / 2 JRZ U MIC INTEGRADO / DUAL LIGHT (30 MTS IR EXIR + 30 MTS LUZ BLANCA) / POE / IP67 **tiempo de entrega de 3 a 5 dias habiles**",
       "precioUnitario": 1918.44,
       "importe": 84411.36
     },
@@ -167,8 +135,6 @@
       "unidad": "PIEZA",
       "codigo": "DS2TD12172/QA",
       "descripcion": "CAMARA IP DUAL / TERMICA 1.8 MM (160 X 120) / CUL OPTICA 2 MM (2688 X 1520) / 15 MTS IR / MEDICION DE TEMPERATURA / IP67",
-      "precioLista": 10596.42,
-      "descuentos": "13.1541% 25% 20%",
       "precioUnitario": 5521.53,
       "importe": 11043.06
     },
@@ -176,9 +142,7 @@
       "cantidad": 8,
       "unidad": "PIEZA",
       "codigo": "DS1280ZJS",
-      "descripcion": "CAJA DE CONEXIONES PARA DIFERENTES TIPO TIJ DE CAMARAS",
-      "precioLista": 543.11,
-      "descuentos": "21.5734% 25% 20%",
+      "descripcion": "CAJA DE CONEXIONES PARA DIFERENTES TIPO DE CAMARAS",
       "precioUnitario": 255.56,
       "importe": 2044.48
     },
@@ -186,9 +150,7 @@
       "cantidad": 20,
       "unidad": "PIEZA",
       "codigo": "DS1273ZJ130TRL",
-      "descripcion": "MONTAJE D/PARED P/CMRA TURRET PUE",
-      "precioLista": 568.75,
-      "descuentos": "17.6293% 25% 20%",
+      "descripcion": "MONTAJE D/PARED P/CMRA TURRET PUE **tiempo de entrega de 3 a 5 dias habiles**",
       "precioUnitario": 281.08,
       "importe": 5621.6
     },
@@ -196,9 +158,7 @@
       "cantidad": 8,
       "unidad": "PIEZA",
       "codigo": "DS2CD2063G2LI2",
-      "descripcion": "BALA IP 6 MP / LENTE 2.8 MM / ACUSENSE / 2 MIC TIJ U INTEGRADO / DUAL LIGHT (40 MTS IR EXIR + 40 MTS LUZ BLANCA) / POE / IP67",
-      "precioLista": 3277.67,
-      "descuentos": "1.4426% 25% 20%",
+      "descripcion": "BALA IP 6 MP / LENTE 2.8 MM / ACUSENSE / 2 MIC U INTEGRADO / DUAL LIGHT (40 MTS IR EXIR + 40 MTS LUZ BLANCA) / POE / IP67",
       "precioUnitario": 1938.22,
       "importe": 15505.76
     },
@@ -206,9 +166,7 @@
       "cantidad": 8,
       "unidad": "PIEZA",
       "codigo": "DS1280ZJS",
-      "descripcion": "CAJA DE CONEXIONES PARA DIFERENTES TIPO TIJ DE CAMARAS",
-      "precioLista": 543.11,
-      "descuentos": "21.5734% 25% 20%",
+      "descripcion": "CAJA DE CONEXIONES PARA DIFERENTES TIPO DE CAMARAS",
       "precioUnitario": 255.56,
       "importe": 2044.48
     },
@@ -216,9 +174,7 @@
       "cantidad": 1,
       "unidad": "PIEZA",
       "codigo": "DS3E1518PSI",
-      "descripcion": "SWITCH POE+ ADMINISTRABLE / 16 PUERTOS TIJ POE+ 10/100/1000 MBPS / 2 PUERTOS SFP / MODO EXTENDIDO",
-      "precioLista": 8621.46,
-      "descuentos": "11.9713% 25% 20%",
+      "descripcion": "SWITCH POE+ ADMINISTRABLE / 16 PUERTOS POE+ 10/100/1000 MBPS / 2 PUERTOS SFP / MODO EXTENDIDO",
       "precioUnitario": 4553.61,
       "importe": 4553.61
     },
@@ -226,9 +182,7 @@
       "cantidad": 6,
       "unidad": "PIEZA",
       "codigo": "HKSFP1.25G1310",
-      "descripcion": "TRANCEPTOR SFP MULTIMODO / HASTA 1 KM / TIJ DFMM 1.25 G.",
-      "precioLista": 511.4,
-      "descuentos": "25% 20%",
+      "descripcion": "TRANCEPTOR SFP MULTIMODO / HASTA 1 KM / DFMM 1.25 G.",
       "precioUnitario": 306.84,
       "importe": 1841.04
     },
@@ -236,9 +190,7 @@
       "cantidad": 2,
       "unidad": "PIEZA",
       "codigo": "DS2SE4C415MW",
-      "descripcion": "PTZ IP 4 MP / 15X ZOOM / 100 MTS IR C/ CAMARA TIJ GE(14F0) FIJA 4 MP / LENTE 2.8 MM / 30 MTS LUZ BLANCA / IP66",
-      "precioLista": 15533.82,
-      "descuentos": "18.1748% 25% 20%",
+      "descripcion": "PTZ IP 4 MP / 15X ZOOM / 100 MTS IR C/ CAMARA GE(14F0) FIJA 4 MP / LENTE 2.8 MM / 30 MTS LUZ BLANCA / IP66",
       "precioUnitario": 7626.34,
       "importe": 15252.68
     },
@@ -246,9 +198,7 @@
       "cantidad": 1,
       "unidad": "PIEZA",
       "codigo": "TT223KVM",
-      "descripcion": "KIT EXTENSOR KVM HDMI A 70M 1080, 40M 40K TIJ C/CAT6 ( TECLADO VIDEO MOUSE )",
-      "precioLista": 2278.8,
-      "descuentos": "9.5500% 25% 20%",
+      "descripcion": "KIT EXTENSOR KVM HDMI A 70M 1080, 40M 40K C/CAT6 ( TECLADO VIDEO MOUSE )",
       "precioUnitario": 1236.7,
       "importe": 1236.7
     },
@@ -256,9 +206,7 @@
       "cantidad": 1,
       "unidad": "PIEZA",
       "codigo": "ES50X",
-      "descripcion": "PANEL DIRECCIONABLE D/DETECCION TIJ D/INCENDIO D/50 PUNTOS C/COMUNICADOR PREINSTALADO",
-      "precioLista": 22326.54,
-      "descuentos": "8.8126% 20% 20%",
+      "descripcion": "PANEL DIRECCIONABLE D/DETECCION D/INCENDIO D/50 PUNTOS C/COMUNICADOR PREINSTALADO",
       "precioUnitario": 13029.74,
       "importe": 13029.74
     },
@@ -267,8 +215,6 @@
       "unidad": "PIEZA",
       "codigo": "BG12LXSP",
       "descripcion": "ESTACION D/JALON DIRECCIONABLE TIJ",
-      "precioLista": 2023.76,
-      "descuentos": "5.4330% 20% 20%",
       "precioUnitario": 1224.83,
       "importe": 4899.32
     },
@@ -277,8 +223,6 @@
       "unidad": "PIEZA",
       "codigo": "SB10",
       "descripcion": "CAJA D/MONTAJE P/ESTACION MANUAL JRZ D/EMERGENCIA BG-12LX Y BG-12L",
-      "precioLista": 503.61,
-      "descuentos": "4.4494% 23% 20%",
       "precioUnitario": 296.41,
       "importe": 1185.64
     },
@@ -287,8 +231,6 @@
       "unidad": "PIEZA",
       "codigo": "SBBRL",
       "descripcion": "CAJA D/MONT EN PARED P/SIRENA CLR ROJO TIJ",
-      "precioLista": 520.32,
-      "descuentos": "4.4160% 23% 20%",
       "precioUnitario": 306.36,
       "importe": 1225.44
     },
@@ -297,8 +239,6 @@
       "unidad": "PIEZA",
       "codigo": "P2RLEDSP",
       "descripcion": "SIRENA C/LAMP LED ESTROBOSCOPICA A 2HILOS TIJ MONT EN PARED CLR ROJO C/CONFIG ESTROBOSCOPICA SELECCIONABLE",
-      "precioLista": 1355.69,
-      "descuentos": "4.4403% 20% 22%",
       "precioUnitario": 808.38,
       "importe": 3233.52
     },
@@ -307,8 +247,6 @@
       "unidad": "PIEZA",
       "codigo": "PS12180F2",
       "descripcion": "BATERIA 12V, 18AH, P/RESPALDO, TECNOLOGIAS TIJ AGM/VRLA, VIDA UTIL D/DISEÑO 5 AÑOS, TERMINALES TIPO F2, LISTADA UL",
-      "precioLista": 1443.24,
-      "descuentos": "4.2631% 25% 20%",
       "precioUnitario": 829.02,
       "importe": 1658.04
     },
@@ -317,8 +255,6 @@
       "unidad": "PIEZA",
       "codigo": "MAG600NLED",
       "descripcion": "CHAPA MAGNET. 600LBS LED ULTRABRILLANTE TIJ",
-      "precioLista": 927.09,
-      "descuentos": "9.8730% 20% 20%",
       "precioUnitario": 534.75,
       "importe": 1069.5
     },
@@ -327,8 +263,6 @@
       "unidad": "PIEZA",
       "codigo": "BZL600N",
       "descripcion": "MONTAJE Z Y L PARA CHAPA MAGNÉTICA TIJ MAG600NLED",
-      "precioLista": 417.4,
-      "descuentos": "11.3739% 20% 20%",
       "precioUnitario": 236.74,
       "importe": 473.48
     },
@@ -337,8 +271,6 @@
       "unidad": "PIEZA",
       "codigo": "SD365",
       "descripcion": "DETECTOR FOTOELECTRICO DIRECCIONABLE JRZ D/HUMO P/USO C/PANELES DIRECCIONABLES FIRE-LITE COLOR BLANCO",
-      "precioLista": 1731.31,
-      "descuentos": "8.7857% 20% 20%",
       "precioUnitario": 1010.68,
       "importe": 26277.68
     },
@@ -347,8 +279,6 @@
       "unidad": "PIEZA",
       "codigo": "SD365T",
       "descripcion": "DETECTOR D/ HUMO FOTOELECTRICO Y JRZ TEMPERATURA DIRECCIONABLE P/USO C/PANELES DIRECCIONABLES FIRELITE",
-      "precioLista": 2723.16,
-      "descuentos": "4.4839% 20% 20%",
       "precioUnitario": 1664.67,
       "importe": 1664.67
     },
@@ -357,25 +287,21 @@
       "unidad": "BOBINA",
       "codigo": "44025504",
       "descripcion": "BOBINA D/152M 2 X 18 AWG BLINDADO RISER FPLR JRZ",
-      "precioLista": 2753.55,
-      "descuentos": "7.7931% 20% 20%",
       "precioUnitario": 1624.93,
       "importe": 6499.72
     },
     {
       "cantidad": 2,
       "unidad": "SERVICIO",
-      "codigo": "ENVIO",
-      "descripcion": "EMPAQUE Y EMBARQUE MTYC",
-      "precioLista": 143.18,
-      "descuentos": "20% 20%",
-      "precioUnitario": 91.63,
+      "codigo": "78121600",
+      "descripcion": "ENVIO EMPAQUE Y EMBARQUE MTYC",
+      "precioUnitario": 143.18,
       "importe": 183.26
     }
   ],
   "totales": {
     "SUB-TOTAL": 282401.41,
-    "8% I.V.A.": 22592.11,
+    "IVA": 22592.11,
     "TOTAL": 304993.52
   }
 }
