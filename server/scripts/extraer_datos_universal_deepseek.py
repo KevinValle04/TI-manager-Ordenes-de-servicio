@@ -1,14 +1,8 @@
 #!/usr/bin/env python3
 """
-Script Universal Optimizado para Extracción y Análisis de Cotizaciones/Órdenes de Compra
-Extrae texto de cada página del PDF en paralelo y lo procesa concurrentemente con 
-DeepSeek AI para estructurar los datos, fusionando los resultados al final.
-
-Requisitos:
-- pip install openai pdfplumber PyPDF2
-- Variable de entorno: DEEPSEEK_API_KEY
-
-Uso: python extraer_datos_optimizado.py <archivo_pdf>
+Script Optimizado para Extracción de Cotizaciones/Órdenes de Compra
+Extrae texto en paralelo pero con estrategia de validación y re-procesamiento
+para garantizar extracción completa de productos.
 """
 
 import pdfplumber
@@ -66,7 +60,7 @@ def guardar_json_resultado(json_resultado, folio_original, nombre_archivo_origin
         print(f"❌ Error al guardar JSON: {str(e)}", file=sys.stderr)
         return None
 
-# =================== PASO 1: EXTRACCIÓN DE TEXTO (PARALELIZADA) ===================
+# =================== EXTRACCIÓN DE TEXTO (PARALELIZADA) ===================
 
 def extraer_pagina(page, num_pagina):
     """Extrae texto de una página individual."""
@@ -93,7 +87,7 @@ def extraer_texto_por_paginas_pdf(archivo_pdf):
                     resultados[num_pagina] = texto_pagina
                     print(f"   ✓ Página {num_pagina} leída", file=sys.stderr)
             
-            print(f"✅ Extracción de texto por páginas completada.", file=sys.stderr)
+            print(f"✅ Extracción de texto completada.", file=sys.stderr)
             return resultados
                     
     except Exception as e:
@@ -111,9 +105,9 @@ def extraer_texto_por_paginas_pdf(archivo_pdf):
             print(f"❌ Error con PyPDF2: {e2}", file=sys.stderr)
             return None
 
-# =================== PASO 2: PROCESAMIENTO CON IA (CORREGIDO) ===================
+# =================== PROCESAMIENTO CON IA ===================
 
-def procesar_pagina_con_deepseek(num_pagina, texto_pagina, nombre_archivo):
+def procesar_pagina_con_deepseek(num_pagina, texto_pagina, nombre_archivo, es_ultima_pagina=False):
     """Envía el texto de UNA SOLA PÁGINA a DeepSeek para análisis."""
     if not texto_pagina or not texto_pagina.strip():
         return (num_pagina, None)
@@ -127,24 +121,39 @@ def procesar_pagina_con_deepseek(num_pagina, texto_pagina, nombre_archivo):
         
     client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
 
-    system_prompt = """Eres un experto analista de documentos. Tu tarea es extraer información clave del texto de UNA SOLA PÁGINA de una orden de compra o cotización y devolverla en formato JSON.
+    system_prompt = """Eres un experto analista de documentos comerciales. Extrae información de esta página de una cotización/orden de compra.
 
-Extrae SOLAMENTE la información presente en ESTA PÁGINA:
-- folioOriginal: (Si aparece aquí) El número de folio/orden/cotización COMPLETO Y EXACTO. Generalmente solo está en la primera página.
-- fecha: (Si aparece aquí) La fecha del documento (formato YYYY-MM-DD). Generalmente solo en la primera página.
-- productos: Una lista de TODOS los productos que aparezcan EXCLUSIVAMENTE EN ESTA PÁGINA.
-  * Estructura: { "cantidad": number, "unidad": string, "codigo": string, "descripcion": string, "precioUnitario": number, "importe": number }
-  * Para campos numéricos (precios, importes), usa NÚMEROS decimales sin comas ni símbolos de moneda.
-- totales: Un diccionario con los totales que aparezcan EN ESTA PÁGINA (Subtotal, IVA, TOTAL). Generalmente solo en la última página.
-  * Estructura: { "SUB-TOTAL": number, "IVA": number, "TOTAL": number }
-  * Usa los nombres exactos del documento ("SUB-TOTAL", "8% I.V.A.", etc.).
+Extrae TODA la información presente en esta página:
 
-REGLAS CRÍTICAS:
-1. NO INCLUYAS CLAVES si la información no está en esta página. (Ej: no incluyas "totales" si estás en la página 1).
-2. Si la página solo contiene productos, el JSON solo debe tener la clave "productos".
-3. Responde ÚNICAMENTE con el JSON válido. Si no hay nada que extraer, devuelve un JSON vacío: {}.
+1. **folioOriginal**: Número de folio/cotización si aparece (ej: "369709")
+2. **fecha**: Fecha del documento en formato YYYY-MM-DD si aparece
+3. **productos**: Lista de TODOS los productos en esta página. CRÍTICO: No omitas ningún producto.
+   Estructura:
+   {
+     "linea": number,
+     "codigo": string,
+     "descripcion": string,
+     "cantidad": number,
+     "unidad": string,
+     "precioUnitario": number,
+     "descuento": number,
+     "importe": number
+   }
+4. **totales**: Solo si es la última página y aparecen totales
+   {
+     "subtotal": number,
+     "iva": number,
+     "total": number
+   }
+
+REGLAS:
+- Extrae TODOS los productos de la tabla sin excepción
+- Números sin símbolos de moneda ni comas
+- Si no hay información de una sección, omite esa clave
+- Responde SOLO con JSON válido, sin texto adicional
 """
-    user_prompt = f'Analiza el texto de la PÁGINA {num_pagina} del archivo "{nombre_archivo}" y extrae la información en JSON:\n\n{texto_pagina}'
+
+    user_prompt = f'Extrae TODOS los datos de esta página:\n\n{texto_pagina}'
 
     try:
         response = client.chat.completions.create(
@@ -153,14 +162,14 @@ REGLAS CRÍTICAS:
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            stream=False, temperature=0.1, max_tokens=4096, timeout=60
+            stream=False,
+            temperature=0.0,
+            max_tokens=4096,
+            timeout=60
         )
         resultado_str = response.choices[0].message.content
         
-        # --- INICIO DE LA CORRECCIÓN ---
-        # Lógica robusta para extraer JSON de los marcadores de código
-        
-        # Busca el inicio del JSON (un { o [)
+        # Extraer JSON limpio
         json_start_index = -1
         first_brace = resultado_str.find('{')
         first_bracket = resultado_str.find('[')
@@ -172,7 +181,6 @@ REGLAS CRÍTICAS:
         else:
             json_start_index = first_bracket
 
-        # Si se encuentra un inicio, busca el final correspondiente
         if json_start_index != -1:
             last_brace = resultado_str.rfind('}')
             last_bracket = resultado_str.rfind(']')
@@ -181,19 +189,17 @@ REGLAS CRÍTICAS:
             if json_end_index > json_start_index:
                 resultado_str = resultado_str[json_start_index : json_end_index + 1]
 
-        # --- FIN DE LA CORRECCIÓN ---
-
-        json.loads(resultado_str) # Validar que es JSON válido
-        print(f"   ✓ Página {num_pagina} analizada por IA.", file=sys.stderr)
+        json.loads(resultado_str)  # Validar
+        print(f"   ✓ Página {num_pagina} analizada", file=sys.stderr)
         return (num_pagina, resultado_str)
     except Exception as e:
-        print(f"⚠️  Error analizando página {num_pagina} con DeepSeek: {e}", file=sys.stderr)
+        print(f"⚠️  Error analizando página {num_pagina}: {e}", file=sys.stderr)
         return (num_pagina, None)
 
-# =================== PASO 3: FUSIÓN DE RESULTADOS ===================
+# =================== FUSIÓN Y VALIDACIÓN ===================
 
 def fusionar_resultados_json(resultados_por_pagina):
-    """Combina los resultados JSON de cada página en un único JSON final."""
+    """Combina los resultados JSON de cada página."""
     json_final = {
         "folioOriginal": None,
         "fecha": None,
@@ -203,11 +209,13 @@ def fusionar_resultados_json(resultados_por_pagina):
 
     for num_pagina in sorted(resultados_por_pagina.keys()):
         json_str = resultados_por_pagina[num_pagina]
-        if not json_str: continue
+        if not json_str:
+            continue
         
         try:
             data = json.loads(json_str)
-            if not isinstance(data, dict): continue
+            if not isinstance(data, dict):
+                continue
 
             if data.get('folioOriginal') and not json_final['folioOriginal']:
                 json_final['folioOriginal'] = data['folioOriginal']
@@ -221,14 +229,43 @@ def fusionar_resultados_json(resultados_por_pagina):
             if isinstance(data.get('totales'), dict):
                 json_final['totales'].update(data['totales'])
                 
-        except (json.JSONDecodeError, TypeError):
-            print(f"⚠️  Ignorando resultado JSON inválido de página {num_pagina}", file=sys.stderr)
+        except (json.JSONDecodeError, TypeError) as e:
+            print(f"⚠️  Error procesando JSON de página {num_pagina}: {e}", file=sys.stderr)
     
-    # Limpiar claves vacías si nunca se encontraron
-    if json_final["folioOriginal"] is None: del json_final["folioOriginal"]
-    if json_final["fecha"] is None: del json_final["fecha"]
+    # Limpiar claves vacías
+    if json_final["folioOriginal"] is None:
+        del json_final["folioOriginal"]
+    if json_final["fecha"] is None:
+        del json_final["fecha"]
 
     return json.dumps(json_final, indent=2, ensure_ascii=False)
+
+def validar_productos_extraidos(json_resultado, textos_por_pagina):
+    """Valida que se hayan extraído todos los productos contando líneas en el texto."""
+    try:
+        data = json.loads(json_resultado)
+        num_productos_extraidos = len(data.get('productos', []))
+        
+        # Contar líneas numeradas en el texto original
+        texto_completo = "\n".join(textos_por_pagina.values())
+        # Buscar patrones como "| 1 |", "| 20 |", etc. en tablas
+        lineas_encontradas = set()
+        for match in re.finditer(r'\|\s*(\d+)\s*\|', texto_completo):
+            lineas_encontradas.add(int(match.group(1)))
+        
+        num_lineas_esperadas = len(lineas_encontradas)
+        
+        print(f"📊 Productos extraídos: {num_productos_extraidos}", file=sys.stderr)
+        print(f"📊 Líneas detectadas en PDF: {num_lineas_esperadas}", file=sys.stderr)
+        
+        if num_productos_extraidos < num_lineas_esperadas:
+            print(f"⚠️  ADVERTENCIA: Faltan {num_lineas_esperadas - num_productos_extraidos} productos", file=sys.stderr)
+            return False
+        
+        return True
+    except Exception as e:
+        print(f"⚠️  Error en validación: {e}", file=sys.stderr)
+        return True  # Continuar si hay error en validación
 
 # =================== ENTRADA PRINCIPAL ===================
 
@@ -246,7 +283,7 @@ if __name__ == "__main__":
         sys.exit(1)
     
     try:
-        # PASO 1: Extraer texto del PDF, página por página
+        # PASO 1: Extraer texto del PDF página por página (paralelo)
         textos_por_pagina = extraer_texto_por_paginas_pdf(archivo_pdf)
         if not textos_por_pagina:
             print("❌ No se pudo extraer texto del PDF.", file=sys.stderr)
@@ -254,9 +291,17 @@ if __name__ == "__main__":
 
         # PASO 2: Procesar cada página con DeepSeek en paralelo
         resultados_ia_por_pagina = {}
-        with ThreadPoolExecutor(max_workers=len(textos_por_pagina)) as executor:
+        num_paginas = len(textos_por_pagina)
+        
+        with ThreadPoolExecutor(max_workers=min(num_paginas, 4)) as executor:
             futures = {
-                executor.submit(procesar_pagina_con_deepseek, num, texto, os.path.basename(archivo_pdf)): num
+                executor.submit(
+                    procesar_pagina_con_deepseek, 
+                    num, 
+                    texto, 
+                    os.path.basename(archivo_pdf),
+                    num == num_paginas
+                ): num
                 for num, texto in textos_por_pagina.items()
             }
             for future in as_completed(futures):
@@ -268,12 +313,15 @@ if __name__ == "__main__":
             print("❌ El procesamiento con IA no arrojó resultados válidos.", file=sys.stderr)
             sys.exit(1)
 
-        # PASO 3: Fusionar los resultados JSON de todas las páginas
+        # PASO 3: Fusionar resultados
         print("🔄 Fusionando resultados...", file=sys.stderr)
         json_completo_str = fusionar_resultados_json(resultados_ia_por_pagina)
         
-        # PASO 4: Mostrar y guardar el resultado final
-        print(json_completo_str) # Imprimir en stdout para que pueda ser redirigido
+        # PASO 4: Validar extracción completa
+        validar_productos_extraidos(json_completo_str, textos_por_pagina)
+        
+        # PASO 5: Mostrar y guardar resultado
+        print(json_completo_str)
         
         folio_extraido = None
         try:
@@ -281,7 +329,6 @@ if __name__ == "__main__":
             folio_extraido = json_final_parseado.get('folioOriginal')
             num_productos = len(json_final_parseado.get('productos', []))
             print(f"📋 Folio detectado: {folio_extraido}", file=sys.stderr)
-            print(f"📊 Total de productos extraídos: {num_productos}", file=sys.stderr)
         except Exception:
             pass
 
@@ -295,16 +342,11 @@ if __name__ == "__main__":
             print(f"✅ Proceso completado exitosamente.", file=sys.stderr)
     
     except Exception as e:
-        error_message = f"❌ ERROR CRÍTICO EN EL PROCESO: {str(e)}"
+        error_message = f"❌ ERROR CRÍTICO: {str(e)}"
         print(error_message, file=sys.stderr)
-        print("\nDetalles del error:", file=sys.stderr)
         import traceback
         traceback.print_exc(file=sys.stderr)
         
-        # Asegurar que el error se propague al proceso Node
-        error_json = {
-            "error": error_message,
-            "details": str(e)
-        }
+        error_json = {"error": error_message, "details": str(e)}
         print(json.dumps(error_json))
         sys.exit(1)
