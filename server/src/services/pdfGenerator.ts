@@ -1,6 +1,6 @@
-import puppeteer from 'puppeteer';
 import * as fs from 'fs';
 import * as path from 'path';
+import puppeteer from 'puppeteer';
 import { DateUtils } from '../utils/dateUtils';
 
 interface OrdenCompraData {
@@ -41,6 +41,7 @@ interface OrdenCompraData {
   datosPdf?: {
     datosExtraidos?: {
       folio?: string;
+      folioOriginal?: string; // Agregar folioOriginal
       formaPago?: string;
       usoMercancia?: string;
       productos?: Array<{
@@ -58,9 +59,7 @@ interface OrdenCompraData {
         total?: number;
       }>;
       totales?: {
-        subTotal: number;
-        iva: number;
-        total: number;
+        [key: string]: number; // Permitir cualquier nombre de campo para totales
       };
     };
   };
@@ -102,19 +101,43 @@ export class PdfGeneratorService {
     // Extraer datos del PDF si existen
     const datosPdf = datosOrden.datosPdf?.datosExtraidos || {};
     
-    // Usar totales calculados si están disponibles, sino usar los del PDF
-    const totales = datosOrden.totalesCalculados || datosPdf.totales || {
+    // Mejorar extracción de totales con múltiples nombres posibles
+    let totales = datosOrden.totalesCalculados || {
       subTotal: 0,
       iva: 0,
       total: 0
     };
+
+    // Si hay totales en el PDF, intentar extraerlos con nombres flexibles
+    if (datosPdf.totales && Object.keys(datosPdf.totales).length > 0) {
+      const totalesPdf = datosPdf.totales;
+      
+      // Buscar subtotal con nombres variables
+      const subtotal = totalesPdf.subTotal || totalesPdf['SUB-TOTAL'] || totalesPdf.Subtotal || totalesPdf.subtotal || 0;
+      
+      // Buscar IVA con nombres variables
+      const iva = totalesPdf.iva || totalesPdf.IVA || totalesPdf['8% I.V.A.'] || totalesPdf['16% IVA'] || totalesPdf['IVA (16%)'] || 0;
+      
+      // Buscar total con nombres variables
+      const total = totalesPdf.total || totalesPdf.Total || totalesPdf.TOTAL || 0;
+      
+      // Solo usar los totales del PDF si tienen valores válidos
+      if (subtotal > 0 || iva > 0 || total > 0) {
+        totales = {
+          subTotal: Number(subtotal) || 0,
+          iva: Number(iva) || 0,
+          total: Number(total) || 0
+        };
+        console.log('📊 Totales extraídos del PDF:', totales);
+      }
+    }
 
     // Mapear variables para la plantilla
     const plantillaVars = {
       // Información del documento
       noDocVal: datosOrden.numeroOrden || '',
       fechaDoc: datosOrden.fecha || DateUtils.formatForOrdenCompra(),
-      numCotizacion: datosPdf.folio || '',
+      numCotizacion: datosPdf.folioOriginal || datosPdf.folio || '', // Usar folioOriginal primero
       
       // Información del proveedor
       nomProveedor: proveedor.empresa || '',

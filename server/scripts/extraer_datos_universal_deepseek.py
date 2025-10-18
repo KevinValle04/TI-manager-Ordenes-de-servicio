@@ -121,15 +121,22 @@ Extrae la siguiente información:
   * Si hay descuentos, mantener el formato de texto original (ej: "10.8557% 24% 23%")
   * ¡CRÍTICO! Si no encuentras "precioUnitario", buscar "precio", "precioNeto", "precioFinal", o cualquier precio disponible
   * Si un producto no tiene precio visible, poner 0 pero NO omitir el producto
-- totales: usar nombres exactos (Subtotal, IVA, Total, etc.)
+- totales: ¡EXTREMADAMENTE CRÍTICO! Extraer TODOS los totales disponibles en el documento:
+  * Buscar secciones de totales al final del documento
+  * Campos comunes: "Subtotal", "SUB-TOTAL", "IVA", "16% IVA", "8% I.V.A.", "TOTAL", "Total"
+  * ¡IMPORTANTE! Para importes usar SOLO números decimales sin comas ni símbolos de moneda
+  * Ejemplo: usar 22592.11 en lugar de "$22,592.11" o "22,592.11"
+  * Incluir EXACTAMENTE los nombres de campos como aparecen en el texto
+  * Si no encuentras totales explícitos, calcularlos de los productos
 
 REGLAS CRÍTICAS:
 1. COMPLETITUD: Incluir TODOS los productos hasta el final
 2. FIDELIDAD: Usar nombres de campos exactos del texto
 3. FOLIO COMPLETO: Extraer el folio EXACTAMENTE como aparece, SIN RECORTAR ni tomar solo una parte
-4. NO agregar campos inexistentes
-5. Si tienes límite de espacio, prioriza completar la lista de productos
-6. Es mejor un JSON con todos los productos que uno incompleto
+4. TOTALES COMPLETOS: Extraer TODOS los totales con nombres exactos del documento
+5. NO agregar campos inexistentes
+6. Si tienes límite de espacio, prioriza completar la lista de productos
+7. Es mejor un JSON con todos los productos que uno incompleto
 
 ESTRUCTURA ESPERADA para productos:
 {
@@ -142,6 +149,19 @@ ESTRUCTURA ESPERADA para productos:
   "precioUnitario": 850.25,
   "importe": 850.25
 }
+
+ESTRUCTURA ESPERADA para totales (usar nombres exactos del documento):
+{
+  "SUB-TOTAL": 282401.41,
+  "8% I.V.A.": 22592.11,
+  "TOTAL": 304993.52
+}
+
+¡ATENCIÓN ESPECIAL PARA TOTALES!
+- Buscar sección de totales al final del documento después de la tabla de productos
+- Incluir TODOS los conceptos de totales que aparezcan
+- Respetar nombres exactos como aparecen en el texto ("SUB-TOTAL", "8% I.V.A.", etc.)
+- Convertir importes a números decimales puros sin comas ni símbolos
 
 IMPORTANTE: Responde ÚNICAMENTE con el JSON válido, SIN marcadores de código como ```json o ```. Solo el JSON puro."""
 
@@ -265,9 +285,19 @@ if __name__ == "__main__":
                 try:
                     json_parseado = json.loads(resultado_deepseek)
                     folio_extraido = json_parseado.get('folioOriginal')
+                    totales_extraidos = json_parseado.get('totales', {})
+                    num_productos = len(json_parseado.get('productos', []))
+                    
                     print(f"📋 Folio detectado: {folio_extraido}", file=sys.stderr)
+                    print(f"📊 Productos extraídos: {num_productos}", file=sys.stderr)
+                    print(f"💰 Totales extraídos: {list(totales_extraidos.keys()) if totales_extraidos else 'Ninguno'}", file=sys.stderr)
+                    
+                    if totales_extraidos:
+                        for campo, valor in totales_extraidos.items():
+                            print(f"   {campo}: {valor}", file=sys.stderr)
+                            
                 except Exception as e:
-                    print(f"⚠️  No se pudo extraer folio: {e}", file=sys.stderr)
+                    print(f"⚠️  No se pudo extraer información: {e}", file=sys.stderr)
                 
                 # Imprimir resultado estructurado de DeepSeek en stdout
                 print(resultado_deepseek)

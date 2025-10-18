@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from "react";
-import { Modal, Form, Button, Row, Col, Alert, Badge, Spinner, ListGroup } from "react-bootstrap";
-import { DateUtils } from "../../utils/dateUtils";
-import { Vendedor } from "../../types";
 import axios from "axios";
+import React, { useMemo, useState } from "react";
+import { Alert, Badge, Button, Col, Form, ListGroup, Modal, Row, Spinner } from "react-bootstrap";
+import { Vendedor } from "../../types";
+import { DateUtils } from "../../utils/dateUtils";
 
 interface ModalResultadosProps {
   show: boolean;
@@ -236,6 +236,14 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
   editId,
   onCancelar
 }) => {
+  // Log de depuración para verificar los totales recibidos
+  React.useEffect(() => {
+    if (show && totalesCalculados) {
+      console.log('🔍 ModalResultados - Totales recibidos:', totalesCalculados);
+      console.log('🔍 ModalResultados - Datos orden completos:', datosOrdenCompletos?.datosPdf?.datosExtraidos?.totales);
+    }
+  }, [show, totalesCalculados, datosOrdenCompletos]);
+
   // Estado para la moneda seleccionada
   const [monedaSeleccionada, setMonedaSeleccionada] = useState<string>('MXN');
   // Estado para el porcentaje de IVA simbólico seleccionado

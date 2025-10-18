@@ -30,7 +30,7 @@ export const getOrdenesCompra = async (req: Request, res: Response) => {
     if (ordenesSinCotizacion.length > 0) {
       console.log(`Migrando ${ordenesSinCotizacion.length} órdenes sin número de cotización`);
       for (const orden of ordenesSinCotizacion) {
-        const folio = orden.datosOrden.datosPdf.datosExtraidos.folio;
+        const folio = orden.datosOrden.datosPdf.datosExtraidos.folioOriginal || orden.datosOrden.datosPdf.datosExtraidos.folio;
         await OrdenCompra.findByIdAndUpdate(orden._id, { numeroCotizacion: folio });
         orden.numeroCotizacion = folio; // Actualizar en memoria para la respuesta
       }
@@ -568,7 +568,7 @@ export const crearOrdenCompraConPdf = async (req: Request, res: Response) => {
     // Crear la orden de compra en la base de datos
     const ordenCompra = new OrdenCompra({
       numeroOrden: numeroOrdenFinal,
-      numeroCotizacion: datosPdf?.datosExtraidos?.folio || undefined, // Extraer número de cotización del PDF
+      numeroCotizacion: datosPdf?.datosExtraidos?.folioOriginal || datosPdf?.datosExtraidos?.folio || undefined, // Usar folioOriginal primero
       fecha: fecha ? DateUtils.parseToMexicaliDate(fecha) : DateUtils.getCurrentDateInMexicali(),
       proveedor,
       razonSocial,

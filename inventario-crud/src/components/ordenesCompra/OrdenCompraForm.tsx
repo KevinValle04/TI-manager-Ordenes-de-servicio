@@ -1,14 +1,14 @@
 import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  Alert,
-  Badge,
-  Button,
-  Col,
-  Form,
-  ListGroup,
-  Modal,
-  Row
+    Alert,
+    Badge,
+    Button,
+    Col,
+    Form,
+    ListGroup,
+    Modal,
+    Row
 } from "react-bootstrap";
 import { Proveedor, RazonSocial } from "../../types";
 import ModalResultados from "./ModalResultados";
@@ -59,6 +59,11 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
     iva: 0,
     total: 0
   });
+  
+  // useEffect para monitorear cambios en totalesCalculados
+  useEffect(() => {
+    console.log('📊 totalesCalculados actualizado:', totalesCalculados);
+  }, [totalesCalculados]);
   
   const urlServer = import.meta.env.VITE_API_URL;
 
@@ -448,8 +453,12 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
 
       setDatosOrdenCompletos(datosCompletos);
       
-      // Inicializar productos editables
-      inicializarProductosEditables(datosPdf);
+      // Inicializar productos editables y obtener totales calculados
+      const totales = inicializarProductosEditables(datosPdf);
+      
+      // Log de depuración antes de mostrar el modal
+      console.log('🚀 Abriendo modal de resultados con totales:', totales);
+      console.log('🚀 Datos PDF extraídos:', datosPdf.datosExtraidos?.totales);
       
       setMostrarModalResultados(true);
 
@@ -531,11 +540,9 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
   };
 
   // Funciones para manejo de productos editables
-  const inicializarProductosEditables = (datosPdf: any) => {
+  const inicializarProductosEditables = (datosPdf: any): { subTotal: number; iva: number; total: number } => {
     // Los productos están en datosPdf.datosExtraidos.productos
-    if (datosPdf && datosPdf.datosExtraidos && datosPdf.datosExtraidos.productos) {
-      console.log(' Productos del PDF (primeros 3):', datosPdf.datosExtraidos.productos.slice(0, 3));
-      
+    if (datosPdf.datosExtraidos && datosPdf.datosExtraidos.productos) {
       const productos = datosPdf.datosExtraidos.productos.map((producto: any, index: number) => {
         const cantidad = parseNumericValue(producto.cantidad);
         const precioUnitario = parseNumericValue(producto.precioUnitario) || 
@@ -546,18 +553,17 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
         const importeOriginal = parseNumericValue(producto.importe) || 
                                parseNumericValue(producto.total) ||
                                parseNumericValue(producto.subtotal) ||
-                               0;
+                               (cantidad * precioUnitario);
         
-        // Calcular importe si no está disponible
-        const importe = importeOriginal || (cantidad * precioUnitario);
-
+        // Calcular el importe final
+        const importe = importeOriginal > 0 ? importeOriginal : (cantidad * precioUnitario);
+        
         const productoMapeado = {
           cantidad: cantidad,
-          clave: producto.codigo || producto.codigoFabricante || '',
-          descripcion: producto.descripcion || '',
+          unidad: producto.unidad || 'PIEZA',
+          codigo: producto.codigo || producto.clave || '',
+          descripcion: producto.descripcion || producto.concepto || '',
           precioUnitario: precioUnitario,
-          unidad: producto.unidad || '',
-          almacen: producto.alm || '',
           precioLista: parseNumericValue(producto.precioLista),
           descuento: parseNumericValue(producto.descuento),
           importe: importe
@@ -576,25 +582,82 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
       
       setProductosEditables(productos);
       
+      // Calcular totales y retornarlos para que el componente padre pueda usarlos inmediatamente
+      let totalesCalculados = { subTotal: 0, iva: 0, total: 0 };
+      
       // Usar totales del PDF si están disponibles, sino calcular automáticamente
       if (datosPdf.datosExtraidos.totales) {
-        setTotalesCalculados({
-          subTotal: parseNumericValue(datosPdf.datosExtraidos.totales.subTotal || datosPdf.datosExtraidos.totales.Subtotal),
-          iva: parseNumericValue(datosPdf.datosExtraidos.totales.iva || datosPdf.datosExtraidos.totales.IVA || datosPdf.datosExtraidos.totales['IVA (16%)']),
-          total: parseNumericValue(datosPdf.datosExtraidos.totales.total || datosPdf.datosExtraidos.totales.Total)
+        const totalesPdf = datosPdf.datosExtraidos.totales;
+        
+        // Buscar subtotal con diferentes nombres posibles
+        const subtotal = parseNumericValue(
+          totalesPdf.subTotal || 
+          totalesPdf['SUB-TOTAL'] || 
+          totalesPdf.Subtotal || 
+          totalesPdf.subtotal || 
+          0
+        );
+        
+        // Buscar IVA con diferentes nombres posibles
+        const iva = parseNumericValue(
+          totalesPdf.iva || 
+          totalesPdf.IVA || 
+          totalesPdf['8% I.V.A.'] || 
+          totalesPdf['16% IVA'] || 
+          totalesPdf['IVA (16%)'] || 
+          0
+        );
+        
+        // Buscar total con diferentes nombres posibles
+        const total = parseNumericValue(
+          totalesPdf.total || 
+          totalesPdf.Total || 
+          totalesPdf.TOTAL || 
+          0
+        );
+        
+        console.log('📊 Totales extraídos del PDF:', {
+          original: totalesPdf,
+          procesado: { subtotal, iva, total }
         });
+        
+        totalesCalculados = {
+          subTotal: subtotal,
+          iva: iva,
+          total: total
+        };
+        
+        console.log('✅ Actualizando totales calculados:', totalesCalculados);
+        setTotalesCalculados(totalesCalculados);
       } else {
         // Calcular totales automáticamente si no están en el PDF
-        calcularTotales(productos);
+        const subTotal = productos.reduce((sum: number, producto: any) => {
+          const importe = producto.importe || ((producto.cantidad || 0) * (producto.precioUnitario || 0));
+          return sum + importe;
+        }, 0);
+        
+        // Detectar el porcentaje de IVA (por defecto 16%)
+        const iva = subTotal * 0.16;
+        const total = subTotal + iva;
+        
+        totalesCalculados = {
+          subTotal: Number(subTotal.toFixed(2)),
+          iva: Number(iva.toFixed(2)),
+          total: Number(total.toFixed(2))
+        };
+        
+        setTotalesCalculados(totalesCalculados);
       }
+      
+      return totalesCalculados; // Retornar los totales para uso inmediato
     } else {
       // Si no hay productos, inicializar arrays vacíos
       setProductosEditables([]);
-      setTotalesCalculados({ subTotal: 0, iva: 0, total: 0 });
+      const totalesVacios = { subTotal: 0, iva: 0, total: 0 };
+      setTotalesCalculados(totalesVacios);
+      return totalesVacios;
     }
-  };
-
-  const calcularTotales = useCallback((productos: any[]) => {
+  };  const calcularTotales = useCallback((productos: any[]) => {
     const subTotal = productos.reduce((sum, producto) => {
       // Usar el importe del PDF si está disponible, sino calcularlo
       const importe = producto.importe || ((producto.cantidad || 0) * (producto.precioUnitario || 0));
