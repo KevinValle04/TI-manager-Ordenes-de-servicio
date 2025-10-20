@@ -234,63 +234,92 @@ export const getOrdenesByDateRange = async (req: Request, res: Response) => {
 };
 
 // Función para ejecutar el script universal de DeepSeek
-function ejecutarScriptUniversal(rutaPDF: string): Promise<any> {
-  return new Promise((resolve, reject) => {
-      const scriptPath = path.join(__dirname, '..', '..', 'scripts', 'extraer_datos_universal_deepseek.py');
-      const pythonPath = 'C:/Users/sopor/AppData/Local/Programs/Python/Python314/python.exe';
+async function ejecutarScriptUniversal(rutaPDF: string): Promise<any> {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const tiempoInicioScript = Date.now();
+      console.log('🚀 [TIMING-BACKEND] Iniciando script universal...');
       
+      // Detectar Python - buscar en el entorno virtual primero
+      let pythonPath = '';
+      const venvPath = path.join(__dirname, '../../../.venv/Scripts/python.exe');
+      
+      try {
+        await ejecutarComando(`"${venvPath}" --version`);
+        pythonPath = venvPath;
+        console.log('🐍 Python detectado en virtual env:', pythonPath);
+      } catch {
+        try {
+          await ejecutarComando('python --version');
+          pythonPath = 'python';
+          console.log('🐍 Python detectado en sistema:', pythonPath);
+        } catch {
+          return reject(new Error('Python no encontrado en el sistema'));
+        }
+      }
+
+      const scriptPath = path.join(__dirname, '../../scripts/extraer_datos_universal_deepseek.py');
       const comando = `"${pythonPath}" "${scriptPath}" "${rutaPDF}"`;
       
-      console.log('🤖 Ejecutando script universal DeepSeek:', comando);
+      console.log('🔧 Ejecutando comando:', comando);
       
       exec(comando, { 
-          maxBuffer: 1024 * 1024 * 10, // 10MB buffer
-          timeout: 300000 // 5 minutos timeout
+        maxBuffer: 1024 * 1024 * 10, // 10MB buffer
+        timeout: 300000 // 5 minutos timeout
       }, (error, stdout, stderr) => {
-          console.log('📄 Stderr:', stderr); // Log stderr siempre, puede contener información útil
-          
-          if (error) {
-              console.error('❌ Error ejecutando script universal:', error);
-              
-              // Intentar extraer mensaje de error JSON del stdout
-              try {
-                  const errorJson = JSON.parse(stdout);
-                  if (errorJson.error) {
-                      reject(new Error(errorJson.error));
-                      return;
-                  }
-              } catch (parseError) {
-                  // Si no es JSON, usar el mensaje de error original
-                  console.error('No se pudo parsear respuesta como JSON');
-              }
-              
-              reject(new Error(`Error al procesar el PDF: ${stderr || error.message}`));
-              return;
-          }
-          
+        if (stderr) {
           console.log('📄 Logs del script:', stderr);
-          
+        }
+        
+        if (error) {
+          console.error('❌ Error ejecutando script:', error.message);
+          return reject(new Error(`Error al procesar el PDF: ${stderr || error.message}`));
+        }
+
+        if (stdout && stdout.trim()) {
           try {
-              // Limpiar posibles marcadores de código que puedan quedar
-              let jsonLimpio = stdout.trim();
-              if (jsonLimpio.startsWith('```json')) {
-                  jsonLimpio = jsonLimpio.replace(/```json\s*/, '').replace(/\s*```$/, '');
-              }
-              
-              const datosExtraidos = JSON.parse(jsonLimpio);
-              
-              console.log('✅ JSON parseado exitosamente');
-              console.log('📋 Folio detectado:', datosExtraidos.folioOriginal);
-              console.log('📊 Productos encontrados:', datosExtraidos.productos?.length || 0);
-              
-              resolve(datosExtraidos);
-              
+            // Limpiar posibles marcadores de código
+            let jsonLimpio = stdout.trim();
+            if (jsonLimpio.startsWith('```json')) {
+              jsonLimpio = jsonLimpio.replace(/```json\s*/, '').replace(/\s*```$/, '');
+            }
+            
+            const datosExtraidos = JSON.parse(jsonLimpio);
+            
+            // 🕐 TIEMPO TOTAL DEL SCRIPT
+            const tiempoTotalScript = Date.now() - tiempoInicioScript;
+            console.log('⏱️ [TIMING-BACKEND] Script completado en:', tiempoTotalScript, 'ms');
+            console.log('✅ JSON parseado exitosamente');
+            console.log('📋 Folio detectado:', datosExtraidos.folioOriginal);
+            console.log('📊 Productos encontrados:', datosExtraidos.productos?.length || 0);
+            
+            resolve(datosExtraidos);
           } catch (parseError) {
-              console.error('❌ Error parseando JSON del script universal:', parseError);
-              console.error('📄 Stdout recibido:', stdout);
-              reject(parseError);
+            console.error('❌ Error parseando JSON del script universal:', parseError);
+            console.error('📄 Stdout recibido:', stdout);
+            reject(parseError);
           }
+        } else {
+          console.error('❌ Script sin resultado');
+          reject(new Error('Script no retornó datos'));
+        }
       });
+    } catch (error) {
+      console.error('❌ Error en ejecutarScriptUniversal:', error);
+      reject(error);
+    }
+  });
+}
+
+async function ejecutarComando(comando: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    exec(comando, (error, stdout, stderr) => {
+      if (error) {
+        reject(new Error(stderr || error.message));
+      } else {
+        resolve(stdout);
+      }
+    });
   });
 }
 

@@ -90,7 +90,7 @@
       "cantidad": 2,
       "unidad": null,
       "precioUnitario": 179.07,
-      "descuento": 52.0,
+      "descuento": 37.0,
       "importe": 358.14
     },
     {
@@ -120,7 +120,7 @@
       "cantidad": 4,
       "unidad": null,
       "precioUnitario": 865.71,
-      "descuento": 42.0,
+      "descuento": 37.0,
       "importe": 3462.84
     }
   ],

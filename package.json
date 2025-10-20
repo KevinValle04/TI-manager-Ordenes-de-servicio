@@ -1,5 +1,19 @@
 {
+  "name": "timanager",
+  "version": "1.0.0",
+  "description": "Sistema de gestión de inventario y órdenes de compra",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "cd server && npm run dev",
+    "client:dev": "cd inventario-crud && npm run dev",
+    "start": "concurrently \"npm run server:start\" \"npm run client:preview\"",
+    "server:start": "cd server && npm start",
+    "client:preview": "cd inventario-crud && npm run preview",
+    "install:all": "npm install && cd server && npm install && cd ../inventario-crud && npm install",
+    "build": "cd inventario-crud && npm run build && cd ../server && npm run build"
+  },
   "devDependencies": {
-    "@types/axios": "^0.9.36"
+    "@types/axios": "^0.9.36",
+    "concurrently": "^8.2.2"
   }
 }

@@ -1,0 +1,94 @@
+{
+  "folioOriginal": "0630JPALEJ026",
+  "fecha": "2025-06-30",
+  "proveedor": {
+    "nombre": "Portenntum de México",
+    "rfc": null,
+    "direccion": null
+  },
+  "cliente": {
+    "nombre": "ALEJANDRO HERNANDEZ CASTILLO",
+    "rfc": null,
+    "direccion": "Av. Revolución #111, Col. Buenos Aires, Monterrey, Nuevo León, C.P. 64820",
+    "contacto": "Ing. Alejandro Hernandez Castillo"
+  },
+  "productos": [
+    {
+      "linea": 1,
+      "codigo": "R7J49A",
+      "descripcion": "Aruba AP-615 (RW) Campus AP",
+      "cantidad": 2,
+      "unidad": null,
+      "precioUnitario": 13763.56,
+      "descuento": 37.78,
+      "importe": 27527.11
+    },
+    {
+      "linea": 2,
+      "codigo": "H62E4E",
+      "descripcion": "Aruba 1Y FC NBD Exch HWAP-615 Campus SVC",
+      "cantidad": 2,
+      "unidad": null,
+      "precioUnitario": 23.22,
+      "descuento": 8.89,
+      "importe": 46.44
+    },
+    {
+      "linea": 3,
+      "codigo": "R3J18A",
+      "descripcion": "AP-MNT-D AP mount bracket individual D",
+      "cantidad": 2,
+      "unidad": null,
+      "precioUnitario": 513.33,
+      "descuento": 37.78,
+      "importe": 1026.67
+    },
+    {
+      "linea": 4,
+      "codigo": "Q9Y58AAE",
+      "descripcion": "HPE ANW Central AP Fnd 1y E-STU",
+      "cantidad": 2,
+      "unidad": null,
+      "precioUnitario": 1616.0,
+      "descuento": 46.67,
+      "importe": 3232.0
+    },
+    {
+      "linea": 5,
+      "codigo": "JL256A-OPG",
+      "descripcion": "Aruba 2930F 48G PoE+ 4SFP+ Swch",
+      "cantidad": 1,
+      "unidad": null,
+      "precioUnitario": 39000.0,
+      "descuento": 77.36,
+      "importe": 39000.0
+    },
+    {
+      "linea": 6,
+      "codigo": "Q9Y73AAE",
+      "descripcion": "HPE ANW Central Sw CL2 Fnd 1y E-STU",
+      "cantidad": 1,
+      "unidad": null,
+      "precioUnitario": 3770.67,
+      "descuento": 46.67,
+      "importe": 3770.67
+    },
+    {
+      "linea": 7,
+      "codigo": "J4858D",
+      "descripcion": "Aruba 1G SFP LC SX 500m MMF XCVR",
+      "cantidad": 4,
+      "unidad": null,
+      "precioUnitario": 8132.67,
+      "descuento": 26.67,
+      "importe": 32530.67
+    }
+  ],
+  "totales": {
+    "subtotal": 107533.56,
+    "iva": null,
+    "total": null
+  },
+  "moneda": "MXN",
+  "condiciones": "Precios y existencias sujetos a cambio sin previo Aviso. Precios + IVA. Debido a temas de corto de material Internacional, las fechas de entrega son aproximadas, confirmar con el PM. En mercancía solicitada a Planta no se aceptan cancelaciones y/o devoluciones. Portenntum de México no es responsable por multas o penalizaciones derivadas del incumplimiento de tiempos de entrega por parte del Fabricante"
+}
