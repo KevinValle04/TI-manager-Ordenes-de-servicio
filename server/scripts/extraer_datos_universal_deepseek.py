@@ -77,6 +77,16 @@ def extraer_texto_completo_pdf(archivo_pdf):
                     print(f"   ✓ Página {i} leída", file=sys.stderr)
             
             print(f"✅ Extracción de texto completada.", file=sys.stderr)
+            
+            # MOSTRAR EL TEXTO EXTRAÍDO EN LA CONSOLA
+            print(f"\n{'='*80}", file=sys.stderr)
+            print(f"📄 TEXTO EXTRAÍDO DEL PDF:", file=sys.stderr)
+            print(f"{'='*80}", file=sys.stderr)
+            print(texto_completo, file=sys.stderr)
+            print(f"{'='*80}", file=sys.stderr)
+            print(f"🔍 Total de caracteres extraídos: {len(texto_completo)}", file=sys.stderr)
+            print(f"{'='*80}\n", file=sys.stderr)
+            
             return texto_completo
                     
     except Exception as e:
@@ -89,6 +99,16 @@ def extraer_texto_completo_pdf(archivo_pdf):
                     texto_pagina = page.extract_text()
                     if texto_pagina:
                         texto_completo += f"\n=== PÁGINA {i} ===\n{texto_pagina}\n"
+            
+            # MOSTRAR EL TEXTO EXTRAÍDO EN LA CONSOLA (PyPDF2)
+            print(f"\n{'='*80}", file=sys.stderr)
+            print(f"📄 TEXTO EXTRAÍDO DEL PDF (PyPDF2):", file=sys.stderr)
+            print(f"{'='*80}", file=sys.stderr)
+            print(texto_completo, file=sys.stderr)
+            print(f"{'='*80}", file=sys.stderr)
+            print(f"🔍 Total de caracteres extraídos: {len(texto_completo)}", file=sys.stderr)
+            print(f"{'='*80}\n", file=sys.stderr)
+            
             return texto_completo
         except Exception as e2:
             print(f"❌ Error con PyPDF2: {e2}", file=sys.stderr)
@@ -110,58 +130,48 @@ def procesar_documento_con_deepseek(texto_completo, nombre_archivo):
         
     client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
 
-    system_prompt = """Eres un experto analista de documentos comerciales. Tu tarea es extraer información completa y precisa de órdenes de compra o cotizaciones y devolverla en formato JSON.
+    system_prompt = """Eres un experto extractor de datos de órdenes de compra y cotizaciones. Tu ÚNICA tarea es extraer EXACTAMENTE 3 tipos de información:
 
-Extrae la siguiente información del documento COMPLETO:
+EXTRAE ÚNICAMENTE:
 
-1. **folioOriginal**: El número de folio/orden/cotización COMPLETO Y EXACTO (ejemplo: "369709", "Cot. 369709", etc.)
+1. **folioOriginal**: El número de folio/orden/cotización principal del documento
+   - Busca números como: "369709", "Cot. 369709", "OC-45004530", etc.
+   - Debe ser el identificador principal del documento
 
-2. **fecha**: La fecha del documento en formato YYYY-MM-DD
-
-3. **proveedor**: Información del proveedor/emisor del documento
-   - nombre: Nombre de la empresa
-   - rfc: RFC si está disponible
-   - direccion: Dirección completa
-
-4. **cliente**: Información del cliente
-   - nombre: Nombre de la empresa cliente
-   - rfc: RFC si está disponible
-   - direccion: Dirección completa
-   - contacto: Nombre de contacto si está disponible
-
-5. **productos**: Lista de TODOS los productos/artículos del documento. IMPORTANTE: Extrae TODOS los productos sin excepción.
+2. **productos**: Lista COMPLETA de TODOS los productos sin excepción
    Estructura por producto:
    {
-     "linea": number,           // Número de línea
-     "codigo": string,          // Código/Parte del producto
-     "descripcion": string,     // Descripción completa
-     "cantidad": number,        // Cantidad numérica
-     "unidad": string,          // Unidad de medida (PZ, BB, etc.)
-     "precioUnitario": number,  // Precio unitario (sin símbolos de moneda)
-     "descuento": number,       // Porcentaje de descuento si aplica
-     "importe": number          // Importe total de la línea
+     "cantidad": number,        // Cantidad numérica pura (sin texto)
+     "codigo": string,          // Código/Parte del producto 
+     "descripcion": string,     // Descripción del producto
+     "precioUnitario": number,  // Precio unitario (solo número, sin símbolos)
+     "importe": number          // Importe total (solo número, sin símbolos)
    }
 
-6. **totales**: Diccionario con los totales del documento
+3. **totales**: Totales del documento
    {
      "subtotal": number,
-     "iva": number,
+     "iva": number, 
      "total": number
    }
 
-7. **moneda**: Tipo de moneda (MXN, USD, etc.)
-
-8. **condiciones**: Condiciones comerciales relevantes (garantía, envío, etc.)
-
 REGLAS CRÍTICAS:
-1. Extrae TODOS los productos de TODAS las páginas. No omitas ninguno.
-2. Los números deben ser numéricos puros (sin comas, símbolos de moneda, ni texto).
-3. Si una tabla continúa en múltiples páginas, asegúrate de capturar todos los renglones.
-4. Responde ÚNICAMENTE con JSON válido, sin texto adicional ni marcadores de código.
-5. Si un campo no está disponible, usa null.
-"""
+1. Extrae TODOS los productos de TODAS las páginas. NO omitas ninguno.
+2. Los números deben ser decimales puros: 1234.56 (SIN comas, símbolos $, ni texto)
+3. Si no encuentras un campo, usa: cantidad=0, codigo="", descripcion="", precioUnitario=0, importe=0
+4. Para totales: busca variaciones como "SUB-TOTAL", "8% I.V.A.", "TOTAL", etc.
+5. Responde SOLO con JSON válido, SIN texto adicional ni marcadores de código.
 
-    user_prompt = f'Analiza el documento completo "{nombre_archivo}" y extrae TODA la información en JSON:\n\n{texto_completo}'
+Ejemplo de respuesta:
+{
+  "folioOriginal": "369709",
+  "productos": [
+    {"cantidad": 2, "codigo": "F-123", "descripcion": "Cable UTP", "precioUnitario": 150.00, "importe": 300.00}
+  ],
+  "totales": {"subtotal": 300.00, "iva": 48.00, "total": 348.00}
+}"""
+
+    user_prompt = f'Extrae del documento "{nombre_archivo}" ÚNICAMENTE: folioOriginal, productos (TODOS sin excepción), y totales. Documento:\n\n{texto_completo}'
 
     try:
         response = client.chat.completions.create(
@@ -172,8 +182,8 @@ REGLAS CRÍTICAS:
             ],
             stream=False,
             temperature=0.0,  # Temperatura 0 para máxima consistencia
-            max_tokens=8192,  # Aumentado para documentos grandes
-            timeout=120
+            max_tokens=6144,  # Optimizado para solo productos, folio y totales
+            timeout=90        # Reducido a 90 segundos
         )
         resultado_str = response.choices[0].message.content
         
@@ -197,13 +207,26 @@ REGLAS CRÍTICAS:
             if json_end_index > json_start_index:
                 resultado_str = resultado_str[json_start_index : json_end_index + 1]
 
-        # Validar JSON
+        # Validar JSON y estructura esencial
         json_parseado = json.loads(resultado_str)
         print(f"   ✓ Documento analizado por IA.", file=sys.stderr)
         
-        # Validar que se extrajeron productos
-        num_productos = len(json_parseado.get('productos', []))
-        print(f"   📊 Productos extraídos: {num_productos}", file=sys.stderr)
+        # Validar que se extrajeron los campos esenciales
+        folio = json_parseado.get('folioOriginal')
+        productos = json_parseado.get('productos', [])
+        totales = json_parseado.get('totales', {})
+        
+        print(f"   � Folio extraído: {folio}", file=sys.stderr)
+        print(f"   �📊 Productos extraídos: {len(productos)}", file=sys.stderr)
+        print(f"   💰 Totales extraídos: {len(totales)} campos", file=sys.stderr)
+        
+        # Advertencias de calidad
+        if not folio:
+            print(f"   ⚠️  ADVERTENCIA: No se detectó folio", file=sys.stderr)
+        if len(productos) < 5:
+            print(f"   ⚠️  ADVERTENCIA: Solo {len(productos)} productos extraídos", file=sys.stderr)
+        if len(totales) < 2:
+            print(f"   ⚠️  ADVERTENCIA: Totales incompletos ({len(totales)} campos)", file=sys.stderr)
         
         return resultado_str
         
@@ -246,16 +269,36 @@ if __name__ == "__main__":
         print(json_resultado)  # Imprimir en stdout
         
         folio_extraido = None
+        num_productos = 0
+        num_totales = 0
+        
         try:
             json_final_parseado = json.loads(json_resultado)
             folio_extraido = json_final_parseado.get('folioOriginal')
-            num_productos = len(json_final_parseado.get('productos', []))
-            print(f"📋 Folio detectado: {folio_extraido}", file=sys.stderr)
-            print(f"📊 Total de productos extraídos: {num_productos}", file=sys.stderr)
+            productos = json_final_parseado.get('productos', [])
+            totales = json_final_parseado.get('totales', {})
             
-            # Validación: Advertir si hay pocos productos
+            num_productos = len(productos)
+            num_totales = len(totales)
+            
+            print(f"📋 Folio detectado: {folio_extraido or 'NO DETECTADO'}", file=sys.stderr)
+            print(f"📊 Total de productos extraídos: {num_productos}", file=sys.stderr)
+            print(f"💰 Total de campos de totales: {num_totales}", file=sys.stderr)
+            
+            # Validaciones de calidad optimizadas
+            if not folio_extraido:
+                print(f"⚠️  ADVERTENCIA: No se detectó folio en el documento", file=sys.stderr)
+            
             if num_productos < 10:
-                print(f"⚠️  ADVERTENCIA: Solo se extrajeron {num_productos} productos. Verifica el resultado.", file=sys.stderr)
+                print(f"⚠️  ADVERTENCIA: Solo se extrajeron {num_productos} productos. ¿Es correcto?", file=sys.stderr)
+            
+            if num_totales < 2:
+                print(f"⚠️  ADVERTENCIA: Totales incompletos. Solo {num_totales} campos detectados", file=sys.stderr)
+            
+            # Mostrar resumen de campos de totales encontrados
+            if totales:
+                campos_totales = list(totales.keys())
+                print(f"💱 Campos de totales encontrados: {', '.join(campos_totales)}", file=sys.stderr)
                 
         except Exception as e:
             print(f"⚠️  Error al parsear JSON final: {e}", file=sys.stderr)
