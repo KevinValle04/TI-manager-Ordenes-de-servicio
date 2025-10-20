@@ -12,8 +12,8 @@
       "cantidad": 2,
       "codigo": "H62E4E",
       "descripcion": "Aruba 1Y FC NBD Exch HWAP-615 Campus SVC",
-      "precioUnitario": 23.22,
-      "importe": 46.44
+      "precioUnitario": 223.22,
+      "importe": 446.44
     },
     {
       "cantidad": 2,
@@ -54,6 +54,6 @@
   "totales": {
     "subtotal": 107533.56,
     "iva": 0,
-    "total": 0
+    "total": 107533.56
   }
 }

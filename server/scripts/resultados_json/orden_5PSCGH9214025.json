@@ -4,14 +4,14 @@
     {
       "cantidad": 1,
       "codigo": "E45RUBKIT",
-      "descripcion": "RACK/RUNWAY KIT 45RU BLK 54IN MTYC",
+      "descripcion": "RACK/RUNWAY KIT 45RU BLK 54IN",
       "precioUnitario": 2766.9,
       "importe": 2766.9
     },
     {
       "cantidad": 1,
       "codigo": "EPB350DTB",
-      "descripcion": "AMPLIFICADOR MEZCLADOR CLASE D, 350 W, CON JRZ MULTIMEDIA, 1 ENTRADA EMC, 2 ENTRADAS AUX, 4 ENTRADAS MIC (BALANCEADAS)",
+      "descripcion": "AMPLIFICADOR MEZCLADOR CLASE D, 350 W, CON MULTIMEDIA, 1 ENTRADA EMC, 2 ENTRADAS AUX, 4 ENTRADAS MIC (BALANCEADAS)",
       "precioUnitario": 7742.56,
       "importe": 7742.56
     },
@@ -32,7 +32,7 @@
     {
       "cantidad": 2,
       "codigo": "DSK1T342MFWX",
-      "descripcion": "TERMINAL DE RECONOCIMIENTO FACIAL / E1 PANTALLA TACTIL 4.3 INCHES / 2 MP / 1500 ROSTROS / 3000 TARJETAS MIFARE",
+      "descripcion": "TERMINAL DE RECONOCIMIENTO FACIAL / PANTALLA TACTIL 4.3 INCHES / 2 MP / 1500 ROSTROS / 3000 TARJETAS MIFARE",
       "precioUnitario": 2522.62,
       "importe": 5045.24
     },
@@ -67,7 +67,7 @@
     {
       "cantidad": 2,
       "codigo": "LK5.512",
-      "descripcion": "BATERIA AGM/VRLA, 12 VCD; 5.5 AH. P/SISTEMAS D/RESPALDO D/ENERGIA EN SISTEMAS DE SEG ELN",
+      "descripcion": "BATERIA AGM/VRLA, 12 VCD; 5.5 AH. P/SISTEMAS D/RESPALDO D/ENERGIA EN SISTEMAS DE SEG",
       "precioUnitario": 0,
       "importe": 0
     },
@@ -81,7 +81,7 @@
     {
       "cantidad": 2,
       "codigo": "CBRNF1P30D",
-      "descripcion": "PAQUETE DÚO: CABLE ROJO Y NEGRO DE 30 CM CADA UNO, CON TERMINAL F1 EN UN EXTREMO Y PUNTAS LIBRES EN EL OTRO",
+      "descripcion": "PAQUETE DÚO: CABLE ROJO Y NEGRO DE 30 CM CADA UNO, CON TERMINAL F1 EN UN EXTREMO Y PUNTAS LIBRES EN EL OTRO,",
       "precioUnitario": 0,
       "importe": 0
     },
@@ -109,7 +109,7 @@
     {
       "cantidad": 44,
       "codigo": "DS2CD2363G2LI2",
-      "descripcion": "TURRET IP 6 MP / LENTE 2.8 MM / ACUSENSE / 2 U MIC INTEGRADO / DUAL LIGHT (30 MTS IR EXIR + 30 MTS LUZ BLANCA) / POE / IP67",
+      "descripcion": "TURRET IP 6 MP / LENTE 2.8 MM / ACUSENSE / 2 MIC INTEGRADO / DUAL LIGHT (30 MTS IR EXIR + 30 MTS LUZ BLANCA) / POE / IP67",
       "precioUnitario": 1918.44,
       "importe": 84411.36
     },
@@ -137,7 +137,7 @@
     {
       "cantidad": 8,
       "codigo": "DS2CD2063G2LI2",
-      "descripcion": "BALA IP 6 MP / LENTE 2.8 MM / ACUSENSE / 2 MIC U INTEGRADO / DUAL LIGHT (40 MTS IR EXIR + 40 MTS LUZ BLANCA) / POE / IP67",
+      "descripcion": "BALA IP 6 MP / LENTE 2.8 MM / ACUSENSE / 2 MIC INTEGRADO / DUAL LIGHT (40 MTS IR EXIR + 40 MTS LUZ BLANCA) / POE / IP67",
       "precioUnitario": 1938.22,
       "importe": 15505.76
     },
@@ -158,14 +158,14 @@
     {
       "cantidad": 6,
       "codigo": "HKSFP1.25G1310",
-      "descripcion": "TRANCEPTOR SFP MULTIMODO / HASTA 1 KM / DFMM 1.25 G.",
+      "descripcion": "TRANCEPTOR SFP MULTIMODO / HASTA 1 KM / 1.25 G.",
       "precioUnitario": 306.84,
       "importe": 1841.04
     },
     {
       "cantidad": 2,
       "codigo": "DS2SE4C415MW",
-      "descripcion": "PTZ IP 4 MP / 15X ZOOM / 100 MTS IR C/ CAMARA GE(14F0) FIJA 4 MP / LENTE 2.8 MM / 30 MTS LUZ BLANCA / IP66",
+      "descripcion": "PTZ IP 4 MP / 15X ZOOM / 100 MTS IR C/ CAMARA FIJA 4 MP / LENTE 2.8 MM / 30 MTS LUZ BLANCA / IP66",
       "precioUnitario": 7626.34,
       "importe": 15252.68
     },
@@ -255,8 +255,8 @@
     },
     {
       "cantidad": 2,
-      "codigo": "ENVIO EMPAQUE Y EMBARQUE",
-      "descripcion": "SERVICIO ENVIO EMPAQUE Y EMBARQUE",
+      "codigo": "ENVIO",
+      "descripcion": "EMPAQUE Y EMBARQUE",
       "precioUnitario": 91.63,
       "importe": 183.26
     }

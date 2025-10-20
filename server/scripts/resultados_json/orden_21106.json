@@ -1,0 +1,45 @@
+{
+  "folioOriginal": "21106",
+  "productos": [
+    {
+      "cantidad": 20.0,
+      "codigo": "BF2R-10065GE",
+      "descripcion": "CHAROLA MALLA 100 MM ANCHO X 65 CINCADO",
+      "precioUnitario": 393.111,
+      "importe": 7862.22
+    },
+    {
+      "cantidad": 18.0,
+      "codigo": "BFR-GS",
+      "descripcion": "SUSPENSION SUP . TRIANGULO 9/02782",
+      "precioUnitario": 93.51,
+      "importe": 1683.18
+    },
+    {
+      "cantidad": 40.0,
+      "codigo": "UREZ",
+      "descripcion": "UNION REFORZADA (EZ) CLEMA CON TORNILLO",
+      "precioUnitario": 17.325,
+      "importe": 693.0
+    },
+    {
+      "cantidad": 20.0,
+      "codigo": "VR-38300GE",
+      "descripcion": "VARILLA ROSCADA  3/8\" X 3 M.",
+      "precioUnitario": 43.0,
+      "importe": 860.0
+    },
+    {
+      "cantidad": 20.0,
+      "codigo": "0101GAVA038",
+      "descripcion": "GANCHO PARA VARILLA 3/8",
+      "precioUnitario": 49.2,
+      "importe": 984.0
+    }
+  ],
+  "totales": {
+    "subtotal": 12082.4,
+    "iva": 966.59,
+    "total": 13048.99
+  }
+}

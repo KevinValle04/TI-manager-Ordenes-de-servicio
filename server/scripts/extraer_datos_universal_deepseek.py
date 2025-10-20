@@ -12,6 +12,7 @@ import os
 import json
 import re
 from openai import OpenAI
+import fitz  # PyMuPDF
 
 # =================== FUNCIONES AUXILIARES ===================
 
@@ -61,58 +62,224 @@ def guardar_json_resultado(json_resultado, folio_original, nombre_archivo_origin
 
 # =================== EXTRACCIÓN DE TEXTO COMPLETO ===================
 
+def extraer_con_pymupdf(archivo_pdf):
+    """Extrae texto y tablas usando PyMuPDF - GRATIS y muy eficiente."""
+    print(f"🔍 Extrayendo con PyMuPDF: {archivo_pdf}", file=sys.stderr)
+    
+    try:
+        texto_completo = ""
+        tablas_detectadas = []
+        
+        doc = fitz.open(archivo_pdf)
+        
+        for i, page in enumerate(doc, 1):
+            print(f"   📄 Procesando página {i}", file=sys.stderr)
+            
+            # Extraer texto normal
+            texto_pagina = page.get_text()
+            if texto_pagina.strip():
+                texto_completo += f"\n=== PÁGINA {i} ===\n{texto_pagina}\n"
+            
+            # Extraer tablas automáticamente
+            try:
+                tablas = page.find_tables()
+                if tablas:
+                    for j, tabla in enumerate(tablas):
+                        tabla_extraida = tabla.extract()
+                        if tabla_extraida:
+                            # Convertir tabla a texto estructurado
+                            tabla_texto = ""
+                            for fila in tabla_extraida:
+                                if fila and any(str(celda).strip() for celda in fila if celda):
+                                    fila_limpia = [str(celda).strip() if celda else "" for celda in fila]
+                                    tabla_texto += "\t".join(fila_limpia) + "\n"
+                            
+                            if tabla_texto.strip():
+                                tablas_detectadas.append(tabla_texto)
+                                texto_completo += f"\n=== TABLA {j+1} PÁGINA {i} (PYMUPDF) ===\n{tabla_texto}\n"
+                                print(f"   📊 Tabla {j+1} extraída de página {i} ({len(tabla_extraida)} filas)", file=sys.stderr)
+            
+            except Exception as e:
+                print(f"   ⚠️  Error extrayendo tablas de página {i}: {e}", file=sys.stderr)
+        
+        doc.close()
+        print(f"✅ PyMuPDF: {len(tablas_detectadas)} tablas estructuradas extraídas", file=sys.stderr)
+        return texto_completo
+        
+    except Exception as e:
+        print(f"❌ Error con PyMuPDF: {e}", file=sys.stderr)
+        return None
+
+def extraer_con_pymupdf_avanzado(archivo_pdf):
+    """Extracción avanzada con PyMuPDF: texto, tablas y metadatos."""
+    print(f"🚀 Extracción avanzada con PyMuPDF: {archivo_pdf}", file=sys.stderr)
+    
+    try:
+        texto_completo = ""
+        tablas_detectadas = []
+        metadatos_encontrados = []
+        
+        doc = fitz.open(archivo_pdf)
+        
+        # Extraer metadatos del documento
+        metadata = doc.metadata
+        if metadata:
+            for key, value in metadata.items():
+                if value and str(value).strip():
+                    metadatos_encontrados.append(f"{key}: {value}")
+                    texto_completo += f"METADATA_{key}: {value}\n"
+        
+        for i, page in enumerate(doc, 1):
+            print(f"   📄 Procesando página {i} (método avanzado)", file=sys.stderr)
+            
+            # Extraer texto con información de posición
+            bloques_texto = page.get_text("dict")
+            texto_pagina = ""
+            
+            for bloque in bloques_texto.get("blocks", []):
+                if "lines" in bloque:  # Bloque de texto
+                    for linea in bloque["lines"]:
+                        texto_linea = ""
+                        for span in linea.get("spans", []):
+                            texto_span = span.get("text", "")
+                            if texto_span.strip():
+                                # Detectar texto en mayúsculas (posibles títulos/folios)
+                                if texto_span.isupper() and len(texto_span) > 3:
+                                    texto_linea += f"[TITULO: {texto_span}] "
+                                else:
+                                    texto_linea += texto_span + " "
+                        
+                        if texto_linea.strip():
+                            texto_pagina += texto_linea.strip() + "\n"
+            
+            if texto_pagina.strip():
+                texto_completo += f"\n=== PÁGINA {i} (AVANZADA) ===\n{texto_pagina}\n"
+            
+            # Extraer tablas con configuración optimizada
+            try:
+                # Buscar tablas con diferentes estrategias
+                tablas = page.find_tables(
+                    vertical_strategy="lines_strict",
+                    horizontal_strategy="lines_strict"
+                )
+                
+                if not tablas:  # Si no encuentra con líneas estrictas, usar texto
+                    tablas = page.find_tables(
+                        vertical_strategy="text",
+                        horizontal_strategy="text"
+                    )
+                
+                for j, tabla in enumerate(tablas):
+                    tabla_extraida = tabla.extract()
+                    if tabla_extraida and len(tabla_extraida) > 1:  # Al menos 2 filas
+                        tabla_texto = ""
+                        filas_validas = 0
+                        
+                        for fila in tabla_extraida:
+                            if fila and any(str(celda).strip() for celda in fila if celda):
+                                fila_limpia = []
+                                for celda in fila:
+                                    celda_str = str(celda).strip() if celda else ""
+                                    # Detectar números que podrían ser precios
+                                    if re.match(r'^\$?\d{1,3}(?:,\d{3})*(?:\.\d{2})?$', celda_str):
+                                        fila_limpia.append(f"[PRECIO: {celda_str}]")
+                                    else:
+                                        fila_limpia.append(celda_str)
+                                
+                                tabla_texto += "\t".join(fila_limpia) + "\n"
+                                filas_validas += 1
+                        
+                        if filas_validas >= 2:  # Tabla válida
+                            tablas_detectadas.append(tabla_texto)
+                            texto_completo += f"\n=== TABLA {j+1} PÁGINA {i} (PYMUPDF-ADV) ===\n{tabla_texto}\n"
+                            print(f"   📊 Tabla {j+1} extraída: {filas_validas} filas válidas", file=sys.stderr)
+            
+            except Exception as e:
+                print(f"   ⚠️  Error extrayendo tablas de página {i}: {e}", file=sys.stderr)
+        
+        doc.close()
+        
+        print(f"✅ PyMuPDF Avanzado: {len(tablas_detectadas)} tablas, {len(metadatos_encontrados)} metadatos", file=sys.stderr)
+        return texto_completo
+        
+    except Exception as e:
+        print(f"❌ Error con PyMuPDF avanzado: {e}", file=sys.stderr)
+        return None
+
 def extraer_texto_completo_pdf(archivo_pdf):
-    """Extrae TODO el texto del PDF de una vez."""
-    print(f"📄 Extrayendo texto completo de: {archivo_pdf}", file=sys.stderr)
+    """Extrae texto con método híbrido: PyMuPDF primero, luego fallbacks."""
+    print(f"📄 Iniciando extracción híbrida de: {archivo_pdf}", file=sys.stderr)
+    
+    # MÉTODO 1: PyMuPDF Avanzado (GRATIS y muy potente)
+    texto_completo = extraer_con_pymupdf_avanzado(archivo_pdf)
+    if texto_completo and len(texto_completo.strip()) > 100:
+        print(f"✅ Extracción exitosa con PyMuPDF Avanzado", file=sys.stderr)
+        return mostrar_texto_extraido(texto_completo, "PYMUPDF AVANZADO")
+    
+    # MÉTODO 2: PyMuPDF Simple
+    texto_completo = extraer_con_pymupdf(archivo_pdf)
+    if texto_completo and len(texto_completo.strip()) > 100:
+        print(f"✅ Extracción exitosa con PyMuPDF Simple", file=sys.stderr)
+        return mostrar_texto_extraido(texto_completo, "PYMUPDF SIMPLE")
+    
+    # MÉTODO 3: pdfplumber con detección de tablas (tu método actual mejorado)
+    print(f"🔄 Fallback a pdfplumber con detección de tablas...", file=sys.stderr)
     try:
         texto_completo = ""
         with pdfplumber.open(archivo_pdf) as pdf:
-            num_paginas = len(pdf.pages)
-            print(f"📖 PDF tiene {num_paginas} página(s)", file=sys.stderr)
-            
             for i, page in enumerate(pdf.pages, 1):
+                # Texto normal
                 texto = page.extract_text()
                 if texto:
                     texto_completo += f"\n=== PÁGINA {i} ===\n{texto}\n"
-                    print(f"   ✓ Página {i} leída", file=sys.stderr)
-            
-            print(f"✅ Extracción de texto completada.", file=sys.stderr)
-            
-            # MOSTRAR EL TEXTO EXTRAÍDO EN LA CONSOLA
-            print(f"\n{'='*80}", file=sys.stderr)
-            print(f"📄 TEXTO EXTRAÍDO DEL PDF:", file=sys.stderr)
-            print(f"{'='*80}", file=sys.stderr)
-            print(texto_completo, file=sys.stderr)
-            print(f"{'='*80}", file=sys.stderr)
-            print(f"🔍 Total de caracteres extraídos: {len(texto_completo)}", file=sys.stderr)
-            print(f"{'='*80}\n", file=sys.stderr)
-            
-            return texto_completo
-                    
+                
+                # Tablas con pdfplumber
+                try:
+                    tablas = page.extract_tables()
+                    if tablas:
+                        for j, tabla in enumerate(tablas):
+                            tabla_texto = "\n".join(["\t".join([str(celda) if celda else "" for celda in fila]) for fila in tabla if fila])
+                            if tabla_texto.strip():
+                                texto_completo += f"\n=== TABLA {j+1} PÁGINA {i} (PDFPLUMBER) ===\n{tabla_texto}\n"
+                                print(f"   📊 Tabla {j+1} extraída con pdfplumber", file=sys.stderr)
+                except Exception as e:
+                    print(f"   ⚠️  Error tablas pdfplumber página {i}: {e}", file=sys.stderr)
+        
+        if texto_completo and len(texto_completo.strip()) > 50:
+            return mostrar_texto_extraido(texto_completo, "PDFPLUMBER + TABLAS")
+    
     except Exception as e:
-        print(f"❌ Error con pdfplumber: {e}. Intentando con PyPDF2...", file=sys.stderr)
-        try:
-            texto_completo = ""
-            with open(archivo_pdf, 'rb') as file:
-                pdf_reader = PyPDF2.PdfReader(file)
-                for i, page in enumerate(pdf_reader.pages, 1):
-                    texto_pagina = page.extract_text()
-                    if texto_pagina:
-                        texto_completo += f"\n=== PÁGINA {i} ===\n{texto_pagina}\n"
-            
-            # MOSTRAR EL TEXTO EXTRAÍDO EN LA CONSOLA (PyPDF2)
-            print(f"\n{'='*80}", file=sys.stderr)
-            print(f"📄 TEXTO EXTRAÍDO DEL PDF (PyPDF2):", file=sys.stderr)
-            print(f"{'='*80}", file=sys.stderr)
-            print(texto_completo, file=sys.stderr)
-            print(f"{'='*80}", file=sys.stderr)
-            print(f"🔍 Total de caracteres extraídos: {len(texto_completo)}", file=sys.stderr)
-            print(f"{'='*80}\n", file=sys.stderr)
-            
-            return texto_completo
-        except Exception as e2:
-            print(f"❌ Error con PyPDF2: {e2}", file=sys.stderr)
-            return None
+        print(f"❌ Error con pdfplumber: {e}", file=sys.stderr)
+    
+    # MÉTODO 4: PyPDF2 (último recurso)
+    print(f"🔄 Último recurso: PyPDF2...", file=sys.stderr)
+    try:
+        texto_completo = ""
+        with open(archivo_pdf, 'rb') as file:
+            pdf_reader = PyPDF2.PdfReader(file)
+            for i, page in enumerate(pdf_reader.pages, 1):
+                texto_pagina = page.extract_text()
+                if texto_pagina:
+                    texto_completo += f"\n=== PÁGINA {i} ===\n{texto_pagina}\n"
+        
+        if texto_completo:
+            return mostrar_texto_extraido(texto_completo, "PYPDF2")
+    
+    except Exception as e:
+        print(f"❌ Error con PyPDF2: {e}", file=sys.stderr)
+    
+    return None
+
+def mostrar_texto_extraido(texto_completo, metodo):
+    """Función auxiliar para mostrar el texto extraído."""
+    print(f"\n{'='*80}", file=sys.stderr)
+    print(f"📄 TEXTO EXTRAÍDO DEL PDF ({metodo}):", file=sys.stderr)
+    print(f"{'='*80}", file=sys.stderr)
+    print(texto_completo, file=sys.stderr)
+    print(f"{'='*80}", file=sys.stderr)
+    print(f"🔍 Total de caracteres extraídos: {len(texto_completo)}", file=sys.stderr)
+    print(f"{'='*80}\n", file=sys.stderr)
+    return texto_completo
 
 # =================== PROCESAMIENTO CON IA ===================
 
@@ -130,39 +297,51 @@ def procesar_documento_con_deepseek(texto_completo, nombre_archivo):
         
     client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
 
-    system_prompt = """Eres un experto extractor de datos de órdenes de compra y cotizaciones. Tu ÚNICA tarea es extraer EXACTAMENTE 3 tipos de información:
+    system_prompt = """Eres un experto extractor de datos de órdenes de compra y cotizaciones.
+
+IMPORTANTE: El documento puede contener elementos estructurados marcados como:
+- "=== TABLA X PÁGINA Y (PYMUPDF) ===" - Tablas extraídas con PyMuPDF
+- "[TITULO: TEXTO]" - Títulos/encabezados detectados
+- "[PRECIO: $1,234.56]" - Precios identificados automáticamente
+- "METADATA_Campo: valor" - Metadatos del PDF
+
+PRIORIDAD DE EXTRACCIÓN:
+1. Las tablas PYMUPDF contienen productos estructurados - MÁXIMA PRIORIDAD
+2. Los títulos en mayúsculas pueden contener folios
+3. Los precios marcados son datos críticos
+4. Los metadatos pueden tener información del documento
 
 EXTRAE ÚNICAMENTE:
 
-1. **folioOriginal**: El número de folio/orden/cotización principal del documento
-   - Busca números como: "369709", "Cot. 369709", "OC-45004530", etc.
-   - Debe ser el identificador principal del documento
+1. **folioOriginal**: Identificador principal
+   - Busca en títulos, metadatos y encabezados
+   - Formatos: "369709", "OC-123456", "Cot. 45678"
 
-2. **productos**: Lista COMPLETA de TODOS los productos sin excepción
+2. **productos**: TODOS los productos sin excepción
    Estructura por producto:
    {
-     "cantidad": number,        // Cantidad numérica pura (sin texto)
-     "codigo": string,          // Código/Parte del producto 
-     "descripcion": string,     // Descripción del producto
-     "precioUnitario": number,  // Precio unitario (solo número, sin símbolos)
-     "importe": number          // Importe total (solo número, sin símbolos)
+     "cantidad": number,
+     "codigo": string,
+     "descripcion": string,
+     "precioUnitario": number,
+     "importe": number
    }
 
 3. **totales**: Totales del documento
    {
      "subtotal": number,
-     "iva": number, 
+     "iva": number,
      "total": number
    }
 
 REGLAS CRÍTICAS:
-1. Extrae TODOS los productos de TODAS las páginas. NO omitas ninguno.
-2. Los números deben ser decimales puros: 1234.56 (SIN comas, símbolos $, ni texto)
-3. Si no encuentras un campo, usa: cantidad=0, codigo="", descripcion="", precioUnitario=0, importe=0
-4. Para totales: busca variaciones como "SUB-TOTAL", "8% I.V.A.", "TOTAL", etc.
-5. Responde SOLO con JSON válido, SIN texto adicional ni marcadores de código.
+1. Las tablas PYMUPDF son PRIORITARIAS - extraer todos sus productos
+2. Los números marcados como [PRECIO: $X] son datos confiables
+3. Los títulos [TITULO: X] pueden contener folios importantes
+4. Números decimales puros: 1234.56 (sin símbolos)
+5. JSON válido únicamente
 
-Ejemplo de respuesta:
+Ejemplo:
 {
   "folioOriginal": "369709",
   "productos": [
