@@ -244,6 +244,18 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
     }
   }, [show, totalesCalculados, datosOrdenCompletos]);
 
+  // Log de depuración para verificar los productos editables
+  React.useEffect(() => {
+    if (show && productosEditables.length > 0) {
+      console.log('🛒 ModalResultados - Productos editables recibidos:', productosEditables);
+      console.log('🔑 ModalResultados - Primer producto (códigos):', {
+        clave: productosEditables[0]?.clave,
+        codigo: productosEditables[0]?.codigo,
+        descripcion: productosEditables[0]?.descripcion
+      });
+    }
+  }, [show, productosEditables]);
+
   // Estado para la moneda seleccionada
   const [monedaSeleccionada, setMonedaSeleccionada] = useState<string>('MXN');
   // Estado para el porcentaje de IVA simbólico seleccionado

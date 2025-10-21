@@ -562,6 +562,7 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
           cantidad: cantidad,
           unidad: producto.unidad || 'PIEZA',
           codigo: producto.codigo || producto.clave || '',
+          clave: producto.codigo || producto.clave || '', // Agregar mapeo explícito para el modal
           descripcion: producto.descripcion || producto.concepto || '',
           precioUnitario: precioUnitario,
           precioLista: parseNumericValue(producto.precioLista),
@@ -693,10 +694,19 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
   const actualizarProducto = useCallback((index: number, campo: string, valor: any) => {
     setProductosEditables(prev => {
       const nuevosProductos = [...prev];
-      nuevosProductos[index] = {
+      const productoActualizado = {
         ...nuevosProductos[index],
         [campo]: valor
       };
+      
+      // Sincronizar codigo y clave cuando se actualiza cualquiera de los dos
+      if (campo === 'codigo') {
+        productoActualizado.clave = valor;
+      } else if (campo === 'clave') {
+        productoActualizado.codigo = valor;
+      }
+      
+      nuevosProductos[index] = productoActualizado;
       
       // Calcular totales directamente con los nuevos productos
       calcularTotales(nuevosProductos);
@@ -709,6 +719,7 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
   const agregarNuevoProducto = useCallback(() => {
     const nuevoProducto = {
       clave: '',
+      codigo: '', // Agregar codigo también
       descripcion: '',
       cantidad: 0,
       unidad: 'PIEZA',

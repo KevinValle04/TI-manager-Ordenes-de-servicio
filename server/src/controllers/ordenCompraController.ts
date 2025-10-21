@@ -335,12 +335,21 @@ export const procesarPdf = async (req: Request, res: Response) => {
     // Usar script universal en lugar de scripts específicos
     const datosExtraidos = await ejecutarScriptUniversal(req.file.path);
     
+    // Mapear 'codigo' a 'clave' para compatibilidad con frontend
+    if (datosExtraidos.productos && Array.isArray(datosExtraidos.productos)) {
+      datosExtraidos.productos = datosExtraidos.productos.map((producto: any) => ({
+        ...producto,
+        clave: producto.codigo || producto.clave || '', // Mapear codigo → clave
+        codigo: producto.codigo || producto.clave || '' // Mantener codigo también
+      }));
+    }
+    
     // Limpiar archivo temporal
     fs.unlinkSync(req.file.path);
     
     res.json({
       success: true,
-      message: 'PDF procesado exitosamente con DeepSeek',
+      message: 'PDF procesado exitosamente con OpenAI',
       datosExtraidos: datosExtraidos, // Cambiar de 'datos' a 'datosExtraidos' para compatibilidad con frontend
       proveedor: 'Detectado automáticamente', // El script ya detecta el proveedor
       folio: datosExtraidos.folioOriginal
@@ -411,6 +420,15 @@ export const crearOrdenDesdePdf = async (req: Request, res: Response) => {
     try {
       // 1. Procesar con script universal
       const datosExtraidos = await ejecutarScriptUniversal(rutaArchivo);
+      
+      // Mapear 'codigo' a 'clave' para compatibilidad con frontend
+      if (datosExtraidos.productos && Array.isArray(datosExtraidos.productos)) {
+        datosExtraidos.productos = datosExtraidos.productos.map((producto: any) => ({
+          ...producto,
+          clave: producto.codigo || producto.clave || '', // Mapear codigo → clave
+          codigo: producto.codigo || producto.clave || '' // Mantener codigo también
+        }));
+      }
       
       // Generar número de orden único
       const timestamp = DateUtils.formatDateForInput().replace(/-/g, '');

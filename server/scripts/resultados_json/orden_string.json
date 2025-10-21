@@ -1,0 +1,44 @@
+{
+  "folioOriginal": "string",
+  "fecha": "2025-07-02",
+  "proveedor": {
+    "nombre": "TI SERVICES",
+    "rfc": null,
+    "direccion": null
+  },
+  "cliente": {
+    "nombre": "string",
+    "rfc": null,
+    "direccion": null,
+    "contacto": "Ing. Alejandro Hernandez Castillo"
+  },
+  "productos": [
+    {
+      "linea": 1,
+      "codigo": "U03N11V",
+      "descripcion": "SMARTZONE UPS, 3kVA, 2U, 120V, VRLA, SINGLE PHASE, DOUBLE-CONVERSION ON-LINE POWER PROTECTION WITH INTELLIGENT NETWORK CARD & RAIL KIT",
+      "cantidad": 1,
+      "unidad": "U",
+      "precioUnitario": 2201.0,
+      "descuento": 0,
+      "importe": 1540.7
+    },
+    {
+      "linea": 2,
+      "codigo": "UVP072",
+      "descripcion": "SMARTZONE UPS, 1kVA, 2U, 230V, VRLA, SINGLE PHASE, DOUBLE-CONVERSION ON-LINE POWER PROTECTION",
+      "cantidad": 1,
+      "unidad": "U",
+      "precioUnitario": 1325.0,
+      "descuento": 0,
+      "importe": 927.5
+    }
+  ],
+  "totales": {
+    "subtotal": 2468.2,
+    "iva": 394.91,
+    "total": 2863.11
+  },
+  "moneda": "USD",
+  "condiciones": "Este producto esta cotizado en USD. Vigencia de la cotización 15 días naturales. Los tiempos de entrega están sujetos a ordenes de compra confirmadas. El tiempo de entrega es considerado para Tijuana. El costo del envío a otra localidad, correo por su cuenta. EL PRECIO, TIEMPO DE ENTREGA Y / O DISPONIBILIDAD PUEDEN VARIAR SIN PREVIO AVISO. EN CASO DE DEVOLUCIÓN O CANCELACIÓN DE MATERIAL, SE COBRARÁ EL 20% DEL COSTO TOTAL DEL PRODUCTO, SIN EXCEPCIÓN, COMO CARGO ADICIONAL."
+}
