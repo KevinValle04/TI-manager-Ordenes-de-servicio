@@ -27,7 +27,7 @@
       "codigo": "Q9Y58AAE",
       "descripcion": "HPE Aruba Networking Central AP Foundation 1-year Subscription E-STU",
       "cantidad": 2,
-      "unidad": "Pieza",
+      "unidad": "Licencia",
       "precioUnitario": 1596.38,
       "descuento": 0,
       "importe": 3192.75
@@ -37,7 +37,7 @@
       "codigo": "Q9Y73AAE",
       "descripcion": "HPE Aruba Networking Central Switch Class-2 Foundation 1-year Subscription E-STU",
       "cantidad": 1,
-      "unidad": "Pieza",
+      "unidad": "Licencia",
       "precioUnitario": 3730.25,
       "descuento": 0,
       "importe": 3730.25
@@ -47,16 +47,16 @@
       "codigo": "J4858D",
       "descripcion": "HPE Aruba Networking 1G SFP LC SX 500m OM2 MMF Transceiver",
       "cantidad": 4,
-      "unidad": "Pieza",
+      "unidad": "Transceiver",
       "precioUnitario": 5032.0,
       "descuento": 0,
       "importe": 20128.0
     }
   ],
   "totales": {
-    "subtotal": 48429.13,
+    "subtotal": 48029.13,
     "iva": 0,
-    "total": 48429.13
+    "total": 48029.13
   },
   "moneda": "MXN",
   "condiciones": null

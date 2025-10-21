@@ -105,7 +105,7 @@
     {
       "linea": 11,
       "codigo": "PLB3",
-      "descripcion": "FUENTE TIPO TARJETA/ SALIDA / REQUIERE TRANSFORMADOR DE ENTRADA",
+      "descripcion": "6 O 12 O 24 VCC @ 4 A / FUENTE TIPO TARJETA/ SALIDA / REQUIERE TRANSFORMADOR DE ENTRADA",
       "cantidad": 2,
       "unidad": "PIEZA",
       "precioUnitario": 0,
@@ -345,7 +345,7 @@
     {
       "linea": 35,
       "codigo": "44025504",
-      "descripcion": "BOBINA D/152M 2 X 18 AWG BLINDADO RISER",
+      "descripcion": "BOBINA D/152M 2 X 18 AWG BLINDADO RISER FPLR",
       "cantidad": 4,
       "unidad": "BOBINA",
       "precioUnitario": 2753.55,
@@ -354,8 +354,8 @@
     },
     {
       "linea": 36,
-      "codigo": "ENVIO",
-      "descripcion": "SERVICIO ENVIO EMPAQUE Y EMBARQUE",
+      "codigo": "SERVICIO",
+      "descripcion": "ENVIO EMPAQUE Y EMBARQUE",
       "cantidad": 2,
       "unidad": "SERVICIO",
       "precioUnitario": 143.18,
