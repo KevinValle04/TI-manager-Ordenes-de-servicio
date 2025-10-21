@@ -1,36 +1,25 @@
 {
   "folioOriginal": "OPE0707JPTISE007",
   "fecha": "2025-07-07",
-  "proveedor": {
-    "nombre": "TISERVICES SOLUTIONS NETWORKS",
-    "rfc": null,
-    "direccion": "Av. Revolución #111, Col. Buenos Aires, Monterrey, Nuevo León, C.P. 64820"
-  },
-  "cliente": {
-    "nombre": "Comercial de Carnes Frías del Norte",
-    "rfc": null,
-    "direccion": null,
-    "contacto": "Alejandro Hernandez"
-  },
   "productos": [
     {
       "linea": 1,
       "codigo": "R7J49A",
-      "descripcion": "HPE Aruba Networking AP-615-RW Dual Radio Tri Band 2x2 Wi-Fi 6E Int Antennas Campus AP",
+      "descripcion": "HPE Aruba Networking AP-615-RW Dual Radio Tri Band 2x2 Wi-Fi",
       "cantidad": 2,
-      "unidad": null,
+      "unidad": "Pieza",
       "precioUnitario": 10036.25,
-      "descuento": 53.75,
+      "descuento": 0,
       "importe": 20072.5
     },
     {
       "linea": 2,
       "codigo": "R3J18A",
-      "descripcion": "HPE Aruba Networking AP-MNT-D Campus AP mount bracket kit (individual) type D: solid surface",
+      "descripcion": "HPE Aruba Networking AP-MNT-D Campus AP mount bracket kit",
       "cantidad": 2,
-      "unidad": null,
+      "unidad": "Pieza",
       "precioUnitario": 452.81,
-      "descuento": 43.75,
+      "descuento": 0,
       "importe": 905.63
     },
     {
@@ -38,9 +27,9 @@
       "codigo": "Q9Y58AAE",
       "descripcion": "HPE Aruba Networking Central AP Foundation 1-year Subscription E-STU",
       "cantidad": 2,
-      "unidad": null,
+      "unidad": "Pieza",
       "precioUnitario": 1596.38,
-      "descuento": 46.25,
+      "descuento": 0,
       "importe": 3192.75
     },
     {
@@ -48,9 +37,9 @@
       "codigo": "Q9Y73AAE",
       "descripcion": "HPE Aruba Networking Central Switch Class-2 Foundation 1-year Subscription E-STU",
       "cantidad": 1,
-      "unidad": null,
+      "unidad": "Pieza",
       "precioUnitario": 3730.25,
-      "descuento": 46.25,
+      "descuento": 0,
       "importe": 3730.25
     },
     {
@@ -58,17 +47,17 @@
       "codigo": "J4858D",
       "descripcion": "HPE Aruba Networking 1G SFP LC SX 500m OM2 MMF Transceiver",
       "cantidad": 4,
-      "unidad": null,
+      "unidad": "Pieza",
       "precioUnitario": 5032.0,
-      "descuento": 53.75,
+      "descuento": 0,
       "importe": 20128.0
     }
   ],
   "totales": {
-    "subtotal": 48029.13,
-    "iva": null,
-    "total": null
+    "subtotal": 48429.13,
+    "iva": 0,
+    "total": 48429.13
   },
   "moneda": "MXN",
-  "condiciones": "Precios + IVA. Precios y existencias sujetos a cambio sin previo Aviso. Debido a temas de corto de material Internacional, las fechas de entrega son aproximadas, confirmar con el PM. En mercancía solicitada a Planta no se aceptan cancelaciones y/o devoluciones. Portenntum de México no es responsable por multas o penalizaciones derivadas del incumplimiento de tiempos de entrega por parte del Fabricante"
+  "condiciones": null
 }

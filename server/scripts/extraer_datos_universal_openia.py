@@ -145,14 +145,12 @@ def procesar_documento_con_openai(texto_completo, nombre_archivo):
         max_retries=2   # Reducido a 2 intentos para mayor velocidad
     )
 
-    # Prompt ultra-optimizado para velocidad
+    # Prompt ultra-optimizado para velocidad (sin proveedor/cliente)
     prompt_consolidado = f"""Extrae datos del documento "{nombre_archivo}" en JSON:
 
 {{
   "folioOriginal": "string",
   "fecha": "YYYY-MM-DD",
-  "proveedor": {{"nombre": "string", "rfc": "string|null", "direccion": "string|null"}},
-  "cliente": {{"nombre": "string", "rfc": "string|null", "direccion": "string|null", "contacto": "string|null"}},
   "productos": [{{
     "linea": number,
     "codigo": "string",

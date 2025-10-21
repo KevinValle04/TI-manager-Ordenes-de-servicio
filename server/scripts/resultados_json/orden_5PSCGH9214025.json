@@ -1,17 +1,6 @@
 {
   "folioOriginal": "5PSCGH9214025",
   "fecha": "2025-07-08",
-  "proveedor": {
-    "nombre": "TISERVICES SOLUTIONS NETWORKS",
-    "rfc": "TSN2307042D7",
-    "direccion": "AV.JEREZ 275-SN COL.EJIDO ZACATECAS C.P:21090 MEXICALI, BAJA CALIFORNIA, MEX"
-  },
-  "cliente": {
-    "nombre": "SYSCOM",
-    "rfc": null,
-    "direccion": null,
-    "contacto": null
-  },
   "productos": [
     {
       "linea": 1,
@@ -46,7 +35,7 @@
     {
       "linea": 4,
       "codigo": "54755501/500",
-      "descripcion": "CARRETE 152M D/CABLE CMR 2/14AWG BLANCO P/APLICACIONES D/VOCEO",
+      "descripcion": "CARRETE 152M D/CABLE CMR 2/14AWG BLANCO",
       "cantidad": 1,
       "unidad": "PIEZA",
       "precioUnitario": 4932.46,
@@ -79,9 +68,9 @@
       "descripcion": "KIT D/4 SOPORTES D/PLAST P/PCB",
       "cantidad": 2,
       "unidad": "PIEZA",
-      "precioUnitario": null,
+      "precioUnitario": 0,
       "descuento": 0,
-      "importe": null
+      "importe": 0
     },
     {
       "linea": 8,
@@ -89,9 +78,9 @@
       "descripcion": "TRANSFORMADOR 16 VCA 40VA",
       "cantidad": 2,
       "unidad": "PIEZA",
-      "precioUnitario": null,
+      "precioUnitario": 0,
       "descuento": 0,
-      "importe": null
+      "importe": 0
     },
     {
       "linea": 9,
@@ -99,9 +88,9 @@
       "descripcion": "GAB. ACERO P/FTE SYSRMTXT / SP4000S",
       "cantidad": 2,
       "unidad": "PIEZA",
-      "precioUnitario": null,
+      "precioUnitario": 0,
       "descuento": 0,
-      "importe": null
+      "importe": 0
     },
     {
       "linea": 10,
@@ -109,9 +98,9 @@
       "descripcion": "BATERIA AGM/VRLA, 12 VCD; 5.5 AH. P/SISTEMAS D/RESPALDO D/ENERGIA EN SISTEMAS DE SEG ELN",
       "cantidad": 2,
       "unidad": "PIEZA",
-      "precioUnitario": null,
+      "precioUnitario": 0,
       "descuento": 0,
-      "importe": null
+      "importe": 0
     },
     {
       "linea": 11,
@@ -119,9 +108,9 @@
       "descripcion": "FUENTE TIPO TARJETA/ SALIDA / REQUIERE TRANSFORMADOR DE ENTRADA",
       "cantidad": 2,
       "unidad": "PIEZA",
-      "precioUnitario": null,
+      "precioUnitario": 0,
       "descuento": 0,
-      "importe": null
+      "importe": 0
     },
     {
       "linea": 12,
@@ -129,9 +118,9 @@
       "descripcion": "PAQUETE DÚO: CABLE ROJO Y NEGRO DE 30 CM CADA UNO, CON TERMINAL F1 EN UN EXTREMO Y PUNTAS LIBRES EN EL OTRO",
       "cantidad": 2,
       "unidad": "PIEZA",
-      "precioUnitario": null,
+      "precioUnitario": 0,
       "descuento": 0,
-      "importe": null
+      "importe": 0
     },
     {
       "linea": 13,
@@ -365,8 +354,8 @@
     },
     {
       "linea": 36,
-      "codigo": "SERVICIO",
-      "descripcion": "ENVIO EMPAQUE Y EMBARQUE",
+      "codigo": "ENVIO",
+      "descripcion": "SERVICIO ENVIO EMPAQUE Y EMBARQUE",
       "cantidad": 2,
       "unidad": "SERVICIO",
       "precioUnitario": 143.18,
