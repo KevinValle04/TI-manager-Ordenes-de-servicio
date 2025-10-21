@@ -3,7 +3,7 @@
 Script Universal para Extracción de TEXTO de Cotizaciones/Órdenes de Compra
 Extrae únicamente el texto plano del PDF sin estructuración JSON.
 
-Uso: python extraer_datos_universal_deepseek_limpio.py <archivo_pdf>
+Uso: python extraer_datos_universal_openia.py <archivo_pdf>
 """
 
 import pdfplumber
@@ -62,7 +62,7 @@ def extraer_texto_pdf(archivo_pdf):
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("❌ ERROR: Se requiere la ruta del archivo PDF como argumento", file=sys.stderr)
-        print("Uso: python extraer_datos_universal_deepseek.py <archivo_pdf>", file=sys.stderr)
+        print("Uso: python extraer_datos_universal_openia.py <archivo_pdf>", file=sys.stderr)
         sys.exit(1)
     
     archivo_pdf = sys.argv[1]

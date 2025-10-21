@@ -65,7 +65,7 @@ def probar_archivo_pdf(ruta_pdf):
         print(f"\n🚀 PROCESANDO: {os.path.basename(ruta_pdf)}")
         
         # Ejecutar el script de extracción
-        script_path = os.path.join(os.path.dirname(__file__), 'extraer_datos_universal_deepseek.py')
+        script_path = os.path.join(os.path.dirname(__file__), 'extraer_datos_universal_openia.py')
         result = subprocess.run(
             [sys.executable, script_path, ruta_pdf],
             capture_output=True,

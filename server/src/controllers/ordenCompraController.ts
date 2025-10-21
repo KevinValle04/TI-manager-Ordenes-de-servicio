@@ -258,14 +258,14 @@ async function ejecutarScriptUniversal(rutaPDF: string): Promise<any> {
         }
       }
 
-      const scriptPath = path.join(__dirname, '../../scripts/extraer_datos_universal_deepseek.py');
+      const scriptPath = path.join(__dirname, '../../scripts/extraer_datos_universal_openia.py');
       const comando = `"${pythonPath}" "${scriptPath}" "${rutaPDF}"`;
       
       console.log('🔧 Ejecutando comando:', comando);
       
       exec(comando, { 
         maxBuffer: 1024 * 1024 * 10, // 10MB buffer
-        timeout: 300000 // 5 minutos timeout
+        timeout: 180000 // 3 minutos timeout (reducido para mayor velocidad)
       }, (error, stdout, stderr) => {
         if (stderr) {
           console.log('📄 Logs del script:', stderr);

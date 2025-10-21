@@ -1,81 +1,126 @@
 {
   "folioOriginal": "45004530",
+  "fecha": "2025-02-28",
+  "proveedor": {
+    "nombre": "TVCenLínea.com",
+    "rfc": null,
+    "direccion": null
+  },
+  "cliente": {
+    "nombre": "Alejandro Hernandez Castillo",
+    "rfc": null,
+    "direccion": "CALLE PRESA FRANCISCO ZARCO, #929, 5 de Julio, 21387, Mexicali, Baja California, México",
+    "contacto": "Tel. 6861209321"
+  },
   "productos": [
     {
-      "cantidad": 1,
+      "linea": 1,
       "codigo": "DSC2480043",
       "descripcion": "DSC NEO RF ALFA - Kit Neo 32 Zonas Inalámbricas Panel HS2032/ / Teclado Alfanumerico HS2LCDRF9N/ Fuente PTC1640U / Gabinete GMX003 #HSDSC",
-      "precioUnitario": 3167.75,
+      "cantidad": 1,
+      "unidad": "pieza",
+      "precioUnitario": 5186.56,
+      "descuento": 0,
       "importe": 3167.75
     },
     {
-      "cantidad": 1,
+      "linea": 2,
       "codigo": "DSC1170007",
       "descripcion": "DSC HS2LCDN - Teclado Cableado LCD Alfanumérico de 32 caracteres admite 128 zonas compatible con NEO",
-      "precioUnitario": 1708.74,
+      "cantidad": 1,
+      "unidad": "pieza",
+      "precioUnitario": 3013.64,
+      "descuento": 0,
       "importe": 1708.74
     },
     {
-      "cantidad": 2,
+      "linea": 3,
       "codigo": "DSC1200004",
       "descripcion": "DSC HSM2108 - Módulo Expansor de 8 Zonas Cableadas compatible con panel NEO, PRO #cer #LosPrincipales #PLANDEBENEFICIOS",
-      "precioUnitario": 631.24,
+      "cantidad": 2,
+      "unidad": "pieza",
+      "precioUnitario": 1113.29,
+      "descuento": 0,
       "importe": 1262.48
     },
     {
-      "cantidad": 5,
+      "linea": 4,
       "codigo": "SEC1180002",
       "descripcion": "Seco-Larm SM433TQW - Contacto magnetico BLANCO de sobreponer 1-1/4\" (31mm) Gap Compatible paneles DSC / RISCO / BOSCH #CER",
-      "precioUnitario": 34.55,
+      "cantidad": 5,
+      "unidad": "pieza",
+      "precioUnitario": 54.85,
+      "descuento": 0,
       "importe": 172.75
     },
     {
-      "cantidad": 2,
+      "linea": 5,
       "codigo": "SEC1180001",
       "descripcion": "Seco-Larm SM226LQ - Contacto metalico para cortina (overhead) Compatible paneles DSC / RISCO / BOSCH",
-      "precioUnitario": 246.25,
+      "cantidad": 2,
+      "unidad": "pieza",
+      "precioUnitario": 390.88,
+      "descuento": 0,
       "importe": 492.5
     },
     {
-      "cantidad": 7,
+      "linea": 6,
       "codigo": "DSC1180008",
       "descripcion": "DSC BV600 - Detector de Movimiento infrarrojo de Doble Elemento PIR cableado Inmune a Mascotas",
-      "precioUnitario": 619.68,
+      "cantidad": 7,
+      "unidad": "pieza",
+      "precioUnitario": 1092.9,
+      "descuento": 0,
       "importe": 4337.76
     },
     {
-      "cantidad": 2,
+      "linea": 7,
       "codigo": "DSC1190016",
       "descripcion": "DSC S30WGPAQTT - Paquete Sirena Exterior 30W con Gabinete GS001 TT001",
-      "precioUnitario": 594.24,
+      "cantidad": 2,
+      "unidad": "pieza",
+      "precioUnitario": 1048.05,
+      "descuento": 0,
       "importe": 1188.48
     },
     {
-      "cantidad": 2,
+      "linea": 8,
       "codigo": "TVN083034",
-      "descripcion": "SAXXON PSU1205D - Fuente de Poder Regulada de 12 Vcc a 5 Amperes/ Ideal para Equipos de Alto Consumo de Corriente/ Para Usos Multiples: Sistemas de CCTV, Acceso, Asistencia, etc/ Certi 5cación UL/",
-      "precioUnitario": 179.07,
+      "descripcion": "SAXXON PSU1205D - Fuente de Poder Regulada de 12 Vcc a 5 Amperes/ Ideal para Equipos de Alto Consumo de Corriente/ Para Usos Multiples: Sistemas de CCTV, Acceso, Asistencia, etc/ Certi(cid:53)cación UL/",
+      "cantidad": 2,
+      "unidad": "pieza",
+      "precioUnitario": 334.4,
+      "descuento": 0,
       "importe": 358.14
     },
     {
-      "cantidad": 5,
+      "linea": 9,
       "codigo": "DSC1190003",
       "descripcion": "DSC SD15W - Sirena Cableada para Interior 12 VCD 15W 2 tonos 85 dB #LosPrincipales",
-      "precioUnitario": 149.14,
+      "cantidad": 5,
+      "unidad": "pieza",
+      "precioUnitario": 263.03,
+      "descuento": 0,
       "importe": 745.7
     },
     {
-      "cantidad": 5,
+      "linea": 10,
       "codigo": "SEC1190001",
       "descripcion": "Seco-Larm SL126QR - Luz Estroboscópica Alámbrica, 6-12VDC, Roja Compatible IHORN / RISCO / DSC / BOSCH",
-      "precioUnitario": 365.72,
+      "cantidad": 5,
+      "unidad": "pieza",
+      "precioUnitario": 580.5,
+      "descuento": 0,
       "importe": 1828.6
     },
     {
-      "cantidad": 4,
+      "linea": 11,
       "codigo": "SXN1570002",
-      "descripcion": "SAXXON OWA4305JF- Cable de alarma de 4 conductores/ CCA/ Calibre 22 AWG/ 305 metros/ Retardante a la  Qama/ Recomendable para control de acceso/ Videoportero/ Audio",
-      "precioUnitario": 865.71,
+      "descripcion": "SAXXON OWA4305JF- Cable de alarma de 4 conductores/ CCA/ Calibre 22 AWG/ 305 metros/ Retardante a la (cid:81)ama/ Recomendable para control de acceso/ Videoportero/ Audio",
+      "cantidad": 4,
+      "unidad": "pieza",
+      "precioUnitario": 1446.47,
+      "descuento": 0,
       "importe": 3462.84
     }
   ],
@@ -83,5 +128,7 @@
     "subtotal": 18725.74,
     "iva": 1498.06,
     "total": 20223.8
-  }
+  },
+  "moneda": "MXN",
+  "condiciones": null
 }
