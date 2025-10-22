@@ -233,12 +233,12 @@ export const getOrdenesByDateRange = async (req: Request, res: Response) => {
   }
 };
 
-// Función para ejecutar el script universal de DeepSeek
+// Función para ejecutar el script universal PARALELO
 async function ejecutarScriptUniversal(rutaPDF: string): Promise<any> {
   return new Promise(async (resolve, reject) => {
     try {
       const tiempoInicioScript = Date.now();
-      console.log('🚀 [TIMING-BACKEND] Iniciando script universal...');
+      console.log('🚀 [TIMING-BACKEND] Iniciando script universal PARALELO...');
       
       // Detectar Python - buscar en el entorno virtual primero
       let pythonPath = '';
@@ -258,14 +258,14 @@ async function ejecutarScriptUniversal(rutaPDF: string): Promise<any> {
         }
       }
 
-      const scriptPath = path.join(__dirname, '../../scripts/extraer_datos_universal_openia.py');
+      const scriptPath = path.join(__dirname, '../../scripts/extraer_datos_universal_openia_paralelo.py');
       const comando = `"${pythonPath}" "${scriptPath}" "${rutaPDF}"`;
       
-      console.log('🔧 Ejecutando comando:', comando);
+      console.log('🔧 Ejecutando comando PARALELO:', comando);
       
       exec(comando, { 
         maxBuffer: 1024 * 1024 * 10, // 10MB buffer
-        timeout: 180000 // 3 minutos timeout (reducido para mayor velocidad)
+        timeout: 240000 // 4 minutos timeout (aumentado para procesamiento paralelo)
       }, (error, stdout, stderr) => {
         if (stderr) {
           console.log('📄 Logs del script:', stderr);
@@ -286,16 +286,23 @@ async function ejecutarScriptUniversal(rutaPDF: string): Promise<any> {
             
             const datosExtraidos = JSON.parse(jsonLimpio);
             
-            // 🕐 TIEMPO TOTAL DEL SCRIPT
+            // 🕐 TIEMPO TOTAL DEL SCRIPT PARALELO
             const tiempoTotalScript = Date.now() - tiempoInicioScript;
-            console.log('⏱️ [TIMING-BACKEND] Script completado en:', tiempoTotalScript, 'ms');
-            console.log('✅ JSON parseado exitosamente');
+            console.log('⏱️ [TIMING-BACKEND] Script PARALELO completado en:', tiempoTotalScript, 'ms');
+            console.log('✅ JSON parseado exitosamente (procesamiento paralelo)');
             console.log('📋 Folio detectado:', datosExtraidos.folioOriginal);
             console.log('📊 Productos encontrados:', datosExtraidos.productos?.length || 0);
             
+            // Mostrar información de procesamiento paralelo si está disponible
+            if (datosExtraidos.procesamiento) {
+              console.log('⚡ Método de procesamiento:', datosExtraidos.procesamiento.metodo);
+              console.log('🧩 Chunks procesados:', datosExtraidos.procesamiento.chunks_procesados);
+              console.log('✅ Chunks exitosos:', datosExtraidos.procesamiento.chunks_exitosos);
+            }
+            
             resolve(datosExtraidos);
           } catch (parseError) {
-            console.error('❌ Error parseando JSON del script universal:', parseError);
+            console.error('❌ Error parseando JSON del script universal PARALELO:', parseError);
             console.error('📄 Stdout recibido:', stdout);
             reject(parseError);
           }
@@ -330,9 +337,9 @@ export const procesarPdf = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'No se proporcionó ningún archivo PDF' });
     }
 
-    console.log('📄 Procesando PDF con script universal:', req.file.originalname);
+    console.log('📄 Procesando PDF con script universal PARALELO:', req.file.originalname);
     
-    // Usar script universal en lugar de scripts específicos
+    // Usar script universal PARALELO en lugar de scripts específicos
     const datosExtraidos = await ejecutarScriptUniversal(req.file.path);
     
     // Mapear 'codigo' a 'clave' para compatibilidad con frontend
@@ -364,7 +371,7 @@ export const procesarPdf = async (req: Request, res: Response) => {
     }
     
     res.status(500).json({ 
-      error: 'Error procesando PDF con script universal', 
+      error: 'Error procesando PDF con script universal PARALELO', 
       details: error.message 
     });
   }
@@ -418,7 +425,7 @@ export const crearOrdenDesdePdf = async (req: Request, res: Response) => {
     const rutaArchivo = req.file.path;
     
     try {
-      // 1. Procesar con script universal
+      // 1. Procesar con script universal PARALELO
       const datosExtraidos = await ejecutarScriptUniversal(rutaArchivo);
       
       // Mapear 'codigo' a 'clave' para compatibilidad con frontend

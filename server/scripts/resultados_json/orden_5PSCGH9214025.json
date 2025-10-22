@@ -1,6 +1,6 @@
 {
   "folioOriginal": "5PSCGH9214025",
-  "fecha": "2025-07-08",
+  "fecha": "08/07/2025 14:05:47",
   "productos": [
     {
       "linea": 1,
@@ -45,7 +45,7 @@
     {
       "linea": 5,
       "codigo": "DSK1T342MFWX",
-      "descripcion": "TERMINAL DE RECONOCIMIENTO FACIAL / E1 PANTALLA TACTIL 4.3 INCHES / 2 MP / 1500 ROSTROS / 3000 TARJETAS MIFARE",
+      "descripcion": "TERMINAL DE RECONOCIMIENTO FACIAL / PANTALLA TACTIL 4.3 INCHES / 2 MP / 1500 ROSTROS / 3000 TARJETAS MIFARE",
       "cantidad": 2,
       "unidad": "PIEZA",
       "precioUnitario": 4671.54,
@@ -105,7 +105,7 @@
     {
       "linea": 11,
       "codigo": "PLB3",
-      "descripcion": "6 O 12 O 24 VCC @ 4 A / FUENTE TIPO TARJETA/ SALIDA / REQUIERE TRANSFORMADOR DE ENTRADA",
+      "descripcion": "6 O 12 O 24 VCC @ 4 A / FUENTE TIPO TARJETA/ REQUIERE TRANSFORMADOR DE ENTRADA",
       "cantidad": 2,
       "unidad": "PIEZA",
       "precioUnitario": 0,
@@ -175,7 +175,7 @@
     {
       "linea": 18,
       "codigo": "DS1280ZJS",
-      "descripcion": "CAJA DE CONEXIONES PARA DIFERENTES TIPO DE CAMARAS",
+      "descripcion": "CAJA DE CONEXIONES PARA DIFERENTES TIPO",
       "cantidad": 8,
       "unidad": "PIEZA",
       "precioUnitario": 543.11,
@@ -195,7 +195,7 @@
     {
       "linea": 20,
       "codigo": "DS2CD2063G2LI2",
-      "descripcion": "BALA IP 6 MP / LENTE 2.8 MM / ACUSENSE / 2 MIC INTEGRADO / DUAL LIGHT (40 MTS IR EXIR + 40 MTS LUZ BLANCA) / POE / IP67",
+      "descripcion": "BALA IP 6 MP / LENTE 2.8 MM / ACUSENSE / 2 MIC U INTEGRADO / DUAL LIGHT (40 MTS IR EXIR + 40 MTS LUZ BLANCA) / POE / IP67",
       "cantidad": 8,
       "unidad": "PIEZA",
       "precioUnitario": 3277.67,
@@ -225,7 +225,7 @@
     {
       "linea": 23,
       "codigo": "DS2SE4C415MW",
-      "descripcion": "PTZ IP 4 MP / 15X ZOOM / 100 MTS IR C/ CAMARA FIJA 4 MP / LENTE 2.8 MM / 30 MTS LUZ BLANCA / IP66",
+      "descripcion": "PTZ IP 4 MP / 15X ZOOM / 100 MTS IR C/ CAMARA GE(14F0) FIJA 4 MP / LENTE 2.8 MM / 30 MTS LUZ BLANCA / IP66",
       "cantidad": 2,
       "unidad": "PIEZA",
       "precioUnitario": 15533.82,
@@ -235,7 +235,7 @@
     {
       "linea": 24,
       "codigo": "TT223KVM",
-      "descripcion": "KIT EXTENSOR KVM HDMI A 70M 1080, 40M 40K",
+      "descripcion": "KIT EXTENSOR KVM HDMI A 70M 1080, 40M 40K C/CAT6 (TECLADO VIDEO MOUSE)",
       "cantidad": 1,
       "unidad": "PIEZA",
       "precioUnitario": 2278.8,
@@ -265,7 +265,7 @@
     {
       "linea": 27,
       "codigo": "SB10",
-      "descripcion": "CAJA D/MONTAJE P/ESTACION MANUAL D/EMERGENCIA BG-12LX Y BG-12L",
+      "descripcion": "CAJA D/MONTAJE P/ESTACION MANUAL JRZ D/EMERGENCIA BG-12LX Y BG-12L",
       "cantidad": 4,
       "unidad": "PIEZA",
       "precioUnitario": 503.61,
@@ -354,20 +354,27 @@
     },
     {
       "linea": 36,
-      "codigo": "SERVICIO",
-      "descripcion": "ENVIO EMPAQUE Y EMBARQUE",
+      "codigo": "MTYC",
+      "descripcion": "SERVICIO ENVIO EMPAQUE Y EMBARQUE",
       "cantidad": 2,
-      "unidad": "SERVICIO",
+      "unidad": "servicio",
       "precioUnitario": 143.18,
       "descuento": 0,
       "importe": 183.26
     }
   ],
   "totales": {
-    "subtotal": 282401.41,
-    "iva": 22592.11,
-    "total": 304993.52
+    "subtotal": 280356.93,
+    "iva": 44857.11,
+    "total": 325214.04
   },
   "moneda": "MXN",
-  "condiciones": null
+  "condiciones": null,
+  "procesamiento": {
+    "metodo": "paralelo_chunks",
+    "chunks_procesados": 3,
+    "chunks_exitosos": 3,
+    "productos_totales": 36,
+    "codigos_potencialmente_perdidos": 383
+  }
 }
