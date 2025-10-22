@@ -1,15 +1,14 @@
 {
   "folioOriginal": "5PSCGH9214025",
-  "fecha": "08/07/2025 14:05:47",
+  "fecha": "2025-07-08",
   "productos": [
     {
       "linea": 1,
       "codigo": "E45RUBKIT",
-      "descripcion": "RACK/RUNWAY KIT 45RU BLK 54IN MTYC",
+      "descripcion": "RACK/RUNWAY KIT 45RU BLK 54IN",
       "cantidad": 1,
       "unidad": "PIEZA",
-      "precioUnitario": 5303.9,
-      "descuento": 0,
+      "precioUnitario": 2766.9,
       "importe": 2766.9
     },
     {
@@ -18,8 +17,7 @@
       "descripcion": "AMPLIFICADOR MEZCLADOR CLASE D, 350 W, CON MULTIMEDIA, 1 ENTRADA EMC, 2 ENTRADAS AUX, 4 ENTRADAS MIC (BALANCEADAS)",
       "cantidad": 1,
       "unidad": "PIEZA",
-      "precioUnitario": 14090.58,
-      "descuento": 0,
+      "precioUnitario": 7742.56,
       "importe": 7742.56
     },
     {
@@ -28,28 +26,25 @@
       "descripcion": "ALTAVOZ DE PARED INTERIOR 5.25'' 50W COLOR BLANCO",
       "cantidad": 6,
       "unidad": "PIEZA",
-      "precioUnitario": 4681.03,
-      "descuento": 0,
+      "precioUnitario": 2696.27,
       "importe": 16177.62
     },
     {
       "linea": 4,
       "codigo": "54755501/500",
-      "descripcion": "CARRETE 152M D/CABLE CMR 2/14AWG BLANCO",
+      "descripcion": "CARRETE 152M D/CABLE CMR 2/14AWG BLANCO P/APLICACIONES D/VOCEO",
       "cantidad": 1,
       "unidad": "PIEZA",
-      "precioUnitario": 4932.46,
-      "descuento": 0,
+      "precioUnitario": 3048.58,
       "importe": 3048.58
     },
     {
       "linea": 5,
-      "codigo": "DSK1T342MFWX",
+      "codigo": "DSK1T342MFWXE1",
       "descripcion": "TERMINAL DE RECONOCIMIENTO FACIAL / PANTALLA TACTIL 4.3 INCHES / 2 MP / 1500 ROSTROS / 3000 TARJETAS MIFARE",
       "cantidad": 2,
       "unidad": "PIEZA",
-      "precioUnitario": 4671.54,
-      "descuento": 0,
+      "precioUnitario": 2522.62,
       "importe": 5045.24
     },
     {
@@ -58,8 +53,7 @@
       "descripcion": "KIT D/FTE D/ALIMENT. (PLB3) C/TRANSF. RT1640 / BAT D/RESPALDO LK5.512 Y GABINETE",
       "cantidad": 2,
       "unidad": "KIT",
-      "precioUnitario": 1487.29,
-      "descuento": 0,
+      "precioUnitario": 572.34,
       "importe": 1144.68
     },
     {
@@ -69,7 +63,6 @@
       "cantidad": 2,
       "unidad": "PIEZA",
       "precioUnitario": 0,
-      "descuento": 0,
       "importe": 0
     },
     {
@@ -79,7 +72,6 @@
       "cantidad": 2,
       "unidad": "PIEZA",
       "precioUnitario": 0,
-      "descuento": 0,
       "importe": 0
     },
     {
@@ -89,7 +81,6 @@
       "cantidad": 2,
       "unidad": "PIEZA",
       "precioUnitario": 0,
-      "descuento": 0,
       "importe": 0
     },
     {
@@ -99,17 +90,15 @@
       "cantidad": 2,
       "unidad": "PIEZA",
       "precioUnitario": 0,
-      "descuento": 0,
       "importe": 0
     },
     {
       "linea": 11,
       "codigo": "PLB3",
-      "descripcion": "6 O 12 O 24 VCC @ 4 A / FUENTE TIPO TARJETA/ REQUIERE TRANSFORMADOR DE ENTRADA",
+      "descripcion": "6 O 12 O 24 VCC @ 4 A / FUENTE TIPO TARJETA/ 1 SALIDA / REQUIERE TRANSFORMADOR DE ENTRADA",
       "cantidad": 2,
       "unidad": "PIEZA",
       "precioUnitario": 0,
-      "descuento": 0,
       "importe": 0
     },
     {
@@ -119,7 +108,6 @@
       "cantidad": 2,
       "unidad": "PIEZA",
       "precioUnitario": 0,
-      "descuento": 0,
       "importe": 0
     },
     {
@@ -128,8 +116,7 @@
       "descripcion": "BOTON D/SALIDA SIN CONTACTO",
       "cantidad": 2,
       "unidad": "PIEZA",
-      "precioUnitario": 207.56,
-      "descuento": 0,
+      "precioUnitario": 114.95,
       "importe": 229.9
     },
     {
@@ -138,8 +125,7 @@
       "descripcion": "NVR 8K / 64 CANALES / SOP. 8 HDD (NO INC) / H.265+ / RAID",
       "cantidad": 1,
       "unidad": "PIEZA",
-      "precioUnitario": 57748.59,
-      "descuento": 0,
+      "precioUnitario": 31184.23,
       "importe": 31184.23
     },
     {
@@ -148,8 +134,7 @@
       "descripcion": "SWITCH POE 48 PUERTOS POE 2 PUERTO UPLINK 2 PUERTOS SFP 300 METROS MODO EXTENDIDO",
       "cantidad": 1,
       "unidad": "PIEZA",
-      "precioUnitario": 17012.19,
-      "descuento": 0,
+      "precioUnitario": 10106.92,
       "importe": 10106.92
     },
     {
@@ -158,8 +143,7 @@
       "descripcion": "TURRET IP 6 MP / LENTE 2.8 MM / ACUSENSE / 2 MIC INTEGRADO / DUAL LIGHT (30 MTS IR EXIR + 30 MTS LUZ BLANCA) / POE / IP67",
       "cantidad": 44,
       "unidad": "PIEZA",
-      "precioUnitario": 3114.36,
-      "descuento": 0,
+      "precioUnitario": 1918.44,
       "importe": 84411.36
     },
     {
@@ -168,18 +152,16 @@
       "descripcion": "CAMARA IP DUAL / TERMICA 1.8 MM (160 X 120) / OPTICA 2 MM (2688 X 1520) / 15 MTS IR / MEDICION DE TEMPERATURA / IP67",
       "cantidad": 2,
       "unidad": "PIEZA",
-      "precioUnitario": 10596.42,
-      "descuento": 0,
+      "precioUnitario": 5521.53,
       "importe": 11043.06
     },
     {
       "linea": 18,
       "codigo": "DS1280ZJS",
-      "descripcion": "CAJA DE CONEXIONES PARA DIFERENTES TIPO",
+      "descripcion": "CAJA DE CONEXIONES PARA DIFERENTES TIPO DE CAMARAS",
       "cantidad": 8,
       "unidad": "PIEZA",
-      "precioUnitario": 543.11,
-      "descuento": 0,
+      "precioUnitario": 255.56,
       "importe": 2044.48
     },
     {
@@ -188,193 +170,176 @@
       "descripcion": "MONTAJE D/PARED P/CMRA TURRET",
       "cantidad": 20,
       "unidad": "PIEZA",
-      "precioUnitario": 568.75,
-      "descuento": 0,
+      "precioUnitario": 281.08,
       "importe": 5621.6
     },
     {
       "linea": 20,
       "codigo": "DS2CD2063G2LI2",
-      "descripcion": "BALA IP 6 MP / LENTE 2.8 MM / ACUSENSE / 2 MIC U INTEGRADO / DUAL LIGHT (40 MTS IR EXIR + 40 MTS LUZ BLANCA) / POE / IP67",
+      "descripcion": "BALA IP 6 MP / LENTE 2.8 MM / ACUSENSE / 2 MIC INTEGRADO / DUAL LIGHT (40 MTS IR EXIR + 40 MTS LUZ BLANCA) / POE / IP67",
       "cantidad": 8,
       "unidad": "PIEZA",
-      "precioUnitario": 3277.67,
-      "descuento": 0,
+      "precioUnitario": 1938.22,
       "importe": 15505.76
     },
     {
       "linea": 21,
+      "codigo": "DS1280ZJS",
+      "descripcion": "CAJA DE CONEXIONES PARA DIFERENTES TIPO DE CAMARAS",
+      "cantidad": 8,
+      "unidad": "PIEZA",
+      "precioUnitario": 255.56,
+      "importe": 2044.48
+    },
+    {
+      "linea": 22,
       "codigo": "DS3E1518PSI",
       "descripcion": "SWITCH POE+ ADMINISTRABLE / 16 PUERTOS POE+ 10/100/1000 MBPS / 2 PUERTOS SFP / MODO EXTENDIDO",
       "cantidad": 1,
       "unidad": "PIEZA",
-      "precioUnitario": 8621.46,
-      "descuento": 0,
+      "precioUnitario": 4553.61,
       "importe": 4553.61
     },
     {
-      "linea": 22,
-      "codigo": "HKSFP1.25G1310",
-      "descripcion": "TRANCEPTOR SFP MULTIMODO / HASTA 1 KM",
+      "linea": 23,
+      "codigo": "HKSFP1.25G1310DFMM",
+      "descripcion": "TRANCEPTOR SFP MULTIMODO / HASTA 1 KM / 1.25 G.",
       "cantidad": 6,
       "unidad": "PIEZA",
-      "precioUnitario": 511.4,
-      "descuento": 0,
+      "precioUnitario": 306.84,
       "importe": 1841.04
     },
     {
-      "linea": 23,
-      "codigo": "DS2SE4C415MW",
-      "descripcion": "PTZ IP 4 MP / 15X ZOOM / 100 MTS IR C/ CAMARA GE(14F0) FIJA 4 MP / LENTE 2.8 MM / 30 MTS LUZ BLANCA / IP66",
+      "linea": 24,
+      "codigo": "DS2SE4C415MWGE(14F0)",
+      "descripcion": "PTZ IP 4 MP / 15X ZOOM / 100 MTS IR C/ CAMARA FIJA 4 MP / LENTE 2.8 MM / 30 MTS LUZ BLANCA / IP66",
       "cantidad": 2,
       "unidad": "PIEZA",
-      "precioUnitario": 15533.82,
-      "descuento": 0,
+      "precioUnitario": 7626.34,
       "importe": 15252.68
     },
     {
-      "linea": 24,
+      "linea": 25,
       "codigo": "TT223KVM",
-      "descripcion": "KIT EXTENSOR KVM HDMI A 70M 1080, 40M 40K C/CAT6 (TECLADO VIDEO MOUSE)",
+      "descripcion": "KIT EXTENSOR KVM HDMI A 70M 1080, 40M 40K C/CAT6 ( TECLADO VIDEO MOUSE )",
       "cantidad": 1,
       "unidad": "PIEZA",
-      "precioUnitario": 2278.8,
-      "descuento": 0,
+      "precioUnitario": 1236.7,
       "importe": 1236.7
     },
     {
-      "linea": 25,
+      "linea": 26,
       "codigo": "ES50X",
       "descripcion": "PANEL DIRECCIONABLE D/DETECCION D/INCENDIO D/50 PUNTOS C/COMUNICADOR PREINSTALADO",
       "cantidad": 1,
       "unidad": "PIEZA",
-      "precioUnitario": 22326.54,
-      "descuento": 0,
+      "precioUnitario": 13029.74,
       "importe": 13029.74
     },
     {
-      "linea": 26,
+      "linea": 27,
       "codigo": "BG12LXSP",
       "descripcion": "ESTACION D/JALON DIRECCIONABLE",
       "cantidad": 4,
       "unidad": "PIEZA",
-      "precioUnitario": 2023.76,
-      "descuento": 0,
+      "precioUnitario": 1224.83,
       "importe": 4899.32
     },
     {
-      "linea": 27,
+      "linea": 28,
       "codigo": "SB10",
-      "descripcion": "CAJA D/MONTAJE P/ESTACION MANUAL JRZ D/EMERGENCIA BG-12LX Y BG-12L",
+      "descripcion": "CAJA D/MONTAJE P/ESTACION MANUAL D/EMERGENCIA BG-12LX Y BG-12L",
       "cantidad": 4,
       "unidad": "PIEZA",
-      "precioUnitario": 503.61,
-      "descuento": 0,
+      "precioUnitario": 296.41,
       "importe": 1185.64
     },
     {
-      "linea": 28,
+      "linea": 29,
       "codigo": "SBBRL",
       "descripcion": "CAJA D/MONT EN PARED P/SIRENA CLR ROJO",
       "cantidad": 4,
       "unidad": "PIEZA",
-      "precioUnitario": 520.32,
-      "descuento": 0,
+      "precioUnitario": 306.36,
       "importe": 1225.44
     },
     {
-      "linea": 29,
+      "linea": 30,
       "codigo": "P2RLEDSP",
       "descripcion": "SIRENA C/LAMP LED ESTROBOSCOPICA A 2HILOS MONT EN PARED CLR ROJO C/CONFIG ESTROBOSCOPICA SELECCIONABLE",
       "cantidad": 4,
       "unidad": "PIEZA",
-      "precioUnitario": 1355.69,
-      "descuento": 0,
+      "precioUnitario": 808.38,
       "importe": 3233.52
     },
     {
-      "linea": 30,
+      "linea": 31,
       "codigo": "PS12180F2",
       "descripcion": "BATERIA 12V, 18AH, P/RESPALDO, TECNOLOGIAS AGM/VRLA, VIDA UTIL D/DISEÑO 5 AÑOS, TERMINALES TIPO F2, LISTADA UL",
       "cantidad": 2,
       "unidad": "PIEZA",
-      "precioUnitario": 1443.24,
-      "descuento": 0,
+      "precioUnitario": 829.02,
       "importe": 1658.04
     },
     {
-      "linea": 31,
+      "linea": 32,
       "codigo": "MAG600NLED",
       "descripcion": "CHAPA MAGNET. 600LBS LED ULTRABRILLANTE",
       "cantidad": 2,
       "unidad": "PIEZA",
-      "precioUnitario": 927.09,
-      "descuento": 0,
+      "precioUnitario": 534.75,
       "importe": 1069.5
     },
     {
-      "linea": 32,
+      "linea": 33,
       "codigo": "BZL600N",
       "descripcion": "MONTAJE Z Y L PARA CHAPA MAGNÉTICA MAG600NLED",
       "cantidad": 2,
       "unidad": "PIEZA",
-      "precioUnitario": 417.4,
-      "descuento": 0,
+      "precioUnitario": 236.74,
       "importe": 473.48
     },
     {
-      "linea": 33,
+      "linea": 34,
       "codigo": "SD365",
       "descripcion": "DETECTOR FOTOELECTRICO DIRECCIONABLE D/HUMO P/USO C/PANELES DIRECCIONABLES FIRE-LITE COLOR BLANCO",
       "cantidad": 26,
       "unidad": "PIEZA",
-      "precioUnitario": 1731.31,
-      "descuento": 0,
+      "precioUnitario": 1010.68,
       "importe": 26277.68
     },
     {
-      "linea": 34,
+      "linea": 35,
       "codigo": "SD365T",
       "descripcion": "DETECTOR D/ HUMO FOTOELECTRICO Y TEMPERATURA DIRECCIONABLE P/USO C/PANELES DIRECCIONABLES FIRELITE",
       "cantidad": 1,
       "unidad": "PIEZA",
-      "precioUnitario": 2723.16,
-      "descuento": 0,
+      "precioUnitario": 1664.67,
       "importe": 1664.67
     },
     {
-      "linea": 35,
+      "linea": 36,
       "codigo": "44025504",
       "descripcion": "BOBINA D/152M 2 X 18 AWG BLINDADO RISER FPLR",
       "cantidad": 4,
       "unidad": "BOBINA",
-      "precioUnitario": 2753.55,
-      "descuento": 0,
+      "precioUnitario": 1624.93,
       "importe": 6499.72
     },
     {
-      "linea": 36,
-      "codigo": "MTYC",
-      "descripcion": "SERVICIO ENVIO EMPAQUE Y EMBARQUE",
+      "linea": 37,
+      "codigo": "ENVIO",
+      "descripcion": "EMPAQUE Y EMBARQUE",
       "cantidad": 2,
-      "unidad": "servicio",
-      "precioUnitario": 143.18,
-      "descuento": 0,
+      "unidad": "SERVICIO",
+      "precioUnitario": 91.63,
       "importe": 183.26
     }
   ],
   "totales": {
-    "subtotal": 280356.93,
-    "iva": 44857.11,
-    "total": 325214.04
+    "subtotal": 282401.41,
+    "iva": 22592.11,
+    "total": 304993.52
   },
-  "moneda": "MXN",
-  "condiciones": null,
-  "procesamiento": {
-    "metodo": "paralelo_chunks",
-    "chunks_procesados": 3,
-    "chunks_exitosos": 3,
-    "productos_totales": 36,
-    "codigos_potencialmente_perdidos": 383
-  }
+  "moneda": "MXN"
 }

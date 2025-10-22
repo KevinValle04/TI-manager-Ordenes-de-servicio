@@ -233,12 +233,12 @@ export const getOrdenesByDateRange = async (req: Request, res: Response) => {
   }
 };
 
-// Función para ejecutar el script universal PARALELO
+// Función para ejecutar el script universal
 async function ejecutarScriptUniversal(rutaPDF: string): Promise<any> {
   return new Promise(async (resolve, reject) => {
     try {
       const tiempoInicioScript = Date.now();
-      console.log('🚀 [TIMING-BACKEND] Iniciando script universal PARALELO...');
+      console.log('🚀 [TIMING-BACKEND] Iniciando script universal...');
       
       // Detectar Python - buscar en el entorno virtual primero
       let pythonPath = '';
@@ -258,14 +258,14 @@ async function ejecutarScriptUniversal(rutaPDF: string): Promise<any> {
         }
       }
 
-      const scriptPath = path.join(__dirname, '../../scripts/extraer_datos_universal_openia_paralelo.py');
+      const scriptPath = path.join(__dirname, '../../scripts/extraer_datos_universal_openia.py');
       const comando = `"${pythonPath}" "${scriptPath}" "${rutaPDF}"`;
       
-      console.log('🔧 Ejecutando comando PARALELO:', comando);
+      console.log('🔧 Ejecutando comando:', comando);
       
       exec(comando, { 
         maxBuffer: 1024 * 1024 * 10, // 10MB buffer
-        timeout: 240000 // 4 minutos timeout (aumentado para procesamiento paralelo)
+        timeout: 120000 // 2 minutos timeout
       }, (error, stdout, stderr) => {
         if (stderr) {
           console.log('📄 Logs del script:', stderr);
@@ -288,17 +288,10 @@ async function ejecutarScriptUniversal(rutaPDF: string): Promise<any> {
             
             // 🕐 TIEMPO TOTAL DEL SCRIPT PARALELO
             const tiempoTotalScript = Date.now() - tiempoInicioScript;
-            console.log('⏱️ [TIMING-BACKEND] Script PARALELO completado en:', tiempoTotalScript, 'ms');
-            console.log('✅ JSON parseado exitosamente (procesamiento paralelo)');
+            console.log('⏱️ [TIMING-BACKEND] Script completado en:', tiempoTotalScript, 'ms');
+            console.log('✅ JSON parseado exitosamente');
             console.log('📋 Folio detectado:', datosExtraidos.folioOriginal);
             console.log('📊 Productos encontrados:', datosExtraidos.productos?.length || 0);
-            
-            // Mostrar información de procesamiento paralelo si está disponible
-            if (datosExtraidos.procesamiento) {
-              console.log('⚡ Método de procesamiento:', datosExtraidos.procesamiento.metodo);
-              console.log('🧩 Chunks procesados:', datosExtraidos.procesamiento.chunks_procesados);
-              console.log('✅ Chunks exitosos:', datosExtraidos.procesamiento.chunks_exitosos);
-            }
             
             resolve(datosExtraidos);
           } catch (parseError) {
@@ -337,7 +330,7 @@ export const procesarPdf = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'No se proporcionó ningún archivo PDF' });
     }
 
-    console.log('📄 Procesando PDF con script universal PARALELO:', req.file.originalname);
+    console.log('📄 Procesando PDF con script universal:', req.file.originalname);
     
     // Usar script universal PARALELO en lugar de scripts específicos
     const datosExtraidos = await ejecutarScriptUniversal(req.file.path);
@@ -371,7 +364,7 @@ export const procesarPdf = async (req: Request, res: Response) => {
     }
     
     res.status(500).json({ 
-      error: 'Error procesando PDF con script universal PARALELO', 
+      error: 'Error procesando PDF con script universal', 
       details: error.message 
     });
   }

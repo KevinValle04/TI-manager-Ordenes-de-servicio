@@ -35,7 +35,7 @@ const inventarioInicial = [
         modelo: "APBSEMC",
         descripcion: "Botón de Paro de Emergencia / Salida de Emergencia en Color Rojo / Tipo enclavado",
         proveedor: "SYSCOM",
-        unidad: "PZA",
+        unidad: "PZA",  
         precioUnitario: 119.34,
         cantidad: 4,
         numerosSerie: [],
