@@ -8,7 +8,9 @@ import {
     Form,
     ListGroup,
     Modal,
-    Row
+    Row,
+    Toast,
+    ToastContainer
 } from "react-bootstrap";
 import { Proveedor, RazonSocial } from "../../types";
 import ModalResultados from "./ModalResultados";
@@ -22,6 +24,11 @@ interface OrdenCompraFormProps {
 }
 
 const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId, onOrdenCreada }) => {
+  // Estados para notificaciones
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastVariant, setToastVariant] = useState<'success' | 'danger' | 'warning'>('warning');
+
   // Estados del formulario
   const [numeroOrden, setNumeroOrden] = useState("");
   
@@ -462,9 +469,26 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
       
       setMostrarModalResultados(true);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al procesar orden:', error);
-      setErrorProcesamiento(error instanceof Error ? error.message : 'Error desconocido al procesar la orden');
+      
+      // Mejorado el manejo de errores para PDF escaneado
+      if (error.response?.data?.type === 'PDF_ESCANEADO' || (error.message && error.message.includes('PDF escaneado'))) {
+        const mensaje = error.response?.data?.message || 
+                       'El archivo parece ser un PDF escaneado. Por favor, sube un PDF que contenga texto digital.';
+        console.log('Detectado PDF escaneado, mostrando mensaje:', mensaje);
+        setErrorProcesamiento(mensaje);
+        // Limpiar el campo de archivo
+        if (document.querySelector('input[type="file"]')) {
+          (document.querySelector('input[type="file"]') as HTMLInputElement).value = '';
+        }
+        setArchivoPdf(null);
+      }
+      
+      setErrorProcesamiento(
+        error.response?.data?.message || 
+        (error.message || 'Error desconocido al procesar la orden')
+      );
     } finally {
       setProcesando(false);
     }
@@ -514,9 +538,33 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
       });
 
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al procesar PDF:', error);
-      throw new Error('Error al procesar el archivo PDF. Verifique que el archivo sea válido.');
+      // Verificar si el error viene directamente del backend
+      if (error.response?.data?.type === 'PDF_ESCANEADO') {
+        const errorData = {
+          response: {
+            data: {
+              type: 'PDF_ESCANEADO',
+              message: error.response.data.message || 'El archivo parece ser un PDF escaneado. Por favor, sube un PDF que contenga texto digital.'
+            }
+          }
+        };
+        throw errorData;
+      }
+      // Verificar si el mensaje de error contiene la palabra clave
+      if (error.message && error.message.includes('PDF escaneado')) {
+        const errorData = {
+          response: {
+            data: {
+              type: 'PDF_ESCANEADO',
+              message: 'El archivo parece ser un PDF escaneado. Por favor, sube un PDF que contenga texto digital.'
+            }
+          }
+        };
+        throw errorData;
+      }
+      throw new Error(error.response?.data?.message || 'Error al procesar el archivo PDF. Verifique que el archivo sea válido.');
     }
   };
 
@@ -840,9 +888,15 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
       onHide();
       resetearFormulario();
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al crear orden desde PDF:', error);
-      setErrorProcesamiento(error instanceof Error ? error.message : 'Error desconocido al crear la orden');
+      // Si es un error de PDF escaneado, mostrar alerta
+      if (error.response?.data?.type === 'PDF_ESCANEADO') {
+        setToastMessage(error.response.data.message);
+        setToastVariant('warning');
+        setShowToast(true);
+      }
+      setErrorProcesamiento(error.response?.data?.message || (error instanceof Error ? error.message : 'Error desconocido al crear la orden'));
     } finally {
       setProcesando(false);
     }
@@ -1060,6 +1114,12 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
                 <Form.Text className="text-muted">
                   Solo se permiten archivos PDF. Tamaño máximo: 10MB
                 </Form.Text>
+                {errorProcesamiento && errorProcesamiento.includes('PDF escaneado') && (
+                  <div className="text-danger mt-2">
+                    <i className="fas fa-exclamation-circle me-1"></i>
+                    El archivo parece ser un PDF escaneado. Por favor, sube un PDF que contenga texto digital.
+                  </div>
+                )}
               </Form.Group>
 
               {archivoPdf && (
@@ -1136,6 +1196,27 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
         editId={editId}
         onCancelar={cancelarProcesamiento}
       />
+
+      {/* Toast de notificaciones */}
+      <ToastContainer position="top-end" className="p-3" style={{ zIndex: 9999, position: 'fixed', top: 20, right: 20 }}>
+        <Toast 
+          show={showToast} 
+          onClose={() => setShowToast(false)}
+          delay={3000}
+          autohide
+          bg={toastVariant}
+        >
+          <Toast.Header closeButton={false}>
+            <strong className="me-auto">
+              {toastVariant === 'warning' && <i className="fas fa-exclamation-triangle me-2"></i>}
+              Aviso
+            </strong>
+          </Toast.Header>
+          <Toast.Body className={toastVariant === 'warning' ? 'text-dark' : 'text-white'}>
+            {toastMessage}
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
     </>
   );
 };

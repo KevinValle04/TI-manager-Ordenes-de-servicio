@@ -362,6 +362,15 @@ export const procesarPdf = async (req: Request, res: Response) => {
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
+
+    // Verificar si es un error de PDF escaneado
+    if (error.message && error.message.includes('PDF_ESCANEADO')) {
+      return res.status(400).json({
+        error: 'PDF Escaneado',
+        message: 'El archivo parece ser un PDF escaneado (imagen). Por favor, sube un PDF que contenga texto real y no imágenes escaneadas.',
+        type: 'PDF_ESCANEADO'
+      });
+    }
     
     res.status(500).json({ 
       error: 'Error procesando PDF con script universal', 
