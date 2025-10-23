@@ -363,7 +363,8 @@ if __name__ == "__main__":
         except json.JSONDecodeError:
             print("⚠️ El resultado final no es un JSON válido.", file=sys.stderr)
 
-        guardar_json_resultado(json_resultado, folio_extraido, os.path.basename(archivo_pdf))
+        # 🔧 DEBUG: Descomentar la siguiente línea para guardar JSON físico para debugging
+        # guardar_json_resultado(json_resultado, folio_extraido, os.path.basename(archivo_pdf))
     
     except Exception as e:
         error_message = f"❌ ERROR CRÍTICO: {str(e)}"
