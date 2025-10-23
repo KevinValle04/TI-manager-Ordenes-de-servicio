@@ -23,4 +23,8 @@ yarn-error.log*
 # Dependencias de Vite
 .vite/
 
+# Scripts de extracción - archivos temporales y cache
+scripts/cache/
+scripts/resultados_json/
+
 orden-compra-visualizacion.png

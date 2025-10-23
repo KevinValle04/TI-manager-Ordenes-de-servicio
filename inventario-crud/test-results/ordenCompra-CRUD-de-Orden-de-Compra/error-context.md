@@ -1,0 +1,163 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - region "Notifications Alt+T"
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - img [ref=e8]
+          - generic [ref=e10]: oleal
+        - button "Configuración de usuario" [ref=e11] [cursor=pointer]:
+          - img [ref=e12] [cursor=pointer]
+      - heading "Menú" [level=4] [ref=e14]
+      - list [ref=e15]:
+        - listitem [ref=e16]:
+          - link "Dashboard" [ref=e17] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e18] [cursor=pointer]
+            - generic [ref=e20] [cursor=pointer]: Dashboard
+        - listitem [ref=e21]:
+          - link "Colaboradores" [ref=e22] [cursor=pointer]:
+            - /url: /colaboradores
+            - img [ref=e23] [cursor=pointer]
+            - generic [ref=e25] [cursor=pointer]: Colaboradores
+        - listitem [ref=e26]:
+          - link "Guías" [ref=e27] [cursor=pointer]:
+            - /url: /guias
+            - img [ref=e28] [cursor=pointer]
+            - generic [ref=e30] [cursor=pointer]: Guías
+        - listitem [ref=e31]:
+          - button "Proyectos ▼" [ref=e33] [cursor=pointer]:
+            - generic [ref=e34] [cursor=pointer]:
+              - img [ref=e35] [cursor=pointer]
+              - generic [ref=e37] [cursor=pointer]: Proyectos
+            - generic [ref=e38] [cursor=pointer]: ▼
+        - listitem [ref=e39]:
+          - button "Inventario ▼" [ref=e41] [cursor=pointer]:
+            - generic [ref=e42] [cursor=pointer]:
+              - img [ref=e43] [cursor=pointer]
+              - generic [ref=e45] [cursor=pointer]: Inventario
+            - generic [ref=e46] [cursor=pointer]: ▼
+        - listitem [ref=e47]:
+          - button "Bases de Datos ▼" [ref=e49] [cursor=pointer]:
+            - generic [ref=e50] [cursor=pointer]:
+              - img [ref=e51] [cursor=pointer]
+              - generic [ref=e53] [cursor=pointer]: Bases de Datos
+            - generic [ref=e54] [cursor=pointer]: ▼
+      - button "Cerrar sesión" [ref=e56] [cursor=pointer]
+    - main [ref=e57]:
+      - generic [ref=e60]:
+        - heading "Órdenes de Compra" [level=2] [ref=e61]
+        - generic [ref=e62]:
+          - generic [ref=e63]:
+            - textbox "Buscar por número de orden, cotización, proveedor o razón social..." [ref=e64]
+            - button "Nueva Orden de Compra" [ref=e65] [cursor=pointer]
+          - table [ref=e67]:
+            - rowgroup [ref=e68]:
+              - row "Número de Orden Número de Cotización Fecha Proveedor Razón Social Más" [ref=e69]:
+                - cell "Número de Orden" [ref=e70]
+                - cell "Número de Cotización" [ref=e71]
+                - cell "Fecha" [ref=e72]
+                - cell "Proveedor" [ref=e73]
+                - cell "Razón Social" [ref=e74]
+                - cell "Más" [ref=e75]
+            - rowgroup [ref=e76]:
+              - row "GRU-MUEL-A001 orden-1761244327090-237385089-ORDEN_DICE 10/23/2025 GRUPO DICE Leticia Muñoz Estrada Editar orden GRU-MUEL-A001 Ver PDF orden GRU-MUEL-A001 Descargar PDF orden GRU-MUEL-A001 Eliminar orden GRU-MUEL-A001" [ref=e77]:
+                - cell "GRU-MUEL-A001" [ref=e78]
+                - cell "orden-1761244327090-237385089-ORDEN_DICE" [ref=e79]
+                - cell "10/23/2025" [ref=e80]
+                - cell "GRUPO DICE" [ref=e81]
+                - cell "Leticia Muñoz Estrada" [ref=e82]
+                - cell "Editar orden GRU-MUEL-A001 Ver PDF orden GRU-MUEL-A001 Descargar PDF orden GRU-MUEL-A001 Eliminar orden GRU-MUEL-A001" [ref=e83]:
+                  - generic [ref=e84]:
+                    - button "Editar orden GRU-MUEL-A001" [ref=e85] [cursor=pointer]: Editar
+                    - button "Ver PDF orden GRU-MUEL-A001" [ref=e86] [cursor=pointer]: Ver PDF
+                    - button "Descargar PDF orden GRU-MUEL-A001" [ref=e87] [cursor=pointer]: 📄
+                    - button "Eliminar orden GRU-MUEL-A001" [ref=e88] [cursor=pointer]: Eliminar
+              - row "POR-MUEL-A001 0630JPALEJ026 10/23/2025 PORTENNTUM SA DE CV Leticia Muñoz Estrada Editar orden POR-MUEL-A001 Ver PDF orden POR-MUEL-A001 Descargar PDF orden POR-MUEL-A001 Eliminar orden POR-MUEL-A001" [ref=e89]:
+                - cell "POR-MUEL-A001" [ref=e90]
+                - cell "0630JPALEJ026" [ref=e91]
+                - cell "10/23/2025" [ref=e92]
+                - cell "PORTENNTUM SA DE CV" [ref=e93]
+                - cell "Leticia Muñoz Estrada" [ref=e94]
+                - cell "Editar orden POR-MUEL-A001 Ver PDF orden POR-MUEL-A001 Descargar PDF orden POR-MUEL-A001 Eliminar orden POR-MUEL-A001" [ref=e95]:
+                  - generic [ref=e96]:
+                    - button "Editar orden POR-MUEL-A001" [ref=e97] [cursor=pointer]: Editar
+                    - button "Ver PDF orden POR-MUEL-A001" [ref=e98] [cursor=pointer]: Ver PDF
+                    - button "Descargar PDF orden POR-MUEL-A001" [ref=e99] [cursor=pointer]: 📄
+                    - button "Eliminar orden POR-MUEL-A001" [ref=e100] [cursor=pointer]: Eliminar
+              - row "ELE-HECA-A001 OPE0707JPTISE007 10/23/2025 ELECTRICA DIAZ ALEJANDRO HERNANDEZ CASTILLO Editar orden ELE-HECA-A001 Ver PDF orden ELE-HECA-A001 Descargar PDF orden ELE-HECA-A001 Eliminar orden ELE-HECA-A001" [ref=e101]:
+                - cell "ELE-HECA-A001" [ref=e102]
+                - cell "OPE0707JPTISE007" [ref=e103]
+                - cell "10/23/2025" [ref=e104]
+                - cell "ELECTRICA DIAZ" [ref=e105]
+                - cell "ALEJANDRO HERNANDEZ CASTILLO" [ref=e106]
+                - cell "Editar orden ELE-HECA-A001 Ver PDF orden ELE-HECA-A001 Descargar PDF orden ELE-HECA-A001 Eliminar orden ELE-HECA-A001" [ref=e107]:
+                  - generic [ref=e108]:
+                    - button "Editar orden ELE-HECA-A001" [ref=e109] [cursor=pointer]: Editar
+                    - button "Ver PDF orden ELE-HECA-A001" [ref=e110] [cursor=pointer]: Ver PDF
+                    - button "Descargar PDF orden ELE-HECA-A001" [ref=e111] [cursor=pointer]: 📄
+                    - button "Eliminar orden ELE-HECA-A001" [ref=e112] [cursor=pointer]: Eliminar
+              - row "SYS-HECA-A001 21106 10/23/2025 SYSCOM ALEJANDRO HERNANDEZ CASTILLO Editar orden SYS-HECA-A001 Ver PDF orden SYS-HECA-A001 Descargar PDF orden SYS-HECA-A001 Eliminar orden SYS-HECA-A001" [ref=e113]:
+                - cell "SYS-HECA-A001" [ref=e114]
+                - cell "21106" [ref=e115]
+                - cell "10/23/2025" [ref=e116]
+                - cell "SYSCOM" [ref=e117]
+                - cell "ALEJANDRO HERNANDEZ CASTILLO" [ref=e118]
+                - cell "Editar orden SYS-HECA-A001 Ver PDF orden SYS-HECA-A001 Descargar PDF orden SYS-HECA-A001 Eliminar orden SYS-HECA-A001" [ref=e119]:
+                  - generic [ref=e120]:
+                    - button "Editar orden SYS-HECA-A001" [ref=e121] [cursor=pointer]: Editar
+                    - button "Ver PDF orden SYS-HECA-A001" [ref=e122] [cursor=pointer]: Ver PDF
+                    - button "Descargar PDF orden SYS-HECA-A001" [ref=e123] [cursor=pointer]: 📄
+                    - button "Eliminar orden SYS-HECA-A001" [ref=e124] [cursor=pointer]: Eliminar
+              - row "OC-20251023-291 5PSCGH9214025 8/7/2025 SYSCOM ALEJANDRO HERNANDEZ CASTILLO Editar orden OC-20251023-291 Ver PDF orden OC-20251023-291 Descargar PDF orden OC-20251023-291 Eliminar orden OC-20251023-291" [ref=e125]:
+                - cell "OC-20251023-291" [ref=e126]
+                - cell "5PSCGH9214025" [ref=e127]
+                - cell "8/7/2025" [ref=e128]
+                - cell "SYSCOM" [ref=e129]
+                - cell "ALEJANDRO HERNANDEZ CASTILLO" [ref=e130]
+                - cell "Editar orden OC-20251023-291 Ver PDF orden OC-20251023-291 Descargar PDF orden OC-20251023-291 Eliminar orden OC-20251023-291" [ref=e131]:
+                  - generic [ref=e132]:
+                    - button "Editar orden OC-20251023-291" [ref=e133] [cursor=pointer]: Editar
+                    - button "Ver PDF orden OC-20251023-291" [ref=e134] [cursor=pointer]: Ver PDF
+                    - button "Descargar PDF orden OC-20251023-291" [ref=e135] [cursor=pointer]: 📄
+                    - button "Eliminar orden OC-20251023-291" [ref=e136] [cursor=pointer]: Eliminar
+              - row "OC-20251023-228 5PSCGH9214025 8/7/2025 SYSCOM usuariorazonsocial Editar orden OC-20251023-228 Ver PDF orden OC-20251023-228 Descargar PDF orden OC-20251023-228 Eliminar orden OC-20251023-228" [ref=e137]:
+                - cell "OC-20251023-228" [ref=e138]
+                - cell "5PSCGH9214025" [ref=e139]
+                - cell "8/7/2025" [ref=e140]
+                - cell "SYSCOM" [ref=e141]
+                - cell "usuariorazonsocial" [ref=e142]
+                - cell "Editar orden OC-20251023-228 Ver PDF orden OC-20251023-228 Descargar PDF orden OC-20251023-228 Eliminar orden OC-20251023-228" [ref=e143]:
+                  - generic [ref=e144]:
+                    - button "Editar orden OC-20251023-228" [ref=e145] [cursor=pointer]: Editar
+                    - button "Ver PDF orden OC-20251023-228" [ref=e146] [cursor=pointer]: Ver PDF
+                    - button "Descargar PDF orden OC-20251023-228" [ref=e147] [cursor=pointer]: 📄
+                    - button "Eliminar orden OC-20251023-228" [ref=e148] [cursor=pointer]: Eliminar
+              - row "OC-20251023-001 0630JPALEJ026 6/30/2025 PORTENNTUM SA DE CV ALEJANDRO HERNANDEZ CASTILLO Editar orden OC-20251023-001 Ver PDF orden OC-20251023-001 Descargar PDF orden OC-20251023-001 Eliminar orden OC-20251023-001" [ref=e149]:
+                - cell "OC-20251023-001" [ref=e150]
+                - cell "0630JPALEJ026" [ref=e151]
+                - cell "6/30/2025" [ref=e152]
+                - cell "PORTENNTUM SA DE CV" [ref=e153]
+                - cell "ALEJANDRO HERNANDEZ CASTILLO" [ref=e154]
+                - cell "Editar orden OC-20251023-001 Ver PDF orden OC-20251023-001 Descargar PDF orden OC-20251023-001 Eliminar orden OC-20251023-001" [ref=e155]:
+                  - generic [ref=e156]:
+                    - button "Editar orden OC-20251023-001" [ref=e157] [cursor=pointer]: Editar
+                    - button "Ver PDF orden OC-20251023-001" [ref=e158] [cursor=pointer]: Ver PDF
+                    - button "Descargar PDF orden OC-20251023-001" [ref=e159] [cursor=pointer]: 📄
+                    - button "Eliminar orden OC-20251023-001" [ref=e160] [cursor=pointer]: Eliminar
+              - row "OC-20251023-622 369709 6/26/2025 PORTENNTUM SA DE CV ALEJANDRO HERNANDEZ CASTILLO Editar orden OC-20251023-622 Ver PDF orden OC-20251023-622 Descargar PDF orden OC-20251023-622 Eliminar orden OC-20251023-622" [ref=e161]:
+                - cell "OC-20251023-622" [ref=e162]
+                - cell "369709" [ref=e163]
+                - cell "6/26/2025" [ref=e164]
+                - cell "PORTENNTUM SA DE CV" [ref=e165]
+                - cell "ALEJANDRO HERNANDEZ CASTILLO" [ref=e166]
+                - cell "Editar orden OC-20251023-622 Ver PDF orden OC-20251023-622 Descargar PDF orden OC-20251023-622 Eliminar orden OC-20251023-622" [ref=e167]:
+                  - generic [ref=e168]:
+                    - button "Editar orden OC-20251023-622" [ref=e169] [cursor=pointer]: Editar
+                    - button "Ver PDF orden OC-20251023-622" [ref=e170] [cursor=pointer]: Ver PDF
+                    - button "Descargar PDF orden OC-20251023-622" [ref=e171] [cursor=pointer]: 📄
+                    - button "Eliminar orden OC-20251023-622" [ref=e172] [cursor=pointer]: Eliminar
+```
