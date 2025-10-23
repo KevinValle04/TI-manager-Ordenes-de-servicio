@@ -144,8 +144,46 @@ def guardar_json_resultado(json_resultado, folio_original, nombre_archivo_origin
 
 # =================== EXTRACCIÓN DE TEXTO ===================
 
+def es_pdf_escaneado(archivo_pdf):
+    """Detecta si un PDF parece ser un escaneo (imagen)."""
+    try:
+        if PYMUPDF_AVAILABLE:
+            doc = fitz.open(archivo_pdf)
+            for page in doc:
+                # Obtener lista de imágenes en la página
+                image_list = page.get_images()
+                if image_list:
+                    # Si hay imágenes que ocupan casi toda la página
+                    for img in image_list:
+                        xref = img[0]
+                        imagen = doc.extract_image(xref)
+                        if imagen:
+                            # Si hay una imagen grande que cubre la mayoría de la página
+                            image_size = imagen["width"] * imagen["height"]
+                            page_size = page.rect.width * page.rect.height
+                            if image_size > 0.7 * page_size:  # Si la imagen cubre >70% de la página
+                                doc.close()
+                                return True
+                
+                # Intentar extraer texto
+                texto = page.get_text().strip()
+                if not texto and image_list:
+                    doc.close()
+                    return True
+            doc.close()
+            
+    except Exception as e:
+        print(f"⚠️ Error al detectar si es escaneo: {e}", file=sys.stderr)
+    
+    return False
+
 def extraer_texto_completo_pdf(archivo_pdf):
     """Extrae texto del PDF usando los métodos más rápidos y efectivos primero."""
+    # Primero verificar si es un escaneo
+    if es_pdf_escaneado(archivo_pdf):
+        print("❌ El PDF parece ser un escaneo (imagen).", file=sys.stderr)
+        raise ValueError("PDF_ESCANEADO: El archivo parece ser un PDF escaneado (imagen). Por favor, sube un PDF que contenga texto real y no imágenes escaneadas.")
+
     texto_completo = ""
     print(f"📄 Extrayendo texto de: {os.path.basename(archivo_pdf)}", file=sys.stderr)
 
