@@ -145,36 +145,38 @@ def guardar_json_resultado(json_resultado, folio_original, nombre_archivo_origin
 # =================== EXTRACCIÓN DE TEXTO ===================
 
 def es_pdf_escaneado(archivo_pdf):
-    """Detecta si un PDF parece ser un escaneo (imagen)."""
+    """Detecta si un PDF parece ser escaneo combinando imágenes grandes + falta de texto."""
     try:
         if PYMUPDF_AVAILABLE:
             doc = fitz.open(archivo_pdf)
             for page in doc:
-                # Obtener lista de imágenes en la página
-                image_list = page.get_images()
-                if image_list:
-                    # Si hay imágenes que ocupan casi toda la página
-                    for img in image_list:
-                        xref = img[0]
-                        imagen = doc.extract_image(xref)
-                        if imagen:
-                            # Si hay una imagen grande que cubre la mayoría de la página
-                            image_size = imagen["width"] * imagen["height"]
-                            page_size = page.rect.width * page.rect.height
-                            if image_size > 0.7 * page_size:  # Si la imagen cubre >70% de la página
-                                doc.close()
-                                return True
-                
-                # Intentar extraer texto
+                # Extraer texto
                 texto = page.get_text().strip()
-                if not texto and image_list:
+                tiene_texto = bool(texto)
+
+                # Obtener imágenes
+                image_list = page.get_images()
+                imagen_grande = False
+
+                for img in image_list:
+                    xref = img[0]
+                    imagen = doc.extract_image(xref)
+                    if imagen:
+                        image_size = imagen["width"] * imagen["height"]
+                        page_size = page.rect.width * page.rect.height
+                        if image_size > 0.7 * page_size:
+                            imagen_grande = True
+                            break
+
+                # Nueva regla: solo escaneado si NO hay texto + imagen grande
+                if imagen_grande and not tiene_texto:
                     doc.close()
                     return True
-            doc.close()
             
+            doc.close()
     except Exception as e:
-        print(f"⚠️ Error al detectar si es escaneo: {e}", file=sys.stderr)
-    
+        print(f"⚠️ Error al detectar escaneo: {e}", file=sys.stderr)
+
     return False
 
 def extraer_texto_completo_pdf(archivo_pdf):
