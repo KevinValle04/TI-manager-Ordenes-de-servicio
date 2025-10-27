@@ -73,7 +73,7 @@ test("CRUD de Orden de Compra", async ({ page }) => {
   await razonOption.click();
 
   // --- Subir PDF ---
-  await page.setInputFiles('input[type="file"]', "test.pdf");
+  await page.setInputFiles('input[type="file"]', "../../server/scripts/ordenes_TEST/ORDEN_SYSCOM.pdf");
 
   // --- Crear orden y esperar la respuesta ---
   const [response] = await Promise.all([

@@ -595,9 +595,9 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
         const cantidad = parseNumericValue(producto.cantidad);
         
         // 🔧 MAPEO INTELIGENTE DE PRECIOS POR PROVEEDOR:
-        // 1. PRIORIDAD: precioUnitario directo (SYSCOM y otros)
+        // 1. PRIORIDAD: precioUnitario directo (SYSCOM, PRECIO DE DISTRIBUIDOR, etc.)
         // 2. FALLBACK: precioListaUnitario (GRUPO DICE)
-        const precioUnitario = parseNumericValue(producto.precioUnitario) ||           // SYSCOM: precio directo
+        const precioUnitario = parseNumericValue(producto.precioUnitario) ||           // SYSCOM/PRECIO DISTRIBUIDOR: precio directo
                               parseNumericValue(producto.precioListaUnitario) ||      // GRUPO DICE: precio de lista
                               parseNumericValue(producto.precioLista) ||              // Otros: precio lista
                               parseNumericValue(producto.precio) ||                   // Genérico: precio
@@ -605,6 +605,7 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
                               0;
         
         // 🔧 DESCUENTOS: Solo para proveedores que los manejen explícitamente
+        // NOTA: Si se usa PRECIO DE DISTRIBUIDOR, el descuento será 0 (ya aplicado)
         // SYSCOM no usa descuentos, GRUPO DICE sí
         const tieneDescuentoExplicito = producto.descuentoPorcentaje !== undefined || 
                                        producto.descuento !== undefined;
