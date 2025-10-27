@@ -237,33 +237,32 @@ def extraer_texto_completo_pdf(archivo_pdf):
     print(f"❌ No se pudo extraer texto del PDF con ningún método.", file=sys.stderr)
     return None
 
-# =================== PROCESAMIENTO CON OPENAI ===================
-
 def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
     """Procesa el documento usando OpenAI GPT-4o para máxima velocidad y precisión."""
     if not texto_completo or not texto_completo.strip():
         return None
 
-    hash_texto = generar_hash_texto(texto_completo)
-    hash_estructura = generar_hash_estructura(texto_completo)
-    
-    resultado_cache, _ = buscar_en_cache(hash_texto, hash_estructura, cache_dir)
-    if resultado_cache:
-        print(f"⚡ CACHE HIT! Usando resultado guardado.", file=sys.stderr)
-        return resultado_cache
-
-    print(f"🤖 Procesando con OpenAI GPT-4o (Modelo insignia)...", file=sys.stderr)
-    
+    # Obtener la API key de las variables de entorno
     api_key = os.environ.get('OPENAI_API_KEY')
     if not api_key:
         print("❌ ERROR: Variable de entorno OPENAI_API_KEY no encontrada.", file=sys.stderr)
         return None
 
+    # Generar hashes para cache
+    hash_texto = generar_hash_texto(texto_completo)
+    hash_estructura = generar_hash_estructura(texto_completo)
+    
+    # Buscar en cache
+    resultado_cache, tipo_cache = buscar_en_cache(hash_texto, hash_estructura, cache_dir)
+    if resultado_cache:
+        print(f"🎯 Resultado obtenido desde cache ({tipo_cache})", file=sys.stderr)
+        return resultado_cache
+
     client = OpenAI(api_key=api_key, timeout=120.0, max_retries=2)
 
     prompt_consolidado = f"""Extrae los datos del siguiente documento de cotización en un formato JSON estructurado.
 
-**Esquema JSON Requerido:**
+**Esquema JSON Requerido (FLEXIBLE para diferentes proveedores):**
 {{
   "folioOriginal": "string",
   "fecha": "YYYY-MM-DD",
@@ -273,19 +272,37 @@ def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
     "descripcion": "string",
     "cantidad": "number",
     "unidad": "string",
-    "precioUnitario": "number",
-    "importe": "number"
+    "precioUnitario": "number", // PRIORITARIO: Precio unitario directo (para SYSCOM, TVC, etc.)
+    "precioListaUnitario": "number", // OPCIONAL: Precio lista antes de descuento (para GRUPO DICE)
+    "descuentoPorcentaje": "number", // OPCIONAL: Descuento en porcentaje (solo si existe explícitamente)
+    "precioUnitarioFinal": "number", // OPCIONAL: Precio después del descuento (calculado)
+    "importe": "number" // OBLIGATORIO: Total de la línea
   }}],
   "totales": {{"subtotal": "number", "iva": "number", "total": "number"}},
   "moneda": "string (Detecta la moneda, si no se especifica, asume 'MXN')"
 }}
 
-**REGLAS CRÍTICAS E INAMOVIBLES PARA LA EXTRACCIÓN:**
-1.  **PRECIO UNITARIO ES LA CLAVE:** El valor para `precioUnitario` DEBE ser extraído **EXCLUSIVAMENTE** de la columna llamada 'PRECIO UNITARIO' en el documento.
-2.  **IGNORAR OTRAS COLUMNAS DE PRECIOS:** Ignora por completo la columna 'PRECIO DE LISTA' y la columna 'DESCUENTOS'. Sus valores **NUNCA** deben usarse para el campo `precioUnitario`.
-3.  **LÍNEAS FÍSICAS:** Cada fila que representa un producto en el documento debe ser un objeto separado en el array `productos`. No omitas ninguna línea, incluso si sus valores de precio o importe son nulos o cero.
-4.  **PRECISIÓN NUMÉRICA:** Extrae todos los números (cantidades, precios, importes, totales) exactamente como aparecen en el documento, conservando los decimales.
-5.  **TOTALES:** Los valores de `subtotal`, `iva` y `total` deben ser extraídos de la sección de totales al final del documento (usualmente en la última página).
+**REGLAS CRÍTICAS PARA EXTRACCIÓN FLEXIBLE:**
+1.  **DETECCIÓN AUTOMÁTICA DEL FORMATO:**
+    * Si el documento tiene columna "PRECIO LISTA" y "DESCUENTO" → usar `precioListaUnitario` + `descuentoPorcentaje`
+    * Si el documento solo tiene "PRECIO UNITARIO" o "P.U." → usar `precioUnitario` directamente
+    * SIEMPRE extraer `importe` de la última columna de totales
+
+2.  **MAPEO DE CAMPOS POR PROVEEDOR:**
+    * **SYSCOM/TVC**: `precioUnitario` desde "P.U." o "PRECIO UNITARIO" (sin descuentos)
+    * **GRUPO DICE**: `precioListaUnitario` desde "PRECIO LISTA UNIT." + `descuentoPorcentaje` desde "DESCUENTO"
+    * **UNIVERSAL**: `precioUnitario` desde cualquier columna de precio unitario
+
+3.  **PRIORIDAD DE EXTRACCIÓN:**
+    * `precioUnitario` → Buscar en: "P.U.", "PRECIO UNITARIO", "PRECIO UNIT.", "UNIT PRICE"
+    * `precioListaUnitario` → Buscar en: "PRECIO LISTA", "LISTA UNIT.", "PRICE LIST"
+    * `descuentoPorcentaje` → Buscar en: "DESCUENTO", "DESC %", "DISCOUNT"
+    * `importe` → Buscar en: "IMPORTE", "TOTAL", "PRECIO EXTENDIDO", "EXTENDED PRICE"
+
+4.  **REGLAS DE CÁLCULO:**
+    * Si existe `precioUnitario` → usarlo directamente
+    * Si existe `precioListaUnitario` + `descuentoPorcentaje` → calcular `precioUnitarioFinal`
+    * `importe` SIEMPRE debe coincidir con `cantidad * precio_final`
 
 **DOCUMENTO A PROCESAR:**
 (Nombre del archivo: {nombre_archivo})

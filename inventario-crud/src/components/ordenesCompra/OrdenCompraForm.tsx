@@ -1,16 +1,16 @@
 import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-    Alert,
-    Badge,
-    Button,
-    Col,
-    Form,
-    ListGroup,
-    Modal,
-    Row,
-    Toast,
-    ToastContainer
+  Alert,
+  Badge,
+  Button,
+  Col,
+  Form,
+  ListGroup,
+  Modal,
+  Row,
+  Toast,
+  ToastContainer
 } from "react-bootstrap";
 import { Proveedor, RazonSocial } from "../../types";
 import ModalResultados from "./ModalResultados";
@@ -593,11 +593,26 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
     if (datosPdf.datosExtraidos && datosPdf.datosExtraidos.productos) {
       const productos = datosPdf.datosExtraidos.productos.map((producto: any, index: number) => {
         const cantidad = parseNumericValue(producto.cantidad);
-        const precioUnitario = parseNumericValue(producto.precioUnitario) || 
-                              parseNumericValue(producto.precioLista) || 
-                              parseNumericValue(producto.precio) ||
-                              parseNumericValue(producto.precioNeto) ||
+        
+        // 🔧 MAPEO INTELIGENTE DE PRECIOS POR PROVEEDOR:
+        // 1. PRIORIDAD: precioUnitario directo (SYSCOM y otros)
+        // 2. FALLBACK: precioListaUnitario (GRUPO DICE)
+        const precioUnitario = parseNumericValue(producto.precioUnitario) ||           // SYSCOM: precio directo
+                              parseNumericValue(producto.precioListaUnitario) ||      // GRUPO DICE: precio de lista
+                              parseNumericValue(producto.precioLista) ||              // Otros: precio lista
+                              parseNumericValue(producto.precio) ||                   // Genérico: precio
+                              parseNumericValue(producto.precioNeto) ||               // Alternativo: precio neto
                               0;
+        
+        // 🔧 DESCUENTOS: Solo para proveedores que los manejen explícitamente
+        // SYSCOM no usa descuentos, GRUPO DICE sí
+        const tieneDescuentoExplicito = producto.descuentoPorcentaje !== undefined || 
+                                       producto.descuento !== undefined;
+        
+        const descuentoPorcentaje = tieneDescuentoExplicito ? 
+                                   (parseNumericValue(producto.descuentoPorcentaje) || 
+                                    parseNumericValue(producto.descuento) || 0) : 0;
+        
         const importeOriginal = parseNumericValue(producto.importe) || 
                                parseNumericValue(producto.total) ||
                                parseNumericValue(producto.subtotal) ||
@@ -612,15 +627,14 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
           codigo: producto.codigo || producto.clave || '',
           clave: producto.codigo || producto.clave || '', // Agregar mapeo explícito para el modal
           descripcion: producto.descripcion || producto.concepto || '',
-          precioUnitario: precioUnitario,
-          precioLista: parseNumericValue(producto.precioLista),
-          descuento: parseNumericValue(producto.descuento),
-          importe: importe
+          precioUnitario: precioUnitario, // ✅ PRIORIZA precioUnitario directo
+          descuento: descuentoPorcentaje, // ✅ Solo si existe explícitamente
+          importe: importe // El importe final
         };
         
         // Log solo productos con problemas de precio
         if (precioUnitario === 0 && index < 5) {
-          console.log(`⚠️ Producto ${index + 1} sin precio:`, {
+          console.log(`⚠️ Producto ${index + 1} sin precio unitario:`, {
             original: producto,
             mapeado: productoMapeado
           });
