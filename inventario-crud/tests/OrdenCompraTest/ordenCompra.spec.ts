@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test";
 import { login, navigateTo } from '../utils/test-utils';
 
+// Configurar timeout extendido para este test debido al procesamiento de PDF con OpenAI
+test.setTimeout(300000); // 5 minutos
+
 test("CRUD de Orden de Compra", async ({ page }) => {
   // Login y navegación usando las utilidades
   await login(page);
@@ -75,7 +78,8 @@ test("CRUD de Orden de Compra", async ({ page }) => {
   // --- Crear orden y esperar la respuesta ---
   const [response] = await Promise.all([
     page.waitForResponse(res =>
-      res.url().includes("/ordenes-compra") && res.request().method() === "POST"
+      res.url().includes("/ordenes-compra") && res.request().method() === "POST",
+      { timeout: 0 } // Sin timeout - esperar indefinidamente
     ),
     page.getByRole("button", { name: /Crear Orden Directa/i }).click(),
   ]);
@@ -83,16 +87,22 @@ test("CRUD de Orden de Compra", async ({ page }) => {
 
   // --- Verificar en la lista ---
   await navigateTo(page, 'ordenes-compra');
-  await expect(page.getByRole("cell", { name: /SYSCOM/i })).toBeVisible({ timeout: 15000 });
+  // Verificar que la tabla tenga al menos una fila con SYSCOM
+  await expect(page.locator('tbody tr').filter({ hasText: 'SYSCOM' }).first()).toBeVisible({ timeout: 60000 }); // 1 minuto para que aparezca en la lista
 
   // --- Editar ---
-  await page.getByRole("button", { name: /^Editar/ }).first().click();
-  await page.getByRole("button", { name: /Cancelar/i }).click();
+  await page.locator('tbody tr').filter({ hasText: 'SYSCOM' }).first().getByRole("button", { name: /^Editar/ }).click();
+  // Esperar a que aparezca el modal de edición y hacer clic en cancelar dentro del modal
+  const modalEdicion = page.getByRole("dialog");
+  await expect(modalEdicion).toBeVisible({ timeout: 10000 });
+  await modalEdicion.getByRole("button", { name: /Cancelar/i }).first().click();
+  await expect(modalEdicion).not.toBeVisible({ timeout: 10000 });
 
   // --- Abrir PDF generado y tomar captura de pantalla ---
   const [pdfPage] = await Promise.all([
     page.waitForEvent('popup'),
-    page.getByRole('button', { name: /Ver PDF/i }).click(),
+    // Buscar específicamente el botón "Ver PDF" en la primera fila con SYSCOM
+    page.locator('tbody tr').filter({ hasText: 'SYSCOM' }).first().getByRole('button', { name: /Ver PDF/i }).click(),
   ]);
   await pdfPage.waitForLoadState('domcontentloaded');
   // Esperar 2 segundos para asegurar que el PDF se renderice
@@ -101,9 +111,15 @@ test("CRUD de Orden de Compra", async ({ page }) => {
 
   // --- Eliminar ---
   await navigateTo(page, 'ordenes-compra');
+  // Contar filas antes de eliminar
+  const filasAntes = await page.locator('tbody tr').count();
   page.once("dialog", (dialog) => dialog.accept());
-  await page.getByRole("button", { name: /^Eliminar/ }).first().click();
+  // Eliminar específicamente la primera fila con SYSCOM
+  await page.locator('tbody tr').filter({ hasText: 'SYSCOM' }).first().getByRole("button", { name: /^Eliminar/ }).click();
 
-  // --- Verificar que ya no existe ---
-  await expect(page.getByRole("cell", { name: /SYSCOM/i })).not.toBeVisible();
+  // --- Verificar que se eliminó una fila ---
+  await expect(async () => {
+    const filasDespues = await page.locator('tbody tr').count();
+    expect(filasDespues).toBe(filasAntes - 1);
+  }).toPass({ timeout: 10000 });
 });

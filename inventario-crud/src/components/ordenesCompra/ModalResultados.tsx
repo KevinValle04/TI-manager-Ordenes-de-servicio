@@ -55,6 +55,10 @@ const FilaProducto = React.memo(({
   }, [producto.cantidad, producto.precioUnitario, producto.descuento]);
 
   const formatearMoneda = (valor: number) => {
+    // Validar que el valor sea un número válido
+    if (valor === null || valor === undefined || isNaN(valor)) {
+      valor = 0;
+    }
     const monedaInfo = MONEDAS[moneda as keyof typeof MONEDAS];
     return `${monedaInfo.simbolo}${valor.toLocaleString(monedaInfo.locale, { 
       minimumFractionDigits: 2, 
@@ -201,7 +205,7 @@ const ComponenteTotales = React.memo(({
             <Form.Control
               type="text"
               size="sm"
-              value={formatearMoneda(totales.subTotal)}
+              value={formatearMoneda(totales.subTotal || 0)}
               readOnly
               className="text-end fw-bold border-0 bg-light"
             />
@@ -215,7 +219,7 @@ const ComponenteTotales = React.memo(({
             <Form.Control
               type="text"
               size="sm"
-              value={formatearMoneda(totales.iva)}
+              value={formatearMoneda(totales.iva || 0)}
               readOnly
               className="text-end fw-bold border-0 bg-light"
             />
@@ -228,7 +232,7 @@ const ComponenteTotales = React.memo(({
             <Form.Control
               type="text"
               size="sm"
-              value={formatearMoneda(totales.total)}
+              value={formatearMoneda(totales.total || 0)}
               readOnly
               className="text-end fw-bold border-2 border-primary bg-light text-primary"
             />
