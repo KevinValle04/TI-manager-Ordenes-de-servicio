@@ -24,14 +24,6 @@ export const TablaProductos: React.FC<TablaProductosProps> = ({
             <Badge bg="info" className="ms-2">{productos.length} productos</Badge>
           }
         </h5>
-        <Button 
-          variant="primary" 
-          size="sm"
-          onClick={onAgregar}
-        >
-          <i className="fas fa-plus me-1"></i>
-          Agregar Producto
-        </Button>
       </div>
       
       <div className="table-responsive">
@@ -70,6 +62,15 @@ export const TablaProductos: React.FC<TablaProductosProps> = ({
           </tbody>
         </table>
       </div>
+      <div className="d-flex justify-content-end mt-3">
+        <Button 
+          variant="primary" 
+          onClick={onAgregar}
+        >
+          <i className="fas fa-plus me-2"></i>
+          Agregar Producto
+        </Button>
+      </div>
     </div>
   );
 };
@@ -87,11 +88,15 @@ const FilaProducto: React.FC<FilaProductoProps> = React.memo(({
   onActualizar,
   moneda 
 }) => {
-  const handleEliminarProducto = () => {
+  const handleEliminarProducto = React.useCallback(() => {
     if (window.confirm('¿Está seguro de eliminar este producto?')) {
       onActualizar(index, 'eliminar', null);
     }
-  };
+  }, [index, onActualizar]);
+
+  const handleInputChange = React.useCallback((campo: string, valor: any) => {
+    onActualizar(index, campo, valor);
+  }, [index, onActualizar]);
 
   const importe = React.useMemo(() => {
     const subtotal = (Number(producto.cantidad) || 0) * (Number(producto.precioUnitario) || 0);
@@ -119,7 +124,7 @@ const FilaProducto: React.FC<FilaProductoProps> = React.memo(({
           type="text"
           size="sm"
           value={producto.clave || ''}
-          onChange={(e) => onActualizar(index, 'clave', e.target.value)}
+          onChange={(e) => handleInputChange('clave', e.target.value)}
           placeholder="Código"
         />
       </td>
@@ -129,7 +134,7 @@ const FilaProducto: React.FC<FilaProductoProps> = React.memo(({
           rows={2}
           size="sm"
           value={producto.descripcion || ''}
-          onChange={(e) => onActualizar(index, 'descripcion', e.target.value)}
+          onChange={(e) => handleInputChange('descripcion', e.target.value)}
           placeholder="Descripción del producto"
         />
       </td>
@@ -138,7 +143,7 @@ const FilaProducto: React.FC<FilaProductoProps> = React.memo(({
           type="number"
           size="sm"
           value={producto.cantidad || ''}
-          onChange={(e) => onActualizar(index, 'cantidad', parseFloat(e.target.value) || 0)}
+          onChange={(e) => handleInputChange('cantidad', parseFloat(e.target.value) || 0)}
           placeholder="0"
           min="0"
           step="0.01"
@@ -149,7 +154,7 @@ const FilaProducto: React.FC<FilaProductoProps> = React.memo(({
           type="text"
           size="sm"
           value={producto.unidad || ''}
-          onChange={(e) => onActualizar(index, 'unidad', e.target.value)}
+          onChange={(e) => handleInputChange('unidad', e.target.value)}
           placeholder="Unidad"
         />
       </td>
@@ -158,7 +163,7 @@ const FilaProducto: React.FC<FilaProductoProps> = React.memo(({
           type="number"
           size="sm"
           value={producto.precioUnitario || ''}
-          onChange={(e) => onActualizar(index, 'precioUnitario', parseFloat(e.target.value) || 0)}
+          onChange={(e) => handleInputChange('precioUnitario', parseFloat(e.target.value) || 0)}
           placeholder="0.00"
           min="0"
           step="0.01"
@@ -169,7 +174,7 @@ const FilaProducto: React.FC<FilaProductoProps> = React.memo(({
           type="number"
           size="sm"
           value={producto.descuento || ''}
-          onChange={(e) => onActualizar(index, 'descuento', parseFloat(e.target.value) || 0)}
+          onChange={(e) => handleInputChange('descuento', parseFloat(e.target.value) || 0)}
           placeholder="0"
           min="0"
           max="100"
