@@ -21,6 +21,7 @@ interface ModalResultadosProps {
   onGenerarOrden?: (datosOrden: any) => Promise<void>;
   editId?: string | null; // Añadido para identificar si está en modo edición
   onCancelar?: () => void; // Nueva prop para manejar cancelación
+  onActualizarTotales?: (totales: { subTotal: number; iva: number; total: number; }) => void; // Nueva prop para actualizar totales
 }
 
 // Tipos de moneda disponibles
@@ -256,7 +257,8 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
   onVolverAlFormulario,
   onGenerarOrden,
   editId,
-  onCancelar
+  onCancelar,
+  onActualizarTotales
 }) => {
   // Log de depuración para verificar los totales recibidos
   React.useEffect(() => {
@@ -364,6 +366,39 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
     }
   }, [totalesCalculados]);
 
+  // Calcular totales cuando cambian los productos
+  React.useEffect(() => {
+    if (!onActualizarTotales) return;
+
+    const calcularTotales = () => {
+      let subTotal = 0;
+      
+      // Calcular subtotal sumando el importe de cada producto
+      productosEditables.forEach(producto => {
+        const cantidad = Number(producto.cantidad) || 0;
+        const precioUnitario = Number(producto.precioUnitario) || 0;
+        const descuento = Number(producto.descuento) || 0;
+        
+        const importeProducto = cantidad * precioUnitario * (1 - descuento / 100);
+        subTotal += importeProducto;
+      });
+
+      // Calcular IVA basado en el porcentaje simbólico seleccionado
+      const porcentajeIva = Number(porcentajeIvaSimbolico) / 100;
+      const iva = subTotal * porcentajeIva;
+      const total = subTotal + iva;
+
+      // Actualizar los totales
+      onActualizarTotales({
+        subTotal,
+        iva,
+        total
+      });
+    };
+
+    calcularTotales();
+  }, [productosEditables, porcentajeIvaSimbolico, onActualizarTotales]);
+
   // Inicializar la fecha editable cuando se cargan los datos
   React.useEffect(() => {
     if (datosOrdenCompletos?.fecha) {
@@ -379,6 +414,20 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
     try {
       setGenerandoOrden(true);
       
+      // Calcular los totales finales antes de enviar
+      let subTotal = 0;
+      productosEditables.forEach(producto => {
+        const cantidad = Number(producto.cantidad) || 0;
+        const precioUnitario = Number(producto.precioUnitario) || 0;
+        const descuento = Number(producto.descuento) || 0;
+        const importeProducto = cantidad * precioUnitario * (1 - descuento / 100);
+        subTotal += importeProducto;
+      });
+
+      const porcentajeIva = Number(porcentajeIvaSimbolico) / 100;
+      const iva = subTotal * porcentajeIva;
+      const total = subTotal + iva;
+
       // Preparar los datos de la orden para enviar al backend
       const datosParaEnviar = {
         numeroOrden: datosOrdenCompletos?.numeroOrden || '',
@@ -388,7 +437,12 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
         vendedor: vendedorSeleccionado?._id || null,
         direccionEnvio: datosOrdenCompletos?.direccionEnvio,
         productos: productosEditables,
-        totalesCalculados: totalesCalculados,
+        totalesCalculados: {
+          subTotal,
+          iva,
+          total,
+          porcentajeIva: Number(porcentajeIvaSimbolico)
+        },
         datosPdf: datosOrdenCompletos?.datosPdf || datosOrdenCompletos?.pdfInfo,
         moneda: monedaSeleccionada,
         porcentajeIvaSimbolico: porcentajeIvaSimbolico

@@ -655,6 +655,7 @@ export const crearOrdenCompraConPdf = async (req: Request, res: Response) => {
     await ordenCompra.save();
     
     // Preparar datos para generar PDF
+    // Asegurarse de que los totales sean correctos
     const datosParaPdf = {
       numeroOrden: numeroOrdenFinal,
       fecha: fecha ? DateUtils.formatForOrdenCompra(fecha) : DateUtils.formatForOrdenCompra(),
@@ -663,8 +664,24 @@ export const crearOrdenCompraConPdf = async (req: Request, res: Response) => {
       vendedor: vendedorData ? vendedorData.toObject() : undefined,
       direccionEnvio,
       productos,
-      totalesCalculados,
-      datosPdf,
+      // Usar los totales calculados proporcionados, NO los del datosPdf original
+      totalesCalculados: {
+        subTotal: totalesCalculados.subTotal || 0,
+        iva: totalesCalculados.iva || 0,
+        total: totalesCalculados.total || 0
+      },
+      datosPdf: {
+        ...datosPdf,
+        datosExtraidos: {
+          ...datosPdf?.datosExtraidos,
+          // Sobreescribir los totales en datosPdf también
+          totales: {
+            subTotal: totalesCalculados.subTotal || 0,
+            iva: totalesCalculados.iva || 0,
+            total: totalesCalculados.total || 0
+          }
+        }
+      },
       moneda: moneda || 'MXN',
       porcentajeIvaSimbolico: porcentajeIvaSimbolico || '16'
     };

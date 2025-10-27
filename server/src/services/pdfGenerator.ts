@@ -101,36 +101,12 @@ export class PdfGeneratorService {
     // Extraer datos del PDF si existen
     const datosPdf = datosOrden.datosPdf?.datosExtraidos || {};
     
-    // Mejorar extracción de totales con múltiples nombres posibles
-    let totales = datosOrden.totalesCalculados || {
-      subTotal: 0,
-      iva: 0,
-      total: 0
+    // Usar siempre los totales calculados proporcionados
+    const totales = {
+      subTotal: Number(datosOrden.totalesCalculados?.subTotal) || 0,
+      iva: Number(datosOrden.totalesCalculados?.iva) || 0,
+      total: Number(datosOrden.totalesCalculados?.total) || 0
     };
-
-    // Si hay totales en el PDF, intentar extraerlos con nombres flexibles
-    if (datosPdf.totales && Object.keys(datosPdf.totales).length > 0) {
-      const totalesPdf = datosPdf.totales;
-      
-      // Buscar subtotal con nombres variables
-      const subtotal = totalesPdf.subTotal || totalesPdf['SUB-TOTAL'] || totalesPdf.Subtotal || totalesPdf.subtotal || 0;
-      
-      // Buscar IVA con nombres variables
-      const iva = totalesPdf.iva || totalesPdf.IVA || totalesPdf['8% I.V.A.'] || totalesPdf['16% IVA'] || totalesPdf['IVA (16%)'] || 0;
-      
-      // Buscar total con nombres variables
-      const total = totalesPdf.total || totalesPdf.Total || totalesPdf.TOTAL || 0;
-      
-      // Solo usar los totales del PDF si tienen valores válidos
-      if (subtotal > 0 || iva > 0 || total > 0) {
-        totales = {
-          subTotal: Number(subtotal) || 0,
-          iva: Number(iva) || 0,
-          total: Number(total) || 0
-        };
-        console.log('📊 Totales extraídos del PDF:', totales);
-      }
-    }
 
     // Mapear variables para la plantilla
     const plantillaVars = {
