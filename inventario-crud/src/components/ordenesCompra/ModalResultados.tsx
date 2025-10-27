@@ -3,6 +3,7 @@ import React, { useMemo, useState } from "react";
 import { Alert, Badge, Button, Col, Form, ListGroup, Modal, Row, Spinner } from "react-bootstrap";
 import { Vendedor } from "../../types";
 import { DateUtils } from "../../utils/dateUtils";
+import TablaProductos from "./TablaProductos";
 
 interface ModalResultadosProps {
   show: boolean;
@@ -15,7 +16,7 @@ interface ModalResultadosProps {
     total: number;
   };
   onActualizarProducto: (index: number, campo: string, valor: any) => void;
-  onAgregarProducto: () => void;
+  onAgregarProducto: () => void; // Función para agregar un nuevo producto
   onVolverAlFormulario: () => void;
   onGenerarOrden?: (datosOrden: any) => Promise<void>;
   editId?: string | null; // Añadido para identificar si está en modo edición
@@ -61,10 +62,26 @@ const FilaProducto = React.memo(({
     })} ${monedaInfo.codigo}`;
   };
   
+  const handleEliminarProducto = () => {
+    if (window.confirm('¿Está seguro de eliminar este producto?')) {
+      onActualizar(index, 'eliminar', null);
+    }
+  };
+
   return (
     <tr>
       <td className="align-middle">
-        <Badge bg="secondary">{index + 1}</Badge>
+        <div className="d-flex align-items-center">
+          <Badge bg="secondary" className="me-2">{index + 1}</Badge>
+          <Button 
+            variant="outline-danger"
+            size="sm"
+            onClick={handleEliminarProducto}
+            title="Eliminar producto"
+          >
+            <i className="fas fa-trash-alt"></i>
+          </Button>
+        </div>
       </td>
       <td className="align-middle">
         <Form.Control
@@ -231,6 +248,7 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
   productosEditables,
   totalesCalculados,
   onActualizarProducto,
+  onAgregarProducto,
   onVolverAlFormulario,
   onGenerarOrden,
   editId,
@@ -553,42 +571,12 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
             </div>
 
             {/* Tabla de productos editables */}
-            {productosEditables.length > 0 && (
-              <div className="mb-4">
-                <h5 className="text-primary mb-3">
-                  <i className="fas fa-shopping-cart me-2"></i>
-                  Productos de la Orden
-                </h5>
-                
-                <div className="table-responsive">
-                  <table className="table table-striped table-hover">
-                    <thead className="table-dark">
-                      <tr>
-                        <th style={{ width: '5%' }}>#</th>
-                        <th style={{ width: '12%' }}>Código</th>
-                        <th style={{ width: '30%' }}>Descripción</th>
-                        <th style={{ width: '8%' }}>Cantidad</th>
-                        <th style={{ width: '8%' }}>Unidad</th>
-                        <th style={{ width: '12%' }}>Precio Unitario</th>
-                        <th style={{ width: '8%' }}>Descuento</th>
-                        <th style={{ width: '17%' }}>Importe</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {productosEditables.map((producto, index) => (
-                        <FilaProducto
-                          key={`producto-${index}-${producto.clave || 'sin-clave'}`}
-                          producto={producto}
-                          index={index}
-                          onActualizar={onActualizarProducto}
-                          moneda={monedaSeleccionada}
-                        />
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
+            <TablaProductos 
+              productos={productosEditables}
+              onActualizar={onActualizarProducto}
+              onAgregar={onAgregarProducto}
+              moneda={monedaSeleccionada}
+            />
 
             {/* Totales */}
             <div className="mb-4">
