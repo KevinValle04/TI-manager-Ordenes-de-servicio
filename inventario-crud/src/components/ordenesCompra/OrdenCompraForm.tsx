@@ -742,19 +742,25 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
   const actualizarProducto = useCallback((index: number, campo: string, valor: any) => {
     setProductosEditables(prev => {
       const nuevosProductos = [...prev];
-      const productoActualizado = {
-        ...nuevosProductos[index],
-        [campo]: valor
-      };
       
-      // Sincronizar codigo y clave cuando se actualiza cualquiera de los dos
-      if (campo === 'codigo') {
-        productoActualizado.clave = valor;
-      } else if (campo === 'clave') {
-        productoActualizado.codigo = valor;
+      // Manejar eliminación de producto
+      if (campo === 'eliminar') {
+        nuevosProductos.splice(index, 1);
+      } else {
+        const productoActualizado = {
+          ...nuevosProductos[index],
+          [campo]: valor
+        };
+        
+        // Sincronizar codigo y clave cuando se actualiza cualquiera de los dos
+        if (campo === 'codigo') {
+          productoActualizado.clave = valor;
+        } else if (campo === 'clave') {
+          productoActualizado.codigo = valor;
+        }
+        
+        nuevosProductos[index] = productoActualizado;
       }
-      
-      nuevosProductos[index] = productoActualizado;
       
       // Calcular totales directamente con los nuevos productos
       calcularTotales(nuevosProductos);
