@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import CotizacionCanalizacion from '../models/CotizacionCanalizacion';
+import { CotizacionCanalizacionPdfGenerator } from '../services/cotizacionCanalizacionPdfGenerator';
 
 export const getCotizacionesCanalizacion = async (req: Request, res: Response) => {
   try {
@@ -154,5 +155,115 @@ export const cambiarEstadoCotizacion = async (req: Request, res: Response) => {
   } catch (err) {
     console.error('Error al cambiar estado de cotización:', err);
     res.status(400).json({ error: 'Error al cambiar estado de cotización' });
+  }
+};
+
+// Generar PDF de cotización de canalización
+export const getPdfCotizacionCanalizacion = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    
+    // Buscar la cotización con datos poblados
+    const cotizacion = await CotizacionCanalizacion.findById(id)
+      .populate('razonSocial', 'nombre rfc emailEmpresa telEmpresa direccionEmpresa');
+    
+    if (!cotizacion) {
+      return res.status(404).json({ error: 'Cotización de canalización no encontrada' });
+    }
+
+    // Preparar datos para el PDF
+    const datosPdf = {
+      numeroPresupuesto: cotizacion.numeroPresupuesto,
+      cliente: cotizacion.cliente,
+      fecha: cotizacion.fecha.toISOString(),
+      vigencia: cotizacion.vigencia.toISOString(),
+      subtotal: cotizacion.subtotal,
+      utilidad: cotizacion.utilidad,
+      total: cotizacion.total,
+      estado: cotizacion.estado,
+      items: cotizacion.items.map(item => ({
+        descripcion: item.descripcion,
+        cantidad: item.cantidad,
+        unidad: item.unidad,
+        precioUnitario: item.precioUnitario,
+        subtotal: item.subtotal
+      })),
+      comentarios: cotizacion.comentarios,
+      razonSocial: cotizacion.razonSocial as any
+    };
+
+    // Generar PDF
+    const pdfGenerator = new CotizacionCanalizacionPdfGenerator();
+    const pdfBuffer = await pdfGenerator.generarPdfCotizacionCanalizacion(datosPdf);
+
+    // Configurar headers para mostrar en navegador
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="Cotizacion-${cotizacion.numeroPresupuesto}.pdf"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
+
+    // Enviar el PDF
+    res.send(pdfBuffer);
+    
+  } catch (err: any) {
+    console.error('Error al generar PDF de cotización:', err);
+    res.status(500).json({ 
+      error: 'Error al generar PDF de cotización',
+      detalles: err.message
+    });
+  }
+};
+
+// Descargar PDF de cotización de canalización
+export const descargarPdfCotizacionCanalizacion = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    
+    // Buscar la cotización con datos poblados
+    const cotizacion = await CotizacionCanalizacion.findById(id)
+      .populate('razonSocial', 'nombre rfc emailEmpresa telEmpresa direccionEmpresa');
+    
+    if (!cotizacion) {
+      return res.status(404).json({ error: 'Cotización de canalización no encontrada' });
+    }
+
+    // Preparar datos para el PDF
+    const datosPdf = {
+      numeroPresupuesto: cotizacion.numeroPresupuesto,
+      cliente: cotizacion.cliente,
+      fecha: cotizacion.fecha.toISOString(),
+      vigencia: cotizacion.vigencia.toISOString(),
+      subtotal: cotizacion.subtotal,
+      utilidad: cotizacion.utilidad,
+      total: cotizacion.total,
+      estado: cotizacion.estado,
+      items: cotizacion.items.map(item => ({
+        descripcion: item.descripcion,
+        cantidad: item.cantidad,
+        unidad: item.unidad,
+        precioUnitario: item.precioUnitario,
+        subtotal: item.subtotal
+      })),
+      comentarios: cotizacion.comentarios,
+      razonSocial: cotizacion.razonSocial as any
+    };
+
+    // Generar PDF
+    const pdfGenerator = new CotizacionCanalizacionPdfGenerator();
+    const pdfBuffer = await pdfGenerator.generarPdfCotizacionCanalizacion(datosPdf);
+
+    // Configurar headers para forzar descarga
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="Cotizacion-${cotizacion.numeroPresupuesto}.pdf"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
+
+    // Enviar el PDF
+    res.send(pdfBuffer);
+    
+  } catch (err: any) {
+    console.error('Error al descargar PDF de cotización:', err);
+    res.status(500).json({ 
+      error: 'Error al descargar PDF de cotización',
+      detalles: err.message
+    });
   }
 };

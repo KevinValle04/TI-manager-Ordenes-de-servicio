@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
+import { Cliente, CotizacionCanalizacion, MaterialCanalizacion, RazonSocial } from '../../types';
 import DataTable from '../common/DataTable';
-import SearchBar from '../common/SearchBar';
 import PaginationCompact from '../common/PaginationCompact';
+import SearchBar from '../common/SearchBar';
 import CotizacionCanalizacionModal from './CotizacionCanalizacionModal';
-import { CotizacionCanalizacion, Cliente, MaterialCanalizacion, RazonSocial } from '../../types';
 
 const CotizacionCanalizacionList: React.FC = () => {
   // Estados básicos
@@ -92,6 +92,46 @@ const CotizacionCanalizacionList: React.FC = () => {
     } catch (error) {
       console.error('Error al cargar razones sociales:', error);
       setRazonesSociales([]);
+    }
+  };
+
+  // Funciones para PDF
+  const handleVerPdf = (cotizacion: CotizacionCanalizacion) => {
+    if (!cotizacion._id) {
+      alert("ID de cotización no válido");
+      return;
+    }
+    window.open(`/api/cotizaciones-canalizacion/${cotizacion._id}/pdf`, "_blank");
+  };
+
+  const handleDescargarPdf = (cotizacion: CotizacionCanalizacion) => {
+    if (!cotizacion._id) {
+      alert("ID de cotización no válido");
+      return;
+    }
+    window.open(`/api/cotizaciones-canalizacion/${cotizacion._id}/pdf/descargar`, "_blank");
+  };
+
+  // Alternativa: Exportar PDF con jsPDF (frontend)
+  const handleExportarPdfLocal = async (cotizacion: CotizacionCanalizacion) => {
+    try {
+      // Importar dinámicamente para evitar errores si no está instalado
+      const { exportarCotizacionPDF } = await import('../../utils/pdfExporter');
+      exportarCotizacionPDF(cotizacion);
+    } catch (error) {
+      console.log('jsPDF no disponible, usando backend...');
+      handleDescargarPdf(cotizacion);
+    }
+  };
+
+  // Exportar lista completa de cotizaciones
+  const handleExportarListaPdf = async () => {
+    try {
+      const { exportarListaCotizacionesPDF } = await import('../../utils/pdfExporter');
+      exportarListaCotizacionesPDF(currentItems);
+    } catch (error) {
+      console.error('Error al exportar lista:', error);
+      alert('Error al exportar la lista. Por favor instale las dependencias de jsPDF.');
     }
   };
 
@@ -277,16 +317,26 @@ const CotizacionCanalizacionList: React.FC = () => {
         </div>
       )}
       
+      {/* Barra de búsqueda y controles */}
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-stretch gap-2 mb-3">
-        <SearchBar 
+        <SearchBar
           value={searchTerm}
-          onChange={setSearchTerm}
-          placeholder="Buscar por cliente, número, estado o comentarios..." 
+          onChange={handleSearch}
+          placeholder="Buscar por presupuesto, cliente o estado..."
           className="flex-grow-1"
         />
-        <Button variant="success" onClick={handleNew}>
-          Nueva Cotización
-        </Button>
+        <div className="d-flex gap-2">
+          <Button 
+            variant="outline-primary" 
+            onClick={() => handleExportarListaPdf()}
+            title="Exportar lista completa a PDF"
+          >
+            📄 Exportar Lista
+          </Button>
+          <Button variant="success" onClick={handleNew}>
+            Nueva Cotización
+          </Button>
+        </div>
       </div>
 
       {loading && (
@@ -320,6 +370,24 @@ const CotizacionCanalizacionList: React.FC = () => {
                     onClick={() => handleEdit(cotizacion)}
                   >
                     Editar
+                  </Button>
+                  <Button
+                    variant="info"
+                    size="sm"
+                    className="w-100 w-sm-auto"
+                    onClick={() => handleVerPdf(cotizacion)}
+                    title="Ver PDF"
+                  >
+                    Ver
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="w-100 w-sm-auto"
+                    onClick={() => handleDescargarPdf(cotizacion)}
+                    title="Descargar PDF"
+                  >
+                    📄
                   </Button>
                   <Button
                     variant="danger"

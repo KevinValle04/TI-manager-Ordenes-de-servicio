@@ -1,13 +1,15 @@
+import type { NextFunction, Request, Response } from 'express';
 import { Router } from 'express';
-import type { Request, Response, NextFunction } from 'express';
-import { 
-  getCotizacionesCanalizacion, 
-  getCotizacionCanalizacionById, 
-  createCotizacionCanalizacion, 
-  updateCotizacionCanalizacion, 
+import {
+  cambiarEstadoCotizacion,
+  createCotizacionCanalizacion,
   deleteCotizacionCanalizacion,
+  descargarPdfCotizacionCanalizacion,
+  getCotizacionCanalizacionById,
+  getCotizacionesCanalizacion,
+  getPdfCotizacionCanalizacion,
   searchCotizacionesCanalizacion,
-  cambiarEstadoCotizacion
+  updateCotizacionCanalizacion
 } from '../controllers/cotizacionCanalizacionController';
 
 const router = Router();
@@ -27,5 +29,9 @@ router.post('/', asyncHandler(createCotizacionCanalizacion));
 router.put('/:id', asyncHandler(updateCotizacionCanalizacion));
 router.put('/:id/estado', asyncHandler(cambiarEstadoCotizacion));
 router.delete('/:id', asyncHandler(deleteCotizacionCanalizacion));
+
+// Rutas para PDFs
+router.get('/:id/pdf', asyncHandler(getPdfCotizacionCanalizacion));
+router.get('/:id/pdf/descargar', asyncHandler(descargarPdfCotizacionCanalizacion));
 
 export default router;

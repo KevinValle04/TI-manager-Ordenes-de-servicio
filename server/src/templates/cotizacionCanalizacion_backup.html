@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cotización de Canalización</title>
+</head>
+<body>
+  <div class="container">
+    <!-- Imagen superior similar a orden de compra -->
+    <div class="top-banner">
+      <div class="company-logo">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" alt="TI SERVICES" class="logo-img">
+      </div>
+    </div>
+
+    <!-- Encabezado profesional estilo orden de compra -->
+    <div class="header-grid">
+      <div class="header-left">
+        <div class="empty-cell"></div>
+        <div class="empty-cell"></div>
+        <div class="empty-cell"></div>
+        <div class="empty-cell"></div>
+        <div class="empty-cell"></div>
+        <div class="empty-cell"></div>
+        <div class="empty-cell"></div>
+        <div class="empty-cell"></div>
+      </div>
+      <div class="header-right">
+        <div class="document-title">Cotización de Canalización</div>
+        <div class="document-info">
+          <div class="info-row">
+            <span class="info-label">No. Cotización</span>
+            <span class="info-value">{{numeroPresupuesto}}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Fecha</span>
+            <span class="info-value">{{fecha}}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Vigencia</span>
+            <span class="info-value">{{vigencia}}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Estado</span>
+            <span class="info-value status-{{estado}}">{{estado}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información del Cliente estilo orden de compra -->
+    <div class="client-section-grid">
+      <div class="client-header">CLIENTE</div>
+      <div class="client-details">
+        <div class="client-name">{{cliente}}</div>
+        {{#if razonSocial}}
+        <div class="client-info-line">{{razonSocial.nombre}}</div>
+        <div class="client-info-line">{{razonSocial.rfc}}</div>
+        {{#if razonSocial.direccionEmpresa}}
+        <div class="client-info-line">{{razonSocial.direccionEmpresa}}</div>
+        {{/if}}
+        {{/if}}
+      </div>
+      
+      <div class="contact-header">CONTACTO</div>
+      <div class="contact-details">
+        {{#if razonSocial}}
+        {{#if razonSocial.telEmpresa}}
+        <div class="contact-info-line">{{razonSocial.telEmpresa}}</div>
+        {{/if}}
+        {{#if razonSocial.emailEmpresa}}
+        <div class="contact-info-line">{{razonSocial.emailEmpresa}}</div>
+        {{/if}}
+        {{/if}}
+      </div>
+
+      <div class="project-header">DETALLES COTIZACIÓN</div>
+      <div class="project-details">
+        <div class="project-info-line">Utilidad: {{utilidad}}</div>
+        <div class="project-info-line">Válida hasta: {{vigencia}}</div>
+      </div>
+    </div>
+
+    <!-- Espaciador -->
+    <div class="spacer"></div>
+
+    <!-- Tabla de Items estilo orden de compra -->
+    <table class="items-table">
+      <thead>
+        <tr>
+          <th class="desc-col">DESCRIPCIÓN DEL MATERIAL</th>
+          <th class="qty-col">CANT.</th>
+          <th class="unit-col">UNIDAD</th>
+          <th class="price-col">PRECIO UNIT.</th>
+          <th class="total-col">IMPORTE</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{filasItems}}
+      </tbody>
+    </table>
+
+    <!-- Totales estilo orden de compra -->
+    <table class="totals-table">
+      <tbody>
+        <tr class="spacer-row"><td colspan="5" class="spacer-cell"></td></tr>
+        <tr>
+          <td colspan="4" class="total-label">SUBTOTAL</td>
+          <td class="total-value subtotal-value">{{subtotal}}</td>
+        </tr>
+        <tr>
+          <td colspan="4" class="total-label">UTILIDAD</td>
+          <td class="total-value utilidad-value">{{utilidadMonto}}</td>
+        </tr>
+        <tr>
+          <td colspan="4" class="total-label final-label">TOTAL</td>
+          <td class="total-value final-value">{{total}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Información adicional estilo orden de compra -->
+    <div class="footer-info">
+      <table class="info-table">
+        <tbody>
+          {{#if comentarios}}
+          <tr>
+            <td class="info-label-cell" colspan="2">Observaciones</td>
+            <td colspan="3" class="info-value-cell">{{comentarios}}</td>
+          </tr>
+          {{/if}}
+          <tr>
+            <td class="info-label-cell" colspan="2">Uso de Cotización</td>
+            <td colspan="3" class="info-value-cell">Materiales de canalización eléctrica</td>
+          </tr>
+          <tr>
+            <td class="info-label-cell" colspan="2">Forma de pago</td>
+            <td colspan="3" class="info-value-cell">Por definir</td>
+          </tr>
+          <tr>
+            <td class="info-label-cell" colspan="2">Moneda</td>
+            <td colspan="3" class="info-value-cell">Pesos Mexicanos (MXN)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Firmas estilo orden de compra -->
+    <div class="signatures">
+      <div class="signature-lines">
+        <div class="signature-line">_____________________</div>
+        <div class="signature-label">AUTORIZA</div>
+      </div>
+      
+      <div class="signature-section">
+        <div class="signature-pair">
+          <div class="signature-item">
+            <div class="signature-line">_____________________</div>
+            <div class="signature-label">FIRMA DEL CLIENTE</div>
+          </div>
+          <div class="signature-item">
+            <div class="signature-line">_____________________</div>
+            <div class="signature-label">FIRMA DEL VENDEDOR</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Imagen inferior similar a orden de compra -->
+    <div class="bottom-banner">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==" alt="Bottom Banner" class="bottom-img">
+    </div>
+  </div>
+</body>
+</html>
