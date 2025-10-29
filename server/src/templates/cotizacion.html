@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cotización - {{numeroPresupuesto}}</title>
+  <link rel="stylesheet" href="cotizacion.css">
+</head>
+<body>
+  <div id="tabla-cotizacion-wrapper" style="width:100%;overflow-x:auto;">
+    
+    <!-- ===== IMAGEN SUPERIOR CORPORATIVA ===== -->
+    <img src="img/top.png" alt="Header Corporativo">
+    
+    <!-- ===== TABLA DE ENCABEZADO ESTILO ORDEN COMPRA ===== -->
+    <table id="tabla-top">
+      <tbody>
+        <tr>
+          <td class="columnaA"></td>
+          <td class="columnaB"></td>
+          <td class="columnaC"></td>
+          <td class="columnaD"></td>
+          <td class="columnaE"></td>
+          <td class="columnaF"></td>
+          <td class="columnaG"></td>
+          <td class="columnaH"></td>
+          <td class="columnaI"></td>
+          <td class="columnaJ"></td>
+        </tr>
+        <tr>
+          <td colspan="8"></td><td colspan="2" class="td-text-archivo" style="font-size: 15pt !important;">Cotización</td>
+        </tr>
+        <tr>
+          <td colspan="6" class="td-info"></td><td></td><td></td><td class="td-info-text">No. Cotización</td><td class="td-doc-info">{{numeroPresupuesto}}</td>
+        </tr>
+        <tr>
+          <td colspan="6" class="td-info-text"></td><td></td><td></td><td class="td-info-text">Fecha</td><td class="td-doc-info">{{fecha}}</td>
+        </tr>
+        <tr>
+          <td colspan="6" class="td-info-text"></td><td></td><td></td><td class="td-info-text">Vigencia</td><td class="td-doc-info">{{vigencia}}</td>
+        </tr>
+        <tr>
+          <td colspan="6" class="td-info-text"></td><td></td><td></td><td class="td-info-text">Estado</td><td class="td-doc-info status-{{estado}}">{{estado}}</td>
+        </tr>
+        {{#if razonSocial}}
+        <tr>
+          <td colspan="2" class="td-info">DATOS EMPRESA</td><td colspan="6" class="td-info-text"></td><td></td><td></td>
+        </tr>
+        <tr>
+          <td></td><td></td><td colspan="6" class="td-info-text">Nombre: {{razonSocial.nombre}}</td><td></td><td></td>
+        </tr>
+        <tr>
+          <td></td><td></td><td colspan="6" class="td-info-text">RFC: {{razonSocial.rfc}}</td><td></td><td></td>
+        </tr>
+        <tr>
+          <td></td><td></td><td colspan="6" class="td-info-text">Email: {{razonSocial.emailEmpresa}}</td><td></td><td></td>
+        </tr>
+        <tr>
+          <td></td><td></td><td colspan="6" class="td-info-text">Tel: {{razonSocial.telEmpresa}}</td><td></td><td></td>
+        </tr>
+        <tr>
+          <td></td><td></td><td colspan="6" class="td-info-text">Dirección: {{razonSocial.direccionEmpresa}}</td><td></td><td></td>
+        </tr>
+        {{/if}}
+        <tr>
+          <td colspan="2" class="td-info">DATOS CLIENTE</td><td colspan="6" class="td-info-text"></td><td></td><td></td>
+        </tr>
+        <tr>
+          <td></td><td></td><td colspan="6" class="td-info-text">Nombre/Empresa: {{cliente}}</td><td></td><td></td>
+        </tr>
+        <tr>
+          <td class="td-info-label">Uso de Cotización</td>
+          <td class="td-info-value">Materiales y servicios varios</td>
+        </tr>
+        <tr>
+          <td class="td-info-label">Forma de pago</td>
+          <td class="td-info-value">Por definir</td>
+        </tr>
+        <tr>
+          <td class="td-info-label">Moneda</td>
+          <td class="td-info-value">Pesos Mexicanos (MXN)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ===== TABLA DE ITEMS ===== -->
+    <table class="tabla-items">
+      <thead>
+        <tr>
+          <th style="width: 45%;">DESCRIPCIÓN DEL MATERIAL</th>
+          <th style="width: 12%;">CANT.</th>
+          <th style="width: 12%;">UNIDAD</th>
+          <th style="width: 15%;">PRECIO UNIT.</th>
+          <th style="width: 16%;">IMPORTE</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each items}}
+        <tr>
+          <td>{{descripcion}}</td>
+          <td class="text-center">{{cantidad}}</td>
+          <td class="text-center">{{unidad}}</td>
+          <td class="text-right">{{precioUnitario}}</td>
+          <td class="text-right">{{subtotal}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4" class="text-right">SUBTOTAL:</td>
+          <td class="text-right">{{subtotal}}</td>
+        </tr>
+        <tr>
+          <td colspan="4" class="text-right">UTILIDAD ({{utilidad}}%):</td>
+          <td class="text-right">{{formatCurrency (multiply subtotal (divide utilidad 100))}}</td>
+        </tr>
+        <tr>
+          <td colspan="4" class="text-right font-weight-bold">TOTAL:</td>
+          <td class="text-right font-weight-bold">{{total}}</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    {{#if comentarios}}
+    <!-- ===== SECCIÓN DE COMENTARIOS ===== -->
+    <div class="comentarios-section">
+      <h4>Comentarios:</h4>
+      <p>{{comentarios}}</p>
+    </div>
+    {{/if}}
+
+    <!-- ===== SECCIÓN DE FIRMAS ===== -->
+    <div style="margin-top: 80px; text-align: center;">
+      <table style="width: 100%; margin-top: 40px;">
+        <tr>
+          <td style="width: 45%; text-align: center; vertical-align: bottom;">
+            <div style="border-bottom: 1px solid #000; width: 200px; margin: 0 auto 8px auto; height: 20px;"></div>
+            <div style="font-size: 12px;">Firma del Cliente</div>
+          </td>
+          <td style="width: 10%;"></td>
+          <td style="width: 45%; text-align: center; vertical-align: bottom;">
+            <div style="border-bottom: 1px solid #000; width: 200px; margin: 0 auto 8px auto; height: 20px;"></div>
+            <div style="font-size: 12px;">Firma de Autorización</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      font-size: 12px;
+    }
+
+    #tabla-cotizacion-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    #tabla-top td {
+      padding: 4px 8px;
+      vertical-align: top;
+    }
+
+    .td-text-archivo {
+      font-size: 18px;
+      font-weight: bold;
+      text-align: right;
+    }
+
+    .td-info {
+      font-weight: bold;
+      background: #e9ecef;
+    }
+
+    .td-info-text {
+      background: #f8f9fa;
+    }
+
+    .td-doc-info {
+      font-weight: bold;
+      text-align: center;
+      background: #f8f9fa;
+    }
+
+    .tabla-items {
+      margin-top: 30px;
+    }
+
+    .tabla-items th,
+    .tabla-items td {
+      border: 1px solid #dee2e6;
+      padding: 8px;
+    }
+
+    .tabla-items th {
+      background: #e9ecef;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .tabla-items tfoot td {
+      font-weight: bold;
+      border-top: 2px solid #000;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .comentarios-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #dee2e6;
+      background: #f8f9fa;
+    }
+
+    .comentarios-section h4 {
+      margin-top: 0;
+      color: #495057;
+    }
+
+    .status-Borrador { color: #6c757d; }
+    .status-Enviada { color: #007bff; }
+    .status-Aceptada { color: #28a745; }
+    .status-Rechazada { color: #dc3545; }
+    .status-Vencida { color: #ffc107; }
+
+    @media print {
+      body {
+        padding: 0;
+      }
+      
+      .no-print {
+        display: none;
+      }
+    }
+  </style>
+</body>
+</html>

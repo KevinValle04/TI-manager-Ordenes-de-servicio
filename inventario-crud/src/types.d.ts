@@ -172,3 +172,30 @@ export interface ItemCotizacionCanalizacion {
   precioUnitario: number;
   subtotal: number;
 }
+
+export interface Cotizacion {
+  _id?: string;
+  numeroPresupuesto: string;
+  cliente: string | Cliente;
+  razonSocial?: string | RazonSocial; // Referencia a la razón social (opcional)
+  fecha: Date | string;
+  vigencia: Date | string;
+  subtotal: number;
+  utilidad: number; // Porcentaje de utilidad
+  total: number;
+  estado: "Borrador" | "Enviada" | "Aceptada" | "Rechazada" | "Vencida";
+  items: ItemCotizacion[];
+  comentarios?: string;
+  fechaCreacion: Date | string;
+  fechaActualizacion: Date | string;
+}
+
+export interface ItemCotizacion {
+  _id?: string;
+  material?: string | IInventoryItem; // Referencia al material (opcional)
+  descripcion: string;
+  cantidad: number;
+  unidad: "PZA" | "MTS";
+  precioUnitario: number;
+  subtotal: number;
+}
