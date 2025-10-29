@@ -51,7 +51,7 @@ export const TablaProductos: React.FC<TablaProductosProps> = ({
             ) : (
               productos.map((producto, index) => (
                 <FilaProducto
-                  key={`producto-${index}-${producto.clave || 'sin-clave'}`}
+                  key={`producto-${index}`}
                   producto={producto}
                   index={index}
                   onActualizar={onActualizar}
