@@ -73,19 +73,19 @@ export class CotizacionPdfGenerator {
 
       // Generar PDF con Puppeteer
       const browser = await puppeteer.launch({
-        headless: 'new'
+        headless: true
       });
       const page = await browser.newPage();
       await page.setContent(html, { waitUntil: 'networkidle0' });
 
-      const pdf = await page.pdf({
+      const pdfBuffer = await page.pdf({
         format: 'A4',
         margin: { top: '1cm', bottom: '1cm', left: '1cm', right: '1cm' },
         printBackground: true
       });
 
       await browser.close();
-      return pdf;
+      return Buffer.from(pdfBuffer);
 
     } catch (error) {
       console.error('Error al generar PDF:', error);

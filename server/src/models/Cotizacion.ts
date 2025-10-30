@@ -127,7 +127,7 @@ const CotizacionSchema = new Schema<ICotizacion>({
 
 // Método para calcular totales
 CotizacionSchema.methods.calcularTotales = function() {
-  this.subtotal = this.items.reduce((total, item) => total + item.subtotal, 0);
+  this.subtotal = this.items.reduce((total: number, item: IItemCotizacion): number => total + item.subtotal, 0);
   this.total = this.subtotal * (1 + this.utilidad / 100);
 };
 

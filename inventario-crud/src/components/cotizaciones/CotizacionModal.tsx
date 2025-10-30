@@ -115,7 +115,11 @@ const CotizacionModal = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    const filteredData = {
+      ...formData,
+      items: formData.items.filter(item => item.descripcion.trim() !== '')
+    };
+    onSave(filteredData);
   };
 
   // Asegurar que siempre haya una fila vacía al final
