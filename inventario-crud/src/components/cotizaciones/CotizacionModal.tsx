@@ -78,6 +78,53 @@ const CotizacionModal = ({
   
   // Estados para drag & drop
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
+  
+  // Estados para el modal de búsqueda de canalizaciones
+  const [showCanalizacionModal, setShowCanalizacionModal] = useState(false);
+  const [canalizaciones, setCanalizaciones] = useState<any[]>([]);
+  const [canalizacionSearchTerm, setCanalizacionSearchTerm] = useState('');
+
+  // Función para buscar canalizaciones
+  const searchCanalizaciones = async (searchTerm: string) => {
+    try {
+      setCanalizacionSearchTerm(searchTerm);
+      const response = await fetch(`/api/cotizaciones-canalizacion/search?term=${searchTerm}`);
+      if (response.ok) {
+        const data = await response.json();
+        setCanalizaciones(data);
+      }
+    } catch (error) {
+      console.error('Error al buscar canalizaciones:', error);
+    }
+  };
+
+  // Función para añadir una canalización como ítem
+  const addCanalizacion = (canalizacion: any) => {
+    const newItem = {
+      descripcion: `Canalización: ${canalizacion.numeroPresupuesto} - ${canalizacion.cliente}`,
+      cantidad: 1,
+      unidad: 'PZA' as const,
+      precioUnitario: canalizacion.total,
+      subtotal: canalizacion.total,
+      material: '',
+      canalizacionId: canalizacion._id // Referencia a la canalización original
+    };
+
+    setFormData(prev => ({
+      ...prev,
+      items: [...prev.items.filter(item => item.descripcion.trim() !== ''), newItem, {
+        descripcion: '',
+        cantidad: 1,
+        unidad: 'PZA',
+        precioUnitario: 0,
+        subtotal: 0,
+        material: ''
+      }]
+    }));
+
+    setShowCanalizacionModal(false);
+    calculateTotals();
+  };
 
   // Efecto para cargar datos de edición
   useEffect(() => {
@@ -527,7 +574,68 @@ const CotizacionModal = ({
                   <i className="fas fa-shopping-cart me-2"></i>
                   Productos en la Cotización
                 </h5>
+                <Button 
+                  variant="outline-primary"
+                  onClick={() => setShowCanalizacionModal(true)}
+                >
+                  <i className="fas fa-plus me-2"></i>
+                  Añadir Canalización
+                </Button>
               </div>
+
+              {/* Modal de búsqueda de canalizaciones */}
+              <Modal 
+                show={showCanalizacionModal} 
+                onHide={() => setShowCanalizacionModal(false)}
+                size="lg"
+              >
+                <Modal.Header closeButton>
+                  <Modal.Title>Buscar Canalización</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <Form.Group className="mb-3">
+                    <Form.Control
+                      type="text"
+                      placeholder="Buscar por número de presupuesto o cliente..."
+                      value={canalizacionSearchTerm}
+                      onChange={(e) => searchCanalizaciones(e.target.value)}
+                    />
+                  </Form.Group>
+                  <div className="table-responsive">
+                    <table className="table table-hover">
+                      <thead>
+                        <tr>
+                          <th>No. Presupuesto</th>
+                          <th>Cliente</th>
+                          <th>Total</th>
+                          <th>Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {canalizaciones.map(canalizacion => (
+                          <tr key={canalizacion._id}>
+                            <td>{canalizacion.numeroPresupuesto}</td>
+                            <td>{canalizacion.cliente}</td>
+                            <td>${canalizacion.total.toLocaleString('es-MX', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            })}</td>
+                            <td>
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={() => addCanalizacion(canalizacion)}
+                              >
+                                Añadir
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Modal.Body>
+              </Modal>
               <div className="table-responsive">
                 <table className="table table-striped table-hover">
                   <thead className="table-dark">

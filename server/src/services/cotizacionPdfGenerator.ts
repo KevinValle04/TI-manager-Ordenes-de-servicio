@@ -46,6 +46,28 @@ export class CotizacionPdfGenerator {
   }
 
   private async obtenerPlantillaHtml(): Promise<string> {
+    // Registrar helpers de Handlebars
+    handlebars.registerHelper('multiply', (a: number, b: number) => {
+      return a * b;
+    });
+    
+    handlebars.registerHelper('divide', (a: number, b: number) => {
+      return a / b;
+    });
+    
+    handlebars.registerHelper('formatCurrency', (value: number) => {
+      return this.formatoMoneda(value);
+    });
+
+    handlebars.registerHelper('increment', (value: number) => {
+      return value + 1;
+    });
+
+    const formatCurrency = this.formatoMoneda.bind(this);
+    handlebars.registerHelper('formatCurrency', (value: number) => {
+      return formatCurrency(value);
+    });
+
     const rutaPlantilla = path.join(__dirname, '../templates/cotizacion.html');
     return fs.promises.readFile(rutaPlantilla, 'utf-8');
   }
