@@ -605,14 +605,23 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
                               0;
         
         // 🔧 DESCUENTOS: Solo para proveedores que los manejen explícitamente
-        // NOTA: Si se usa PRECIO DE DISTRIBUIDOR, el descuento será 0 (ya aplicado)
-        // SYSCOM no usa descuentos, GRUPO DICE sí
+        // NOTA: Si se usa PRECIO DE DISTRIBUIDOR (TVC), el descuento será 0 (ya aplicado)
+        // SYSCOM no usa descuentos, GRUPO DICE sí, TVC usa precio distribuidor sin descuentos adicionales
+        
+        // Detectar si es TVC basado en el proveedor seleccionado o campos del PDF
+        const esTVC = proveedorSeleccionado?.empresa?.toLowerCase().includes('tvc') || 
+                      JSON.stringify(producto).toLowerCase().includes('precio distribuidor') ||
+                      JSON.stringify(producto).toLowerCase().includes('precio distribu');
+        
         const tieneDescuentoExplicito = producto.descuentoPorcentaje !== undefined || 
                                        producto.descuento !== undefined;
         
-        const descuentoPorcentaje = tieneDescuentoExplicito ? 
-                                   (parseNumericValue(producto.descuentoPorcentaje) || 
-                                    parseNumericValue(producto.descuento) || 0) : 0;
+        // Para TVC: siempre descuento = 0, para otros: usar descuento explícito si existe
+        let descuentoPorcentaje = 0;
+        if (!esTVC && tieneDescuentoExplicito) {
+          descuentoPorcentaje = parseNumericValue(producto.descuentoPorcentaje) || 
+                               parseNumericValue(producto.descuento) || 0;
+        }
         
         const importeOriginal = parseNumericValue(producto.importe) || 
                                parseNumericValue(producto.total) ||
@@ -629,9 +638,19 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
           clave: producto.codigo || producto.clave || '', // Agregar mapeo explícito para el modal
           descripcion: producto.descripcion || producto.concepto || '',
           precioUnitario: precioUnitario, // ✅ PRIORIZA precioUnitario directo
-          descuento: descuentoPorcentaje, // ✅ Solo si existe explícitamente
+          descuento: descuentoPorcentaje, // ✅ TVC = 0, otros = valor explícito
           importe: importe // El importe final
         };
+        
+        // Log para TVC cuando se detecta y se aplica descuento cero
+        if (esTVC && index < 3) {
+          console.log(`🔵 TVC detectado - Producto ${index + 1}:`, {
+            esDetectadoComoTVC: esTVC,
+            descuentoOriginal: producto.descuentoPorcentaje || producto.descuento,
+            descuentoFinal: descuentoPorcentaje,
+            precioUnitario: precioUnitario
+          });
+        }
         
         // Log solo productos con problemas de precio
         if (precioUnitario === 0 && index < 5) {
