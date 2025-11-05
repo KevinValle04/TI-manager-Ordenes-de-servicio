@@ -16,6 +16,8 @@ type CotizacionFormData = Omit<Cotizacion, 'fechaCreacion' | 'fechaActualizacion
   fecha: string;
   vigencia: string;
   items: ItemCotizacion[];
+  iva: number;
+  ivaImporte: number;
 }
 
 interface CotizacionModalProps {
@@ -46,15 +48,18 @@ const CotizacionModal = ({
     fecha: new Date().toISOString().split('T')[0],
     vigencia: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     items: [{
-      descripcion: '',
+      clave: 1,
+      marca: '',
+      modelo: '',
+      concepto: '',
       cantidad: 1,
       unidad: 'PZA' as const,
       precioUnitario: 0,
-      subtotal: 0,
-      material: ''
+      importe: 0
     }],
     subtotal: 0,
-    utilidad: 30,
+    iva: 8,
+    ivaImporte: 0,
     total: 0,
     estado: 'Borrador',
     comentarios: ''
@@ -101,24 +106,32 @@ const CotizacionModal = ({
   // Función para añadir una canalización como ítem
   const addCanalizacion = (canalizacion: any) => {
     const newItem = {
-      descripcion: `Canalización: ${canalizacion.numeroPresupuesto} - ${canalizacion.cliente}`,
+      clave: formData.items.length + 1,
+      marca: 'CANALIZACIÓN',
+      modelo: canalizacion.numeroPresupuesto,
+      concepto: `Canalización: ${canalizacion.numeroPresupuesto} - ${canalizacion.cliente}`,
       cantidad: 1,
       unidad: 'PZA' as const,
       precioUnitario: canalizacion.total,
-      subtotal: canalizacion.total,
+      importe: canalizacion.total,
       material: '',
-      canalizacionId: canalizacion._id // Referencia a la canalización original
+      canalizacionId: canalizacion._id, // Referencia a la canalización original
+      esCanalizacion: true
     };
 
     setFormData(prev => ({
       ...prev,
-      items: [...prev.items.filter(item => item.descripcion.trim() !== ''), newItem, {
-        descripcion: '',
+      items: [...prev.items.filter(item => item.concepto.trim() !== ''), newItem, {
+        clave: prev.items.length + 2,
+        marca: '',
+        modelo: '',
+        concepto: '',
         cantidad: 1,
         unidad: 'PZA',
         precioUnitario: 0,
-        subtotal: 0,
-        material: ''
+        importe: 0,
+        material: '',
+        esCanalizacion: false
       }]
     }));
 
@@ -164,21 +177,25 @@ const CotizacionModal = ({
     e.preventDefault();
     const filteredData = {
       ...formData,
-      items: formData.items.filter(item => item.descripcion.trim() !== '')
+      items: formData.items.filter(item => item.concepto.trim() !== '')
     };
     onSave(filteredData);
   };
 
   // Asegurar que siempre haya una fila vacía al final
   const ensureEmptyRow = (items: ItemCotizacion[]): ItemCotizacion[] => {
-    if (items.length === 0 || items[items.length - 1].descripcion !== '') {
+    if (items.length === 0 || items[items.length - 1].concepto !== '') {
+      const newIndex = items.length + 1;
       return [...items, { 
-        material: '',
-        descripcion: '',
+        clave: newIndex,
+        marca: '',
+        modelo: '',
+        concepto: '',
         cantidad: 1,
         unidad: 'PZA' as const,
         precioUnitario: 0,
-        subtotal: 0
+        importe: 0,
+        material: ''
       }];
     }
     return items;
@@ -212,12 +229,12 @@ const CotizacionModal = ({
     const items = [...(formData.items || [])];
     
     // No permitir reordenar la última fila vacía
-    if (dropIndex === items.length - 1 && items[dropIndex].descripcion === '') {
+    if (dropIndex === items.length - 1 && items[dropIndex].concepto === '') {
       return;
     }
     
     // No permitir arrastrar la última fila vacía
-    if (draggedItem === items.length - 1 && items[draggedItem].descripcion === '') {
+    if (draggedItem === items.length - 1 && items[draggedItem].concepto === '') {
       return;
     }
 
@@ -228,8 +245,9 @@ const CotizacionModal = ({
 
     // Asegurar fila vacía al final y actualizar totales
     const updatedItems = ensureEmptyRow(items);
-    const newSubtotal = updatedItems.reduce((sum, item) => sum + (item.subtotal || 0), 0);
-    const newTotal = newSubtotal * (1 + (formData.utilidad || 30) / 100);
+    const newSubtotal = updatedItems.reduce((sum, item) => sum + (item.importe || 0), 0);
+    const ivaImporte = newSubtotal * (formData.iva / 100);
+    const newTotal = newSubtotal + ivaImporte;
 
     setFormData({
       ...formData,
@@ -304,14 +322,14 @@ const CotizacionModal = ({
       width: rect.width
     });
     
-    const currentValue = formData.items?.[index]?.descripcion || '';
+    const currentValue = formData.items?.[index]?.concepto || '';
     let filtered: IInventoryItem[] = [];
     
     if (currentValue.length > 0) {
       const searchWords = currentValue.toLowerCase().trim().split(/\s+/);
       filtered = inventarioItems.filter(item => {
         const searchableText = `${item.descripcion.toLowerCase()}`;
-        return searchWords.every(word => searchableText.includes(word));
+        return searchWords.every((word: string) => searchableText.includes(word));
       });
     } else {
       filtered = inventarioItems.slice(0, 5);
@@ -331,7 +349,7 @@ const CotizacionModal = ({
   };
 
   const handleProductSearch = (index: number, value: string, event?: React.ChangeEvent) => {
-    handleItemChange(index, 'descripcion', value);
+    handleItemChange(index, 'concepto', value);
     
     if (event) {
       const target = event.target as HTMLInputElement;
@@ -349,7 +367,7 @@ const CotizacionModal = ({
       const searchWords = value.toLowerCase().trim().split(/\s+/);
       filtered = inventarioItems.filter(item => {
         const searchableText = `${item.descripcion.toLowerCase()}`;
-        return searchWords.every(word => searchableText.includes(word));
+        return searchWords.every((word: string) => searchableText.includes(word));
       });
     } else {
       filtered = inventarioItems.slice(0, 5);
@@ -369,14 +387,18 @@ const CotizacionModal = ({
         const selectedItem = inventarioItems.find(item => item._id === value);
         if (selectedItem) {
           const unidad = (selectedItem.unidad === 'PZA' || selectedItem.unidad === 'MTS') ? selectedItem.unidad : 'PZA' as const;
+          const cantidad = newItems[index]?.cantidad || 1;
           newItems[index] = {
             ...newItems[index],
-            descripcion: selectedItem.descripcion,
+            clave: index + 1,
+            marca: selectedItem.marca,
+            modelo: selectedItem.modelo,
+            concepto: selectedItem.descripcion,
             unidad,
             precioUnitario: selectedItem.precioUnitario,
             material: value,
-            cantidad: newItems[index]?.cantidad || 1,
-            subtotal: Number(newItems[index]?.cantidad || 1) * selectedItem.precioUnitario
+            cantidad,
+            importe: cantidad * selectedItem.precioUnitario
           };
         }
       } else {
@@ -384,19 +406,23 @@ const CotizacionModal = ({
         const updatedItem: ItemCotizacion = {
           ...currentItem,
           [name]: value,
-          unidad: currentItem.unidad || 'PZA' as const
+          unidad: currentItem.unidad || 'PZA' as const,
+          clave: currentItem.clave || index + 1
         };
 
-        // Recalcular subtotal si cambia cantidad o precio
+        // Recalcular importe si cambia cantidad o precio
         if (['cantidad', 'precioUnitario'].includes(name)) {
-          updatedItem.subtotal = 
+          updatedItem.importe = 
             Number(updatedItem.cantidad || 0) * Number(updatedItem.precioUnitario || 0);
         }
 
         newItems[index] = updatedItem;
       }
 
-      const updatedItems = ensureEmptyRow(newItems);
+      const updatedItems = ensureEmptyRow(newItems).map((item, idx) => ({
+        ...item,
+        clave: idx + 1
+      }));
 
       return {
         ...prev,
@@ -408,11 +434,13 @@ const CotizacionModal = ({
 
   const calculateTotals = () => {
     setFormData(prev => {
-      const subtotal = prev.items?.reduce((sum, item) => sum + (item.subtotal || 0), 0) || 0;
-      const total = subtotal * (1 + (Number(prev.utilidad) || 0) / 100);
+      const subtotal = prev.items?.reduce((sum, item) => sum + (item.importe || 0), 0) || 0;
+      const ivaImporte = subtotal * (prev.iva / 100);
+      const total = subtotal + ivaImporte;
       return {
         ...prev,
         subtotal,
+        ivaImporte,
         total
       };
     });
@@ -420,7 +448,7 @@ const CotizacionModal = ({
 
   useEffect(() => {
     calculateTotals();
-  }, [formData.items, formData.utilidad]);
+  }, [formData.items]);
 
   return createPortal(
     <>
@@ -641,30 +669,33 @@ const CotizacionModal = ({
                   <thead className="table-dark">
                     <tr>
                       <th style={{ width: '3%' }}>⋮⋮</th>
-                      <th style={{ width: '5%' }}>#</th>
-                      <th style={{ width: '35%' }}>Descripción</th>
-                      <th style={{ width: '10%' }}>Cantidad</th>
-                      <th style={{ width: '15%' }}>Precio Unitario</th>
-                      <th style={{ width: '15%' }}>Importe</th>
-                      <th style={{ width: '17%' }}>Acciones</th>
+                      <th style={{ width: '5%' }}>CLAVE</th>
+                      <th style={{ width: '15%' }}>MARCA</th>
+                      <th style={{ width: '15%' }}>MODELO</th>
+                      <th style={{ width: '25%' }}>CONCEPTO</th>
+                      <th style={{ width: '5%' }}>U</th>
+                      <th style={{ width: '7%' }}>CANT</th>
+                      <th style={{ width: '10%' }}>P.U</th>
+                      <th style={{ width: '10%' }}>IMPORTE</th>
+                      <th style={{ width: '5%' }}>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
                     {formData.items && formData.items.map((item, index) => (
                       <tr 
                         key={index}
-                        draggable={item.descripcion !== ''}
+                        draggable={item.concepto !== ''}
                         onDragStart={(e) => handleDragStart(e, index)}
                         onDragEnd={handleDragEnd}
                         onDragOver={handleDragOver}
                         onDrop={(e) => handleDrop(e, index)}
                         style={{
-                          cursor: item.descripcion !== '' ? 'move' : 'default',
+                          cursor: item.concepto !== '' ? 'move' : 'default',
                           backgroundColor: draggedItem === index ? '#f8f9fa' : 'transparent'
                         }}
                       >
-                        <td className="text-center" style={{ cursor: item.descripcion !== '' ? 'grab' : 'default' }}>
-                          {item.descripcion !== '' && (
+                        <td className="text-center" style={{ cursor: item.concepto !== '' ? 'grab' : 'default' }}>
+                          {item.concepto !== '' && (
                             <FontAwesomeIcon 
                               icon={faGripVertical} 
                               className="text-muted"
@@ -672,19 +703,46 @@ const CotizacionModal = ({
                             />
                           )}
                         </td>
-                        <td>{index + 1}</td>
+                        <td>{item.clave || index + 1}</td>
+                        <td>
+                          <Form.Control
+                            type="text"
+                            value={item.marca || ''}
+                            onChange={(e) => handleItemChange(index, 'marca', e.target.value)}
+                            placeholder="Marca..."
+                          />
+                        </td>
+                        <td>
+                          <Form.Control
+                            type="text"
+                            value={item.modelo || ''}
+                            onChange={(e) => handleItemChange(index, 'modelo', e.target.value)}
+                            placeholder="Modelo..."
+                          />
+                        </td>
                         <td>
                           <div className="position-relative">
                             <Form.Control
                               type="text"
-                              value={item.descripcion}
+                              value={item.concepto || ''}
                               onChange={(e) => handleProductSearch(index, e.target.value, e)}
                               onFocus={(e) => handleProductFocus(index, e)}
                               onBlur={() => hideProductSuggestions(index)}
-                              placeholder="Descripción del producto..."
+                              placeholder="Concepto..."
                               autoComplete="off"
                             />
                           </div>
+                        </td>
+                        <td>
+                          <Form.Select
+                            value={item.unidad}
+                            onChange={(e) => handleItemChange(index, 'unidad', e.target.value)}
+                          >
+                            <option value="PZA">PZA</option>
+                            <option value="MTS">MTS</option>
+                            <option value="SERV">SERV</option>
+                            <option value="LOTE">LOTE</option>
+                          </Form.Select>
                         </td>
                         <td>
                           <Form.Control
@@ -705,14 +763,14 @@ const CotizacionModal = ({
                           />
                         </td>
                         <td>
-                          <span className="fw-bold">${(item.subtotal || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          <span className="fw-bold">${(item.importe || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </td>
                         <td>
                           <Button
                             variant="outline-danger"
                             size="sm"
                             onClick={() => handleRemoveItem(index)}
-                            disabled={formData.items?.length === 1 || (index === (formData.items?.length || 0) - 1 && item.descripcion === '')}
+                            disabled={formData.items?.length === 1 || (index === (formData.items?.length || 0) - 1 && item.concepto === '')}
                             title="Eliminar producto"
                           >
                             <FontAwesomeIcon icon={faTrash} />
@@ -742,8 +800,8 @@ const CotizacionModal = ({
                         <span className="fw-bold">${(formData.subtotal || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                       </div>
                       <div className="d-flex justify-content-between py-2 border-bottom">
-                        <span>Utilidad ({formData.utilidad}%):</span>
-                        <span className="text-success fw-bold">+${(((formData.subtotal || 0) * (formData.utilidad || 0)) / 100).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        <span>IVA ({formData.iva}%):</span>
+                        <span className="text-info fw-bold">${(formData.ivaImporte || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                       </div>
                       <div className="d-flex justify-content-between py-3 bg-light rounded mt-2">
                         <span className="fw-bold text-primary">Total:</span>

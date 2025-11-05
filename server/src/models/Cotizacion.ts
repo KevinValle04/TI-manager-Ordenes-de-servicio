@@ -7,7 +7,8 @@ export interface ICotizacion extends Document {
   fecha: Date;
   vigencia: Date;
   subtotal: number;
-  utilidad: number; // Porcentaje de utilidad
+  iva: number; // Porcentaje de IVA (8%)
+  ivaImporte: number; // Monto del IVA
   total: number;
   estado: 'Borrador' | 'Enviada' | 'Aceptada' | 'Rechazada' | 'Vencida';
   items: IItemCotizacion[];
@@ -15,23 +16,36 @@ export interface ICotizacion extends Document {
   fechaCreacion: Date;
   fechaActualizacion: Date;
   calcularTotales(): void;
+  ultimaClave: number; // Para el autonumérico
 }
 
 export interface IItemCotizacion {
-  material?: string; // Referencia al ID del material (opcional)
-  descripcion: string;
+  clave: number; // Autonumérico
+  marca?: string; // Opcional para canalizaciones
+  modelo?: string; // Opcional para canalizaciones
+  concepto: string; // Descripción o concepto del item
   cantidad: number;
-  unidad: 'PZA' | 'MTS';
+  unidad: 'PZA' | 'MTS' | 'SERV' | 'LOTE';
   precioUnitario: number;
-  subtotal: number;
+  importe: number;
+  esCanalizacion?: boolean; // Para identificar si es una canalización
+  canalizacionId?: string; // ID de la canalización si aplica
 }
 
 const ItemCotizacionSchema = new Schema<IItemCotizacion>({
-  material: { 
-    type: String, 
-    required: false // Opcional
+  clave: { 
+    type: Number, 
+    required: true
   },
-  descripcion: { 
+  marca: { 
+    type: String, 
+    required: false
+  },
+  modelo: { 
+    type: String, 
+    required: false
+  },
+  concepto: { 
     type: String, 
     required: true,
     trim: true 
@@ -44,17 +58,25 @@ const ItemCotizacionSchema = new Schema<IItemCotizacion>({
   unidad: { 
     type: String, 
     required: true,
-    enum: ['PZA', 'MTS']
+    enum: ['PZA', 'MTS', 'SERV', 'LOTE']
   },
   precioUnitario: { 
     type: Number, 
     required: true,
     min: 0 
   },
-  subtotal: { 
+  importe: { 
     type: Number, 
     required: true,
     min: 0 
+  },
+  esCanalizacion: {
+    type: Boolean,
+    default: false
+  },
+  canalizacionId: {
+    type: String,
+    required: false
   }
 });
 
@@ -90,11 +112,16 @@ const CotizacionSchema = new Schema<ICotizacion>({
     min: 0,
     default: 0 
   },
-  utilidad: { 
-    type: Number, 
+  iva: {
+    type: Number,
+    required: true,
+    default: 8 // 8% por defecto
+  },
+  ivaImporte: {
+    type: Number,
     required: true,
     min: 0,
-    default: 0 
+    default: 0
   },
   total: { 
     type: Number, 
@@ -122,13 +149,27 @@ const CotizacionSchema = new Schema<ICotizacion>({
     type: Date, 
     required: true,
     default: Date.now
+  },
+  ultimaClave: {
+    type: Number,
+    required: true,
+    default: 0
   }
 });
 
 // Método para calcular totales
 CotizacionSchema.methods.calcularTotales = function() {
-  this.subtotal = this.items.reduce((total: number, item: IItemCotizacion): number => total + item.subtotal, 0);
-  this.total = this.subtotal * (1 + this.utilidad / 100);
+  // Calcula el subtotal sumando los importes de los items
+  this.subtotal = this.items.reduce((total: number, item: IItemCotizacion): number => total + item.importe, 0);
+  
+  // Calcula el importe del IVA
+  this.ivaImporte = this.subtotal * (this.iva / 100);
+  
+  // Calcula el total sumando el subtotal y el IVA
+  this.total = this.subtotal + this.ivaImporte;
+
+  // Actualiza la fecha de actualización
+  this.fechaActualizacion = new Date();
 };
 
 export default mongoose.model<ICotizacion>('Cotizacion', CotizacionSchema);

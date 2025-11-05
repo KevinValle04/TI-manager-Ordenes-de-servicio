@@ -181,7 +181,8 @@ export interface Cotizacion {
   fecha: Date | string;
   vigencia: Date | string;
   subtotal: number;
-  utilidad: number; // Porcentaje de utilidad
+  iva: number; // Porcentaje de IVA (8%)
+  ivaImporte: number; // Monto del IVA
   total: number;
   estado: "Borrador" | "Enviada" | "Aceptada" | "Rechazada" | "Vencida";
   items: ItemCotizacion[];
@@ -192,10 +193,15 @@ export interface Cotizacion {
 
 export interface ItemCotizacion {
   _id?: string;
-  material?: string | IInventoryItem; // Referencia al material (opcional)
-  descripcion: string;
+  clave: number;
+  marca?: string;
+  modelo?: string;
+  concepto: string;
   cantidad: number;
-  unidad: "PZA" | "MTS";
+  unidad: "PZA" | "MTS" | "SERV" | "LOTE";
   precioUnitario: number;
-  subtotal: number;
+  importe: number;
+  material?: string | IInventoryItem; // Referencia al material (opcional)
+  canalizacionId?: string; // ID de la canalización si aplica
+  esCanalizacion?: boolean;
 }
