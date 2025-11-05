@@ -98,6 +98,70 @@ def guardar_en_cache(hash_texto, hash_estructura, resultado, cache_dir):
     except Exception as e:
         print(f"⚠️ Error al guardar en cache: {e}", file=sys.stderr)
 
+def procesar_guiones_syscom(texto):
+    """
+    Reemplaza patrones comunes de códigos Syscom que usan guiones (ej: "TIJ -- -- -- --")
+    por una versión con ceros en lugar de los guiones dobles, para que los códigos
+    mantengan longitud y sean detectables por los parsers.
+
+    Reglas implementadas:
+    - Reemplaza cada ocurrencia de "--" por "00"
+    - Remueve espacios entre el prefijo y los bloques de ceros resultantes
+    - Aplica sólo a patrones donde aparece una abreviatura al inicio seguida de guiones
+    """
+    if not texto:
+        return texto
+
+    # Primero, combinamos líneas donde el prefijo (ej: TIJ) está en una línea
+    # y las siguientes contienen "--" en líneas separadas. Esto ocurre en
+    # muchos PDFs donde los guiones se colocan en líneas separadas.
+    lines = texto.splitlines()
+    out_lines = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        m = re.match(r"^\s*([A-Z]{2,6})\s*$", line)
+        if m:
+            prefix = m.group(1)
+            j = i + 1
+            dash_count = 0
+            # Contar cuántas líneas siguientes contienen guiones "--"
+            while j < len(lines):
+                s = lines[j].strip()
+                if not s:
+                    break
+                # Considerar líneas que contengan uno o más "--" tokens
+                if '--' in s:
+                    # contar cuántas apariciones de "--" hay en la línea
+                    dash_count += s.count('--')
+                    j += 1
+                    continue
+                else:
+                    break
+
+            if dash_count > 0:
+                # Reconstruir una línea compacta tipo: "TIJ -- -- -- --"
+                combined = prefix + ' ' + ' '.join(['--'] * dash_count)
+                out_lines.append(combined)
+                i = j
+                continue
+
+        out_lines.append(line)
+        i += 1
+
+    texto_comb = '\n'.join(out_lines)
+
+    # Ahora reemplazar los tokens "--" por "00"
+    texto_replaced = re.sub(r"--", "00", texto_comb)
+
+    # Colapsar espacios internos en tokens que tengan prefijo de letras seguido de ceros
+    # Ej: "TIJ 00 00 00" -> "TIJ000000"
+    def _collapse(m):
+        return re.sub(r"\s+", "", m.group(0))
+
+    texto_final = re.sub(r"\b[A-Z]{2,6}(?:\s+0)+\b", _collapse, texto_replaced)
+    return texto_final
+
 def cargar_env():
     """Carga variables desde un archivo .env en la raíz del proyecto"""
     try:
@@ -239,13 +303,19 @@ def extraer_texto_completo_pdf(archivo_pdf):
 
 def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
     """Procesa el documento usando OpenAI GPT-4o para máxima velocidad y precisión."""
+    print(f"🔍 DEBUG: Iniciando procesamiento con OpenAI", file=sys.stderr)
+    
     if not texto_completo or not texto_completo.strip():
+        print("❌ ERROR: Texto completo está vacío", file=sys.stderr)
         return None
 
     # Obtener la API key de las variables de entorno
     api_key = os.environ.get('OPENAI_API_KEY')
+    print(f"🔍 DEBUG: API Key presente: {bool(api_key)}", file=sys.stderr)
+    
     if not api_key:
         print("❌ ERROR: Variable de entorno OPENAI_API_KEY no encontrada.", file=sys.stderr)
+        print(f"🔍 DEBUG: Variables disponibles: {list(os.environ.keys())[:10]}...", file=sys.stderr)
         return None
 
     # Generar hashes para cache
@@ -258,7 +328,13 @@ def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
         print(f"🎯 Resultado obtenido desde cache ({tipo_cache})", file=sys.stderr)
         return resultado_cache
 
-    client = OpenAI(api_key=api_key, timeout=120.0, max_retries=2)
+    print(f"🔍 DEBUG: Creando cliente OpenAI", file=sys.stderr)
+    try:
+        client = OpenAI(api_key=api_key, timeout=120.0, max_retries=2)
+        print(f"✅ DEBUG: Cliente OpenAI creado exitosamente", file=sys.stderr)
+    except Exception as e:
+        print(f"❌ ERROR: No se pudo crear cliente OpenAI: {e}", file=sys.stderr)
+        return None
 
     prompt_consolidado = f"""Extrae los datos del siguiente documento de cotización en un formato JSON estructurado.
 
@@ -289,20 +365,32 @@ def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
     * SIEMPRE extraer `importe` de la última columna de totales
 
 2.  **MAPEO DE CAMPOS POR PROVEEDOR:**
-    * **SYSCOM/TVC**: `precioUnitario` desde "P.U." o "PRECIO UNITARIO" (sin descuentos)
+    * **TVC**: `precioUnitario` desde "PRECIO DISTRIBUIDOR" (sin descuentos, descuento = 0)
+    * **SYSCOM**: `precioUnitario` desde "P.U." o "PRECIO UNITARIO" (YA incluye descuentos, descuento = 0)
     * **GRUPO DICE**: `precioListaUnitario` desde "PRECIO LISTA UNIT." + `descuentoPorcentaje` desde "DESCUENTO"
     * **UNIVERSAL**: `precioUnitario` desde cualquier columna de precio unitario
 
-3.  **PRIORIDAD DE EXTRACCIÓN:**
-    * `precioUnitario` → Buscar en: "P.U.", "PRECIO UNITARIO", "PRECIO UNIT.", "UNIT PRICE"
+4.  **PRIORIDAD DE EXTRACCIÓN:**
+    * **Para TVC**: `precioUnitario` → "PRECIO DISTRIBUIDOR" (descuento automático = 0)
+    * **Para SYSCOM**: `precioUnitario` → "P.U." o "PRECIO UNITARIO" (descuento automático = 0, precios YA incluyen descuentos)
+    * **Para otros**: `precioUnitario` → Buscar en: "P.U.", "PRECIO UNITARIO", "PRECIO UNIT.", "UNIT PRICE"
     * `precioListaUnitario` → Buscar en: "PRECIO LISTA", "LISTA UNIT.", "PRICE LIST"
-    * `descuentoPorcentaje` → Buscar en: "DESCUENTO", "DESC %", "DISCOUNT"
+    * `descuentoPorcentaje` → Buscar en: "DESCUENTO", "DESC %", "DISCOUNT" (excepto TVC y SYSCOM = 0)
     * `importe` → Buscar en: "IMPORTE", "TOTAL", "PRECIO EXTENDIDO", "EXTENDED PRICE"
 
-4.  **REGLAS DE CÁLCULO:**
-    * Si existe `precioUnitario` → usarlo directamente
+5.  **REGLAS DE CÁLCULO:**
+    * **Para TVC**: usar `precioUnitario` desde "PRECIO DISTRIBUIDOR" + `descuentoPorcentaje` = 0
+    * **Para SYSCOM**: usar `precioUnitario` desde "P.U." + `descuentoPorcentaje` = 0 (precios YA con descuentos aplicados)
+    * **Para otros**: Si existe `precioUnitario` → usarlo directamente
     * Si existe `precioListaUnitario` + `descuentoPorcentaje` → calcular `precioUnitarioFinal`
     * `importe` SIEMPRE debe coincidir con `cantidad * precio_final`
+
+6.  **REGLA ESPECIAL PARA TVC Y SYSCOM:**
+    * **TVC**: SIEMPRE buscar la columna "PRECIO DISTRIBUIDOR" o "PRECIO DISTRIBU."
+    * **SYSCOM**: SIEMPRE buscar la columna "P.U." o "PRECIO UNITARIO"
+    * Usar ese valor como `precioUnitario` final
+    * NUNCA aplicar descuentos adicionales (descuento = 0)
+    * El precio unitario ya incluye todos los descuentos aplicables
 
 **DOCUMENTO A PROCESAR:**
 (Nombre del archivo: {nombre_archivo})
@@ -311,6 +399,7 @@ def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
 ---
 """
 
+    print(f"🔍 DEBUG: Enviando request a OpenAI con {len(texto_completo)} caracteres", file=sys.stderr)
     try:
         response = client.chat.completions.create(
             # ==============================================================
@@ -322,7 +411,10 @@ def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
             max_tokens=8192,
             response_format={"type": "json_object"}
         )
+        print(f"✅ DEBUG: Respuesta recibida de OpenAI", file=sys.stderr)
+        
         resultado_str = response.choices[0].message.content
+        print(f"🔍 DEBUG: Longitud de respuesta: {len(resultado_str) if resultado_str else 0}", file=sys.stderr)
         
         # Validación básica del JSON
         json_parseado = json.loads(resultado_str)
@@ -337,6 +429,9 @@ def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
         
     except Exception as e:
         print(f"❌ Error procesando con OpenAI: {e}", file=sys.stderr)
+        import traceback
+        print(f"🔍 DEBUG: Traceback completo:", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
         return None
 
 # =================== ENTRADA PRINCIPAL ===================
@@ -361,6 +456,18 @@ if __name__ == "__main__":
         inicializar_cache(cache_dir)
         
         texto_completo = extraer_texto_completo_pdf(archivo_pdf)
+
+        # Intentar usar cache sobre el texto ORIGINAL (sin preprocesar) para evitar llamadas
+        # innecesarias a la API si ya existe un resultado.
+        hash_texto_raw = generar_hash_texto(texto_completo)
+        hash_estructura_raw = generar_hash_estructura(texto_completo)
+        resultado_cache_raw, tipo_cache_raw = buscar_en_cache(hash_texto_raw, hash_estructura_raw, cache_dir)
+        if resultado_cache_raw:
+            print(resultado_cache_raw)
+            sys.exit(0)
+
+        # Si no hay cache, aplicar preprocesamiento para códigos Syscom con guiones
+        texto_completo = procesar_guiones_syscom(texto_completo)
         if not texto_completo or not texto_completo.strip():
             sys.exit(1)
         
