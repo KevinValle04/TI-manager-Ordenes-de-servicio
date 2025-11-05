@@ -1,6 +1,29 @@
 import { Request, Response } from 'express';
-import Cotizacion from '../models/Cotizacion';
-import { CotizacionPdfGenerator } from '../services/cotizacionPdfGenerator';
+import Cotizacion, { ICotizacion, IItemCotizacion } from '../models/Cotizacion';
+import { CotizacionPdfGenerator, CotizacionPdfData } from '../services/cotizacionPdfGenerator';
+
+const prepararDatosPdf = (cotizacion: ICotizacion): CotizacionPdfData => ({
+  numeroPresupuesto: cotizacion.numeroPresupuesto,
+  cliente: cotizacion.cliente,
+  fecha: cotizacion.fecha.toISOString(),
+  vigencia: cotizacion.vigencia.toISOString(),
+  subtotal: cotizacion.subtotal,
+  iva: cotizacion.iva,
+  ivaImporte: cotizacion.ivaImporte,
+  total: cotizacion.total,
+  estado: cotizacion.estado,
+  items: cotizacion.items.map(item => ({
+    descripcion: item.concepto,
+    cantidad: item.cantidad,
+    unidad: item.unidad,
+    precioUnitario: item.precioUnitario,
+    subtotal: item.importe,
+    aplicarIva: item.aplicarIva || false,
+    iva: item.aplicarIva ? item.importe * (cotizacion.iva/100) : 0
+  })),
+  comentarios: cotizacion.comentarios,
+  razonSocial: cotizacion.razonSocial as any
+});
 
 export const getCotizaciones = async (req: Request, res: Response) => {
   try {
@@ -160,25 +183,7 @@ export const getPdfCotizacion = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Cotización no encontrada' });
     }
 
-    const datosPdf = {
-      numeroPresupuesto: cotizacion.numeroPresupuesto,
-      cliente: cotizacion.cliente,
-      fecha: cotizacion.fecha.toISOString(),
-      vigencia: cotizacion.vigencia.toISOString(),
-      subtotal: cotizacion.subtotal,
-      utilidad: cotizacion.utilidad,
-      total: cotizacion.total,
-      estado: cotizacion.estado,
-      items: cotizacion.items.map(item => ({
-        descripcion: item.descripcion,
-        cantidad: item.cantidad,
-        unidad: item.unidad,
-        precioUnitario: item.precioUnitario,
-        subtotal: item.subtotal
-      })),
-      comentarios: cotizacion.comentarios,
-      razonSocial: cotizacion.razonSocial as any
-    };
+    const datosPdf = prepararDatosPdf(cotizacion);
 
     const pdfGenerator = new CotizacionPdfGenerator();
     const pdfBuffer = await pdfGenerator.generarPdfCotizacion(datosPdf);
@@ -209,25 +214,7 @@ export const descargarPdfCotizacion = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Cotización no encontrada' });
     }
 
-    const datosPdf = {
-      numeroPresupuesto: cotizacion.numeroPresupuesto,
-      cliente: cotizacion.cliente,
-      fecha: cotizacion.fecha.toISOString(),
-      vigencia: cotizacion.vigencia.toISOString(),
-      subtotal: cotizacion.subtotal,
-      utilidad: cotizacion.utilidad,
-      total: cotizacion.total,
-      estado: cotizacion.estado,
-      items: cotizacion.items.map(item => ({
-        descripcion: item.descripcion,
-        cantidad: item.cantidad,
-        unidad: item.unidad,
-        precioUnitario: item.precioUnitario,
-        subtotal: item.subtotal
-      })),
-      comentarios: cotizacion.comentarios,
-      razonSocial: cotizacion.razonSocial as any
-    };
+    const datosPdf = prepararDatosPdf(cotizacion);
 
     const pdfGenerator = new CotizacionPdfGenerator();
     const pdfBuffer = await pdfGenerator.generarPdfCotizacion(datosPdf);

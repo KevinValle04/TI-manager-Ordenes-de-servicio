@@ -9,7 +9,8 @@ export interface CotizacionPdfData {
   fecha: string;
   vigencia: string;
   subtotal: number;
-  utilidad: number;
+  iva: number;
+  ivaImporte: number;
   total: number;
   estado: string;
   items: Array<{
@@ -18,6 +19,8 @@ export interface CotizacionPdfData {
     unidad: string;
     precioUnitario: number;
     subtotal: number;
+    aplicarIva: boolean;
+    iva?: number;
   }>;
   comentarios?: string;
   razonSocial?: {
@@ -61,6 +64,10 @@ export class CotizacionPdfGenerator {
 
     handlebars.registerHelper('increment', (value: number) => {
       return value + 1;
+    });
+    
+    handlebars.registerHelper('reduce', (array, prop, initial) => {
+      return array.reduce((acc: number, item: any) => acc + (item[prop] || 0), initial);
     });
 
     const formatCurrency = this.formatoMoneda.bind(this);

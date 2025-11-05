@@ -191,11 +191,12 @@
       <thead>
         <tr>
           <th style="width: 5%">#</th>
-          <th style="width: 45%">Descripción</th>
+          <th style="width: 40%">Descripción</th>
           <th style="width: 10%">Cantidad</th>
           <th style="width: 10%">Unidad</th>
-          <th style="width: 15%">Precio Unit.</th>
-          <th style="width: 15%">Importe</th>
+          <th style="width: 12%">Precio Unit.</th>
+          <th style="width: 13%">Importe</th>
+          <th style="width: 10%">IVA</th>
         </tr>
       </thead>
       <tbody>
@@ -207,6 +208,7 @@
           <td class="text-center">{{unidad}}</td>
           <td class="text-right">{{precioUnitario}}</td>
           <td class="text-right">{{subtotal}}</td>
+          <td class="text-right">{{#if aplicarIva}}{{formatCurrency iva}}{{else}}-{{/if}}</td>
         </tr>
         {{/each}}
       </tbody>
@@ -218,8 +220,8 @@
         <span>{{subtotal}}</span>
       </div>
       <div class="total-row">
-        <span>Utilidad ({{utilidad}}%):</span>
-        <span>{{formatCurrency (multiply subtotal (divide utilidad 100))}}</span>
+        <span>IVA ({{iva}}%):</span>
+        <span>{{formatCurrency ivaImporte}}</span>
       </div>
       <div class="total-row grand-total">
         <span>Total:</span>
