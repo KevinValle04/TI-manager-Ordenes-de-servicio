@@ -596,13 +596,54 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
         
         // 🔧 MAPEO INTELIGENTE DE PRECIOS POR PROVEEDOR:
         // 1. PRIORIDAD: precioUnitario directo (SYSCOM, PRECIO DE DISTRIBUIDOR, etc.)
-        // 2. FALLBACK: precioListaUnitario (GRUPO DICE)
-        const precioUnitario = parseNumericValue(producto.precioUnitario) ||           // SYSCOM/PRECIO DISTRIBUIDOR: precio directo
-                              parseNumericValue(producto.precioListaUnitario) ||      // GRUPO DICE: precio de lista
-                              parseNumericValue(producto.precioLista) ||              // Otros: precio lista
-                              parseNumericValue(producto.precio) ||                   // Genérico: precio
-                              parseNumericValue(producto.precioNeto) ||               // Alternativo: precio neto
-                              0;
+        // 2. EXCEPCIÓN PORTENTUM: para Portentum usar precioLista como precioUnitario
+        // 3. FALLBACK: precioListaUnitario (GRUPO DICE)
+        
+        // Detectar si es Portentum/Aruba (múltiples variantes del nombre)
+        const esPortentum = proveedorSeleccionado?.empresa?.toLowerCase().includes('portentum') ||
+                            proveedorSeleccionado?.empresa?.toLowerCase().includes('portenntu') ||
+                            proveedorSeleccionado?.empresa?.toLowerCase().includes('aruba') ||
+                            JSON.stringify(producto).toLowerCase().includes('portentum') ||
+                            JSON.stringify(producto).toLowerCase().includes('portenntu') ||
+                            JSON.stringify(producto).toLowerCase().includes('aruba') ||
+                            (datosPdf.nombreArchivo && (
+                              datosPdf.nombreArchivo.toLowerCase().includes('portentum') ||
+                              datosPdf.nombreArchivo.toLowerCase().includes('portenntu') ||
+                              datosPdf.nombreArchivo.toLowerCase().includes('aruba')
+                            )) ||
+                            JSON.stringify(datosPdf).toLowerCase().includes('portentum') ||
+                            JSON.stringify(datosPdf).toLowerCase().includes('portenntu') ||
+                            JSON.stringify(datosPdf).toLowerCase().includes('aruba');
+        
+        // 🔍 DEBUG: Log para entender qué está pasando con Portentum/Aruba
+        if (index < 3) {
+          console.log(`🔍 DEBUG Producto ${index + 1}:`, {
+            proveedorSeleccionado: proveedorSeleccionado?.empresa,
+            esPortentum: esPortentum,
+            nombreArchivo: datosPdf.nombreArchivo,
+            productoCompleto: producto,
+            precioLista: producto.precioLista,
+            precioUnitario: producto.precioUnitario,
+            precioListaUnitario: producto.precioListaUnitario
+          });
+        }
+        
+        let precioUnitario = 0;
+        if (esPortentum) {
+          // Para Portentum/Aruba: usar PRECIO LISTA UNITARIO como precio unitario
+          precioUnitario = parseNumericValue(producto.precioListaUnitario) ||      // PORTENTUM/ARUBA: precio lista unitario
+                          parseNumericValue(producto.precioLista) ||              // Alternativo: precio lista
+                          parseNumericValue(producto.precioUnitario) ||           // Fallback: precio unitario
+                          parseNumericValue(producto.precio) ||                   // Genérico: precio
+                          0;
+        } else {
+          precioUnitario = parseNumericValue(producto.precioUnitario) ||           // SYSCOM/PRECIO DISTRIBUIDOR: precio directo
+                          parseNumericValue(producto.precioListaUnitario) ||      // GRUPO DICE: precio de lista
+                          parseNumericValue(producto.precioLista) ||              // Otros: precio lista
+                          parseNumericValue(producto.precio) ||                   // Genérico: precio
+                          parseNumericValue(producto.precioNeto) ||               // Alternativo: precio neto
+                          0;
+        }
         
         // 🔧 DESCUENTOS: Solo para proveedores que los manejen explícitamente
         // NOTA: Si se usa PRECIO DE DISTRIBUIDOR (TVC), el descuento será 0 (ya aplicado)
@@ -616,9 +657,9 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
         const tieneDescuentoExplicito = producto.descuentoPorcentaje !== undefined || 
                                        producto.descuento !== undefined;
         
-        // Para TVC: siempre descuento = 0, para otros: usar descuento explícito si existe
+        // Para TVC, Portentum y Aruba: siempre descuento = 0, para otros: usar descuento explícito si existe
         let descuentoPorcentaje = 0;
-        if (!esTVC && tieneDescuentoExplicito) {
+        if (!esTVC && !esPortentum && tieneDescuentoExplicito) {
           descuentoPorcentaje = parseNumericValue(producto.descuentoPorcentaje) || 
                                parseNumericValue(producto.descuento) || 0;
         }
@@ -638,14 +679,15 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
           clave: producto.codigo || producto.clave || '', // Agregar mapeo explícito para el modal
           descripcion: producto.descripcion || producto.concepto || '',
           precioUnitario: precioUnitario, // ✅ PRIORIZA precioUnitario directo
-          descuento: descuentoPorcentaje, // ✅ TVC = 0, otros = valor explícito
+          descuento: descuentoPorcentaje, // ✅ TVC, Portentum y Aruba = 0, otros = valor explícito
           importe: importe // El importe final
         };
         
-        // Log para TVC cuando se detecta y se aplica descuento cero
-        if (esTVC && index < 3) {
-          console.log(`🔵 TVC detectado - Producto ${index + 1}:`, {
+        // Log para TVC, Portentum y Aruba cuando se detecta y se aplica descuento cero
+        if ((esTVC || esPortentum) && index < 3) {
+          console.log(`🔵 ${esTVC ? 'TVC' : 'Portentum/Aruba'} detectado - Producto ${index + 1}:`, {
             esDetectadoComoTVC: esTVC,
+            esDetectadoComoPortentum: esPortentum,
             descuentoOriginal: producto.descuentoPorcentaje || producto.descuento,
             descuentoFinal: descuentoPorcentaje,
             precioUnitario: precioUnitario
