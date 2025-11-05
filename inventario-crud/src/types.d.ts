@@ -201,6 +201,7 @@ export interface ItemCotizacion {
   unidad: "PZA" | "MTS" | "SERV" | "LOTE";
   precioUnitario: number;
   importe: number;
+  aplicarIva: boolean;
   material?: string | IInventoryItem; // Referencia al material (opcional)
   canalizacionId?: string; // ID de la canalización si aplica
   esCanalizacion?: boolean;

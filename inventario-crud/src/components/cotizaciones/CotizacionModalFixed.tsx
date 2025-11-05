@@ -56,7 +56,8 @@ const CotizacionModal = ({
       unidad: 'PZA' as const,
       precioUnitario: 0,
       importe: 0,
-      material: ''
+      material: '',
+      aplicarIva: true
     }],
     subtotal: 0,
     iva: 8,
@@ -119,7 +120,8 @@ const CotizacionModal = ({
         importe: canalizacion.total,
         material: '',
         canalizacionId: canalizacion._id,
-        esCanalizacion: true
+        esCanalizacion: true,
+        aplicarIva: false // Las canalizaciones no llevan IVA por defecto
       }, {
         clave: prev.items.length + 2,
         marca: '',
@@ -130,7 +132,8 @@ const CotizacionModal = ({
         precioUnitario: 0,
         importe: 0,
         material: '',
-        esCanalizacion: false
+        esCanalizacion: false,
+        aplicarIva: true
       }]
     }));
 
@@ -190,7 +193,8 @@ const CotizacionModal = ({
         unidad: 'PZA' as const,
         precioUnitario: 0,
         importe: 0,
-        material: ''
+        material: '',
+        aplicarIva: true
       }];
     }
     return items;
@@ -424,7 +428,9 @@ const CotizacionModal = ({
   const calculateTotals = () => {
     setFormData(prev => {
       const subtotal = prev.items?.reduce((sum, item) => sum + (item.importe || 0), 0) || 0;
-      const ivaImporte = subtotal * (prev.iva || 8) / 100;
+      // Solo calcular IVA para los items que tienen aplicarIva=true
+      const subtotalConIva = prev.items?.reduce((sum, item) => sum + (item.aplicarIva ? (item.importe || 0) : 0), 0) || 0;
+      const ivaImporte = subtotalConIva * (prev.iva || 8) / 100;
       const total = subtotal + ivaImporte;
       return {
         ...prev,
@@ -663,7 +669,8 @@ const CotizacionModal = ({
                       <th style={{ width: '10%' }}>Cantidad</th>
                       <th style={{ width: '15%' }}>Precio Unitario</th>
                       <th style={{ width: '15%' }}>Importe</th>
-                      <th style={{ width: '17%' }}>Acciones</th>
+                      <th style={{ width: '10%' }}>IVA</th>
+                      <th style={{ width: '7%' }}>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -723,6 +730,14 @@ const CotizacionModal = ({
                         </td>
                         <td>
                           <span className="fw-bold">${(item.importe || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </td>
+                        <td>
+                          <Form.Check
+                            type="checkbox"
+                            checked={item.aplicarIva}
+                            onChange={(e) => handleItemChange(index, 'aplicarIva', e.target.checked)}
+                            disabled={item.esCanalizacion}
+                          />
                         </td>
                         <td>
                           <Button
