@@ -73,9 +73,14 @@ const CotizacionList: React.FC = () => {
 
   const fetchInventarioItems = async () => {
     try {
-      const response = await fetch('/api/items');
-      if (!response.ok) throw new Error('Error al cargar items de inventario');
+      console.log('Iniciando carga de inventario interior...');
+      const response = await fetch('/api/inventario');
+      if (!response.ok) {
+        console.error('Error en la respuesta del servidor:', response.status, response.statusText);
+        throw new Error('Error al cargar items de inventario');
+      }
       const data = await response.json();
+      console.log('Items de inventario cargados:', data);
       setInventarioItems(data);
     } catch (error) {
       console.error('Error al cargar items de inventario:', error);

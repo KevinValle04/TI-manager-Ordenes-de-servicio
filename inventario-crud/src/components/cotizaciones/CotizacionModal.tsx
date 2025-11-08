@@ -5,13 +5,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faGripVertical } from '@fortawesome/free-solid-svg-icons';
 import { Cotizacion, Cliente, IInventoryItem, RazonSocial, ItemCotizacion } from '../../types';
 
-// Estados adicionales para autocompletado y UI
-interface DropdownPosition {
-  top: number;
-  left: number;
-  width: number;
-}
-
 type CotizacionFormData = Omit<Cotizacion, 'fechaCreacion' | 'fechaActualizacion'> & {
   fecha: string;
   vigencia: string;
@@ -78,10 +71,9 @@ const CotizacionModal = ({
   const [razonSocialDisplayText, setRazonSocialDisplayText] = useState('');
   
   // Estados para productos
-  const [productSuggestions, setProductSuggestions] = useState<IInventoryItem[]>([]);
-  const [showProductSuggestions, setShowProductSuggestions] = useState<{[key: number]: boolean}>({});
+  const [productSuggestions, setProductSuggestions] = useState<{[key: number]: IInventoryItem[]}>({});
+  const [showProductSuggestions, setShowProductSuggestions] = useState<{[key: number]: boolean}>({}); 
   const [activeRow, setActiveRow] = useState<number | null>(null);
-  const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition>({top: 0, left: 0, width: 0});
   
   // Estados para drag & drop
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
@@ -167,6 +159,17 @@ const CotizacionModal = ({
       }));
     }
   }, [editingCotizacion, generatePresupuestoNumber]);
+
+  // Debug: Ver items de inventario cargados
+  useEffect(() => {
+    console.log('=== DEBUG INVENTARIO ===');
+    console.log('Total items en inventario:', inventarioItems.length);
+    if (inventarioItems.length > 0) {
+      console.log('Primer item del inventario:', inventarioItems[0]);
+      console.log('Campos disponibles:', Object.keys(inventarioItems[0]));
+    }
+    console.log('=======================');
+  }, [inventarioItems]);
 
   // Funciones de manejo de formulario
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -316,71 +319,75 @@ const CotizacionModal = ({
   };
 
   // Manejo de productos
-  const handleProductFocus = (index: number, event: React.FocusEvent) => {
+  const handleProductFocus = (index: number) => {
     setActiveRow(index);
-    
-    const target = event.target as HTMLInputElement;
-    const rect = target.getBoundingClientRect();
-    setDropdownPosition({
-      top: rect.bottom + window.scrollY + 2,
-      left: rect.left + window.scrollX,
-      width: rect.width
-    });
-    
-    const currentValue = formData.items?.[index]?.concepto || '';
-    let filtered: IInventoryItem[] = [];
-    
-    if (currentValue.length > 0) {
-      const searchWords = currentValue.toLowerCase().trim().split(/\s+/);
-      filtered = inventarioItems.filter(item => {
-        const searchableText = `${item.descripcion.toLowerCase()}`;
-        return searchWords.every((word: string) => searchableText.includes(word));
-      });
-    } else {
-      filtered = inventarioItems.slice(0, 5);
+  };
+  
+  // Cierra las sugerencias cuando se hace click fuera
+  const handleClickOutside = (e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+    // No cerrar si el click fue dentro de un dropdown de sugerencias
+    if (target.closest('.position-absolute')) {
+      return;
     }
-    
-    setProductSuggestions(filtered);
-    setShowProductSuggestions({ ...showProductSuggestions, [index]: true });
+    setShowProductSuggestions({});
   };
 
-  const hideProductSuggestions = (index: number) => {
-    setTimeout(() => {
-      setShowProductSuggestions(prev => ({ ...prev, [index]: false }));
-      if (activeRow === index) {
-        setActiveRow(null);
-      }
-    }, 150);
-  };
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutside as any);
+    return () => {
+      document.removeEventListener('click', handleClickOutside as any);
+    };
+  }, []);
 
-  const handleProductSearch = (index: number, value: string, event?: React.ChangeEvent) => {
-    handleItemChange(index, 'concepto', value);
-    
-    if (event) {
-      const target = event.target as HTMLInputElement;
-      const rect = target.getBoundingClientRect();
-      setDropdownPosition({
-        top: rect.bottom + window.scrollY + 2,
-        left: rect.left + window.scrollX,
-        width: rect.width
-      });
-    }
-    
-    let filtered: IInventoryItem[] = [];
-    
-    if (value.length > 0) {
-      const searchWords = value.toLowerCase().trim().split(/\s+/);
-      filtered = inventarioItems.filter(item => {
-        const searchableText = `${item.descripcion.toLowerCase()}`;
-        return searchWords.every((word: string) => searchableText.includes(word));
-      });
-    } else {
-      filtered = inventarioItems.slice(0, 5);
-    }
-    
-    setProductSuggestions(filtered);
-    setShowProductSuggestions(prev => ({ ...prev, [index]: true }));
+  const handleProductSearch = (index: number, value: string, field: 'marca' | 'modelo' | 'concepto') => {
+    handleItemChange(index, field, value);
     setActiveRow(index);
+    
+    console.log('=== BÚSQUEDA DE PRODUCTO ===');
+    console.log('Campo:', field);
+    console.log('Valor buscado:', value);
+    console.log('Total items disponibles:', inventarioItems.length);
+    
+    if (value.length > 1) {
+      const searchTerm = value.toLowerCase().trim();
+      const filtered = inventarioItems.filter(item => {
+        const descripcion = (item.descripcion || '').toLowerCase();
+        const marca = (item.marca || '').toLowerCase();
+        const modelo = (item.modelo || '').toLowerCase();
+        
+        const matches = descripcion.includes(searchTerm) || 
+               marca.includes(searchTerm) || 
+               modelo.includes(searchTerm);
+        
+        if (matches) {
+          console.log('Match encontrado:', {
+            descripcion: item.descripcion,
+            marca: item.marca,
+            modelo: item.modelo
+          });
+        }
+        
+        return matches;
+      }).slice(0, 10);
+      
+      console.log('Resultados filtrados:', filtered.length);
+      
+      setProductSuggestions(prev => ({
+        ...prev,
+        [index]: filtered
+      }));
+      setShowProductSuggestions(prev => ({
+        ...prev,
+        [index]: true
+      }));
+    } else {
+      setShowProductSuggestions(prev => ({
+        ...prev,
+        [index]: false
+      }));
+    }
+    console.log('============================');
   };
 
   const handleItemChange = (index: number, name: keyof ItemCotizacion, value: any) => {
@@ -393,17 +400,23 @@ const CotizacionModal = ({
         if (selectedItem) {
           const unidad = (selectedItem.unidad === 'PZA' || selectedItem.unidad === 'MTS') ? selectedItem.unidad : 'PZA' as const;
           const cantidad = newItems[index]?.cantidad || 1;
+          const concepto = [
+            selectedItem.descripcion,
+            selectedItem.marca,
+            selectedItem.modelo
+          ].filter(Boolean).join(' - ');
           newItems[index] = {
             ...newItems[index],
             clave: index + 1,
             marca: selectedItem.marca,
             modelo: selectedItem.modelo,
-            concepto: selectedItem.descripcion,
+            concepto: concepto,
             unidad,
             precioUnitario: selectedItem.precioUnitario,
             material: value,
             cantidad,
-            importe: cantidad * selectedItem.precioUnitario
+            importe: cantidad * selectedItem.precioUnitario,
+            aplicarIva: true
           };
         }
       } else {
@@ -609,7 +622,7 @@ const CotizacionModal = ({
                   <i className="fas fa-shopping-cart me-2"></i>
                   Productos en la Cotización
                 </h5>
-                <Button 
+                  <Button 
                   variant="outline-primary"
                   onClick={() => setShowCanalizacionModal(true)}
                 >
@@ -671,21 +684,29 @@ const CotizacionModal = ({
                   </div>
                 </Modal.Body>
               </Modal>
-              <div className="table-responsive">
-                <table className="table table-striped table-hover">
-                  <thead className="table-dark">
+              <div className="table-responsive" style={{ 
+                maxWidth: '100%', 
+                minHeight: '400px',
+                maxHeight: '600px', 
+                overflowX: 'auto', 
+                overflowY: 'auto',
+                border: '1px solid #dee2e6',
+                borderRadius: '0.25rem'
+              }}>
+                <table className="table table-striped table-hover mb-0" style={{ minWidth: '1200px' }}>
+                  <thead className="table-dark" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                     <tr>
-                      <th style={{ width: '3%' }}>⋮⋮</th>
-                      <th style={{ width: '5%' }}>CLAVE</th>
-                      <th style={{ width: '15%' }}>MARCA</th>
-                      <th style={{ width: '15%' }}>MODELO</th>
+                      <th style={{ width: '40px' }}>⋮⋮</th>
+                      <th style={{ width: '80px' }}>CLAVE</th>
+                      <th style={{ width: '20%' }}>MARCA</th>
+                      <th style={{ width: '20%' }}>MODELO</th>
                       <th style={{ width: '25%' }}>CONCEPTO</th>
-                      <th style={{ width: '5%' }}>U</th>
-                      <th style={{ width: '7%' }}>CANT</th>
-                      <th style={{ width: '10%' }}>P.U</th>
-                      <th style={{ width: '10%' }}>IMPORTE</th>
-                      <th style={{ width: '5%' }}>IVA</th>
-                      <th style={{ width: '5%' }}>Acciones</th>
+                      <th style={{ width: '60px' }}>U</th>
+                      <th style={{ width: '80px' }}>CANT</th>
+                      <th style={{ width: '120px' }}>P.U</th>
+                      <th style={{ width: '120px' }}>IMPORTE</th>
+                      <th style={{ width: '60px' }}>IVA</th>
+                      <th style={{ width: '80px' }}>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -713,32 +734,188 @@ const CotizacionModal = ({
                         </td>
                         <td>{item.clave || index + 1}</td>
                         <td>
-                          <Form.Control
-                            type="text"
-                            value={item.marca || ''}
-                            onChange={(e) => handleItemChange(index, 'marca', e.target.value)}
-                            placeholder="Marca..."
-                          />
+                          <div className="position-relative">
+                            <Form.Control
+                              type="text"
+                              value={item.marca || ''}
+                              onChange={(e) => handleProductSearch(index, e.target.value, 'marca')}
+                              onFocus={() => handleProductFocus(index)}
+                              placeholder="Marca..."
+                              autoComplete="off"
+                            />
+                            {showProductSuggestions[index] && productSuggestions[index]?.length > 0 && (
+                              <div className="position-absolute w-100 bg-white border rounded shadow-sm" 
+                                   style={{ zIndex: 1000, maxHeight: '200px', overflowY: 'auto' }}>
+                                {productSuggestions[index].map((suggestion) => (
+                                  <div
+                                    key={suggestion._id}
+                                    className="p-2 border-bottom cursor-pointer hover-bg-light"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const updatedItem: ItemCotizacion = {
+                                        ...formData.items[index],
+                                        marca: suggestion.marca,
+                                        modelo: suggestion.modelo,
+                                        concepto: suggestion.descripcion,
+                                        unidad: (suggestion.unidad === 'PZA' || suggestion.unidad === 'MTS') ? suggestion.unidad as 'PZA' | 'MTS' : 'PZA',
+                                        precioUnitario: suggestion.precioUnitario,
+                                        material: suggestion._id,
+                                        importe: (formData.items[index].cantidad || 1) * suggestion.precioUnitario,
+                                        aplicarIva: true
+                                      };
+                                      setFormData(prev => ({
+                                        ...prev,
+                                        items: prev.items.map((item, i) => 
+                                          i === index ? updatedItem : item
+                                        )
+                                      }));
+                                      setShowProductSuggestions(prev => ({
+                                        ...prev,
+                                        [index]: false
+                                      }));
+                                      setTimeout(() => calculateTotals(), 100);
+                                    }}
+                                    style={{ cursor: 'pointer' }}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                  >
+                                    <div><strong>{suggestion.marca}</strong></div>
+                                    <div className="small text-muted">{suggestion.descripcion}</div>
+                                    <div className="small text-muted">
+                                      Modelo: {suggestion.modelo}
+                                      <span className="float-end text-success">
+                                        ${suggestion.precioUnitario.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </td>
                         <td>
-                          <Form.Control
-                            type="text"
-                            value={item.modelo || ''}
-                            onChange={(e) => handleItemChange(index, 'modelo', e.target.value)}
-                            placeholder="Modelo..."
-                          />
+                          <div className="position-relative">
+                            <Form.Control
+                              type="text"
+                              value={item.modelo || ''}
+                              onChange={(e) => handleProductSearch(index, e.target.value, 'modelo')}
+                              onFocus={() => handleProductFocus(index)}
+                              placeholder="Modelo..."
+                              autoComplete="off"
+                            />
+                            {showProductSuggestions[index] && productSuggestions[index]?.length > 0 && (
+                              <div className="position-absolute w-100 bg-white border rounded shadow-sm" 
+                                   style={{ zIndex: 1000, maxHeight: '200px', overflowY: 'auto' }}>
+                                {productSuggestions[index].map((suggestion) => (
+                                  <div
+                                    key={suggestion._id}
+                                    className="p-2 border-bottom cursor-pointer hover-bg-light"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const updatedItem: ItemCotizacion = {
+                                        ...formData.items[index],
+                                        marca: suggestion.marca,
+                                        modelo: suggestion.modelo,
+                                        concepto: suggestion.descripcion,
+                                        unidad: (suggestion.unidad === 'PZA' || suggestion.unidad === 'MTS') ? suggestion.unidad as 'PZA' | 'MTS' : 'PZA',
+                                        precioUnitario: suggestion.precioUnitario,
+                                        material: suggestion._id,
+                                        importe: (formData.items[index].cantidad || 1) * suggestion.precioUnitario,
+                                        aplicarIva: true
+                                      };
+                                      setFormData(prev => ({
+                                        ...prev,
+                                        items: prev.items.map((item, i) => 
+                                          i === index ? updatedItem : item
+                                        )
+                                      }));
+                                      setShowProductSuggestions(prev => ({
+                                        ...prev,
+                                        [index]: false
+                                      }));
+                                      setTimeout(() => calculateTotals(), 100);
+                                    }}
+                                    style={{ cursor: 'pointer' }}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                  >
+                                    <div><strong>{suggestion.modelo}</strong></div>
+                                    <div className="small text-muted">{suggestion.descripcion}</div>
+                                    <div className="small text-muted">
+                                      Marca: {suggestion.marca}
+                                      <span className="float-end text-success">
+                                        ${suggestion.precioUnitario.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </td>
                         <td>
                           <div className="position-relative">
                             <Form.Control
                               type="text"
                               value={item.concepto || ''}
-                              onChange={(e) => handleProductSearch(index, e.target.value, e)}
-                              onFocus={(e) => handleProductFocus(index, e)}
-                              onBlur={() => hideProductSuggestions(index)}
+                              onChange={(e) => handleProductSearch(index, e.target.value, 'concepto')}
+                              onFocus={() => handleProductFocus(index)}
                               placeholder="Concepto..."
                               autoComplete="off"
                             />
+                            {showProductSuggestions[index] && productSuggestions[index]?.length > 0 && (
+                              <div className="position-absolute w-100 bg-white border rounded shadow-sm" 
+                                   style={{ zIndex: 1000, maxHeight: '200px', overflowY: 'auto' }}>
+                                {productSuggestions[index].map((suggestion) => (
+                                  <div
+                                    key={suggestion._id}
+                                    className="p-2 border-bottom cursor-pointer hover-bg-light"
+                                    onClick={() => {
+                                      // Actualizar todos los campos del item con la información del producto seleccionado
+                                      const updatedItem: ItemCotizacion = {
+                                        ...formData.items[index],
+                                        marca: suggestion.marca,
+                                        modelo: suggestion.modelo,
+                                        concepto: suggestion.descripcion,
+                                        unidad: suggestion.unidad as 'PZA' | 'MTS',
+                                        precioUnitario: suggestion.precioUnitario,
+                                        material: suggestion._id,
+                                        importe: (formData.items[index].cantidad || 1) * suggestion.precioUnitario,
+                                        aplicarIva: true
+                                      };
+                                      
+                                      setFormData(prev => ({
+                                        ...prev,
+                                        items: prev.items.map((item, i) => 
+                                          i === index ? updatedItem : item
+                                        )
+                                      }));
+                                      
+                                      setShowProductSuggestions(prev => ({
+                                        ...prev,
+                                        [index]: false
+                                      }));
+                                      
+                                      calculateTotals();
+                                    }}
+                                    style={{ cursor: 'pointer' }}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+                                  >
+                                    <div><strong>{suggestion.descripcion}</strong></div>
+                                    <div className="small text-muted">
+                                      <span>{suggestion.marca} - {suggestion.modelo}</span>
+                                      <span className="float-end text-success">
+                                        ${suggestion.precioUnitario.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                                      </span>
+                                    </div>
+                                    <div className="small text-muted">
+                                      Stock: {suggestion.cantidad} {suggestion.unidad}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </td>
                         <td>
@@ -840,37 +1017,6 @@ const CotizacionModal = ({
           </Button>
         </Modal.Footer>
       </Modal>
-      {showProductSuggestions[activeRow ?? -1] && (
-        <div 
-          className="bg-white border rounded shadow-lg" 
-          style={{ 
-            position: 'fixed',
-            zIndex: 999999, 
-            maxHeight: '200px', 
-            overflowY: 'auto',
-            top: dropdownPosition.top + 'px',
-            left: dropdownPosition.left + 'px',
-            minWidth: Math.max(dropdownPosition.width, 300) + 'px',
-            maxWidth: '400px'
-          }}
-        >
-          {productSuggestions.map(material => (
-            <div
-              key={material._id}
-              className="p-2 border-bottom cursor-pointer hover-bg-light"
-              onClick={() => activeRow !== null && handleItemChange(activeRow, 'material', material._id)}
-              style={{ cursor: 'pointer' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
-            >
-              <strong>{material.descripcion}</strong><br />
-              <small className="text-muted">
-                Precio: ${material.precioUnitario?.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </small>
-            </div>
-          ))}
-        </div>
-      )}
     </>,
     document.body
   );
