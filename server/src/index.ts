@@ -32,6 +32,7 @@ import documentosRoutes from './routes/documentos';
 import herramientasRoutes from './routes/herramientas';
 import inventoryRequestsRoutes from './routes/inventoryRequests';
 import solicitudesRoutes from './routes/solicitudes';
+import proyectosRoutes from './routes/proyectos';
 
 dotenv.config();
 const app: Application = express();
@@ -66,6 +67,7 @@ app.use('/api/documentos', documentosRoutes);
 app.use('/api/herramientas', herramientasRoutes);
 app.use('/api/inventory-requests', inventoryRequestsRoutes);
 app.use('/api/solicitudes', solicitudesRoutes);
+app.use('/api/proyectos', proyectosRoutes);
 
 app.post("/api/notificar-guias", async (req, res) => {
   try {

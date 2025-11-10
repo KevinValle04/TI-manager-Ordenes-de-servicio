@@ -206,3 +206,15 @@ export interface ItemCotizacion {
   canalizacionId?: string; // ID de la canalización si aplica
   esCanalizacion?: boolean;
 }
+
+export interface Proyecto {
+  _id?: string;
+  nombre: string;
+  fechaInicio: Date | string;
+  fechaTerminacion: Date | string;
+  colaboradores: string[] | Colaborador[]; // Array de IDs o colaboradores populados
+  estado?: 'En progreso' | 'Completado' | 'Pausado' | 'Cancelado';
+  descripcion?: string;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+}

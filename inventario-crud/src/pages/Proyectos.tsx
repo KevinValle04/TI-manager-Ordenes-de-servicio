@@ -1,7 +1,14 @@
-// src/pages/Dashboard.tsx
+import React from 'react';
+import ProyectoList from '../components/proyectos/ProyectoList';
+
 const Proyectos: React.FC = () => {
-    return <h2>Proyectos</h2>;
-  };
-  
-  export default Proyectos;
+  return (
+    <div>
+      <ProyectoList />
+    </div>
+  );
+};
+
+export default Proyectos;
+
   
