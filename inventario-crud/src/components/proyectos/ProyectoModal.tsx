@@ -60,12 +60,23 @@ const ProyectoModal: React.FC<ProyectoModalProps> = ({
     }));
   };
 
-  const handleColaboradorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
-    setFormData(prev => ({
-      ...prev,
-      colaboradores: selectedOptions
-    }));
+  const handleColaboradorChange = (colaboradorId: string) => {
+    setFormData(prev => {
+      const currentColaboradores = Array.isArray(prev.colaboradores) ? prev.colaboradores as string[] : [];
+      const isSelected = currentColaboradores.includes(colaboradorId);
+      
+      return {
+        ...prev,
+        colaboradores: isSelected
+          ? currentColaboradores.filter(id => id !== colaboradorId)
+          : [...currentColaboradores, colaboradorId]
+      };
+    });
+  };
+
+  const isColaboradorSelected = (colaboradorId: string): boolean => {
+    const currentColaboradores = Array.isArray(formData.colaboradores) ? formData.colaboradores as string[] : [];
+    return currentColaboradores.includes(colaboradorId);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -162,7 +173,7 @@ const ProyectoModal: React.FC<ProyectoModalProps> = ({
               </Form.Group>
             </div>
 
-            <div className="col-md-6 mb-3">
+            <div className="col-md-12 mb-3">
               <Form.Group>
                 <Form.Label>Estado</Form.Label>
                 <Form.Select
@@ -178,29 +189,52 @@ const ProyectoModal: React.FC<ProyectoModalProps> = ({
               </Form.Group>
             </div>
 
-            <div className="col-md-6 mb-3">
+            <div className="col-md-12 mb-3">
               <Form.Group>
                 <Form.Label>
                   Colaboradores Participantes
-                  <small className="text-muted ms-2">(Mantén Ctrl para seleccionar varios)</small>
                 </Form.Label>
-                <Form.Select
-                  multiple
-                  name="colaboradores"
-                  value={formData.colaboradores as string[] || []}
-                  onChange={handleColaboradorChange}
-                  style={{ minHeight: '150px' }}
+                <div 
+                  className="border rounded p-3" 
+                  style={{ 
+                    maxHeight: '250px', 
+                    overflowY: 'auto',
+                    backgroundColor: '#f8f9fa'
+                  }}
                 >
                   {colaboradoresActivos.length === 0 ? (
-                    <option disabled>No hay colaboradores activos disponibles</option>
+                    <div className="text-muted text-center py-3">
+                      <i className="fas fa-users me-2"></i>
+                      No hay colaboradores activos disponibles
+                    </div>
                   ) : (
-                    colaboradoresActivos.map(colaborador => (
-                      <option key={colaborador._id} value={colaborador._id}>
-                        {colaborador.numeroEmpleado} - {colaborador.nombre} ({colaborador.puesto})
-                      </option>
-                    ))
+                    <div className="row">
+                      {colaboradoresActivos.map(colaborador => (
+                        <div key={colaborador._id} className="col-md-6 mb-2">
+                          <Form.Check
+                            type="checkbox"
+                            id={`colaborador-${colaborador._id}`}
+                            label={
+                              <span>
+                                <strong>{colaborador.numeroEmpleado}</strong> - {colaborador.nombre}
+                                <br />
+                                <small className="text-muted">{colaborador.puesto}</small>
+                              </span>
+                            }
+                            checked={isColaboradorSelected(colaborador._id || '')}
+                            onChange={() => handleColaboradorChange(colaborador._id || '')}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   )}
-                </Form.Select>
+                </div>
+                {formData.colaboradores && (formData.colaboradores as string[]).length > 0 && (
+                  <small className="text-muted mt-2 d-block">
+                    <i className="fas fa-check-circle text-success me-1"></i>
+                    {(formData.colaboradores as string[]).length} colaborador(es) seleccionado(s)
+                  </small>
+                )}
               </Form.Group>
             </div>
 

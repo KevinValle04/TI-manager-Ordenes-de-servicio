@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { Cliente, Cotizacion, IInventoryItem, RazonSocial } from '../../types';
+import { Cliente, Cotizacion, IInventoryItem, RazonSocial, Proyecto } from '../../types';
 import DataTable from '../common/DataTable';
 import PaginationCompact from '../common/PaginationCompact';
 import SearchBar from '../common/SearchBar';
@@ -26,6 +26,7 @@ const CotizacionList: React.FC = () => {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [inventarioItems, setInventarioItems] = useState<IInventoryItem[]>([]);
   const [razonesSociales, setRazonesSociales] = useState<RazonSocial[]>([]);
+  const [proyectos, setProyectos] = useState<Proyecto[]>([]);
 
   // Efectos
   useEffect(() => {
@@ -33,6 +34,7 @@ const CotizacionList: React.FC = () => {
     fetchClientes();
     fetchInventarioItems();
     fetchRazonesSociales();
+    fetchProyectos();
   }, []);
 
   useEffect(() => {
@@ -97,6 +99,18 @@ const CotizacionList: React.FC = () => {
     } catch (error) {
       console.error('Error al cargar razones sociales:', error);
       setRazonesSociales([]);
+    }
+  };
+
+  const fetchProyectos = async () => {
+    try {
+      const response = await fetch('/api/proyectos');
+      if (!response.ok) throw new Error('Error al cargar proyectos');
+      const data = await response.json();
+      setProyectos(data);
+    } catch (error) {
+      console.error('Error al cargar proyectos:', error);
+      setProyectos([]);
     }
   };
 
@@ -344,6 +358,7 @@ const CotizacionList: React.FC = () => {
         clientes={clientes}
         inventarioItems={inventarioItems}
         razonesSociales={razonesSociales}
+        proyectos={proyectos}
         generatePresupuestoNumber={generatePresupuestoNumber}
       />
     </div>

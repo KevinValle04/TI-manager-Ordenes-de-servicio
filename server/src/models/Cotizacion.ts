@@ -4,6 +4,7 @@ export interface ICotizacion extends Document {
   numeroPresupuesto: string;
   cliente: string;
   razonSocial?: string; // Referencia al ID de la razón social (opcional)
+  proyecto?: string; // Referencia al ID del proyecto (opcional)
   fecha: Date;
   vigencia: Date;
   subtotal: number;
@@ -101,6 +102,11 @@ const CotizacionSchema = new Schema<ICotizacion>({
   razonSocial: { 
     type: Schema.Types.ObjectId,
     ref: 'RazonSocial',
+    required: false
+  },
+  proyecto: {
+    type: Schema.Types.ObjectId,
+    ref: 'Proyecto',
     required: false
   },
   fecha: { 

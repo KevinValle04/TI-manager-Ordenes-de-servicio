@@ -117,6 +117,7 @@ export interface OrdenCompra {
   proveedor: string | Proveedor;
   razonSocial: string | RazonSocial;
   vendedor?: string | Vendedor;
+  proyecto?: string | Proyecto; // Referencia al proyecto (opcional)
   datosOrden: any;
   rutaPdf?: string; // Ruta del PDF generado
   createdAt?: string;
@@ -178,6 +179,7 @@ export interface Cotizacion {
   numeroPresupuesto: string;
   cliente: string | Cliente;
   razonSocial?: string | RazonSocial; // Referencia a la razón social (opcional)
+  proyecto?: string | Proyecto; // Referencia al proyecto (opcional)
   fecha: Date | string;
   vigencia: Date | string;
   subtotal: number;

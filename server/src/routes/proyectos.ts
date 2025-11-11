@@ -4,7 +4,9 @@ import {
   obtenerProyectoPorId,
   crearProyecto,
   actualizarProyecto,
-  eliminarProyecto
+  eliminarProyecto,
+  obtenerCotizacionesProyecto,
+  obtenerOrdenesCompraProyecto
 } from '../controllers/proyectoController';
 
 const router = Router();
@@ -23,5 +25,11 @@ router.put('/:id', actualizarProyecto);
 
 // DELETE /api/proyectos/:id - Eliminar un proyecto
 router.delete('/:id', eliminarProyecto);
+
+// GET /api/proyectos/:id/cotizaciones - Obtener cotizaciones de un proyecto
+router.get('/:id/cotizaciones', obtenerCotizacionesProyecto);
+
+// GET /api/proyectos/:id/ordenes-compra - Obtener órdenes de compra de un proyecto
+router.get('/:id/ordenes-compra', obtenerOrdenesCompraProyecto);
 
 export default router;

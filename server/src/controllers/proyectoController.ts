@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { Proyecto, IProyecto } from '../models/Proyecto';
 import Colaborador from '../models/Colaborador';
+import Cotizacion from '../models/Cotizacion';
+import OrdenCompra from '../models/OrdenCompra';
 
 // Obtener todos los proyectos
 export const obtenerProyectos = async (req: Request, res: Response): Promise<void> => {
@@ -138,5 +140,36 @@ export const eliminarProyecto = async (req: Request, res: Response): Promise<voi
   } catch (error) {
     console.error('Error al eliminar proyecto:', error);
     res.status(500).json({ message: 'Error al eliminar proyecto', error });
+  }
+};
+
+// Obtener cotizaciones de un proyecto
+export const obtenerCotizacionesProyecto = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const cotizaciones = await Cotizacion.find({ proyecto: req.params.id })
+      .populate('cliente')
+      .populate('razonSocial')
+      .sort({ fechaCreacion: -1 });
+    
+    res.json(cotizaciones);
+  } catch (error) {
+    console.error('Error al obtener cotizaciones del proyecto:', error);
+    res.status(500).json({ message: 'Error al obtener cotizaciones del proyecto', error });
+  }
+};
+
+// Obtener órdenes de compra de un proyecto
+export const obtenerOrdenesCompraProyecto = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const ordenesCompra = await OrdenCompra.find({ proyecto: req.params.id })
+      .populate('proveedor')
+      .populate('razonSocial')
+      .populate('vendedor')
+      .sort({ fecha: -1 });
+    
+    res.json(ordenesCompra);
+  } catch (error) {
+    console.error('Error al obtener órdenes de compra del proyecto:', error);
+    res.status(500).json({ message: 'Error al obtener órdenes de compra del proyecto', error });
   }
 };

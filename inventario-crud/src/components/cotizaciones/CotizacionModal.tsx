@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faGripVertical } from '@fortawesome/free-solid-svg-icons';
-import { Cotizacion, Cliente, IInventoryItem, RazonSocial, ItemCotizacion } from '../../types';
+import { Cotizacion, Cliente, IInventoryItem, RazonSocial, ItemCotizacion, Proyecto } from '../../types';
 
 type CotizacionFormData = Omit<Cotizacion, 'fechaCreacion' | 'fechaActualizacion'> & {
   fecha: string;
@@ -21,6 +21,7 @@ interface CotizacionModalProps {
   clientes: Cliente[];
   inventarioItems: IInventoryItem[];
   razonesSociales: RazonSocial[];
+  proyectos: Proyecto[];
   generatePresupuestoNumber: () => string;
 }
 
@@ -32,6 +33,7 @@ const CotizacionModal = ({
   clientes,
   inventarioItems,
   razonesSociales,
+  proyectos,
   generatePresupuestoNumber
 }: CotizacionModalProps): React.ReactPortal => {
   const defaultFormData: CotizacionFormData = {
@@ -595,6 +597,25 @@ const CotizacionModal = ({
                     <option value="Aceptada">Aceptada</option>
                     <option value="Rechazada">Rechazada</option>
                     <option value="Vencida">Vencida</option>
+                  </Form.Select>
+                </Form.Group>
+              </div>
+              <div className="col-md-6">
+                <Form.Group>
+                  <Form.Label>
+                    Proyecto <small className="text-muted">(Opcional)</small>
+                  </Form.Label>
+                  <Form.Select
+                    name="proyecto"
+                    value={typeof formData.proyecto === 'string' ? formData.proyecto : formData.proyecto?._id || ''}
+                    onChange={handleChange}
+                  >
+                    <option value="">Sin proyecto asignado</option>
+                    {proyectos.map(proyecto => (
+                      <option key={proyecto._id} value={proyecto._id}>
+                        {proyecto.nombre}
+                      </option>
+                    ))}
                   </Form.Select>
                 </Form.Group>
               </div>

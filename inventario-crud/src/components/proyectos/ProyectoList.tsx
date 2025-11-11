@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Button } from 'react-bootstrap';
-import { Proyecto, Colaborador } from '../../types';
+import { Button, Modal } from 'react-bootstrap';
+import { Proyecto, Colaborador, Cotizacion, OrdenCompra } from '../../types';
 import DataTable from '../common/DataTable';
 import PaginationCompact from '../common/PaginationCompact';
 import SearchBar from '../common/SearchBar';
@@ -14,6 +14,15 @@ const ProyectoList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [colaboradores, setColaboradores] = useState<Colaborador[]>([]);
+  
+  // Estados para los modales de cotizaciones y órdenes de compra
+  const [showCotizacionesModal, setShowCotizacionesModal] = useState(false);
+  const [showOrdenesModal, setShowOrdenesModal] = useState(false);
+  const [selectedProyecto, setSelectedProyecto] = useState<Proyecto | null>(null);
+  const [cotizacionesProyecto, setCotizacionesProyecto] = useState<Cotizacion[]>([]);
+  const [ordenesProyecto, setOrdenesProyecto] = useState<OrdenCompra[]>([]);
+  const [loadingCotizaciones, setLoadingCotizaciones] = useState(false);
+  const [loadingOrdenes, setLoadingOrdenes] = useState(false);
   
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -130,6 +139,43 @@ const ProyectoList: React.FC = () => {
     }
   };
 
+  // Funciones para manejar cotizaciones y órdenes de compra
+  const handleViewCotizaciones = async (proyecto: Proyecto) => {
+    setSelectedProyecto(proyecto);
+    setLoadingCotizaciones(true);
+    setShowCotizacionesModal(true);
+    
+    try {
+      const response = await fetch(`/api/proyectos/${proyecto._id}/cotizaciones`);
+      if (!response.ok) throw new Error('Error al cargar cotizaciones');
+      const data = await response.json();
+      setCotizacionesProyecto(data);
+    } catch (error) {
+      console.error('Error al cargar cotizaciones:', error);
+      alert('Error al cargar las cotizaciones del proyecto');
+    } finally {
+      setLoadingCotizaciones(false);
+    }
+  };
+
+  const handleViewOrdenes = async (proyecto: Proyecto) => {
+    setSelectedProyecto(proyecto);
+    setLoadingOrdenes(true);
+    setShowOrdenesModal(true);
+    
+    try {
+      const response = await fetch(`/api/proyectos/${proyecto._id}/ordenes-compra`);
+      if (!response.ok) throw new Error('Error al cargar órdenes de compra');
+      const data = await response.json();
+      setOrdenesProyecto(data);
+    } catch (error) {
+      console.error('Error al cargar órdenes de compra:', error);
+      alert('Error al cargar las órdenes de compra del proyecto');
+    } finally {
+      setLoadingOrdenes(false);
+    }
+  };
+
   const getEstadoBadgeClass = (estado?: string) => {
     switch (estado) {
       case 'En progreso': return 'primary';
@@ -220,23 +266,40 @@ const ProyectoList: React.FC = () => {
       key: 'acciones',
       label: 'Acciones',
       render: (proyecto: Proyecto) => (
-        <>
+        <div className="d-flex flex-wrap gap-1">
+          <Button
+            variant="info"
+            size="sm"
+            onClick={() => handleViewCotizaciones(proyecto)}
+            title="Ver cotizaciones"
+          >
+            <i className="fas fa-file-invoice"></i> Cotizaciones
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => handleViewOrdenes(proyecto)}
+            title="Ver órdenes de compra"
+          >
+            <i className="fas fa-shopping-cart"></i> Órdenes
+          </Button>
           <Button
             variant="warning"
             size="sm"
-            className="me-2"
             onClick={() => handleEdit(proyecto)}
+            title="Editar proyecto"
           >
-            <i className="fas fa-edit"></i> Editar
+            <i className="fas fa-edit"></i>
           </Button>
           <Button
             variant="danger"
             size="sm"
             onClick={() => handleDelete(proyecto._id!)}
+            title="Eliminar proyecto"
           >
-            <i className="fas fa-trash"></i> Eliminar
+            <i className="fas fa-trash"></i>
           </Button>
-        </>
+        </div>
       )
     }
   ];
@@ -313,6 +376,124 @@ const ProyectoList: React.FC = () => {
         editingProyecto={editingProyecto}
         colaboradores={colaboradores}
       />
+
+      {/* Modal de Cotizaciones */}
+      <Modal 
+        show={showCotizacionesModal} 
+        onHide={() => setShowCotizacionesModal(false)}
+        size="xl"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <i className="fas fa-file-invoice me-2"></i>
+            Cotizaciones del Proyecto: {selectedProyecto?.nombre}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {loadingCotizaciones ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+          ) : cotizacionesProyecto.length === 0 ? (
+            <div className="alert alert-info">
+              <i className="fas fa-info-circle me-2"></i>
+              No hay cotizaciones asociadas a este proyecto
+            </div>
+          ) : (
+            <div className="table-responsive">
+              <table className="table table-hover">
+                <thead className="table-dark">
+                  <tr>
+                    <th>No. Presupuesto</th>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cotizacionesProyecto.map(cotizacion => (
+                    <tr key={cotizacion._id}>
+                      <td>{cotizacion.numeroPresupuesto}</td>
+                      <td>{typeof cotizacion.cliente === 'string' ? cotizacion.cliente : cotizacion.cliente?.nombreEmpresa}</td>
+                      <td>{new Date(cotizacion.fecha).toLocaleDateString('es-MX')}</td>
+                      <td>${cotizacion.total.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</td>
+                      <td>
+                        <span className={`badge bg-${cotizacion.estado === 'Aceptada' ? 'success' : cotizacion.estado === 'Rechazada' ? 'danger' : cotizacion.estado === 'Enviada' ? 'primary' : 'secondary'}`}>
+                          {cotizacion.estado}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowCotizacionesModal(false)}>
+            Cerrar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modal de Órdenes de Compra */}
+      <Modal 
+        show={showOrdenesModal} 
+        onHide={() => setShowOrdenesModal(false)}
+        size="xl"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <i className="fas fa-shopping-cart me-2"></i>
+            Órdenes de Compra del Proyecto: {selectedProyecto?.nombre}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {loadingOrdenes ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+          ) : ordenesProyecto.length === 0 ? (
+            <div className="alert alert-info">
+              <i className="fas fa-info-circle me-2"></i>
+              No hay órdenes de compra asociadas a este proyecto
+            </div>
+          ) : (
+            <div className="table-responsive">
+              <table className="table table-hover">
+                <thead className="table-dark">
+                  <tr>
+                    <th>No. Orden</th>
+                    <th>Proveedor</th>
+                    <th>Fecha</th>
+                    <th>Razón Social</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ordenesProyecto.map(orden => (
+                    <tr key={orden._id}>
+                      <td>{orden.numeroOrden}</td>
+                      <td>{typeof orden.proveedor === 'string' ? orden.proveedor : orden.proveedor?.empresa}</td>
+                      <td>{new Date(orden.fecha).toLocaleDateString('es-MX')}</td>
+                      <td>{typeof orden.razonSocial === 'string' ? orden.razonSocial : orden.razonSocial?.nombre}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowOrdenesModal(false)}>
+            Cerrar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

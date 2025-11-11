@@ -7,6 +7,7 @@ export interface IOrdenCompra extends Document {
   proveedor: mongoose.Types.ObjectId;
   razonSocial: mongoose.Types.ObjectId;
   vendedor?: mongoose.Types.ObjectId;
+  proyecto?: mongoose.Types.ObjectId; // Referencia al proyecto (opcional)
   datosOrden: any; // JSON flexible que puede variar en estructura
   rutaPdf?: string; // Ruta donde se guardó el PDF generado
 }
@@ -41,6 +42,11 @@ const OrdenCompraSchema: Schema = new Schema({
   vendedor: { 
     type: Schema.Types.ObjectId, 
     ref: 'Vendedor', 
+    required: false
+  },
+  proyecto: {
+    type: Schema.Types.ObjectId,
+    ref: 'Proyecto',
     required: false
   },
   datosOrden: { 
