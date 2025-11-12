@@ -425,6 +425,7 @@ const ProyectoList: React.FC = () => {
                     <th>Fecha</th>
                     <th>Total</th>
                     <th>Estado</th>
+                    <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -438,6 +439,17 @@ const ProyectoList: React.FC = () => {
                         <span className={`badge bg-${cotizacion.estado === 'Aceptada' ? 'success' : cotizacion.estado === 'Rechazada' ? 'danger' : cotizacion.estado === 'Enviada' ? 'primary' : 'secondary'}`}>
                           {cotizacion.estado}
                         </span>
+                      </td>
+                      <td>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => window.open(`/api/cotizaciones/${cotizacion._id}/pdf`, '_blank')}
+                          title="Ver PDF"
+                        >
+                          <i className="fas fa-file-pdf me-1"></i>
+                          Ver PDF
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -486,6 +498,7 @@ const ProyectoList: React.FC = () => {
                     <th>Proveedor</th>
                     <th>Fecha</th>
                     <th>Razón Social</th>
+                    <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -495,6 +508,21 @@ const ProyectoList: React.FC = () => {
                       <td>{typeof orden.proveedor === 'string' ? orden.proveedor : orden.proveedor?.empresa}</td>
                       <td>{new Date(orden.fecha).toLocaleDateString('es-MX')}</td>
                       <td>{typeof orden.razonSocial === 'string' ? orden.razonSocial : orden.razonSocial?.nombre}</td>
+                      <td>
+                        {orden.rutaPdf ? (
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => window.open(`/api/uploads/${orden.rutaPdf}`, '_blank')}
+                            title="Ver PDF"
+                          >
+                            <i className="fas fa-file-pdf me-1"></i>
+                            Ver PDF
+                          </Button>
+                        ) : (
+                          <span className="text-muted small">Sin PDF</span>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
