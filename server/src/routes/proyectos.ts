@@ -8,6 +8,13 @@ import {
   obtenerCotizacionesProyecto,
   obtenerOrdenesCompraProyecto
 } from '../controllers/proyectoController';
+import {
+  obtenerActividadesProyecto,
+  obtenerActividadPorId,
+  crearActividad,
+  actualizarActividad,
+  eliminarActividad
+} from '../controllers/actividadController';
 
 const router = Router();
 
@@ -31,5 +38,11 @@ router.get('/:id/cotizaciones', obtenerCotizacionesProyecto);
 
 // GET /api/proyectos/:id/ordenes-compra - Obtener órdenes de compra de un proyecto
 router.get('/:id/ordenes-compra', obtenerOrdenesCompraProyecto);
+
+// GET /api/proyectos/:proyectoId/actividades - Obtener todas las actividades de un proyecto
+router.get('/:proyectoId/actividades', obtenerActividadesProyecto);
+
+// POST /api/proyectos/:proyectoId/actividades - Crear una nueva actividad
+router.post('/:proyectoId/actividades', crearActividad);
 
 export default router;

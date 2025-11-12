@@ -5,6 +5,7 @@ import DataTable from '../common/DataTable';
 import PaginationCompact from '../common/PaginationCompact';
 import SearchBar from '../common/SearchBar';
 import ProyectoModal from './ProyectoModal';
+import ActividadesList from './ActividadesList';
 
 const ProyectoList: React.FC = () => {
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
@@ -18,6 +19,7 @@ const ProyectoList: React.FC = () => {
   // Estados para los modales de cotizaciones y órdenes de compra
   const [showCotizacionesModal, setShowCotizacionesModal] = useState(false);
   const [showOrdenesModal, setShowOrdenesModal] = useState(false);
+  const [showActividadesModal, setShowActividadesModal] = useState(false);
   const [selectedProyecto, setSelectedProyecto] = useState<Proyecto | null>(null);
   const [cotizacionesProyecto, setCotizacionesProyecto] = useState<Cotizacion[]>([]);
   const [ordenesProyecto, setOrdenesProyecto] = useState<OrdenCompra[]>([]);
@@ -176,6 +178,11 @@ const ProyectoList: React.FC = () => {
     }
   };
 
+  const handleViewActividades = (proyecto: Proyecto) => {
+    setSelectedProyecto(proyecto);
+    setShowActividadesModal(true);
+  };
+
   const getEstadoBadgeClass = (estado?: string) => {
     switch (estado) {
       case 'En progreso': return 'primary';
@@ -267,6 +274,18 @@ const ProyectoList: React.FC = () => {
       label: 'Acciones',
       render: (proyecto: Proyecto) => (
         <div className="d-flex flex-column gap-1" style={{ minWidth: '150px' }}>
+          <div className="d-flex gap-1">
+            <Button
+              variant="success"
+              size="sm"
+              onClick={() => handleViewActividades(proyecto)}
+              title="Ver actividades del proyecto"
+              className="flex-fill"
+            >
+              <i className="fas fa-tasks me-1"></i>
+              Actividades
+            </Button>
+          </div>
           <div className="d-flex gap-1">
             <Button
               variant="info"
@@ -536,6 +555,14 @@ const ProyectoList: React.FC = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Modal de Actividades */}
+      <ActividadesList
+        show={showActividadesModal}
+        onHide={() => setShowActividadesModal(false)}
+        proyecto={selectedProyecto}
+        colaboradores={colaboradores}
+      />
     </div>
   );
 };

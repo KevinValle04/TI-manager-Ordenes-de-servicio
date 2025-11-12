@@ -220,3 +220,15 @@ export interface Proyecto {
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }
+
+export interface Actividad {
+  _id?: string;
+  proyecto: string | Proyecto; // Referencia al proyecto
+  descripcion: string;
+  fechaInicio: Date | string;
+  fechaFinal: Date | string;
+  estado: 'Pendiente' | 'En progreso' | 'Completada' | 'Cancelada';
+  colaboradores: string[] | Colaborador[]; // Array de IDs o colaboradores populados
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+}
