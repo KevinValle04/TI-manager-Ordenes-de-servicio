@@ -266,39 +266,53 @@ const ProyectoList: React.FC = () => {
       key: 'acciones',
       label: 'Acciones',
       render: (proyecto: Proyecto) => (
-        <div className="d-flex flex-wrap gap-1">
-          <Button
-            variant="info"
-            size="sm"
-            onClick={() => handleViewCotizaciones(proyecto)}
-            title="Ver cotizaciones"
-          >
-            <i className="fas fa-file-invoice"></i> Cotizaciones
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => handleViewOrdenes(proyecto)}
-            title="Ver órdenes de compra"
-          >
-            <i className="fas fa-shopping-cart"></i> Órdenes
-          </Button>
-          <Button
-            variant="warning"
-            size="sm"
-            onClick={() => handleEdit(proyecto)}
-            title="Editar proyecto"
-          >
-            <i className="fas fa-edit"></i>
-          </Button>
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={() => handleDelete(proyecto._id!)}
-            title="Eliminar proyecto"
-          >
-            <i className="fas fa-trash"></i>
-          </Button>
+        <div className="d-flex flex-column gap-1" style={{ minWidth: '150px' }}>
+          <div className="d-flex gap-1">
+            <Button
+              variant="info"
+              size="sm"
+              onClick={() => handleViewCotizaciones(proyecto)}
+              title="Ver cotizaciones del proyecto"
+              className="flex-fill"
+            >
+              <i className="fas fa-file-invoice me-1"></i>
+              Cotizaciones
+            </Button>
+          </div>
+          <div className="d-flex gap-1">
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => handleViewOrdenes(proyecto)}
+              title="Ver órdenes de compra del proyecto"
+              className="flex-fill"
+            >
+              <i className="fas fa-shopping-cart me-1"></i>
+              Órdenes
+            </Button>
+          </div>
+          <div className="d-flex gap-1">
+            <Button
+              variant="warning"
+              size="sm"
+              onClick={() => handleEdit(proyecto)}
+              title="Editar proyecto"
+              className="flex-fill"
+            >
+              <i className="fas fa-edit me-1"></i>
+              Editar
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => handleDelete(proyecto._id!)}
+              title="Eliminar proyecto"
+              className="flex-fill"
+            >
+              <i className="fas fa-trash me-1"></i>
+              Eliminar
+            </Button>
+          </div>
         </div>
       )
     }
