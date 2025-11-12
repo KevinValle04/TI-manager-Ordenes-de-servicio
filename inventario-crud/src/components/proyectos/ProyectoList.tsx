@@ -513,7 +513,7 @@ const ProyectoList: React.FC = () => {
                           <Button
                             variant="primary"
                             size="sm"
-                            onClick={() => window.open(`/api/uploads/${orden.rutaPdf}`, '_blank')}
+                            onClick={() => window.open(`/api/ordenes-compra/${orden._id}/pdf`, '_blank')}
                             title="Ver PDF"
                           >
                             <i className="fas fa-file-pdf me-1"></i>

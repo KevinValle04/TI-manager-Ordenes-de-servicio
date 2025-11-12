@@ -12,37 +12,6 @@
   border-color: #0d6efd;
 }
 
-/* Base styles for all modals */
-.modal {
-  z-index: 1050; /* Base z-index for modals */
-}
-
-/* Increment z-index for subsequent modals */
-.modal.show:nth-child(2) {
-  z-index: 1060;
-}
-
-.modal.show:nth-child(3) {
-  z-index: 1070;
-}
-
-.modal.show:nth-child(4) {
-  z-index: 1080;
-}
-
-/* Ensure modal backdrop doesn't block subsequent modals */
-.modal-backdrop:nth-child(2) {
-  z-index: 1055;
-}
-
-.modal-backdrop:nth-child(3) {
-  z-index: 1065;
-}
-
-.modal-backdrop:nth-child(4) {
-  z-index: 1075;
-}
-
 /* Estilos para el modal de imagen */
 .modal-90w {
   max-width: 90vw !important;
@@ -89,4 +58,161 @@
 .modal-documentos .modal-body {
   padding: 1rem;
   overflow-y: auto;
+}
+
+/* Estilos mejorados para modales anidados */
+.ant-modal-wrap {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: auto !important;
+}
+
+.ant-modal-mask {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: auto !important;
+}
+
+.ant-modal {
+  position: relative !important;
+  pointer-events: auto !important;
+}
+
+.ant-modal-content {
+  position: relative !important;
+  background: white !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  pointer-events: auto !important;
+  isolation: isolate !important;
+}
+
+/* Estilos específicos para formularios en modales */
+.ant-modal-content .ant-form {
+  position: relative !important;
+  z-index: 1 !important;
+  pointer-events: auto !important;
+}
+
+.ant-modal-content .ant-form-item {
+  position: relative !important;
+  z-index: 1 !important;
+  pointer-events: auto !important;
+}
+
+.ant-modal-content .ant-form-item-control {
+  position: relative !important;
+  z-index: 1 !important;
+  pointer-events: auto !important;
+}
+
+.ant-modal-content .ant-input,
+.ant-modal-content .ant-select,
+.ant-modal-content .ant-picker,
+.ant-modal-content .ant-btn,
+.ant-modal-content .ant-input-number,
+.ant-modal-content .ant-input-number-input {
+  position: relative !important;
+  z-index: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Estilos específicos para el modal de herramientas */
+.herramienta-modal .ant-modal-content {
+  isolation: isolate !important;
+}
+
+.herramienta-modal .ant-form {
+  isolation: isolate !important;
+}
+
+.herramienta-modal .ant-input,
+.herramienta-modal .ant-input-number,
+.herramienta-modal .ant-input-number-input {
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+}
+
+/* Prevenir interferencias de eventos */
+.ant-modal-content * {
+  pointer-events: auto !important;
+}
+
+/* Asegurar que los inputs mantengan el foco */
+.ant-input:focus,
+.ant-input-number:focus,
+.ant-input-number-input:focus {
+  outline: none !important;
+  border-color: #1890ff !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+}
+
+.documentos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  padding: 16px;
+}
+
+.documento-card {
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.documento-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.documento-card .ant-card-head {
+  min-height: unset;
+  padding: 8px 12px;
+}
+
+.documento-card .ant-card-head-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0;
+  font-size: 14px;
+}
+
+.documento-card .ant-card-extra {
+  padding: 0;
+}
+
+.documento-card .ant-card-body {
+  padding: 12px;
+}
+
+.documento-info {
+  font-size: 12px;
+  color: #666;
+  margin: 4px 0;
+}
+
+.documento-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.documento-view-button {
+  padding: 0;
+  height: auto;
+}
+
+.documento-date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
 }

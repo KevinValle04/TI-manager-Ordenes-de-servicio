@@ -22,6 +22,8 @@ interface ModalResultadosProps {
   editId?: string | null; // Añadido para identificar si está en modo edición
   onCancelar?: () => void; // Nueva prop para manejar cancelación
   onActualizarTotales?: (totales: { subTotal: number; iva: number; total: number; }) => void; // Nueva prop para actualizar totales
+  proyectoId?: string; // ID del proyecto seleccionado inicialmente (opcional)
+  proyectos?: any[]; // Array de proyectos disponibles
 }
 
 // Tipos de moneda disponibles
@@ -258,6 +260,8 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
   onGenerarOrden,
   editId,
   onCancelar,
+  proyectoId,
+  proyectos,
   onActualizarTotales
 }) => {
   // Log de depuración para verificar los totales recibidos
@@ -291,7 +295,11 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
   
   // Estados para vendedor
   const [vendedorBusqueda, setVendedorBusqueda] = useState<string>('');
+  // Estado para el vendedor seleccionado
   const [vendedorSeleccionado, setVendedorSeleccionado] = useState<Vendedor | null>(null);
+  
+  // Estado para el proyecto seleccionado
+  const [proyectoSeleccionadoModal, setProyectoSeleccionadoModal] = useState<string>(proyectoId || '');
   const [vendedoresSugerencias, setVendedoresSugerencias] = useState<Vendedor[]>([]);
   const [mostrarSugerenciasVendedor, setMostrarSugerenciasVendedor] = useState<boolean>(false);
   
@@ -354,6 +362,13 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
       setVendedorBusqueda(datosOrdenCompletos.vendedor.nombre || '');
     }
   }, [datosOrdenCompletos]);
+
+  // Efecto para actualizar proyecto cuando cambie proyectoId
+  React.useEffect(() => {
+    if (proyectoId) {
+      setProyectoSeleccionadoModal(proyectoId);
+    }
+  }, [proyectoId]);
 
   // Detectar automáticamente el porcentaje de IVA al cargar los datos
   React.useEffect(() => {
@@ -445,7 +460,8 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
         },
         datosPdf: datosOrdenCompletos?.datosPdf || datosOrdenCompletos?.pdfInfo,
         moneda: monedaSeleccionada,
-        porcentajeIvaSimbolico: porcentajeIvaSimbolico
+        porcentajeIvaSimbolico: porcentajeIvaSimbolico,
+        proyecto: proyectoSeleccionadoModal || null // Usar proyecto del modal
       };
       
       await onGenerarOrden(datosParaEnviar);
@@ -622,6 +638,28 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
                           'Opcional - Escriba para buscar'
                         )}
                       </small>
+                    </Form.Text>
+                  </Form.Group>
+                </Col>
+                
+                <Col md={3}>
+                  <Form.Group className="mb-3">
+                    <Form.Label className="small fw-bold mb-1">Proyecto (Opcional):</Form.Label>
+                    <Form.Select
+                      size="sm"
+                      value={proyectoSeleccionadoModal}
+                      onChange={(e) => setProyectoSeleccionadoModal(e.target.value)}
+                      className="border-info"
+                    >
+                      <option value="">Sin proyecto asignado</option>
+                      {proyectos && proyectos.map((proyecto) => (
+                        <option key={proyecto._id} value={proyecto._id}>
+                          {proyecto.nombre} - {proyecto.estado}
+                        </option>
+                      ))}
+                    </Form.Select>
+                    <Form.Text className="text-muted">
+                      <small><i className="fas fa-project-diagram me-1"></i>Asociar con un proyecto</small>
                     </Form.Text>
                   </Form.Group>
                 </Col>

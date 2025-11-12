@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Alert, Button, Spinner } from "react-bootstrap";
-import { OrdenCompra } from "../../types";
+import { OrdenCompra, Proyecto } from "../../types";
 import DataTable, { DataTableColumn } from "../common/DataTable";
 import PaginationCompact from "../common/PaginationCompact";
 import SearchBar from "../common/SearchBar";
@@ -16,6 +16,7 @@ const OrdenCompraList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [proyectos, setProyectos] = useState<Proyecto[]>([]);
 
   const itemsPerPage = 10;
   const urlServer = import.meta.env.VITE_API_URL;
@@ -38,7 +39,20 @@ const OrdenCompraList: React.FC = () => {
     }
   };
 
-  useEffect(() => { fetchOrdenes(); }, []);
+  // Cargar proyectos
+  const fetchProyectos = async () => {
+    try {
+      const response = await axios.get(`${urlServer}proyectos/`);
+      setProyectos(response.data);
+    } catch (error) {
+      console.error("Error al cargar proyectos:", error);
+    }
+  };
+
+  useEffect(() => { 
+    fetchOrdenes();
+    fetchProyectos();
+  }, []);
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
@@ -199,6 +213,7 @@ const OrdenCompraList: React.FC = () => {
 
       {/* Modal Form */}
       <OrdenCompraForm
+        proyectos={proyectos}
         show={showModal}
         onHide={handleCloseForm}
         onSave={handleSaveForm}

@@ -19,6 +19,7 @@ export const getOrdenesCompra = async (req: Request, res: Response) => {
       .populate('proveedor', 'empresa')
       .populate('razonSocial', 'nombre rfc')
       .populate('vendedor', 'nombre correo telefono')
+      .populate('proyecto', 'nombre estado')
       .sort({ fecha: -1 });
 
     // Migrar órdenes que no tienen numeroCotizacion pero tienen datosPdf
@@ -48,7 +49,8 @@ export const getOrdenCompraById = async (req: Request, res: Response) => {
     const ordenCompra = await OrdenCompra.findById(req.params.id)
       .populate('proveedor')
       .populate('razonSocial')
-      .populate('vendedor');
+      .populate('vendedor')
+      .populate('proyecto');
     if (!ordenCompra) {
       return res.status(404).json({ error: 'Orden de compra no encontrada' });
     }
@@ -391,7 +393,8 @@ export const crearOrdenDesdePdf = async (req: Request, res: Response) => {
       razonSocial: razonSocialId, 
       vendedor: vendedorId,
       direccionEnvio,
-      datosAdicionales 
+      datosAdicionales,
+      proyecto: proyectoId 
     } = req.body;
 
     // Validar que se proporcionaron los datos mínimos
@@ -452,6 +455,7 @@ export const crearOrdenDesdePdf = async (req: Request, res: Response) => {
         proveedor: proveedorId,
         razonSocial: razonSocialId,
         vendedor: vendedorId || undefined,
+        proyecto: proyectoId || undefined,
         datosOrden: {
           direccionEnvio: direccionEnvio ? JSON.parse(direccionEnvio) : undefined,
           productos: datosExtraidos.productos || [],
@@ -507,7 +511,8 @@ export const crearOrdenDesdePdf = async (req: Request, res: Response) => {
       const ordenCreada = await OrdenCompra.findById(ordenCompra._id)
         .populate('proveedor', 'empresa')
         .populate('razonSocial', 'nombre rfc')
-        .populate('vendedor', 'nombre correo telefono');
+        .populate('vendedor', 'nombre correo telefono')
+        .populate('proyecto', 'nombre estado');
 
       res.status(201).json({
         success: true,
@@ -602,7 +607,8 @@ export const crearOrdenCompraConPdf = async (req: Request, res: Response) => {
       totalesCalculados,
       datosPdf,
       moneda,
-      porcentajeIvaSimbolico
+      porcentajeIvaSimbolico,
+      proyecto
     } = req.body;
     
     // Validar que el proveedor existe
@@ -642,6 +648,7 @@ export const crearOrdenCompraConPdf = async (req: Request, res: Response) => {
       proveedor,
       razonSocial,
       vendedor: vendedor || undefined,
+      proyecto: proyecto || undefined,
       datosOrden: {
         direccionEnvio,
         productos,
@@ -708,7 +715,8 @@ export const crearOrdenCompraConPdf = async (req: Request, res: Response) => {
     const ordenCreada = await OrdenCompra.findById(ordenCompra._id)
       .populate('proveedor', 'empresa')
       .populate('razonSocial', 'nombre rfc')
-      .populate('vendedor', 'nombre correo telefono');
+      .populate('vendedor', 'nombre correo telefono')
+      .populate('proyecto', 'nombre estado');
     
     // Configurar headers para la respuesta PDF
     res.setHeader('Content-Type', 'application/pdf');
@@ -749,7 +757,8 @@ export const updateOrdenCompraConPdf = async (req: Request, res: Response) => {
       totalesCalculados,
       datosPdf,
       moneda,
-      porcentajeIvaSimbolico
+      porcentajeIvaSimbolico,
+      proyecto
     } = req.body;
     
     // Buscar la orden existente
@@ -787,6 +796,7 @@ export const updateOrdenCompraConPdf = async (req: Request, res: Response) => {
       proveedor,
       razonSocial,
       vendedor: vendedor || undefined,
+      proyecto: proyecto || undefined,
       datosOrden: {
         direccionEnvio,
         productos,

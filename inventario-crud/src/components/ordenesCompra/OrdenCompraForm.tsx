@@ -21,9 +21,10 @@ interface OrdenCompraFormProps {
   onSave: (data: any) => void;
   editId?: string | null;
   onOrdenCreada?: () => void; // Nueva prop para notificar cuando se crea una orden
+  proyectos: any[]; // Array de proyectos disponibles
 }
 
-const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId, onOrdenCreada }) => {
+const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId, onOrdenCreada, proyectos }) => {
   // Estados para notificaciones
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -31,6 +32,7 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
 
   // Estados del formulario
   const [numeroOrden, setNumeroOrden] = useState("");
+  const [proyectoSeleccionado, setProyectoSeleccionado] = useState<string>("");
   
   // Estados para proveedor
   const [proveedorBusqueda, setProveedorBusqueda] = useState("");
@@ -207,6 +209,12 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
           // Cargar datos básicos
           setNumeroOrden(orden.numeroOrden || '');
           
+          // Cargar proyecto si existe
+          if (orden.proyecto) {
+            const proyectoId = typeof orden.proyecto === 'object' ? orden.proyecto._id : orden.proyecto;
+            setProyectoSeleccionado(proyectoId || '');
+          }
+          
           // Cargar proveedor
           if (typeof orden.proveedor === 'object') {
             setProveedorSeleccionado(orden.proveedor);
@@ -271,6 +279,7 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
   // Función para resetear el formulario
   const resetearFormulario = () => {
     setNumeroOrden('');
+    setProyectoSeleccionado('');
     // No establecer fecha por defecto
     setProveedorBusqueda('');
     setProveedorSeleccionado(null);
@@ -508,6 +517,9 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
         indice: direccionEnvioSeleccionada,
         ...razonSocialSeleccionada.direccionEnvio[direccionEnvioSeleccionada]
       }));
+    }
+    if (proyectoSeleccionado) {
+      formData.append('proyecto', proyectoSeleccionado);
     }
 
     try {
@@ -1060,6 +1072,31 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
               </Col>
             </Row>
 
+            {/* Selección de Proyecto (Opcional) */}
+            <Row className="mb-3">
+              <Col md={12}>
+                <Form.Group>
+                  <Form.Label>
+                    Proyecto (Opcional)
+                    <small className="text-muted ms-2">
+                      Seleccione un proyecto para asociar esta orden de compra
+                    </small>
+                  </Form.Label>
+                  <Form.Select
+                    value={proyectoSeleccionado}
+                    onChange={(e) => setProyectoSeleccionado(e.target.value)}
+                  >
+                    <option value="">Sin proyecto asignado</option>
+                    {proyectos && proyectos.map((proyecto) => (
+                      <option key={proyecto._id} value={proyecto._id}>
+                        {proyecto.nombre} - {proyecto.estado}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+            </Row>
+
             {/* Secciones de Proveedor y Razón Social lado a lado */}
             <Row className="mb-4">
               {/* Sección de Proveedor */}
@@ -1277,6 +1314,8 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
         onGenerarOrden={generarOrdenCompra}
         editId={editId}
         onCancelar={cancelarProcesamiento}
+        proyectoId={proyectoSeleccionado || undefined}
+        proyectos={proyectos}
       />
 
       {/* Toast de notificaciones */}
