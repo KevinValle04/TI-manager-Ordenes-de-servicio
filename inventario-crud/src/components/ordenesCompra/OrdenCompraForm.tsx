@@ -765,22 +765,15 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
         console.log('✅ Actualizando totales calculados:', totalesCalculados);
         setTotalesCalculados(totalesCalculados);
       } else {
-        // Calcular totales automáticamente si no están en el PDF
-        const subTotal = productos.reduce((sum: number, producto: any) => {
-          const importe = producto.importe || ((producto.cantidad || 0) * (producto.precioUnitario || 0));
-          return sum + importe;
-        }, 0);
-        
-        // Detectar el porcentaje de IVA (por defecto 16%)
-        const iva = subTotal * 0.16;
-        const total = subTotal + iva;
-        
+        // ✅ NO calcular totales automáticamente - dejar que el modal lo haga
+        // Solo inicializar totales vacíos 
         totalesCalculados = {
-          subTotal: Number(subTotal.toFixed(2)),
-          iva: Number(iva.toFixed(2)),
-          total: Number(total.toFixed(2))
+          subTotal: 0,
+          iva: 0,
+          total: 0
         };
         
+        console.log('✅ Productos preparados, totales se calcularán en el modal');
         setTotalesCalculados(totalesCalculados);
       }
       
@@ -826,12 +819,17 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
 
   // Función optimizada para actualizar productos con useCallback
   const actualizarProducto = useCallback((index: number, campo: string, valor: any) => {
+    console.log('🔧 actualizarProducto llamado:', { index, campo, valor });
+    
     setProductosEditables(prev => {
       const nuevosProductos = [...prev];
+      
+      console.log('📋 Estado anterior:', prev[index]);
       
       // Manejar eliminación de producto
       if (campo === 'eliminar') {
         nuevosProductos.splice(index, 1);
+        console.log(`🗑️ Producto ${index} eliminado`);
       } else {
         const productoActualizado = {
           ...nuevosProductos[index],
@@ -846,14 +844,20 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
         }
         
         nuevosProductos[index] = productoActualizado;
+        console.log('📋 Estado nuevo:', productoActualizado);
       }
       
-      // Calcular totales directamente con los nuevos productos
-      calcularTotales(nuevosProductos);
+      console.log('🔄 Producto actualizado:', { 
+        index, 
+        campo, 
+        valor, 
+        totalProductos: nuevosProductos.length,
+        estadoCompleto: nuevosProductos
+      });
       
       return nuevosProductos;
     });
-  }, [calcularTotales]);
+  }, []); // Sin dependencias porque ya no usa calcularTotales
 
   // Función para agregar producto optimizada
   const agregarNuevoProducto = useCallback(() => {
@@ -1314,6 +1318,7 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
         onCancelar={cancelarProcesamiento}
         proyectoId={proyectoSeleccionado || undefined}
         proyectos={proyectos}
+        onActualizarTotales={(totales) => setTotalesCalculados(totales)}
       />
 
       {/* Toast de notificaciones */}

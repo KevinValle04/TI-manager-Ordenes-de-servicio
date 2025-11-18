@@ -761,6 +761,11 @@ export const updateOrdenCompraConPdf = async (req: Request, res: Response) => {
       proyecto
     } = req.body;
     
+    console.log('🔍 DEBUG updateOrdenCompraConPdf - Datos recibidos del modal:');
+    console.log('📊 Productos del modal:', JSON.stringify(productos?.slice(0, 2), null, 2)); // Solo primeros 2
+    console.log('💰 Totales del modal:', JSON.stringify(totalesCalculados, null, 2));
+    console.log('🏷️ Porcentaje IVA del modal:', porcentajeIvaSimbolico);
+
     // Buscar la orden existente
     const ordenExistente = await OrdenCompra.findById(id);
     if (!ordenExistente) {
@@ -815,6 +820,10 @@ export const updateOrdenCompraConPdf = async (req: Request, res: Response) => {
     if (!ordenActualizada) {
       return res.status(500).json({ error: 'Error al actualizar la orden de compra' });
     }
+    
+    console.log('📄 DEBUG - Preparando datos para PDF:');
+    console.log('📦 Productos para PDF:', JSON.stringify(productos?.slice(0, 2), null, 2));
+    console.log('🧮 Totales para PDF:', JSON.stringify(totalesCalculados, null, 2));
     
     // Preparar datos para generar PDF
     const datosParaPdf = {

@@ -358,6 +358,11 @@ def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
   "moneda": "string (Detecta la moneda, si no se especifica, asume 'MXN')"
 }}
 
+**IMPORTANTE - EXTRACCIÓN DE DATOS:**
+- Extrae los productos con sus precios exactos del documento
+- Para los totales, usa los valores que aparecen en el PDF (el modal los recalculará si es necesario)
+- Enfócate en la precisión de los datos de productos y precios
+
 **REGLAS CRÍTICAS PARA EXTRACCIÓN FLEXIBLE:**
 1.  **DETECCIÓN AUTOMÁTICA DEL FORMATO:**
     * Si el documento tiene columna "PRECIO LISTA" y "DESCUENTO" → usar `precioListaUnitario` + `descuentoPorcentaje`
@@ -411,16 +416,13 @@ DEBES USAR:
     * `descuentoPorcentaje` → Buscar en: "DESCUENTO", "DESC %", "DISCOUNT" (excepto TVC, SYSCOM, PORTENTUM y ARUBA = 0)
     * `importe` → Buscar en: "IMPORTE", "TOTAL", "PRECIO EXTENDIDO", "P. EXTENDIDO", "EXTENDED PRICE"
 
-5.  **REGLAS DE CÁLCULO:**
-    * **Para TVC**: usar `precioUnitario` desde "PRECIO DISTRIBUIDOR" + `descuentoPorcentaje` = 0
-    * **Para SYSCOM**: usar `precioUnitario` desde "P.U." + `descuentoPorcentaje` = 0 (precios YA con descuentos aplicados)
-    * **Para PORTENTUM**: usar `precioUnitario` desde "PRECIO COSTO" + `descuentoPorcentaje` = 0 (no aplicar descuentos)
-    * **Para ARUBA**: usar `precioUnitario` desde "P.U. Canal" + `importe` desde "P. Extendido" + `descuentoPorcentaje` = 0
-    * **Para otros**: Si existe `precioUnitario` → usarlo directamente
-    * Si existe `precioListaUnitario` + `descuentoPorcentaje` → calcular `precioUnitarioFinal`
-    * `importe` SIEMPRE debe coincidir con `cantidad * precio_final` O usar el valor directo si está disponible
+5.  **EXTRACCIÓN PRECISA:**
+    * Extrae `precioUnitario` tal como aparece en el documento
+    * Si hay `precioListaUnitario` y `descuentoPorcentaje`, extrae ambos valores
+    * `importe` debe ser el valor exacto que aparece en el documento
+    * Los cálculos y validaciones se harán en el frontend (modal)
 
-6.  **REGLA ESPECIAL PARA TVC, SYSCOM, PORTENTUM Y ARUBA:**
+6.  **REGLA ESPECIAL PARA PROVEEDORES ESPECÍFICOS:**
     * **TVC**: SIEMPRE buscar la columna "PRECIO DISTRIBUIDOR" o "PRECIO DISTRIBU."
     * **SYSCOM**: SIEMPRE buscar la columna "P.U." o "PRECIO UNITARIO"
     * **PORTENTUM**: SIEMPRE buscar la columna "PRECIO COSTO" o "Precio costo" (NUNCA usar "Precio Unitario")
@@ -441,6 +443,12 @@ DEBES USAR:
 Si el documento contiene las columnas "Precio costo" Y "Precio Unitario", debes usar SOLAMENTE el valor de "Precio costo" como precioUnitario en el JSON final. El valor de "Precio Unitario" debe ser completamente ignorado. Esta es una regla ABSOLUTA e inviolable para documentos Portentum.
 
 Si el documento contiene las columnas "P.U. Canal" Y "Precio Lista", debes usar SOLAMENTE el valor de "P.U. Canal" como precioUnitario en el JSON final. Además, usar "P. Extendido" como importe directo. Esta es una regla ABSOLUTA e inviolable para documentos Aruba.
+
+**PRIORIDAD: EXTRACCIÓN PRECISA SOBRE CÁLCULOS**
+- Enfócate en extraer los datos exactos del documento
+- No te preocupes por validar cálculos matemáticos
+- El frontend (modal) se encargará de todos los cálculos y recálculos
+- Tu trabajo es ser un extractor de datos preciso y confiable
 
 ---
 {texto_completo}

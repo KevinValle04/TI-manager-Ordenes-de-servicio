@@ -260,15 +260,20 @@ export class PdfGeneratorService {
       const precioLista = Number(producto.precioLista) || 0;
       const descuento = Number(producto.descuento) || 0;
       
-      // Calcular importe con descuento
-      let importe = producto.importe || producto.total;
-      if (!importe) {
-        const subtotal = cantidad * precioUnitario;
-        importe = subtotal * (1 - descuento / 100);
-      }
-      
+      // Declarar variables antes de usarlas
       const almacen = producto.alm || producto.almacen || '';
       const codigo = producto.codigo || producto.clave || producto.codigoFabricante || '';
+      
+      // Usar el importe que viene del modal/frontend (ya calculado correctamente)
+      // Si no existe, calcularlo como fallback
+      let importe = Number(producto.importe) || Number(producto.total);
+      if (!importe || isNaN(importe)) {
+        const subtotal = cantidad * precioUnitario;
+        importe = subtotal * (1 - descuento / 100);
+        console.log(`⚠️ Recalculando importe para ${codigo}: ${cantidad} × ${precioUnitario} × (1 - ${descuento}%) = ${importe}`);
+      } else {
+        console.log(`✅ Usando importe del modal para ${codigo}: ${importe}`);
+      }
       
       let fila = '<tr>';
       
@@ -306,6 +311,11 @@ export class PdfGeneratorService {
   }
 
   public async generarPdfOrdenCompra(datosOrden: OrdenCompraData): Promise<Buffer> {
+    console.log('🖨️ DEBUG pdfGenerator - Datos recibidos:');
+    console.log('📦 Productos en PDF:', JSON.stringify(datosOrden.productos?.slice(0, 2), null, 2));
+    console.log('🧮 Totales en PDF:', JSON.stringify(datosOrden.totalesCalculados, null, 2));
+    console.log('🏷️ Porcentaje IVA en PDF:', datosOrden.porcentajeIvaSimbolico);
+    
     let browser;
     
     try {
