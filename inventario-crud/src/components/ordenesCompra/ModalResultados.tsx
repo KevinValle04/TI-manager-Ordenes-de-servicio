@@ -230,7 +230,9 @@ const ComponenteTotales = React.memo(({
         </Row>
         <hr />
         <Row>
-          <Col xs={6} className="fw-bold text-primary">Total:</Col>
+          <Col xs={6} className="fw-bold text-primary">
+            Total:
+          </Col>
           <Col xs={6} className="text-end">
             <Form.Control
               type="text"
@@ -376,12 +378,13 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
       const porcentajeDetectado = ((totalesCalculados.iva / totalesCalculados.subTotal) * 100).toFixed(0);
       // Solo cambiar si es un porcentaje común y el usuario no ha cambiado manualmente
       if (['0', '8', '16'].includes(porcentajeDetectado)) {
+        console.log(`📊 IVA detectado automáticamente: ${porcentajeDetectado}%`);
         setPorcentajeIvaSimbolico(porcentajeDetectado);
       }
     }
   }, [totalesCalculados]);
 
-  // Calcular totales cuando cambian los productos
+  // Calcular totales cuando cambian los productos o el porcentaje de IVA
   React.useEffect(() => {
     if (!onActualizarTotales) return;
 
@@ -402,6 +405,13 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
       const porcentajeIva = Number(porcentajeIvaSimbolico) / 100;
       const iva = subTotal * porcentajeIva;
       const total = subTotal + iva;
+
+      console.log(`🧮 Recalculando totales - IVA: ${porcentajeIvaSimbolico}%`, {
+        subTotal: subTotal.toFixed(2),
+        iva: iva.toFixed(2),
+        total: total.toFixed(2),
+        porcentajeIva: porcentajeIvaSimbolico
+      });
 
       // Actualizar los totales
       onActualizarTotales({
@@ -572,7 +582,7 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
                 
                 <Col md={3}>
                   <Form.Group className="mb-3">
-                    <Form.Label className="small fw-bold mb-1">Porcentaje de IVA (Simbólico):</Form.Label>
+                    <Form.Label className="small fw-bold mb-1">Porcentaje de IVA:</Form.Label>
                     <Form.Select
                       size="sm"
                       value={porcentajeIvaSimbolico}
@@ -586,7 +596,7 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
                       ))}
                     </Form.Select>
                     <Form.Text className="text-muted">
-                      <small><i className="fas fa-info-circle me-1"></i>Solo para mostrar en el PDF. El valor real se toma de la cotización.</small>
+                      <small>Se recalculan totales automáticamente</small>
                     </Form.Text>
                   </Form.Group>
                 </Col>

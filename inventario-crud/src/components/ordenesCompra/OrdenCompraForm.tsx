@@ -1,16 +1,16 @@
 import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  Alert,
-  Badge,
-  Button,
-  Col,
-  Form,
-  ListGroup,
-  Modal,
-  Row,
-  Toast,
-  ToastContainer
+    Alert,
+    Badge,
+    Button,
+    Col,
+    Form,
+    ListGroup,
+    Modal,
+    Row,
+    Toast,
+    ToastContainer
 } from "react-bootstrap";
 import { Proveedor, RazonSocial } from "../../types";
 import ModalResultados from "./ModalResultados";
@@ -642,11 +642,9 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
         
         let precioUnitario = 0;
         if (esPortentum) {
-          // Para Portentum/Aruba: usar PRECIO LISTA UNITARIO como precio unitario
-          precioUnitario = parseNumericValue(producto.precioListaUnitario) ||      // PORTENTUM/ARUBA: precio lista unitario
-                          parseNumericValue(producto.precioLista) ||              // Alternativo: precio lista
-                          parseNumericValue(producto.precioUnitario) ||           // Fallback: precio unitario
-                          parseNumericValue(producto.precio) ||                   // Genérico: precio
+          // Para Portentum: usar PRECIO COSTO como precio unitario (ya extraído correctamente del JSON)
+          precioUnitario = parseNumericValue(producto.precioUnitario) ||           // PORTENTUM: precio costo
+                          parseNumericValue(producto.precio) ||                   // Fallback genérico
                           0;
         } else {
           precioUnitario = parseNumericValue(producto.precioUnitario) ||           // SYSCOM/PRECIO DISTRIBUIDOR: precio directo

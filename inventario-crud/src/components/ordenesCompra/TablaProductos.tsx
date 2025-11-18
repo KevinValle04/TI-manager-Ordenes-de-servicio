@@ -115,7 +115,7 @@ const FilaProducto: React.FC<FilaProductoProps> = React.memo(({
             onClick={handleEliminarProducto}
             title="Eliminar producto"
           >
-            <i className="fas fa-trash-alt"></i>
+            ×
           </Button>
         </div>
       </td>

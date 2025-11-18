@@ -322,11 +322,11 @@ def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
     hash_texto = generar_hash_texto(texto_completo)
     hash_estructura = generar_hash_estructura(texto_completo)
     
-    # Buscar en cache
-    resultado_cache, tipo_cache = buscar_en_cache(hash_texto, hash_estructura, cache_dir)
-    if resultado_cache:
-        print(f"🎯 Resultado obtenido desde cache ({tipo_cache})", file=sys.stderr)
-        return resultado_cache
+    # Buscar en cache - DESACTIVADO PARA PRUEBAS
+    # resultado_cache, tipo_cache = buscar_en_cache(hash_texto, hash_estructura, cache_dir)
+    # if resultado_cache:
+    #     print(f"🎯 Resultado obtenido desde cache ({tipo_cache})", file=sys.stderr)
+    #     return resultado_cache
 
     print(f"🔍 DEBUG: Creando cliente OpenAI", file=sys.stderr)
     try:
@@ -362,38 +362,86 @@ def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
 1.  **DETECCIÓN AUTOMÁTICA DEL FORMATO:**
     * Si el documento tiene columna "PRECIO LISTA" y "DESCUENTO" → usar `precioListaUnitario` + `descuentoPorcentaje`
     * Si el documento solo tiene "PRECIO UNITARIO" o "P.U." → usar `precioUnitario` directamente
+    * **ESPECIAL PORTENTUM**: Si existe "PRECIO COSTO" → usar como `precioUnitario` (precio real de venta)
+    * **ESPECIAL ARUBA**: Si existe "P.U. Canal" → usar como `precioUnitario` + usar "P. Extendido" como `importe`
+    * **IMPORTANTE**: Para Portentum, IGNORAR columnas "Precio Unitario" si existe "Precio costo"
+    * **IMPORTANTE**: Para Aruba, IGNORAR columnas "Precio Lista" y usar "P.U. Canal"
     * SIEMPRE extraer `importe` de la última columna de totales
+
+**EJEMPLO ESPECÍFICO PORTENTUM:**
+Si ves esta estructura en el documento:
+- Precio lista: 1,415.6200
+- % Dto.: 43.50  
+- Precio costo: 799.8300
+- Precio Unitario: 1415
+
+DEBES USAR:
+- precioUnitario = 799.8300 (desde "Precio costo")
+- precioListaUnitario = 1415.6200 (desde "Precio lista") 
+- descuentoPorcentaje = 0 (PORTENTUM no usa descuentos, precio costo ya es final)
+- IGNORAR completamente el valor "1415" de la columna "Precio Unitario"
+
+**EJEMPLO ESPECÍFICO ARUBA:**
+Si ves esta estructura en el documento:
+- Precio Lista: 44,260.00
+- P.U. Canal: 13,730.56
+- P. Extendido: 27,527.11
+
+DEBES USAR:
+- precioUnitario = 13730.56 (desde "P.U. Canal")
+- precioListaUnitario = 44260.00 (desde "Precio Lista")
+- importe = 27527.11 (desde "P. Extendido")
+- descuentoPorcentaje = 0 (precio canal ya es final)
 
 2.  **MAPEO DE CAMPOS POR PROVEEDOR:**
     * **TVC**: `precioUnitario` desde "PRECIO DISTRIBUIDOR" (sin descuentos, descuento = 0)
     * **SYSCOM**: `precioUnitario` desde "P.U." o "PRECIO UNITARIO" (YA incluye descuentos, descuento = 0)
     * **GRUPO DICE**: `precioListaUnitario` desde "PRECIO LISTA UNIT." + `descuentoPorcentaje` desde "DESCUENTO"
+    * **PORTENTUM**: `precioUnitario` desde "PRECIO COSTO" o "Precio costo" (NUNCA desde "Precio Unitario") + `precioListaUnitario` desde "PRECIO LISTA" + `descuentoPorcentaje` = 0 (sin descuentos)
+    * **ARUBA**: `precioUnitario` desde "P.U. Canal" + `importe` desde "P. Extendido" + `descuentoPorcentaje` = 0 (sin descuentos)
     * **UNIVERSAL**: `precioUnitario` desde cualquier columna de precio unitario
 
 4.  **PRIORIDAD DE EXTRACCIÓN:**
     * **Para TVC**: `precioUnitario` → "PRECIO DISTRIBUIDOR" (descuento automático = 0)
     * **Para SYSCOM**: `precioUnitario` → "P.U." o "PRECIO UNITARIO" (descuento automático = 0, precios YA incluyen descuentos)
+    * **Para PORTENTUM**: `precioUnitario` → "PRECIO COSTO" o "Precio costo" (descuento = 0, precio final)
+    * **Para ARUBA**: `precioUnitario` → "P.U. Canal" + `importe` → "P. Extendido" (descuento = 0)
     * **Para otros**: `precioUnitario` → Buscar en: "P.U.", "PRECIO UNITARIO", "PRECIO UNIT.", "UNIT PRICE"
     * `precioListaUnitario` → Buscar en: "PRECIO LISTA", "LISTA UNIT.", "PRICE LIST"
-    * `descuentoPorcentaje` → Buscar en: "DESCUENTO", "DESC %", "DISCOUNT" (excepto TVC y SYSCOM = 0)
-    * `importe` → Buscar en: "IMPORTE", "TOTAL", "PRECIO EXTENDIDO", "EXTENDED PRICE"
+    * `descuentoPorcentaje` → Buscar en: "DESCUENTO", "DESC %", "DISCOUNT" (excepto TVC, SYSCOM, PORTENTUM y ARUBA = 0)
+    * `importe` → Buscar en: "IMPORTE", "TOTAL", "PRECIO EXTENDIDO", "P. EXTENDIDO", "EXTENDED PRICE"
 
 5.  **REGLAS DE CÁLCULO:**
     * **Para TVC**: usar `precioUnitario` desde "PRECIO DISTRIBUIDOR" + `descuentoPorcentaje` = 0
     * **Para SYSCOM**: usar `precioUnitario` desde "P.U." + `descuentoPorcentaje` = 0 (precios YA con descuentos aplicados)
+    * **Para PORTENTUM**: usar `precioUnitario` desde "PRECIO COSTO" + `descuentoPorcentaje` = 0 (no aplicar descuentos)
+    * **Para ARUBA**: usar `precioUnitario` desde "P.U. Canal" + `importe` desde "P. Extendido" + `descuentoPorcentaje` = 0
     * **Para otros**: Si existe `precioUnitario` → usarlo directamente
     * Si existe `precioListaUnitario` + `descuentoPorcentaje` → calcular `precioUnitarioFinal`
-    * `importe` SIEMPRE debe coincidir con `cantidad * precio_final`
+    * `importe` SIEMPRE debe coincidir con `cantidad * precio_final` O usar el valor directo si está disponible
 
-6.  **REGLA ESPECIAL PARA TVC Y SYSCOM:**
+6.  **REGLA ESPECIAL PARA TVC, SYSCOM, PORTENTUM Y ARUBA:**
     * **TVC**: SIEMPRE buscar la columna "PRECIO DISTRIBUIDOR" o "PRECIO DISTRIBU."
     * **SYSCOM**: SIEMPRE buscar la columna "P.U." o "PRECIO UNITARIO"
+    * **PORTENTUM**: SIEMPRE buscar la columna "PRECIO COSTO" o "Precio costo" (NUNCA usar "Precio Unitario")
+    * **ARUBA**: SIEMPRE buscar la columna "P.U. Canal" para precio unitario y "P. Extendido" para importe
+    * **PRIORIDAD ABSOLUTA PORTENTUM**: Si encuentras "Precio costo" = 799.83 y "Precio Unitario" = 1415, USA 799.83
+    * **PRIORIDAD ABSOLUTA ARUBA**: Si encuentras "P.U. Canal" = 13730.56 y "Precio Lista" = 44260.00, USA 13730.56
     * Usar ese valor como `precioUnitario` final
-    * NUNCA aplicar descuentos adicionales (descuento = 0)
-    * El precio unitario ya incluye todos los descuentos aplicables
+    * Para TVC, SYSCOM, PORTENTUM y ARUBA: NUNCA aplicar descuentos adicionales (descuento = 0)
+    * Para PORTENTUM: El "PRECIO COSTO" ya es el precio final, sin descuentos adicionales
+    * Para ARUBA: El "P.U. Canal" ya es el precio final de canal, sin descuentos adicionales
+    * **REGLA CRÍTICA PORTENTUM**: Si hay múltiples columnas de precio (ej: "Precio Unitario" y "Precio costo"), SIEMPRE usar "Precio costo" como precioUnitario
+    * **REGLA CRÍTICA ARUBA**: Si hay múltiples columnas de precio (ej: "Precio Lista" y "P.U. Canal"), SIEMPRE usar "P.U. Canal" como precioUnitario
 
 **DOCUMENTO A PROCESAR:**
 (Nombre del archivo: {nombre_archivo})
+
+**INSTRUCCIÓN FINAL CRÍTICA:**
+Si el documento contiene las columnas "Precio costo" Y "Precio Unitario", debes usar SOLAMENTE el valor de "Precio costo" como precioUnitario en el JSON final. El valor de "Precio Unitario" debe ser completamente ignorado. Esta es una regla ABSOLUTA e inviolable para documentos Portentum.
+
+Si el documento contiene las columnas "P.U. Canal" Y "Precio Lista", debes usar SOLAMENTE el valor de "P.U. Canal" como precioUnitario en el JSON final. Además, usar "P. Extendido" como importe directo. Esta es una regla ABSOLUTA e inviolable para documentos Aruba.
+
 ---
 {texto_completo}
 ---
@@ -424,7 +472,7 @@ def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
         print(f"   ✓ Documento analizado por GPT-4o.", file=sys.stderr)
         print(f"   📊 Productos extraídos: {len(json_parseado.get('productos', []))}", file=sys.stderr)
         
-        guardar_en_cache(hash_texto, hash_estructura, resultado_str, cache_dir)
+        # guardar_en_cache(hash_texto, hash_estructura, resultado_str, cache_dir) # DESACTIVADO PARA PRUEBAS
         return resultado_str
         
     except Exception as e:
@@ -461,10 +509,10 @@ if __name__ == "__main__":
         # innecesarias a la API si ya existe un resultado.
         hash_texto_raw = generar_hash_texto(texto_completo)
         hash_estructura_raw = generar_hash_estructura(texto_completo)
-        resultado_cache_raw, tipo_cache_raw = buscar_en_cache(hash_texto_raw, hash_estructura_raw, cache_dir)
-        if resultado_cache_raw:
-            print(resultado_cache_raw)
-            sys.exit(0)
+        # resultado_cache_raw, tipo_cache_raw = buscar_en_cache(hash_texto_raw, hash_estructura_raw, cache_dir) # DESACTIVADO PARA PRUEBAS
+        # if resultado_cache_raw:
+        #     print(resultado_cache_raw)
+        #     sys.exit(0)
 
         # Si no hay cache, aplicar preprocesamiento para códigos Syscom con guiones
         texto_completo = procesar_guiones_syscom(texto_completo)
@@ -490,7 +538,7 @@ if __name__ == "__main__":
             print("⚠️ El resultado final no es un JSON válido.", file=sys.stderr)
 
         # 🔧 DEBUG: Descomentar la siguiente línea para guardar JSON físico para debugging
-        # guardar_json_resultado(json_resultado, folio_extraido, os.path.basename(archivo_pdf))
+        guardar_json_resultado(json_resultado, folio_extraido, os.path.basename(archivo_pdf))
     
     except Exception as e:
         error_message = f"❌ ERROR CRÍTICO: {str(e)}"
