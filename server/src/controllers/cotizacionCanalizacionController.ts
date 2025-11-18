@@ -105,10 +105,26 @@ export const deleteCotizacionCanalizacion = async (req: Request, res: Response) 
 // Buscar cotizaciones por criterios específicos
 export const searchCotizacionesCanalizacion = async (req: Request, res: Response) => {
   try {
-    const { cliente, proyecto, estado, fechaDesde, fechaHasta } = req.query;
+    const { term, cliente, proyecto, estado, fechaDesde, fechaHasta } = req.query;
+    
+    // Si no hay ningún parámetro de búsqueda, retornar array vacío
+    if (!term && !cliente && !proyecto && !estado && !fechaDesde && !fechaHasta) {
+      return res.json([]);
+    }
+    
     const filter: any = {};
     
-    if (cliente) filter.cliente = new RegExp(cliente as string, 'i');
+    // Si hay un término de búsqueda general, buscar en comentarios, numeroPresupuesto y cliente
+    if (term) {
+      filter.$or = [
+        { comentarios: new RegExp(term as string, 'i') },
+        { numeroPresupuesto: new RegExp(term as string, 'i') },
+        { cliente: new RegExp(term as string, 'i') }
+      ];
+    }
+    
+    // Filtros adicionales específicos
+    if (cliente && !term) filter.cliente = new RegExp(cliente as string, 'i');
     if (proyecto) filter.proyecto = new RegExp(proyecto as string, 'i');
     if (estado) filter.estado = estado;
     
@@ -120,7 +136,8 @@ export const searchCotizacionesCanalizacion = async (req: Request, res: Response
     
     const cotizaciones = await CotizacionCanalizacion.find(filter)
       .populate('razonSocial', 'nombre rfc emailEmpresa telEmpresa direccionEmpresa')
-      .sort({ fechaActualizacion: -1 });
+      .sort({ fechaActualizacion: -1 })
+      .limit(50); // Limitar resultados para mejor rendimiento
     res.json(cotizaciones);
   } catch (err) {
     console.error('Error al buscar cotizaciones de canalización:', err);

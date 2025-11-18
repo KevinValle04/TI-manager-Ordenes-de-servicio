@@ -95,7 +95,14 @@ const CotizacionModal = ({
   const searchCanalizaciones = async (searchTerm: string) => {
     try {
       setCanalizacionSearchTerm(searchTerm);
-      const response = await fetch(`/api/cotizaciones-canalizacion/search?term=${searchTerm}`);
+      
+      // Si no hay término de búsqueda, limpiar resultados
+      if (!searchTerm || searchTerm.trim().length === 0) {
+        setCanalizaciones([]);
+        return;
+      }
+      
+      const response = await fetch(`/api/cotizaciones-canalizacion/search?term=${encodeURIComponent(searchTerm)}`);
       if (response.ok) {
         const data = await response.json();
         setCanalizaciones(data);
@@ -610,7 +617,7 @@ const CotizacionModal = ({
               <Modal 
                 show={showCanalizacionModal} 
                 onHide={() => setShowCanalizacionModal(false)}
-                size="lg"
+                size="xl"
               >
                 <Modal.Header closeButton>
                   <Modal.Title>Buscar Canalización</Modal.Title>
@@ -619,44 +626,62 @@ const CotizacionModal = ({
                   <Form.Group className="mb-3">
                     <Form.Control
                       type="text"
-                      placeholder="Buscar por número de presupuesto o cliente..."
+                      placeholder="Buscar por comentario, número de presupuesto o cliente..."
                       value={canalizacionSearchTerm}
                       onChange={(e) => searchCanalizaciones(e.target.value)}
+                      autoFocus
                     />
+                    <Form.Text className="text-muted">
+                      Escribe el título o descripción de la canalización que buscas
+                    </Form.Text>
                   </Form.Group>
-                  <div className="table-responsive">
-                    <table className="table table-hover">
-                      <thead>
-                        <tr>
-                          <th>No. Presupuesto</th>
-                          <th>Cliente</th>
-                          <th>Total</th>
-                          <th>Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {canalizaciones.map(canalizacion => (
-                          <tr key={canalizacion._id}>
-                            <td>{canalizacion.numeroPresupuesto}</td>
-                            <td>{canalizacion.cliente}</td>
-                            <td>${canalizacion.total.toLocaleString('es-MX', {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2
-                            })}</td>
-                            <td>
-                              <Button
-                                variant="primary"
-                                size="sm"
-                                onClick={() => addCanalizacion(canalizacion)}
-                              >
-                                Añadir
-                              </Button>
-                            </td>
+                  {canalizaciones.length === 0 && canalizacionSearchTerm ? (
+                    <div className="alert alert-info">
+                      <i className="fas fa-info-circle me-2"></i>
+                      No se encontraron canalizaciones. Intenta con otro término de búsqueda.
+                    </div>
+                  ) : (
+                    <div className="table-responsive">
+                      <table className="table table-hover">
+                        <thead className="table-dark">
+                          <tr>
+                            <th>No. Presupuesto</th>
+                            <th>Comentarios/Título</th>
+                            <th>Cliente</th>
+                            <th>Total</th>
+                            <th>Acciones</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {canalizaciones.map(canalizacion => (
+                            <tr key={canalizacion._id}>
+                              <td>{canalizacion.numeroPresupuesto}</td>
+                              <td>
+                                <div className="text-truncate" style={{ maxWidth: '300px' }} title={canalizacion.comentarios}>
+                                  {canalizacion.comentarios || <span className="text-muted">Sin comentarios</span>}
+                                </div>
+                              </td>
+                              <td>{canalizacion.cliente}</td>
+                              <td>${canalizacion.total.toLocaleString('es-MX', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                              })}</td>
+                              <td>
+                                <Button
+                                  variant="primary"
+                                  size="sm"
+                                  onClick={() => addCanalizacion(canalizacion)}
+                                >
+                                  <i className="fas fa-plus me-1"></i>
+                                  Añadir
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </Modal.Body>
               </Modal>
               <div className="table-responsive">
