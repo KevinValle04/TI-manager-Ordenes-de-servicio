@@ -100,14 +100,20 @@ export class CotizacionCanalizacionPdfGenerator {
         }).join('');
 
       // Obtener paths de imágenes
+      const logoPath = path.join(this.templatesPath, 'img', 'logo.png');
       const topImagePath = path.join(this.templatesPath, 'img', 'top.png');
       const bottomImagePath = path.join(this.templatesPath, 'img', 'bottom.png');
       
       // Convertir imágenes a base64 si existen
+      let logoBase64 = '';
       let topImageBase64 = '';
       let bottomImageBase64 = '';
       
       try {
+        if (fs.existsSync(logoPath)) {
+          const logoBuffer = fs.readFileSync(logoPath);
+          logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+        }
         if (fs.existsSync(topImagePath)) {
           const topImageBuffer = fs.readFileSync(topImagePath);
           topImageBase64 = `data:image/png;base64,${topImageBuffer.toString('base64')}`;
@@ -131,6 +137,8 @@ export class CotizacionCanalizacionPdfGenerator {
         </head>
         <body>
           <div id="tabla-cotizacion-wrapper" style="width:100%;overflow-x:auto;">
+            
+            ${logoBase64 ? `<div style="text-align: center; margin: 10px 0 20px 0;"><img src="${logoBase64}" alt="Logo Empresa" style="max-width: 200px; height: auto;"></div>` : ''}
             
             ${topImageBase64 ? `<img src="${topImageBase64}" alt="Header Corporativo" style="width: 100%; height: auto; max-height: 100px; display: block;">` : ''}
             

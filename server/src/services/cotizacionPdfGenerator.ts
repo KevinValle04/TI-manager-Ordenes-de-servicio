@@ -81,9 +81,23 @@ export class CotizacionPdfGenerator {
 
   public async generarPdfCotizacion(datos: CotizacionPdfData): Promise<Buffer> {
     try {
+      // Cargar el logo y convertir a base64
+      const logoPath = path.join(__dirname, '../templates/img/logo.png');
+      let logoBase64 = '';
+      
+      try {
+        if (fs.existsSync(logoPath)) {
+          const logoBuffer = fs.readFileSync(logoPath);
+          logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+        }
+      } catch (logoError) {
+        console.warn('Error cargando logo:', logoError);
+      }
+
       // Preparar datos para la plantilla
       const datosFormateados = {
         ...datos,
+        logoPath: logoBase64,
         fecha: this.formatoFecha(datos.fecha),
         vigencia: this.formatoFecha(datos.vigencia),
         subtotal: this.formatoMoneda(datos.subtotal),

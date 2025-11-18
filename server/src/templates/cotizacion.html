@@ -124,6 +124,16 @@
       color: #6c757d;
     }
 
+    .logo {
+      text-align: center;
+      margin: 10px 0 20px 0;
+    }
+
+    .logo img {
+      max-width: 200px;
+      height: auto;
+    }
+
     .status-Borrador { color: #6c757d; }
     .status-Enviada { color: #007bff; }
     .status-Aceptada { color: #28a745; }
@@ -133,6 +143,12 @@
 </head>
 <body>
   <div id="tabla-cotizacion-wrapper">
+    {{#if logoPath}}
+    <div class="logo">
+      <img src="{{logoPath}}" alt="Logo Empresa">
+    </div>
+    {{/if}}
+    
     <div class="header">
       <h1>COTIZACIÓN</h1>
       <div class="info-grid">
