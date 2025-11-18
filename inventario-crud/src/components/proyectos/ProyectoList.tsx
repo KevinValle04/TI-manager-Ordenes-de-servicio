@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { Proyecto, Colaborador, Cotizacion, OrdenCompra } from '../../types';
+import { Proyecto, Colaborador, Cotizacion, OrdenCompra, Cliente, IInventoryItem, RazonSocial } from '../../types';
 import DataTable from '../common/DataTable';
 import PaginationCompact from '../common/PaginationCompact';
 import SearchBar from '../common/SearchBar';
 import ProyectoModal from './ProyectoModal';
 import ActividadesList from './ActividadesList';
+import CotizacionModal from '../cotizaciones/CotizacionModal';
+import OrdenCompraForm from '../ordenesCompra/OrdenCompraForm';
 
 const ProyectoList: React.FC = () => {
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
@@ -26,6 +28,17 @@ const ProyectoList: React.FC = () => {
   const [loadingCotizaciones, setLoadingCotizaciones] = useState(false);
   const [loadingOrdenes, setLoadingOrdenes] = useState(false);
   
+  // Estados para editar cotizaciones y órdenes
+  const [showEditCotizacionModal, setShowEditCotizacionModal] = useState(false);
+  const [showEditOrdenModal, setShowEditOrdenModal] = useState(false);
+  const [editingCotizacion, setEditingCotizacion] = useState<Cotizacion | null>(null);
+  const [editingOrdenId, setEditingOrdenId] = useState<string | null>(null);
+  
+  // Datos auxiliares para edición
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [inventarioItems, setInventarioItems] = useState<IInventoryItem[]>([]);
+  const [razonesSociales, setRazonesSociales] = useState<RazonSocial[]>([]);
+  
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [searchTerm, setSearchTerm] = useState('');
@@ -33,6 +46,9 @@ const ProyectoList: React.FC = () => {
   useEffect(() => {
     fetchProyectos();
     fetchColaboradores();
+    fetchClientes();
+    fetchInventarioItems();
+    fetchRazonesSociales();
   }, []);
 
   useEffect(() => {
@@ -67,6 +83,42 @@ const ProyectoList: React.FC = () => {
     } catch (error) {
       console.error('Error al cargar colaboradores:', error);
       setColaboradores([]);
+    }
+  };
+
+  const fetchClientes = async () => {
+    try {
+      const response = await fetch('/api/clientes');
+      if (!response.ok) throw new Error('Error al cargar clientes');
+      const data = await response.json();
+      setClientes(data);
+    } catch (error) {
+      console.error('Error al cargar clientes:', error);
+      setClientes([]);
+    }
+  };
+
+  const fetchInventarioItems = async () => {
+    try {
+      const response = await fetch('/api/inventario');
+      if (!response.ok) throw new Error('Error al cargar inventario');
+      const data = await response.json();
+      setInventarioItems(data);
+    } catch (error) {
+      console.error('Error al cargar inventario:', error);
+      setInventarioItems([]);
+    }
+  };
+
+  const fetchRazonesSociales = async () => {
+    try {
+      const response = await fetch('/api/razones-sociales');
+      if (!response.ok) throw new Error('Error al cargar razones sociales');
+      const data = await response.json();
+      setRazonesSociales(data);
+    } catch (error) {
+      console.error('Error al cargar razones sociales:', error);
+      setRazonesSociales([]);
     }
   };
 
@@ -181,6 +233,65 @@ const ProyectoList: React.FC = () => {
   const handleViewActividades = (proyecto: Proyecto) => {
     setSelectedProyecto(proyecto);
     setShowActividadesModal(true);
+  };
+
+  const handleEditCotizacion = (cotizacion: Cotizacion) => {
+    setEditingCotizacion(cotizacion);
+    setShowEditCotizacionModal(true);
+  };
+
+  const handleEditOrden = (orden: OrdenCompra) => {
+    setEditingOrdenId(orden._id || null);
+    setShowEditOrdenModal(true);
+  };
+
+  const handleSaveCotizacion = async (data: Partial<Cotizacion>) => {
+    try {
+      const url = data._id 
+        ? `/api/cotizaciones/${data._id}`
+        : '/api/cotizaciones';
+      
+      const response = await fetch(url, {
+        method: data._id ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al guardar la cotización');
+      }
+
+      // Recargar cotizaciones del proyecto
+      if (selectedProyecto) {
+        await handleViewCotizaciones(selectedProyecto);
+      }
+      
+      setShowEditCotizacionModal(false);
+      setEditingCotizacion(null);
+    } catch (error: any) {
+      console.error('Error al guardar cotización:', error);
+      alert(error.message || 'Error al guardar la cotización');
+    }
+  };
+
+  const handleSaveOrden = async () => {
+    // Recargar órdenes del proyecto
+    if (selectedProyecto) {
+      await handleViewOrdenes(selectedProyecto);
+    }
+    setShowEditOrdenModal(false);
+    setEditingOrdenId(null);
+  };
+
+  const generatePresupuestoNumber = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    return `PRES-${year}${month}-${random}`;
   };
 
   const getEstadoBadgeClass = (estado?: string) => {
@@ -460,15 +571,26 @@ const ProyectoList: React.FC = () => {
                         </span>
                       </td>
                       <td>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          onClick={() => window.open(`/api/cotizaciones/${cotizacion._id}/pdf`, '_blank')}
-                          title="Ver PDF"
-                        >
-                          <i className="fas fa-file-pdf me-1"></i>
-                          Ver PDF
-                        </Button>
+                        <div className="d-flex gap-1">
+                          <Button
+                            variant="warning"
+                            size="sm"
+                            onClick={() => handleEditCotizacion(cotizacion)}
+                            title="Editar cotización"
+                          >
+                            <i className="fas fa-edit me-1"></i>
+                            Editar
+                          </Button>
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => window.open(`/api/cotizaciones/${cotizacion._id}/pdf`, '_blank')}
+                            title="Ver PDF"
+                          >
+                            <i className="fas fa-file-pdf me-1"></i>
+                            PDF
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -528,19 +650,30 @@ const ProyectoList: React.FC = () => {
                       <td>{new Date(orden.fecha).toLocaleDateString('es-MX')}</td>
                       <td>{typeof orden.razonSocial === 'string' ? orden.razonSocial : orden.razonSocial?.nombre}</td>
                       <td>
-                        {orden.rutaPdf ? (
+                        <div className="d-flex gap-1">
                           <Button
-                            variant="primary"
+                            variant="warning"
                             size="sm"
-                            onClick={() => window.open(`/api/ordenes-compra/${orden._id}/pdf`, '_blank')}
-                            title="Ver PDF"
+                            onClick={() => handleEditOrden(orden)}
+                            title="Editar orden de compra"
                           >
-                            <i className="fas fa-file-pdf me-1"></i>
-                            Ver PDF
+                            <i className="fas fa-edit me-1"></i>
+                            Editar
                           </Button>
-                        ) : (
-                          <span className="text-muted small">Sin PDF</span>
-                        )}
+                          {orden.rutaPdf ? (
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              onClick={() => window.open(`/api/ordenes-compra/${orden._id}/pdf`, '_blank')}
+                              title="Ver PDF"
+                            >
+                              <i className="fas fa-file-pdf me-1"></i>
+                              PDF
+                            </Button>
+                          ) : (
+                            <span className="text-muted small">Sin PDF</span>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -563,6 +696,38 @@ const ProyectoList: React.FC = () => {
         proyecto={selectedProyecto}
         colaboradores={colaboradores}
       />
+
+      {/* Modal de Edición de Cotización */}
+      {showEditCotizacionModal && (
+        <CotizacionModal
+          show={showEditCotizacionModal}
+          onHide={() => {
+            setShowEditCotizacionModal(false);
+            setEditingCotizacion(null);
+          }}
+          onSave={handleSaveCotizacion}
+          editingCotizacion={editingCotizacion}
+          clientes={clientes}
+          inventarioItems={inventarioItems}
+          razonesSociales={razonesSociales}
+          proyectos={proyectos}
+          generatePresupuestoNumber={generatePresupuestoNumber}
+        />
+      )}
+
+      {/* Modal de Edición de Orden de Compra */}
+      {showEditOrdenModal && (
+        <OrdenCompraForm
+          show={showEditOrdenModal}
+          onHide={() => {
+            setShowEditOrdenModal(false);
+            setEditingOrdenId(null);
+          }}
+          onSave={handleSaveOrden}
+          editId={editingOrdenId}
+          proyectos={proyectos}
+        />
+      )}
     </div>
   );
 };
