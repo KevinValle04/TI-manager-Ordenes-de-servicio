@@ -293,14 +293,14 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
           </Button>
         </div>
 
-        <div className="kanban-board-container">
-          {loading ? (
-            <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Cargando...</span>
-              </div>
+        {loading ? (
+          <div className="text-center py-5">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Cargando...</span>
             </div>
-          ) : (
+          </div>
+        ) : (
+          <div className="kanban-board-container">
             <ControlledBoard
               onCardDragEnd={handleCardMove}
               renderCard={renderCard}
@@ -313,8 +313,8 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
             >
               {board}
             </ControlledBoard>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       <ActividadModal
