@@ -1,0 +1,300 @@
+/* Contenedor del modal Kanban */
+.kanban-modal-body {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  min-height: 70vh;
+}
+
+.kanban-board-container {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+/* Estilos para el tablero Kanban */
+.react-kanban-board {
+  padding: 1rem 0;
+  display: flex;
+  gap: 1.5rem;
+  min-height: 500px;
+}
+
+/* Columnas del Kanban */
+.react-kanban-column {
+  background-color: #e9ecef;
+  border-radius: 8px;
+  padding: 1rem;
+  min-width: 300px;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.react-kanban-column-header {
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  background-color: #fff;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Tarjetas del Kanban */
+.kanban-card {
+  background-color: #ffffff;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s ease;
+  cursor: grab;
+  border-left: 4px solid #0d6efd;
+}
+
+.kanban-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.kanban-card:active {
+  cursor: grabbing;
+}
+
+.react-kanban-card--dragging {
+  opacity: 0.5;
+  transform: rotate(5deg);
+}
+
+/* Encabezado de la tarjeta */
+.kanban-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.kanban-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #212529;
+  margin: 0;
+  flex: 1;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.kanban-card-actions {
+  display: flex;
+  gap: 0.25rem;
+  margin-left: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.kanban-card:hover .kanban-card-actions {
+  opacity: 1;
+}
+
+.kanban-card-actions button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.kanban-card-actions button:hover {
+  transform: scale(1.1);
+}
+
+/* Cuerpo de la tarjeta */
+.kanban-card-body {
+  font-size: 0.875rem;
+}
+
+.kanban-card-dates {
+  padding: 0.5rem 0;
+  border-top: 1px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 0.5rem;
+}
+
+.kanban-card-dates small {
+  display: flex;
+  align-items: center;
+  color: #6c757d;
+}
+
+.kanban-card-colaboradores {
+  margin-top: 0.5rem;
+}
+
+.kanban-badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  white-space: nowrap;
+}
+
+/* Botón de agregar tarjeta */
+.react-kanban-card-adder-button {
+  background-color: transparent;
+  border: 2px dashed #ced4da;
+  border-radius: 6px;
+  padding: 0.75rem;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  width: 100%;
+  text-align: center;
+}
+
+.react-kanban-card-adder-button:hover {
+  background-color: #f8f9fa;
+  border-color: #0d6efd;
+  color: #0d6efd;
+}
+
+/* Formulario de agregar tarjeta */
+.react-kanban-card-adder-form {
+  background-color: #ffffff;
+  border-radius: 6px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.75rem;
+}
+
+.react-kanban-card-adder-form__title,
+.react-kanban-card-adder-form__description {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.react-kanban-card-adder-form__button {
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.react-kanban-card-adder-form__button:hover {
+  background-color: #0b5ed7;
+}
+
+/* Botón de agregar columna */
+.react-kanban-column-adder-button {
+  min-width: 300px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 2px dashed #ced4da;
+  border-radius: 8px;
+  padding: 1rem;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.react-kanban-column-adder-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-color: #0d6efd;
+  color: #0d6efd;
+}
+
+/* Colores de estado para las tarjetas */
+.kanban-card[data-estado="Pendiente"] {
+  border-left-color: #6c757d;
+}
+
+.kanban-card[data-estado="En progreso"] {
+  border-left-color: #0d6efd;
+}
+
+.kanban-card[data-estado="Completada"] {
+  border-left-color: #198754;
+}
+
+.kanban-card[data-estado="Cancelada"] {
+  border-left-color: #dc3545;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .react-kanban-board {
+    flex-direction: column;
+  }
+
+  .react-kanban-column {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .kanban-modal-body {
+    padding: 1rem;
+  }
+}
+
+/* Skeleton para cards mientras cargan */
+.react-kanban-card-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 6px;
+  height: 120px;
+  margin-bottom: 0.75rem;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Estilos para el drag and drop */
+.react-kanban-column > div {
+  min-height: 200px;
+  flex: 1;
+}
+
+/* Estilos para cuando una columna está recibiendo un drag */
+.react-kanban-column.is-dragging-over {
+  background-color: #d1e7dd;
+  border: 2px dashed #198754;
+}
+
+/* Scroll horizontal suave */
+.kanban-board-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.kanban-board-container::-webkit-scrollbar-track {
+  background: #e9ecef;
+  border-radius: 4px;
+}
+
+.kanban-board-container::-webkit-scrollbar-thumb {
+  background: #ced4da;
+  border-radius: 4px;
+}
+
+.kanban-board-container::-webkit-scrollbar-thumb:hover {
+  background: #adb5bd;
+}
