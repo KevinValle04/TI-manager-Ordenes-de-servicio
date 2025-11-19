@@ -570,6 +570,15 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
     }
   };
 
+  const handleResetearDescuentos = () => {
+    if (window.confirm('¿Está seguro de que desea poner todos los descuentos en 0%?')) {
+      // Resetear descuentos de todos los productos
+      productosEditables.forEach((_, index) => {
+        onActualizarProducto(index, 'descuento', 0);
+      });
+    }
+  };
+
   return (
     <Modal show={show} onHide={handleCerrarModal} size="xl" centered>
       <Modal.Header className="bg-success text-white">
@@ -762,6 +771,7 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
               productos={productosEditables}
               onActualizar={onActualizarProducto}
               onAgregar={onAgregarProducto}
+              onResetearDescuentos={handleResetearDescuentos}
               moneda={monedaSeleccionada}
             />
 

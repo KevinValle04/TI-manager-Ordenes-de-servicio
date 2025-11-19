@@ -409,6 +409,53 @@ def procesar_envio_tvc(json_data, texto_original):
         # En caso de error, devolver datos originales
         return json.dumps(json_data, ensure_ascii=False, indent=2)
 
+def procesar_iva_portentum_aruba(json_data, texto_original):
+    """
+    Post-procesamiento para Portentum y Aruba:
+    Establecer IVA en 0 por defecto ya que son proveedores internacionales
+    """
+    try:
+        # Verificar si es proveedor Portentum o Aruba
+        proveedor = json_data.get('proveedor', '').upper()
+        texto_upper = texto_original.upper()
+        
+        es_portentum = 'PORTENTUM' in proveedor or 'PORTENTUM' in texto_upper
+        es_aruba = 'ARUBA' in proveedor or 'ARUBA' in texto_upper
+        
+        if es_portentum or es_aruba:
+            proveedor_tipo = "Portentum" if es_portentum else "Aruba"
+            print(f"   🌍 Detectado proveedor {proveedor_tipo}, estableciendo IVA = 0...", file=sys.stderr)
+            
+            # Establecer IVA en 0 en totales
+            totales = json_data.get('totales', {})
+            totales['iva'] = 0
+            json_data['totales'] = totales
+            
+            # Recalcular total si es necesario
+            subtotal = totales.get('subtotal', 0)
+            envio = totales.get('envio', 0)
+            flete = totales.get('flete', 0)
+            shipping = totales.get('shipping', 0)
+            
+            # Sumar todos los costos adicionales
+            costos_adicionales = envio + flete + shipping
+            nuevo_total = subtotal + costos_adicionales
+            
+            # Solo actualizar el total si es diferente (para evitar cambios innecesarios)
+            total_actual = totales.get('total', 0)
+            if abs(nuevo_total - total_actual) > 0.01:  # Tolerancia para diferencias de centavos
+                totales['total'] = nuevo_total
+                print(f"   📊 Total recalculado: ${nuevo_total:,.2f} (sin IVA)", file=sys.stderr)
+            
+            print(f"   ✅ IVA establecido en 0 para proveedor {proveedor_tipo}", file=sys.stderr)
+        
+        return json.dumps(json_data, ensure_ascii=False, indent=2)
+        
+    except Exception as e:
+        print(f"   ⚠️  Error en post-procesamiento IVA: {e}", file=sys.stderr)
+        # En caso de error, devolver datos originales
+        return json.dumps(json_data, ensure_ascii=False, indent=2)
+
 def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
     """Procesa el documento usando OpenAI GPT-4o para máxima velocidad y precisión."""
     print(f"🔍 DEBUG: Iniciando procesamiento con OpenAI", file=sys.stderr)
@@ -430,11 +477,11 @@ def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
     hash_texto = generar_hash_texto(texto_completo)
     hash_estructura = generar_hash_estructura(texto_completo)
     
-    # Buscar en cache - DESACTIVADO PARA PRUEBAS
-    # resultado_cache, tipo_cache = buscar_en_cache(hash_texto, hash_estructura, cache_dir)
-    # if resultado_cache:
-    #     print(f"🎯 Resultado obtenido desde cache ({tipo_cache})", file=sys.stderr)
-    #     return resultado_cache
+    # Buscar en cache
+    resultado_cache, tipo_cache = buscar_en_cache(hash_texto, hash_estructura, cache_dir)
+    if resultado_cache:
+        print(f"🎯 Resultado obtenido desde cache ({tipo_cache})", file=sys.stderr)
+        return resultado_cache
 
     print(f"🔍 DEBUG: Creando cliente OpenAI", file=sys.stderr)
     try:
@@ -471,6 +518,7 @@ def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
 - Para los totales, usa los valores que aparecen en el PDF (el modal los recalculará si es necesario)
 - **CRÍTICO PARA COSTOS DE ENVÍO**: Si el documento muestra costos de envío, flete, shipping o entrega por separado en los totales, inclúyelos en la sección "totales" con las claves correspondientes ("envio", "flete", "shipping")
 - **ESPECIAL TVC**: TVC frecuentemente incluye costos de envío separados - asegúrate de preservarlos en totales
+- **IMPORTANTE IVA**: Los proveedores Portentum y Aruba son internacionales, por lo que generalmente tienen IVA = 0. Si detectas estos proveedores, establece "iva": 0
 - Enfócate en la precisión de los datos de productos y precios
 
 **REGLAS CRÍTICAS PARA EXTRACCIÓN FLEXIBLE:**
@@ -623,8 +671,15 @@ Si el documento contiene las columnas "P.U. Canal" Y "Precio Lista", debes usar 
         # Post-procesamiento específico para TVC - agregar envío como producto
         resultado_procesado = procesar_envio_tvc(json_parseado, texto_completo)
         
-        # guardar_en_cache(hash_texto, hash_estructura, resultado_str, cache_dir) # DESACTIVADO PARA PRUEBAS
-        return resultado_procesado
+        # Post-procesamiento para Portentum y Aruba - establecer IVA en 0
+        resultado_final = procesar_iva_portentum_aruba(json.loads(resultado_procesado), texto_completo)
+        
+        # Guardar en cache el resultado final
+        try:
+            guardar_en_cache(hash_texto, hash_estructura, resultado_final, cache_dir)
+        except Exception as e:
+            print(f"⚠️ Error guardando en cache: {e}", file=sys.stderr)
+        return resultado_final
         
     except Exception as e:
         print(f"❌ Error procesando con OpenAI: {e}", file=sys.stderr)

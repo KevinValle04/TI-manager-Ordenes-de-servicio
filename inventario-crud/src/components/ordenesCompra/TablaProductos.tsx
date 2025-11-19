@@ -6,6 +6,7 @@ interface TablaProductosProps {
   productos: any[];
   onActualizar: (index: number, campo: string, valor: any) => void;
   onAgregar: () => void;
+  onResetearDescuentos?: () => void;
   moneda: string;
 }
 
@@ -13,6 +14,7 @@ export const TablaProductos: React.FC<TablaProductosProps> = ({
   productos,
   onActualizar,
   onAgregar,
+  onResetearDescuentos,
   moneda
 }) => {
   return (
@@ -62,7 +64,17 @@ export const TablaProductos: React.FC<TablaProductosProps> = ({
           </tbody>
         </table>
       </div>
-      <div className="d-flex justify-content-end mt-3">
+      <div className="d-flex justify-content-end gap-2 mt-3">
+        {onResetearDescuentos && productos.length > 0 && (
+          <Button 
+            variant="outline-warning" 
+            onClick={onResetearDescuentos}
+            title="Poner todos los descuentos en 0%"
+          >
+            <i className="fas fa-percent me-2"></i>
+            Resetear Descuentos
+          </Button>
+        )}
         <Button 
           variant="primary" 
           onClick={onAgregar}
