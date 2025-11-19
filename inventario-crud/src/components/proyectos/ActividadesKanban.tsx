@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Badge } from 'react-bootstrap';
-import { Board, Card, KanbanBoard } from '@caldwell619/react-kanban';
+import { ControlledBoard, Card, KanbanBoard, moveCard } from '@caldwell619/react-kanban';
 import '@caldwell619/react-kanban/dist/styles.css';
 import { Actividad, Colaborador, Proyecto } from '../../types';
 import ActividadModal from './ActividadModal';
@@ -28,17 +28,26 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
   proyecto,
   colaboradores
 }) => {
-  const [board, setBoard] = useState<KanbanBoard<KanbanCard>>({ columns: [] });
-  const [loading, setLoading] = useState(false);
-  const [showActividadModal, setShowActividadModal] = useState(false);
-  const [editingActividad, setEditingActividad] = useState<Actividad | null>(null);
-
   const estadosConfig = [
     { id: 'Pendiente', title: 'Pendiente', color: '#6c757d' },
     { id: 'En progreso', title: 'En progreso', color: '#0d6efd' },
     { id: 'Completada', title: 'Completada', color: '#198754' },
     { id: 'Cancelada', title: 'Cancelada', color: '#dc3545' }
   ];
+
+  // Inicializar board con columnas vacías
+  const initialBoard: KanbanBoard<KanbanCard> = {
+    columns: estadosConfig.map(estado => ({
+      id: estado.id,
+      title: estado.title,
+      cards: []
+    }))
+  };
+
+  const [board, setBoard] = useState<KanbanBoard<KanbanCard>>(initialBoard);
+  const [loading, setLoading] = useState(true); // Comenzar en true para la primera carga
+  const [showActividadModal, setShowActividadModal] = useState(false);
+  const [editingActividad, setEditingActividad] = useState<Actividad | null>(null);
 
   useEffect(() => {
     if (show && proyecto) {
@@ -76,6 +85,14 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
     } catch (error) {
       console.error('Error al cargar actividades:', error);
       alert('Error al cargar las actividades del proyecto');
+      // En caso de error, mantener las columnas vacías
+      setBoard({
+        columns: estadosConfig.map(estado => ({
+          id: estado.id,
+          title: estado.title,
+          cards: []
+        }))
+      });
     } finally {
       setLoading(false);
     }
@@ -94,9 +111,13 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
     source?: { fromPosition: number; fromColumnId?: string | number },
     destination?: { toPosition?: number; toColumnId?: string | number }
   ) => {
-    if (!destination?.toColumnId || source?.fromColumnId === destination?.toColumnId) return;
+    if (!destination?.toColumnId || !source) return;
 
-    // Actualizar el estado en el servidor
+    // Primero actualizar el board localmente para feedback inmediato
+    const updatedBoard = moveCard(board, source, destination);
+    setBoard(updatedBoard);
+
+    // Luego actualizar en el servidor
     try {
       const actividad = _card.actividadData;
       const response = await fetch(`/api/actividades/${actividad._id}`, {
@@ -112,13 +133,14 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
 
       if (!response.ok) {
         throw new Error('Error al actualizar el estado');
+        // Si falla, recargar desde el servidor
+        fetchActividades();
       }
-
-      fetchActividades();
     } catch (error) {
       console.error('Error al actualizar estado:', error);
       alert('Error al actualizar el estado de la actividad');
-      fetchActividades(); // Recargar para revertir el cambio visual
+      // Recargar desde el servidor para revertir
+      fetchActividades();
     }
   };
 
@@ -271,16 +293,15 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
           </Button>
         </div>
 
-        {loading ? (
-          <div className="text-center py-5">
-            <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Cargando...</span>
+        <div className="kanban-board-container">
+          {loading ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Cargando...</span>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="kanban-board-container">
-            <Board
-              initialBoard={board}
+          ) : (
+            <ControlledBoard
               onCardDragEnd={handleCardMove}
               renderCard={renderCard}
               disableColumnDrag
@@ -289,9 +310,11 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
               allowAddColumn={false}
               allowRemoveColumn={false}
               allowRenameColumn={false}
-            />
-          </div>
-        )}
+            >
+              {board}
+            </ControlledBoard>
+          )}
+        </div>
       </div>
 
       <ActividadModal
