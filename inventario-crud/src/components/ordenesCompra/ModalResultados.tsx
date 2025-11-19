@@ -57,6 +57,8 @@ const FilaProducto = React.memo(({
     return subtotal * (1 - descuento);
   }, [producto.cantidad, producto.precioUnitario, producto.descuento]);
 
+  // YA NO actualizamos el importe en el objeto porque calculamos en tiempo real en el modal
+
   const formatearMoneda = (valor: number) => {
     // Validar que el valor sea un número válido
     if (valor === null || valor === undefined || isNaN(valor)) {
@@ -230,7 +232,9 @@ const ComponenteTotales = React.memo(({
         </Row>
         <hr />
         <Row>
-          <Col xs={6} className="fw-bold text-primary">Total:</Col>
+          <Col xs={6} className="fw-bold text-primary">
+            Total:
+          </Col>
           <Col xs={6} className="text-end">
             <Form.Control
               type="text"
@@ -303,6 +307,21 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
   const [vendedoresSugerencias, setVendedoresSugerencias] = useState<Vendedor[]>([]);
   const [mostrarSugerenciasVendedor, setMostrarSugerenciasVendedor] = useState<boolean>(false);
   
+  // Estado local para los totales (se actualiza cuando cambia el IVA)
+  const [totalesLocales, setTotalesLocales] = useState(totalesCalculados);
+  
+  // Calcular totales iniciales cuando se abra el modal
+  React.useEffect(() => {
+    if (show && productosEditables.length > 0) {
+      console.log('🚀 Modal abierto - Calculando totales iniciales');
+      // Trigger inicial del cálculo
+      setTimeout(() => {
+        // Esto forzará el recálculo de totales
+        setPorcentajeIvaSimbolico(prev => prev); // Trigger del useEffect de cálculo
+      }, 100);
+    }
+  }, [show, productosEditables.length]);
+  
   const urlServer = import.meta.env.VITE_API_URL;
 
   // Función para buscar vendedores
@@ -370,49 +389,77 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
     }
   }, [proyectoId]);
 
-  // Detectar automáticamente el porcentaje de IVA al cargar los datos
+  // Inicializar totales locales SOLO una vez al abrir el modal
   React.useEffect(() => {
-    if (totalesCalculados.subTotal > 0 && totalesCalculados.iva > 0) {
-      const porcentajeDetectado = ((totalesCalculados.iva / totalesCalculados.subTotal) * 100).toFixed(0);
-      // Solo cambiar si es un porcentaje común y el usuario no ha cambiado manualmente
-      if (['0', '8', '16'].includes(porcentajeDetectado)) {
-        setPorcentajeIvaSimbolico(porcentajeDetectado);
+    if (show && totalesCalculados.subTotal > 0) {
+      console.log('🔄 Inicializando totales locales una sola vez');
+      setTotalesLocales(totalesCalculados);
+      
+      // Detectar IVA SOLO una vez al abrir
+      if (totalesCalculados.iva > 0) {
+        const porcentajeDetectado = ((totalesCalculados.iva / totalesCalculados.subTotal) * 100).toFixed(0);
+        if (['0', '8', '16'].includes(porcentajeDetectado)) {
+          console.log(`📊 IVA detectado UNA VEZ: ${porcentajeDetectado}%`);
+          setPorcentajeIvaSimbolico(porcentajeDetectado);
+        }
       }
     }
-  }, [totalesCalculados]);
+  }, [show]); // SOLO cuando se abre el modal
 
-  // Calcular totales cuando cambian los productos
-  React.useEffect(() => {
-    if (!onActualizarTotales) return;
-
-    const calcularTotales = () => {
-      let subTotal = 0;
+  // Calcular totales en tiempo real con useMemo
+  const totalesCalculadosEnTiempoReal = React.useMemo(() => {
+    let subTotal = 0;
+    
+    console.log('⚡ Recalculando totales en tiempo real...');
+    
+    // Calcular subtotal sumando el importe de cada producto
+    productosEditables.forEach((producto, index) => {
+      // Siempre calcular desde cantidad * precio * descuento para tener el valor más actual
+      const cantidad = Number(producto.cantidad) || 0;
+      const precio = Number(producto.precioUnitario) || 0;
+      const descuento = Number(producto.descuento) || 0;
+      const importe = cantidad * precio * (1 - descuento / 100);
       
-      // Calcular subtotal sumando el importe de cada producto
-      productosEditables.forEach(producto => {
-        const cantidad = Number(producto.cantidad) || 0;
-        const precioUnitario = Number(producto.precioUnitario) || 0;
-        const descuento = Number(producto.descuento) || 0;
-        
-        const importeProducto = cantidad * precioUnitario * (1 - descuento / 100);
-        subTotal += importeProducto;
+      console.log(`⚡ Producto ${index} (tiempo real):`, {
+        cantidad,
+        precio,
+        descuento,
+        importe: importe.toFixed(2)
       });
+      
+      subTotal += importe;
+    });
 
-      // Calcular IVA basado en el porcentaje simbólico seleccionado
-      const porcentajeIva = Number(porcentajeIvaSimbolico) / 100;
-      const iva = subTotal * porcentajeIva;
-      const total = subTotal + iva;
+    // Calcular IVA basado en el porcentaje simbólico seleccionado
+    const porcentajeIva = Number(porcentajeIvaSimbolico) / 100;
+    const iva = subTotal * porcentajeIva;
+    const total = subTotal + iva;
 
-      // Actualizar los totales
-      onActualizarTotales({
-        subTotal,
-        iva,
-        total
-      });
+    const resultado = {
+      subTotal: Number(subTotal.toFixed(2)),
+      iva: Number(iva.toFixed(2)),
+      total: Number(total.toFixed(2))
     };
 
-    calcularTotales();
-  }, [productosEditables, porcentajeIvaSimbolico, onActualizarTotales]);
+    console.log(`⚡ Totales calculados en tiempo real:`, resultado);
+    
+    return resultado;
+  }, [productosEditables, porcentajeIvaSimbolico]);
+
+  // Actualizar totalesLocales cuando cambien los totales calculados en tiempo real
+  React.useEffect(() => {
+    setTotalesLocales(totalesCalculadosEnTiempoReal);
+    
+    // También actualizar en el componente padre si la función existe
+    if (onActualizarTotales) {
+      onActualizarTotales(totalesCalculadosEnTiempoReal);
+    }
+  }, [totalesCalculadosEnTiempoReal, onActualizarTotales]);
+
+  // Log cuando cambien productosEditables para debug
+  React.useEffect(() => {
+    console.log('🔍 productosEditables cambió:', productosEditables);
+  }, [productosEditables]);
 
   // Inicializar la fecha editable cuando se cargan los datos
   React.useEffect(() => {
@@ -429,19 +476,61 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
     try {
       setGenerandoOrden(true);
       
+      console.log('📄 Iniciando generación de PDF con productos actualizados:', productosEditables);
+      
       // Calcular los totales finales antes de enviar
       let subTotal = 0;
-      productosEditables.forEach(producto => {
+      productosEditables.forEach((producto, index) => {
         const cantidad = Number(producto.cantidad) || 0;
         const precioUnitario = Number(producto.precioUnitario) || 0;
         const descuento = Number(producto.descuento) || 0;
         const importeProducto = cantidad * precioUnitario * (1 - descuento / 100);
+        
+        console.log(`📦 Producto ${index} para PDF:`, {
+          codigo: producto.clave || producto.codigo,
+          descripcion: producto.descripcion,
+          cantidad,
+          precioUnitario,
+          descuento,
+          importeCalculado: importeProducto.toFixed(2),
+          importeGuardado: producto.importe
+        });
+        
         subTotal += importeProducto;
       });
 
       const porcentajeIva = Number(porcentajeIvaSimbolico) / 100;
       const iva = subTotal * porcentajeIva;
       const total = subTotal + iva;
+
+      console.log('💰 Totales finales para PDF:', {
+        subTotal: subTotal.toFixed(2),
+        iva: iva.toFixed(2),
+        total: total.toFixed(2),
+        porcentajeIva: porcentajeIvaSimbolico + '%'
+      });
+
+      // Preparar productos con importes actualizados para el backend
+      const productosConImportesActualizados = productosEditables.map((producto, index) => {
+        const cantidad = Number(producto.cantidad) || 0;
+        const precioUnitario = Number(producto.precioUnitario) || 0;
+        const descuento = Number(producto.descuento) || 0;
+        const importeActualizado = cantidad * precioUnitario * (1 - descuento / 100);
+        
+        console.log(`📦 Actualizando producto ${index} para PDF:`, {
+          codigo: producto.clave || producto.codigo,
+          cantidad,
+          precioUnitario,
+          descuento,
+          importeAnterior: producto.importe,
+          importeActualizado: importeActualizado.toFixed(2)
+        });
+        
+        return {
+          ...producto,
+          importe: Number(importeActualizado.toFixed(2))
+        };
+      });
 
       // Preparar los datos de la orden para enviar al backend
       const datosParaEnviar = {
@@ -451,7 +540,7 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
         razonSocial: datosOrdenCompletos?.razonSocial?.id || datosOrdenCompletos?.razonSocial?._id,
         vendedor: vendedorSeleccionado?._id || null,
         direccionEnvio: datosOrdenCompletos?.direccionEnvio,
-        productos: productosEditables,
+        productos: productosConImportesActualizados, // Usar productos con importes actualizados
         totalesCalculados: {
           subTotal,
           iva,
@@ -463,6 +552,8 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
         porcentajeIvaSimbolico: porcentajeIvaSimbolico,
         proyecto: proyectoSeleccionadoModal || null // Usar proyecto del modal
       };
+      
+      console.log('🚀 Enviando datos completos al backend:', datosParaEnviar);
       
       await onGenerarOrden(datosParaEnviar);
     } catch (error) {
@@ -476,6 +567,15 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
       onCancelar();
     } else {
       onVolverAlFormulario();
+    }
+  };
+
+  const handleResetearDescuentos = () => {
+    if (window.confirm('¿Está seguro de que desea poner todos los descuentos en 0%?')) {
+      // Resetear descuentos de todos los productos
+      productosEditables.forEach((_, index) => {
+        onActualizarProducto(index, 'descuento', 0);
+      });
     }
   };
 
@@ -572,7 +672,7 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
                 
                 <Col md={3}>
                   <Form.Group className="mb-3">
-                    <Form.Label className="small fw-bold mb-1">Porcentaje de IVA (Simbólico):</Form.Label>
+                    <Form.Label className="small fw-bold mb-1">Porcentaje de IVA:</Form.Label>
                     <Form.Select
                       size="sm"
                       value={porcentajeIvaSimbolico}
@@ -586,7 +686,7 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
                       ))}
                     </Form.Select>
                     <Form.Text className="text-muted">
-                      <small><i className="fas fa-info-circle me-1"></i>Solo para mostrar en el PDF. El valor real se toma de la cotización.</small>
+                      <small>Se recalculan totales automáticamente</small>
                     </Form.Text>
                   </Form.Group>
                 </Col>
@@ -671,6 +771,7 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
               productos={productosEditables}
               onActualizar={onActualizarProducto}
               onAgregar={onAgregarProducto}
+              onResetearDescuentos={handleResetearDescuentos}
               moneda={monedaSeleccionada}
             />
 
@@ -680,7 +781,7 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
                 <Col md={8}></Col>
                 <Col md={4}>
                   <ComponenteTotales 
-                    totales={totalesCalculados} 
+                    totales={totalesLocales} 
                     moneda={monedaSeleccionada}
                     porcentajeIvaSimbolico={porcentajeIvaSimbolico}
                   />

@@ -275,7 +275,21 @@ async function ejecutarScriptUniversal(rutaPDF: string): Promise<any> {
         
         if (error) {
           console.error('❌ Error ejecutando script:', error.message);
-          return reject(new Error(`Error al procesar el PDF: ${stderr || error.message}`));
+          
+          // Detectar errores específicos de OpenAI
+          const errorMessage = stderr || error.message;
+          
+          if (errorMessage.includes('You exceeded your current quota') || 
+              errorMessage.includes('insufficient_quota') ||
+              errorMessage.includes('openai.RateLimitError')) {
+            return reject(new Error('OPENAI_QUOTA_EXCEEDED'));
+          }
+          
+          if (errorMessage.includes('El procesamiento con OpenAI falló')) {
+            return reject(new Error('OPENAI_PROCESSING_FAILED'));
+          }
+          
+          return reject(new Error(`Error al procesar el PDF: ${errorMessage}`));
         }
 
         if (stdout && stdout.trim()) {
@@ -371,6 +385,25 @@ export const procesarPdf = async (req: Request, res: Response) => {
         error: 'PDF Escaneado',
         message: 'El archivo parece ser un PDF escaneado (imagen). Por favor, sube un PDF que contenga texto real y no imágenes escaneadas.',
         type: 'PDF_ESCANEADO'
+      });
+    }
+    
+    // Verificar si es un error de quota de OpenAI
+    if (error.message && error.message.includes('OPENAI_QUOTA_EXCEEDED')) {
+      return res.status(429).json({
+        error: 'OpenAI Quota Excedida',
+        message: 'Se han agotado los tokens de OpenAI disponibles. Por favor, contacta al administrador para recargar la cuenta o intenta más tarde.',
+        type: 'OPENAI_QUOTA_EXCEEDED',
+        details: 'Los tokens de OpenAI se renovarán automáticamente el próximo ciclo de facturación.'
+      });
+    }
+    
+    // Verificar si es un error general de procesamiento de OpenAI
+    if (error.message && error.message.includes('OPENAI_PROCESSING_FAILED')) {
+      return res.status(503).json({
+        error: 'Error de Procesamiento OpenAI',
+        message: 'El servicio de OpenAI no pudo procesar el documento. Verifica que el PDF contenga texto legible e intenta nuevamente.',
+        type: 'OPENAI_PROCESSING_FAILED'
       });
     }
     
@@ -525,6 +558,26 @@ export const crearOrdenDesdePdf = async (req: Request, res: Response) => {
 
     } catch (error) {
       console.error('Error al procesar PDF:', error);
+      
+      // Verificar si es un error de quota de OpenAI
+      if (error instanceof Error && error.message.includes('OPENAI_QUOTA_EXCEEDED')) {
+        return res.status(429).json({
+          error: 'OpenAI Quota Excedida',
+          message: 'Se han agotado los tokens de OpenAI disponibles. Por favor, contacta al administrador para recargar la cuenta o intenta más tarde.',
+          type: 'OPENAI_QUOTA_EXCEEDED',
+          details: 'Los tokens de OpenAI se renovarán automáticamente el próximo ciclo de facturación.'
+        });
+      }
+      
+      // Verificar si es un error general de procesamiento de OpenAI
+      if (error instanceof Error && error.message.includes('OPENAI_PROCESSING_FAILED')) {
+        return res.status(503).json({
+          error: 'Error de Procesamiento OpenAI',
+          message: 'El servicio de OpenAI no pudo procesar el documento. Verifica que el PDF contenga texto legible e intenta nuevamente.',
+          type: 'OPENAI_PROCESSING_FAILED'
+        });
+      }
+      
       return res.status(500).json({ 
         error: 'Error al procesar el archivo PDF',
         detalles: error instanceof Error ? error.message : 'Error desconocido'
@@ -541,6 +594,26 @@ export const crearOrdenDesdePdf = async (req: Request, res: Response) => {
 
   } catch (error) {
     console.error('Error general en crearOrdenDesdePdf:', error);
+    
+    // Verificar si es un error de quota de OpenAI
+    if (error instanceof Error && error.message.includes('OPENAI_QUOTA_EXCEEDED')) {
+      return res.status(429).json({
+        error: 'OpenAI Quota Excedida',
+        message: 'Se han agotado los tokens de OpenAI disponibles. Por favor, contacta al administrador para recargar la cuenta o intenta más tarde.',
+        type: 'OPENAI_QUOTA_EXCEEDED',
+        details: 'Los tokens de OpenAI se renovarán automáticamente el próximo ciclo de facturación.'
+      });
+    }
+    
+    // Verificar si es un error general de procesamiento de OpenAI
+    if (error instanceof Error && error.message.includes('OPENAI_PROCESSING_FAILED')) {
+      return res.status(503).json({
+        error: 'Error de Procesamiento OpenAI',
+        message: 'El servicio de OpenAI no pudo procesar el documento. Verifica que el PDF contenga texto legible e intenta nuevamente.',
+        type: 'OPENAI_PROCESSING_FAILED'
+      });
+    }
+    
     res.status(500).json({ 
       error: 'Error interno del servidor',
       detalles: error instanceof Error ? error.message : 'Error desconocido'
@@ -761,6 +834,11 @@ export const updateOrdenCompraConPdf = async (req: Request, res: Response) => {
       proyecto
     } = req.body;
     
+    console.log('🔍 DEBUG updateOrdenCompraConPdf - Datos recibidos del modal:');
+    console.log('📊 Productos del modal:', JSON.stringify(productos?.slice(0, 2), null, 2)); // Solo primeros 2
+    console.log('💰 Totales del modal:', JSON.stringify(totalesCalculados, null, 2));
+    console.log('🏷️ Porcentaje IVA del modal:', porcentajeIvaSimbolico);
+
     // Buscar la orden existente
     const ordenExistente = await OrdenCompra.findById(id);
     if (!ordenExistente) {
@@ -815,6 +893,10 @@ export const updateOrdenCompraConPdf = async (req: Request, res: Response) => {
     if (!ordenActualizada) {
       return res.status(500).json({ error: 'Error al actualizar la orden de compra' });
     }
+    
+    console.log('📄 DEBUG - Preparando datos para PDF:');
+    console.log('📦 Productos para PDF:', JSON.stringify(productos?.slice(0, 2), null, 2));
+    console.log('🧮 Totales para PDF:', JSON.stringify(totalesCalculados, null, 2));
     
     // Preparar datos para generar PDF
     const datosParaPdf = {
