@@ -67,17 +67,43 @@ export const TablaProductos: React.FC<TablaProductosProps> = ({
       <div className="d-flex justify-content-end gap-2 mt-3">
         {onResetearDescuentos && productos.length > 0 && (
           <Button 
-            variant="outline-warning" 
             onClick={onResetearDescuentos}
             title="Poner todos los descuentos en 0%"
+            style={{ 
+              backgroundColor: '#FF6B35', 
+              borderColor: '#FF6B35', 
+              color: 'white',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#E55A2B';
+              e.target.style.borderColor = '#E55A2B';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#FF6B35';
+              e.target.style.borderColor = '#FF6B35';
+            }}
           >
             <i className="fas fa-percent me-2"></i>
             Resetear Descuentos
           </Button>
         )}
         <Button 
-          variant="primary" 
           onClick={onAgregar}
+          style={{ 
+            backgroundColor: '#17A2B8', 
+            borderColor: '#17A2B8', 
+            color: 'white',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#138496';
+            e.target.style.borderColor = '#138496';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = '#17A2B8';
+            e.target.style.borderColor = '#17A2B8';
+          }}
         >
           <i className="fas fa-plus me-2"></i>
           Agregar Producto

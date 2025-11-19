@@ -551,7 +551,7 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
     }
   };
 
-  // Crear orden directamente desde PDF con detección automática del proveedor
+  // Procesar PDF con detección automática del proveedor
   const crearOrdenDesdePdf = async (pdf: File, proveedorId: string, razonSocialId: string, vendedorId?: string): Promise<any> => {
     const formData = new FormData();
     formData.append('pdf', pdf);
@@ -1028,90 +1028,6 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
     }
   };
 
-  // Crear orden directamente desde PDF (sin modal intermedio)
-  const crearOrdenDirectamenteDesdePdf = async () => {
-    // Validaciones básicas
-    if (!proveedorSeleccionado) {
-      alert('Debe seleccionar un proveedor');
-      return;
-    }
-    
-    if (!razonSocialSeleccionada) {
-      alert('Debe seleccionar una razón social');
-      return;
-    }
-
-    if (!archivoPdf) {
-      alert('Debe seleccionar un archivo PDF');
-      return;
-    }
-
-    setProcesando(true);
-    setErrorProcesamiento(null);
-
-    try {
-      // Crear orden directamente desde PDF usando la nueva funcionalidad
-      const resultado = await crearOrdenDesdePdf(
-        archivoPdf,
-        proveedorSeleccionado._id ?? "",
-        razonSocialSeleccionada._id ?? "",
-        undefined // El vendedor se seleccionará en el modal de resultados
-      );
-
-      // Mostrar mensaje de éxito
-      alert(`¡Orden de compra creada exitosamente!\n\nDetalles:\n- Orden: ${resultado.orden?.numeroOrden}\n- Productos extraídos: ${resultado.datosExtraidos?.productos?.length || 0}\n- Total: $${resultado.datosExtraidos?.totales?.total?.toFixed(2) || '0.00'}`);
-      
-      // Notificar al componente padre que se creó una nueva orden
-      if (onOrdenCreada) {
-        onOrdenCreada();
-      }
-      
-      // Cerrar modal y resetear formulario
-      onHide();
-      resetearFormulario();
-      
-    } catch (error: any) {
-      console.error('Error al crear orden desde PDF:', error);
-      
-      // Manejo específico de errores de OpenAI - QUOTA EXCEEDED
-      if (error.response?.data?.type === 'OPENAI_QUOTA_EXCEEDED' || 
-          (error.message && error.message.includes('OPENAI_QUOTA_EXCEEDED'))) {
-        setOpenAIErrorDetails({
-          type: 'OPENAI_QUOTA_EXCEEDED',
-          title: '🚫 Tokens de OpenAI Agotados',
-          message: error.response?.data?.message || 'Se han agotado los tokens de OpenAI disponibles.',
-          details: 'Para continuar procesando documentos, es necesario contactar al administrador del sistema para recargar la cuenta. Los tokens se renovarán automáticamente en el próximo ciclo de facturación.'
-        });
-        setShowOpenAIErrorModal(true);
-        return;
-      }
-      
-      // Manejo específico de errores de OpenAI - PROCESSING FAILED
-      if (error.response?.data?.type === 'OPENAI_PROCESSING_FAILED' || 
-          (error.message && error.message.includes('OPENAI_PROCESSING_FAILED'))) {
-        setOpenAIErrorDetails({
-          type: 'OPENAI_PROCESSING_FAILED',
-          title: '⚠️ Error de Procesamiento OpenAI',
-          message: error.response?.data?.message || 'El servicio de OpenAI no pudo procesar el documento.',
-          details: 'Esto puede deberse a que el PDF no contiene texto legible o el formato no es compatible. Verifica que el documento no sea una imagen escaneada e intenta nuevamente.'
-        });
-        setShowOpenAIErrorModal(true);
-        return;
-      }
-      
-      // Si es un error de PDF escaneado, mostrar alerta
-      if (error.response?.data?.type === 'PDF_ESCANEADO') {
-        setToastMessage(error.response.data.message);
-        setToastVariant('warning');
-        setShowToast(true);
-      }
-      
-      setErrorProcesamiento(error.response?.data?.message || (error instanceof Error ? error.message : 'Error desconocido al crear la orden'));
-    } finally {
-      setProcesando(false);
-    }
-  };
-
   // Función para cancelar y cerrar el modal de resultados
   const cancelarProcesamiento = () => {
     setMostrarModalResultados(false);
@@ -1364,8 +1280,7 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
                   <strong>Tamaño:</strong> {(archivoPdf.size / 1024 / 1024).toFixed(2)} MB
                   <br />
                   <small className="text-muted">
-                    <strong>Opciones:</strong> Use "Revisar Datos" para ver y editar los productos extraídos antes de crear la orden, 
-                    o "Crear Orden Directa" para generar automáticamente la orden con los datos extraídos del PDF.
+                    <strong>Opciones:</strong> Use "Procesar Orden" para extraer y editar los productos antes de crear la orden.
                   </small>
                 </Alert>
               )}
@@ -1377,7 +1292,7 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
             Cancelar
           </Button>
           
-          {/* Botón para revisar datos extraídos */}
+          {/* Botón para procesar orden */}
           <Button 
             variant="outline-primary" 
             onClick={procesarOrden}
@@ -1390,27 +1305,8 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
               </>
             ) : (
               <>
-                <i className="fas fa-search me-2"></i>
-                Revisar Datos
-              </>
-            )}
-          </Button>
-          
-          {/* Botón para crear orden directamente */}
-          <Button 
-            variant="success" 
-            onClick={crearOrdenDirectamenteDesdePdf}
-            disabled={procesando || !archivoPdf || !proveedorSeleccionado || !razonSocialSeleccionada}
-          >
-            {procesando ? (
-              <>
-                <i className="fas fa-spinner fa-spin me-2"></i>
-                Creando...
-              </>
-            ) : (
-              <>
-                <i className="fas fa-plus-circle me-2"></i>
-                Crear Orden Directa
+                <i className="fas fa-cogs me-2"></i>
+                Procesar Orden
               </>
             )}
           </Button>
