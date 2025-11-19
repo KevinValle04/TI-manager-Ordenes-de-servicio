@@ -301,6 +301,114 @@ def extraer_texto_completo_pdf(archivo_pdf):
     print(f"❌ No se pudo extraer texto del PDF con ningún método.", file=sys.stderr)
     return None
 
+def procesar_envio_tvc(json_data, texto_original):
+    """
+    Post-procesamiento específico para TVC:
+    Si es proveedor TVC y hay costos de envío en totales, agrégalo como producto
+    """
+    try:
+        # Verificar si es proveedor TVC
+        proveedor = json_data.get('proveedor', '').upper()
+        # También buscar TVC en el texto original como respaldo
+        es_tvc = 'TVC' in proveedor or 'TVC' in texto_original.upper()
+        
+        if not es_tvc:
+            return json.dumps(json_data, ensure_ascii=False, indent=2)
+        
+        print(f"   📦 Detectado proveedor TVC, verificando envíos...", file=sys.stderr)
+        
+        # Buscar costos de envío en totales
+        totales = json_data.get('totales', {})
+        costo_envio = 0
+        clave_envio = None
+        
+        # Buscar diferentes patrones de envío en totales
+        patrones_envio = ['envio', 'envío', 'shipping', 'flete', 'entrega', 'delivery']
+        for key, value in totales.items():
+            key_lower = key.lower()
+            for patron in patrones_envio:
+                if patron in key_lower:
+                    try:
+                        # Limpiar y convertir valor
+                        if isinstance(value, str):
+                            value_clean = value.replace('$', '').replace(',', '').replace(' ', '')
+                            costo_envio = float(value_clean)
+                        elif isinstance(value, (int, float)):
+                            costo_envio = float(value)
+                        
+                        if costo_envio > 0:
+                            clave_envio = key
+                            print(f"   🚚 Costo de envío detectado en totales - {key}: ${costo_envio:,.2f}", file=sys.stderr)
+                            break
+                    except (ValueError, TypeError):
+                        continue
+            if costo_envio > 0:
+                break
+        
+        # Si no se encontró en totales, buscar en el texto original como respaldo
+        if costo_envio == 0:
+            import re
+            # Patrones más amplios para buscar envío en el texto
+            patrones_texto = [
+                r'env[íi]o[:\s]*\$?[\s]*([0-9,]+\.?[0-9]*)',
+                r'flete[:\s]*\$?[\s]*([0-9,]+\.?[0-9]*)',
+                r'shipping[:\s]*\$?[\s]*([0-9,]+\.?[0-9]*)',
+                r'entrega[:\s]*\$?[\s]*([0-9,]+\.?[0-9]*)'
+            ]
+            
+            for patron in patrones_texto:
+                matches = re.findall(patron, texto_original.lower())
+                if matches:
+                    try:
+                        valor_encontrado = matches[0].replace(',', '')
+                        costo_envio = float(valor_encontrado)
+                        if costo_envio > 0:
+                            print(f"   🔍 Costo de envío detectado en texto: ${costo_envio:,.2f}", file=sys.stderr)
+                            break
+                    except (ValueError, TypeError):
+                        continue
+        
+        # Si hay costo de envío, agregarlo como producto
+        if costo_envio > 0:
+            productos = json_data.get('productos', [])
+            
+            # Verificar que no exista ya un producto de envío
+            existe_envio = any(
+                any(patron in producto.get('descripcion', '').lower() for patron in patrones_envio)
+                for producto in productos
+            )
+            
+            if not existe_envio:
+                # Determinar el siguiente número de línea
+                max_linea = max((p.get('linea', 0) for p in productos), default=0)
+                
+                producto_envio = {
+                    "linea": max_linea + 1,
+                    "codigo": "ENVIO-TVC",
+                    "descripcion": "Costo de Envio TVC",
+                    "cantidad": 1,
+                    "unidad": "SERVICIO",
+                    "precioUnitario": costo_envio,
+                    "importe": costo_envio
+                }
+                
+                productos.append(producto_envio)
+                json_data['productos'] = productos
+                
+                print(f"   ✅ Producto de envío agregado como línea {max_linea + 1}: ${costo_envio:,.2f}", file=sys.stderr)
+                print(f"   📊 Total productos ahora: {len(productos)}", file=sys.stderr)
+            else:
+                print(f"   ⚠️  Producto de envío ya existe en la lista, no se duplica", file=sys.stderr)
+        else:
+            print(f"   ℹ️  No se detectaron costos de envío para este documento TVC", file=sys.stderr)
+        
+        return json.dumps(json_data, ensure_ascii=False, indent=2)
+        
+    except Exception as e:
+        print(f"   ⚠️  Error en post-procesamiento TVC: {e}", file=sys.stderr)
+        # En caso de error, devolver datos originales
+        return json.dumps(json_data, ensure_ascii=False, indent=2)
+
 def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
     """Procesa el documento usando OpenAI GPT-4o para máxima velocidad y precisión."""
     print(f"🔍 DEBUG: Iniciando procesamiento con OpenAI", file=sys.stderr)
@@ -354,13 +462,15 @@ def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
     "precioUnitarioFinal": "number", // OPCIONAL: Precio después del descuento (calculado)
     "importe": "number" // OBLIGATORIO: Total de la línea
   }}],
-  "totales": {{"subtotal": "number", "iva": "number", "total": "number"}},
+  "totales": {{"subtotal": "number", "iva": "number", "total": "number", "envio": "number (OPCIONAL)", "flete": "number (OPCIONAL)", "shipping": "number (OPCIONAL)"}},
   "moneda": "string (Detecta la moneda, si no se especifica, asume 'MXN')"
 }}
 
 **IMPORTANTE - EXTRACCIÓN DE DATOS:**
 - Extrae los productos con sus precios exactos del documento
 - Para los totales, usa los valores que aparecen en el PDF (el modal los recalculará si es necesario)
+- **CRÍTICO PARA COSTOS DE ENVÍO**: Si el documento muestra costos de envío, flete, shipping o entrega por separado en los totales, inclúyelos en la sección "totales" con las claves correspondientes ("envio", "flete", "shipping")
+- **ESPECIAL TVC**: TVC frecuentemente incluye costos de envío separados - asegúrate de preservarlos en totales
 - Enfócate en la precisión de los datos de productos y precios
 
 **REGLAS CRÍTICAS PARA EXTRACCIÓN FLEXIBLE:**
@@ -372,6 +482,22 @@ def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
     * **IMPORTANTE**: Para Portentum, IGNORAR columnas "Precio Unitario" si existe "Precio costo"
     * **IMPORTANTE**: Para Aruba, IGNORAR columnas "Precio Lista" y usar "P.U. Canal"
     * SIEMPRE extraer `importe` de la última columna de totales
+
+2.  **MANEJO DE VALORES FALTANTES Y PRODUCTOS ESPECIALES:**
+    * **PRODUCTOS CON "---" O VALORES VACÍOS**: 
+      - Si cantidad = "---" → usar cantidad = 0
+      - Si precioUnitario = "---" → usar precioUnitario = 0  
+      - Si importe = "---" → usar importe = 0
+      - **OBLIGATORIO**: INCLUIR estos productos en el JSON, NO los omitas
+      - Estos productos deben aparecer en la orden de compra final
+    * **PRODUCTOS DUPLICADOS**: 
+      - Si encuentras productos con el mismo código Y descripción, mantén ambos como líneas separadas
+      - Incrementa el número de línea secuencialmente (1, 2, 3...)
+      - NO fusiones productos duplicados, mantenlos como líneas independientes
+      - Ejemplo: Si "ENVIO" aparece 2 veces, crear línea 1 y línea 2 separadas
+    * **PRODUCTOS DE SERVICIO**: 
+      - Productos como "ENVIO", "EMPAQUE Y EMBARQUE", "SERVICIO" deben incluirse siempre
+      - Usar unidad = "SERVICIO" si no está especificada
 
 **EJEMPLO ESPECÍFICO PORTENTUM:**
 Si ves esta estructura en el documento:
@@ -450,6 +576,20 @@ Si el documento contiene las columnas "P.U. Canal" Y "Precio Lista", debes usar 
 - El frontend (modal) se encargará de todos los cálculos y recálculos
 - Tu trabajo es ser un extractor de datos preciso y confiable
 
+**REGLA CRÍTICA FINAL SOBRE PRODUCTOS:**
+- TODOS los productos del documento DEBEN aparecer en el JSON final, incluso si tienen valores "---" o están vacíos
+- Si un valor es "---", null, vacío o no existe, usa 0 como valor predeterminado
+- NUNCA omitas productos del JSON, independientemente de sus valores
+- Los productos duplicados deben mantenerse como líneas separadas con numeración secuencial
+- El sistema necesita ver TODOS los productos para la orden de compra final
+
+**REGLA CRÍTICA FINAL SOBRE COSTOS DE ENVÍO:**
+- Si encuentras costos de "ENVÍO", "FLETE", "SHIPPING", "ENTREGA" o similar en la sección de totales del documento, DEBES incluirlos en la sección "totales" del JSON
+- Usa las claves: "envio", "flete", "shipping" según corresponda
+- **ESPECIAL PARA TVC**: Es común que TVC incluya costos de envío separados en sus cotizaciones - asegúrate de preservarlos
+- Ejemplo: Si ves "Envío: $150.00" en totales, incluye "envio": 150.00 en el JSON
+- NO omitas estos costos aunque no aparezcan como productos separados
+
 ---
 {texto_completo}
 ---
@@ -480,8 +620,11 @@ Si el documento contiene las columnas "P.U. Canal" Y "Precio Lista", debes usar 
         print(f"   ✓ Documento analizado por GPT-4o.", file=sys.stderr)
         print(f"   📊 Productos extraídos: {len(json_parseado.get('productos', []))}", file=sys.stderr)
         
+        # Post-procesamiento específico para TVC - agregar envío como producto
+        resultado_procesado = procesar_envio_tvc(json_parseado, texto_completo)
+        
         # guardar_en_cache(hash_texto, hash_estructura, resultado_str, cache_dir) # DESACTIVADO PARA PRUEBAS
-        return resultado_str
+        return resultado_procesado
         
     except Exception as e:
         print(f"❌ Error procesando con OpenAI: {e}", file=sys.stderr)

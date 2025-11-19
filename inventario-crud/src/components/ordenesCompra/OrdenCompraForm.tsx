@@ -34,6 +34,15 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
   const [numeroOrden, setNumeroOrden] = useState("");
   const [proyectoSeleccionado, setProyectoSeleccionado] = useState<string>("");
   
+  // Estado para modal de error de OpenAI
+  const [showOpenAIErrorModal, setShowOpenAIErrorModal] = useState(false);
+  const [openAIErrorDetails, setOpenAIErrorDetails] = useState<{
+    type: string;
+    title: string;
+    message: string;
+    details?: string;
+  }>({ type: '', title: '', message: '' });
+  
   // Estados para proveedor
   const [proveedorBusqueda, setProveedorBusqueda] = useState("");
   const [proveedorSeleccionado, setProveedorSeleccionado] = useState<Proveedor | null>(null);
@@ -481,6 +490,44 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
     } catch (error: any) {
       console.error('Error al procesar orden:', error);
       
+      // Manejo específico de errores de OpenAI - QUOTA EXCEEDED
+      if (error.response?.data?.type === 'OPENAI_QUOTA_EXCEEDED' || 
+          (error.message && error.message.includes('OPENAI_QUOTA_EXCEEDED'))) {
+        console.log('Detectado error de OpenAI quota, mostrando modal');
+        setOpenAIErrorDetails({
+          type: 'OPENAI_QUOTA_EXCEEDED',
+          title: '🚫 Tokens de OpenAI Agotados',
+          message: error.response?.data?.message || 'Se han agotado los tokens de OpenAI disponibles.',
+          details: 'Para continuar procesando documentos, es necesario contactar al administrador del sistema para recargar la cuenta. Los tokens se renovarán automáticamente en el próximo ciclo de facturación.'
+        });
+        setShowOpenAIErrorModal(true);
+        // Limpiar el campo de archivo
+        if (document.querySelector('input[type="file"]')) {
+          (document.querySelector('input[type="file"]') as HTMLInputElement).value = '';
+        }
+        setArchivoPdf(null);
+        return; // Salir para evitar el setErrorProcesamiento duplicado
+      }
+      
+      // Manejo específico de errores de OpenAI - PROCESSING FAILED
+      if (error.response?.data?.type === 'OPENAI_PROCESSING_FAILED' || 
+          (error.message && error.message.includes('OPENAI_PROCESSING_FAILED'))) {
+        console.log('Detectado error de OpenAI processing, mostrando modal');
+        setOpenAIErrorDetails({
+          type: 'OPENAI_PROCESSING_FAILED',
+          title: '⚠️ Error de Procesamiento OpenAI',
+          message: error.response?.data?.message || 'El servicio de OpenAI no pudo procesar el documento.',
+          details: 'Esto puede deberse a que el PDF no contiene texto legible o el formato no es compatible. Verifica que el documento no sea una imagen escaneada e intenta nuevamente.'
+        });
+        setShowOpenAIErrorModal(true);
+        // Limpiar el campo de archivo
+        if (document.querySelector('input[type="file"]')) {
+          (document.querySelector('input[type="file"]') as HTMLInputElement).value = '';
+        }
+        setArchivoPdf(null);
+        return; // Salir para evitar el setErrorProcesamiento duplicado
+      }
+      
       // Mejorado el manejo de errores para PDF escaneado
       if (error.response?.data?.type === 'PDF_ESCANEADO' || (error.message && error.message.includes('PDF escaneado'))) {
         const mensaje = error.response?.data?.message || 
@@ -492,6 +539,7 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
           (document.querySelector('input[type="file"]') as HTMLInputElement).value = '';
         }
         setArchivoPdf(null);
+        return; // Salir para evitar el setErrorProcesamiento duplicado
       }
       
       setErrorProcesamiento(
@@ -532,6 +580,17 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
       return response.data;
     } catch (error) {
       console.error('Error al crear orden desde PDF:', error);
+      
+      // Verificar si es un error de OpenAI quota exceeded
+      if ((error as any).response?.data?.type === 'OPENAI_QUOTA_EXCEEDED') {
+        throw new Error('OPENAI_QUOTA_EXCEEDED');
+      }
+      
+      // Verificar si es un error de OpenAI processing failed
+      if ((error as any).response?.data?.type === 'OPENAI_PROCESSING_FAILED') {
+        throw new Error('OPENAI_PROCESSING_FAILED');
+      }
+      
       throw new Error('Error al crear la orden desde el archivo PDF. Verifique que el archivo sea válido y que el proveedor sea compatible.');
     }
   };
@@ -552,7 +611,34 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
       return response.data;
     } catch (error: any) {
       console.error('Error al procesar PDF:', error);
-      // Verificar si el error viene directamente del backend
+      
+      // Verificar si es un error de OpenAI quota exceeded
+      if (error.response?.data?.type === 'OPENAI_QUOTA_EXCEEDED') {
+        const errorData = {
+          response: {
+            data: {
+              type: 'OPENAI_QUOTA_EXCEEDED',
+              message: error.response.data.message || 'Se han agotado los tokens de OpenAI disponibles. Por favor, contacta al administrador para recargar la cuenta o intenta más tarde.'
+            }
+          }
+        };
+        throw errorData;
+      }
+      
+      // Verificar si es un error de OpenAI processing failed
+      if (error.response?.data?.type === 'OPENAI_PROCESSING_FAILED') {
+        const errorData = {
+          response: {
+            data: {
+              type: 'OPENAI_PROCESSING_FAILED',
+              message: error.response.data.message || 'El servicio de OpenAI no pudo procesar el documento. Verifica que el PDF contenga texto legible e intenta nuevamente.'
+            }
+          }
+        };
+        throw errorData;
+      }
+      
+      // Verificar si el error viene directamente del backend - PDF escaneado
       if (error.response?.data?.type === 'PDF_ESCANEADO') {
         const errorData = {
           response: {
@@ -986,12 +1072,40 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
       
     } catch (error: any) {
       console.error('Error al crear orden desde PDF:', error);
+      
+      // Manejo específico de errores de OpenAI - QUOTA EXCEEDED
+      if (error.response?.data?.type === 'OPENAI_QUOTA_EXCEEDED' || 
+          (error.message && error.message.includes('OPENAI_QUOTA_EXCEEDED'))) {
+        setOpenAIErrorDetails({
+          type: 'OPENAI_QUOTA_EXCEEDED',
+          title: '🚫 Tokens de OpenAI Agotados',
+          message: error.response?.data?.message || 'Se han agotado los tokens de OpenAI disponibles.',
+          details: 'Para continuar procesando documentos, es necesario contactar al administrador del sistema para recargar la cuenta. Los tokens se renovarán automáticamente en el próximo ciclo de facturación.'
+        });
+        setShowOpenAIErrorModal(true);
+        return;
+      }
+      
+      // Manejo específico de errores de OpenAI - PROCESSING FAILED
+      if (error.response?.data?.type === 'OPENAI_PROCESSING_FAILED' || 
+          (error.message && error.message.includes('OPENAI_PROCESSING_FAILED'))) {
+        setOpenAIErrorDetails({
+          type: 'OPENAI_PROCESSING_FAILED',
+          title: '⚠️ Error de Procesamiento OpenAI',
+          message: error.response?.data?.message || 'El servicio de OpenAI no pudo procesar el documento.',
+          details: 'Esto puede deberse a que el PDF no contiene texto legible o el formato no es compatible. Verifica que el documento no sea una imagen escaneada e intenta nuevamente.'
+        });
+        setShowOpenAIErrorModal(true);
+        return;
+      }
+      
       // Si es un error de PDF escaneado, mostrar alerta
       if (error.response?.data?.type === 'PDF_ESCANEADO') {
         setToastMessage(error.response.data.message);
         setToastVariant('warning');
         setShowToast(true);
       }
+      
       setErrorProcesamiento(error.response?.data?.message || (error instanceof Error ? error.message : 'Error desconocido al crear la orden'));
     } finally {
       setProcesando(false);
@@ -1341,6 +1455,65 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
           </Toast.Body>
         </Toast>
       </ToastContainer>
+
+      {/* Modal de Error OpenAI */}
+      <Modal 
+        show={showOpenAIErrorModal} 
+        onHide={() => setShowOpenAIErrorModal(false)} 
+        size="lg" 
+        centered
+        backdrop="static"
+      >
+        <Modal.Header closeButton className="bg-danger text-white">
+          <Modal.Title>
+            <i className="fas fa-robot me-2"></i>
+            {openAIErrorDetails.title}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="text-center mb-4">
+            <div className="mb-3">
+              {openAIErrorDetails.type === 'OPENAI_QUOTA_EXCEEDED' ? (
+                <div style={{ fontSize: '4rem' }}>🚫</div>
+              ) : (
+                <div style={{ fontSize: '4rem' }}>⚠️</div>
+              )}
+            </div>
+            
+            <h5 className="fw-bold mb-3">{openAIErrorDetails.message}</h5>
+            
+            {openAIErrorDetails.details && (
+              <Alert variant={openAIErrorDetails.type === 'OPENAI_QUOTA_EXCEEDED' ? 'warning' : 'info'} className="text-start">
+                <div className="small">
+                  <strong>Detalles:</strong><br />
+                  {openAIErrorDetails.details}
+                </div>
+              </Alert>
+            )}
+            
+            {openAIErrorDetails.type === 'OPENAI_QUOTA_EXCEEDED' && (
+              <Alert variant="primary" className="text-start">
+                <div className="small">
+                  <strong>¿Qué puedes hacer?</strong><br />
+                  • Contactar al administrador del sistema<br />
+                  • Esperar a que se renueven los tokens automáticamente<br />
+                  • Intentar más tarde cuando el límite se haya reiniciado
+                </div>
+              </Alert>
+            )}
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button 
+            variant="primary" 
+            onClick={() => setShowOpenAIErrorModal(false)}
+            className="px-4"
+          >
+            <i className="fas fa-check me-2"></i>
+            Entendido
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };
