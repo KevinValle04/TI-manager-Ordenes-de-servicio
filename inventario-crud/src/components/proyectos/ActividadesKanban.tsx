@@ -215,7 +215,11 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
     const colaboradoresNames = getColaboradoresNames(card.colaboradores);
     
     return (
-      <div className="kanban-card">
+      <div 
+        className="kanban-card" 
+        onClick={() => handleEditCard(card)}
+        style={{ cursor: 'pointer' }}
+      >
         <div className="kanban-card-header">
           <h6 className="kanban-card-title">{card.title}</h6>
           <div className="kanban-card-actions">
