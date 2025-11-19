@@ -208,17 +208,19 @@ const FilaProducto: React.FC<FilaProductoProps> = React.memo(({
         />
       </td>
       <td className="align-middle">
-        <Form.Control
-          type="number"
-          size="sm"
-          value={producto.descuento || ''}
-          onChange={(e) => handleInputChange('descuento', parseFloat(e.target.value) || 0)}
-          placeholder="0"
-          min="0"
-          max="100"
-          step="0.1"
-        />
-        <small className="text-muted">%</small>
+        <div className="d-flex align-items-center gap-1">
+          <Form.Control
+            type="number"
+            size="sm"
+            value={producto.descuento || ''}
+            onChange={(e) => handleInputChange('descuento', parseFloat(e.target.value) || 0)}
+            placeholder="0"
+            min="0"
+            max="100"
+            step="0.1"
+          />
+          <span className="text-muted">%</span>
+        </div>
       </td>
       <td className="align-middle">
         <div className="fw-bold text-end">
