@@ -1,16 +1,16 @@
 import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  Alert,
-  Badge,
-  Button,
-  Col,
-  Form,
-  ListGroup,
-  Modal,
-  Row,
-  Toast,
-  ToastContainer
+    Alert,
+    Badge,
+    Button,
+    Col,
+    Form,
+    ListGroup,
+    Modal,
+    Row,
+    Toast,
+    ToastContainer
 } from "react-bootstrap";
 import { Proveedor, RazonSocial } from "../../types";
 import ModalResultados from "./ModalResultados";
@@ -33,6 +33,15 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
   // Estados del formulario
   const [numeroOrden, setNumeroOrden] = useState("");
   const [proyectoSeleccionado, setProyectoSeleccionado] = useState<string>("");
+  
+  // Estado para modal de error de OpenAI
+  const [showOpenAIErrorModal, setShowOpenAIErrorModal] = useState(false);
+  const [openAIErrorDetails, setOpenAIErrorDetails] = useState<{
+    type: string;
+    title: string;
+    message: string;
+    details?: string;
+  }>({ type: '', title: '', message: '' });
   
   // Estados para proveedor
   const [proveedorBusqueda, setProveedorBusqueda] = useState("");
@@ -481,6 +490,44 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
     } catch (error: any) {
       console.error('Error al procesar orden:', error);
       
+      // Manejo específico de errores de OpenAI - QUOTA EXCEEDED
+      if (error.response?.data?.type === 'OPENAI_QUOTA_EXCEEDED' || 
+          (error.message && error.message.includes('OPENAI_QUOTA_EXCEEDED'))) {
+        console.log('Detectado error de OpenAI quota, mostrando modal');
+        setOpenAIErrorDetails({
+          type: 'OPENAI_QUOTA_EXCEEDED',
+          title: '🚫 Tokens de OpenAI Agotados',
+          message: error.response?.data?.message || 'Se han agotado los tokens de OpenAI disponibles.',
+          details: 'Para continuar procesando documentos, es necesario contactar al administrador del sistema para recargar la cuenta. Los tokens se renovarán automáticamente en el próximo ciclo de facturación.'
+        });
+        setShowOpenAIErrorModal(true);
+        // Limpiar el campo de archivo
+        if (document.querySelector('input[type="file"]')) {
+          (document.querySelector('input[type="file"]') as HTMLInputElement).value = '';
+        }
+        setArchivoPdf(null);
+        return; // Salir para evitar el setErrorProcesamiento duplicado
+      }
+      
+      // Manejo específico de errores de OpenAI - PROCESSING FAILED
+      if (error.response?.data?.type === 'OPENAI_PROCESSING_FAILED' || 
+          (error.message && error.message.includes('OPENAI_PROCESSING_FAILED'))) {
+        console.log('Detectado error de OpenAI processing, mostrando modal');
+        setOpenAIErrorDetails({
+          type: 'OPENAI_PROCESSING_FAILED',
+          title: '⚠️ Error de Procesamiento OpenAI',
+          message: error.response?.data?.message || 'El servicio de OpenAI no pudo procesar el documento.',
+          details: 'Esto puede deberse a que el PDF no contiene texto legible o el formato no es compatible. Verifica que el documento no sea una imagen escaneada e intenta nuevamente.'
+        });
+        setShowOpenAIErrorModal(true);
+        // Limpiar el campo de archivo
+        if (document.querySelector('input[type="file"]')) {
+          (document.querySelector('input[type="file"]') as HTMLInputElement).value = '';
+        }
+        setArchivoPdf(null);
+        return; // Salir para evitar el setErrorProcesamiento duplicado
+      }
+      
       // Mejorado el manejo de errores para PDF escaneado
       if (error.response?.data?.type === 'PDF_ESCANEADO' || (error.message && error.message.includes('PDF escaneado'))) {
         const mensaje = error.response?.data?.message || 
@@ -492,6 +539,7 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
           (document.querySelector('input[type="file"]') as HTMLInputElement).value = '';
         }
         setArchivoPdf(null);
+        return; // Salir para evitar el setErrorProcesamiento duplicado
       }
       
       setErrorProcesamiento(
@@ -503,7 +551,7 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
     }
   };
 
-  // Crear orden directamente desde PDF con detección automática del proveedor
+  // Procesar PDF con detección automática del proveedor
   const crearOrdenDesdePdf = async (pdf: File, proveedorId: string, razonSocialId: string, vendedorId?: string): Promise<any> => {
     const formData = new FormData();
     formData.append('pdf', pdf);
@@ -532,6 +580,17 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
       return response.data;
     } catch (error) {
       console.error('Error al crear orden desde PDF:', error);
+      
+      // Verificar si es un error de OpenAI quota exceeded
+      if ((error as any).response?.data?.type === 'OPENAI_QUOTA_EXCEEDED') {
+        throw new Error('OPENAI_QUOTA_EXCEEDED');
+      }
+      
+      // Verificar si es un error de OpenAI processing failed
+      if ((error as any).response?.data?.type === 'OPENAI_PROCESSING_FAILED') {
+        throw new Error('OPENAI_PROCESSING_FAILED');
+      }
+      
       throw new Error('Error al crear la orden desde el archivo PDF. Verifique que el archivo sea válido y que el proveedor sea compatible.');
     }
   };
@@ -552,7 +611,34 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
       return response.data;
     } catch (error: any) {
       console.error('Error al procesar PDF:', error);
-      // Verificar si el error viene directamente del backend
+      
+      // Verificar si es un error de OpenAI quota exceeded
+      if (error.response?.data?.type === 'OPENAI_QUOTA_EXCEEDED') {
+        const errorData = {
+          response: {
+            data: {
+              type: 'OPENAI_QUOTA_EXCEEDED',
+              message: error.response.data.message || 'Se han agotado los tokens de OpenAI disponibles. Por favor, contacta al administrador para recargar la cuenta o intenta más tarde.'
+            }
+          }
+        };
+        throw errorData;
+      }
+      
+      // Verificar si es un error de OpenAI processing failed
+      if (error.response?.data?.type === 'OPENAI_PROCESSING_FAILED') {
+        const errorData = {
+          response: {
+            data: {
+              type: 'OPENAI_PROCESSING_FAILED',
+              message: error.response.data.message || 'El servicio de OpenAI no pudo procesar el documento. Verifica que el PDF contenga texto legible e intenta nuevamente.'
+            }
+          }
+        };
+        throw errorData;
+      }
+      
+      // Verificar si el error viene directamente del backend - PDF escaneado
       if (error.response?.data?.type === 'PDF_ESCANEADO') {
         const errorData = {
           response: {
@@ -642,11 +728,9 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
         
         let precioUnitario = 0;
         if (esPortentum) {
-          // Para Portentum/Aruba: usar PRECIO LISTA UNITARIO como precio unitario
-          precioUnitario = parseNumericValue(producto.precioListaUnitario) ||      // PORTENTUM/ARUBA: precio lista unitario
-                          parseNumericValue(producto.precioLista) ||              // Alternativo: precio lista
-                          parseNumericValue(producto.precioUnitario) ||           // Fallback: precio unitario
-                          parseNumericValue(producto.precio) ||                   // Genérico: precio
+          // Para Portentum: usar PRECIO COSTO como precio unitario (ya extraído correctamente del JSON)
+          precioUnitario = parseNumericValue(producto.precioUnitario) ||           // PORTENTUM: precio costo
+                          parseNumericValue(producto.precio) ||                   // Fallback genérico
                           0;
         } else {
           precioUnitario = parseNumericValue(producto.precioUnitario) ||           // SYSCOM/PRECIO DISTRIBUIDOR: precio directo
@@ -767,22 +851,15 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
         console.log('✅ Actualizando totales calculados:', totalesCalculados);
         setTotalesCalculados(totalesCalculados);
       } else {
-        // Calcular totales automáticamente si no están en el PDF
-        const subTotal = productos.reduce((sum: number, producto: any) => {
-          const importe = producto.importe || ((producto.cantidad || 0) * (producto.precioUnitario || 0));
-          return sum + importe;
-        }, 0);
-        
-        // Detectar el porcentaje de IVA (por defecto 16%)
-        const iva = subTotal * 0.16;
-        const total = subTotal + iva;
-        
+        // ✅ NO calcular totales automáticamente - dejar que el modal lo haga
+        // Solo inicializar totales vacíos 
         totalesCalculados = {
-          subTotal: Number(subTotal.toFixed(2)),
-          iva: Number(iva.toFixed(2)),
-          total: Number(total.toFixed(2))
+          subTotal: 0,
+          iva: 0,
+          total: 0
         };
         
+        console.log('✅ Productos preparados, totales se calcularán en el modal');
         setTotalesCalculados(totalesCalculados);
       }
       
@@ -828,12 +905,17 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
 
   // Función optimizada para actualizar productos con useCallback
   const actualizarProducto = useCallback((index: number, campo: string, valor: any) => {
+    console.log('🔧 actualizarProducto llamado:', { index, campo, valor });
+    
     setProductosEditables(prev => {
       const nuevosProductos = [...prev];
+      
+      console.log('📋 Estado anterior:', prev[index]);
       
       // Manejar eliminación de producto
       if (campo === 'eliminar') {
         nuevosProductos.splice(index, 1);
+        console.log(`🗑️ Producto ${index} eliminado`);
       } else {
         const productoActualizado = {
           ...nuevosProductos[index],
@@ -848,14 +930,20 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
         }
         
         nuevosProductos[index] = productoActualizado;
+        console.log('📋 Estado nuevo:', productoActualizado);
       }
       
-      // Calcular totales directamente con los nuevos productos
-      calcularTotales(nuevosProductos);
+      console.log('🔄 Producto actualizado:', { 
+        index, 
+        campo, 
+        valor, 
+        totalProductos: nuevosProductos.length,
+        estadoCompleto: nuevosProductos
+      });
       
       return nuevosProductos;
     });
-  }, [calcularTotales]);
+  }, []); // Sin dependencias porque ya no usa calcularTotales
 
   // Función para agregar producto optimizada
   const agregarNuevoProducto = useCallback(() => {
@@ -937,62 +1025,6 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
     } catch (error) {
       console.error('Error al generar orden de compra:', error);
 
-    }
-  };
-
-  // Crear orden directamente desde PDF (sin modal intermedio)
-  const crearOrdenDirectamenteDesdePdf = async () => {
-    // Validaciones básicas
-    if (!proveedorSeleccionado) {
-      alert('Debe seleccionar un proveedor');
-      return;
-    }
-    
-    if (!razonSocialSeleccionada) {
-      alert('Debe seleccionar una razón social');
-      return;
-    }
-
-    if (!archivoPdf) {
-      alert('Debe seleccionar un archivo PDF');
-      return;
-    }
-
-    setProcesando(true);
-    setErrorProcesamiento(null);
-
-    try {
-      // Crear orden directamente desde PDF usando la nueva funcionalidad
-      const resultado = await crearOrdenDesdePdf(
-        archivoPdf,
-        proveedorSeleccionado._id ?? "",
-        razonSocialSeleccionada._id ?? "",
-        undefined // El vendedor se seleccionará en el modal de resultados
-      );
-
-      // Mostrar mensaje de éxito
-      alert(`¡Orden de compra creada exitosamente!\n\nDetalles:\n- Orden: ${resultado.orden?.numeroOrden}\n- Productos extraídos: ${resultado.datosExtraidos?.productos?.length || 0}\n- Total: $${resultado.datosExtraidos?.totales?.total?.toFixed(2) || '0.00'}`);
-      
-      // Notificar al componente padre que se creó una nueva orden
-      if (onOrdenCreada) {
-        onOrdenCreada();
-      }
-      
-      // Cerrar modal y resetear formulario
-      onHide();
-      resetearFormulario();
-      
-    } catch (error: any) {
-      console.error('Error al crear orden desde PDF:', error);
-      // Si es un error de PDF escaneado, mostrar alerta
-      if (error.response?.data?.type === 'PDF_ESCANEADO') {
-        setToastMessage(error.response.data.message);
-        setToastVariant('warning');
-        setShowToast(true);
-      }
-      setErrorProcesamiento(error.response?.data?.message || (error instanceof Error ? error.message : 'Error desconocido al crear la orden'));
-    } finally {
-      setProcesando(false);
     }
   };
 
@@ -1248,8 +1280,7 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
                   <strong>Tamaño:</strong> {(archivoPdf.size / 1024 / 1024).toFixed(2)} MB
                   <br />
                   <small className="text-muted">
-                    <strong>Opciones:</strong> Use "Revisar Datos" para ver y editar los productos extraídos antes de crear la orden, 
-                    o "Crear Orden Directa" para generar automáticamente la orden con los datos extraídos del PDF.
+                    <strong>Opciones:</strong> Use "Procesar Orden" para extraer y editar los productos antes de crear la orden.
                   </small>
                 </Alert>
               )}
@@ -1261,7 +1292,7 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
             Cancelar
           </Button>
           
-          {/* Botón para revisar datos extraídos */}
+          {/* Botón para procesar orden */}
           <Button 
             variant="outline-primary" 
             onClick={procesarOrden}
@@ -1274,27 +1305,8 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
               </>
             ) : (
               <>
-                <i className="fas fa-search me-2"></i>
-                Revisar Datos
-              </>
-            )}
-          </Button>
-          
-          {/* Botón para crear orden directamente */}
-          <Button 
-            variant="success" 
-            onClick={crearOrdenDirectamenteDesdePdf}
-            disabled={procesando || !archivoPdf || !proveedorSeleccionado || !razonSocialSeleccionada}
-          >
-            {procesando ? (
-              <>
-                <i className="fas fa-spinner fa-spin me-2"></i>
-                Creando...
-              </>
-            ) : (
-              <>
-                <i className="fas fa-plus-circle me-2"></i>
-                Crear Orden Directa
+                <i className="fas fa-cogs me-2"></i>
+                Procesar Orden
               </>
             )}
           </Button>
@@ -1316,6 +1328,7 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
         onCancelar={cancelarProcesamiento}
         proyectoId={proyectoSeleccionado || undefined}
         proyectos={proyectos}
+        onActualizarTotales={(totales) => setTotalesCalculados(totales)}
       />
 
       {/* Toast de notificaciones */}
@@ -1338,6 +1351,65 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
           </Toast.Body>
         </Toast>
       </ToastContainer>
+
+      {/* Modal de Error OpenAI */}
+      <Modal 
+        show={showOpenAIErrorModal} 
+        onHide={() => setShowOpenAIErrorModal(false)} 
+        size="lg" 
+        centered
+        backdrop="static"
+      >
+        <Modal.Header closeButton className="bg-danger text-white">
+          <Modal.Title>
+            <i className="fas fa-robot me-2"></i>
+            {openAIErrorDetails.title}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="text-center mb-4">
+            <div className="mb-3">
+              {openAIErrorDetails.type === 'OPENAI_QUOTA_EXCEEDED' ? (
+                <div style={{ fontSize: '4rem' }}>🚫</div>
+              ) : (
+                <div style={{ fontSize: '4rem' }}>⚠️</div>
+              )}
+            </div>
+            
+            <h5 className="fw-bold mb-3">{openAIErrorDetails.message}</h5>
+            
+            {openAIErrorDetails.details && (
+              <Alert variant={openAIErrorDetails.type === 'OPENAI_QUOTA_EXCEEDED' ? 'warning' : 'info'} className="text-start">
+                <div className="small">
+                  <strong>Detalles:</strong><br />
+                  {openAIErrorDetails.details}
+                </div>
+              </Alert>
+            )}
+            
+            {openAIErrorDetails.type === 'OPENAI_QUOTA_EXCEEDED' && (
+              <Alert variant="primary" className="text-start">
+                <div className="small">
+                  <strong>¿Qué puedes hacer?</strong><br />
+                  • Contactar al administrador del sistema<br />
+                  • Esperar a que se renueven los tokens automáticamente<br />
+                  • Intentar más tarde cuando el límite se haya reiniciado
+                </div>
+              </Alert>
+            )}
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button 
+            variant="primary" 
+            onClick={() => setShowOpenAIErrorModal(false)}
+            className="px-4"
+          >
+            <i className="fas fa-check me-2"></i>
+            Entendido
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };

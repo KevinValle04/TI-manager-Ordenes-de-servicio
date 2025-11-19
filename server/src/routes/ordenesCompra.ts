@@ -1,21 +1,21 @@
+import type { NextFunction, Request, Response } from 'express';
 import { Router } from 'express';
-import type { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
-import { 
-  getOrdenesCompra, 
-  getOrdenCompraById, 
-  createOrdenCompra, 
-  updateOrdenCompra, 
-  deleteOrdenCompra,
-  getOrdenesByProveedor,
-  getOrdenesByRazonSocial,
-  getOrdenesByDateRange,
-  procesarPdf,
-  generarPdfOrdenCompra,
+import {
   crearOrdenCompraConPdf,
   crearOrdenDesdePdf,
-  getPdfOrdenCompra,
+  createOrdenCompra,
+  deleteOrdenCompra,
   descargarPdfOrdenCompra,
+  generarPdfOrdenCompra,
+  getOrdenCompraById,
+  getOrdenesByDateRange,
+  getOrdenesByProveedor,
+  getOrdenesByRazonSocial,
+  getOrdenesCompra,
+  getPdfOrdenCompra,
+  procesarPdf,
+  updateOrdenCompra,
   updateOrdenCompraConPdf
 } from '../controllers/ordenCompraController';
 

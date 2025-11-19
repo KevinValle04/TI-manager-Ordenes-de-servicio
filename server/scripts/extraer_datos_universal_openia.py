@@ -301,6 +301,161 @@ def extraer_texto_completo_pdf(archivo_pdf):
     print(f"❌ No se pudo extraer texto del PDF con ningún método.", file=sys.stderr)
     return None
 
+def procesar_envio_tvc(json_data, texto_original):
+    """
+    Post-procesamiento específico para TVC:
+    Si es proveedor TVC y hay costos de envío en totales, agrégalo como producto
+    """
+    try:
+        # Verificar si es proveedor TVC
+        proveedor = json_data.get('proveedor', '').upper()
+        # También buscar TVC en el texto original como respaldo
+        es_tvc = 'TVC' in proveedor or 'TVC' in texto_original.upper()
+        
+        if not es_tvc:
+            return json.dumps(json_data, ensure_ascii=False, indent=2)
+        
+        print(f"   📦 Detectado proveedor TVC, verificando envíos...", file=sys.stderr)
+        
+        # Buscar costos de envío en totales
+        totales = json_data.get('totales', {})
+        costo_envio = 0
+        clave_envio = None
+        
+        # Buscar diferentes patrones de envío en totales
+        patrones_envio = ['envio', 'envío', 'shipping', 'flete', 'entrega', 'delivery']
+        for key, value in totales.items():
+            key_lower = key.lower()
+            for patron in patrones_envio:
+                if patron in key_lower:
+                    try:
+                        # Limpiar y convertir valor
+                        if isinstance(value, str):
+                            value_clean = value.replace('$', '').replace(',', '').replace(' ', '')
+                            costo_envio = float(value_clean)
+                        elif isinstance(value, (int, float)):
+                            costo_envio = float(value)
+                        
+                        if costo_envio > 0:
+                            clave_envio = key
+                            print(f"   🚚 Costo de envío detectado en totales - {key}: ${costo_envio:,.2f}", file=sys.stderr)
+                            break
+                    except (ValueError, TypeError):
+                        continue
+            if costo_envio > 0:
+                break
+        
+        # Si no se encontró en totales, buscar en el texto original como respaldo
+        if costo_envio == 0:
+            import re
+            # Patrones más amplios para buscar envío en el texto
+            patrones_texto = [
+                r'env[íi]o[:\s]*\$?[\s]*([0-9,]+\.?[0-9]*)',
+                r'flete[:\s]*\$?[\s]*([0-9,]+\.?[0-9]*)',
+                r'shipping[:\s]*\$?[\s]*([0-9,]+\.?[0-9]*)',
+                r'entrega[:\s]*\$?[\s]*([0-9,]+\.?[0-9]*)'
+            ]
+            
+            for patron in patrones_texto:
+                matches = re.findall(patron, texto_original.lower())
+                if matches:
+                    try:
+                        valor_encontrado = matches[0].replace(',', '')
+                        costo_envio = float(valor_encontrado)
+                        if costo_envio > 0:
+                            print(f"   🔍 Costo de envío detectado en texto: ${costo_envio:,.2f}", file=sys.stderr)
+                            break
+                    except (ValueError, TypeError):
+                        continue
+        
+        # Si hay costo de envío, agregarlo como producto
+        if costo_envio > 0:
+            productos = json_data.get('productos', [])
+            
+            # Verificar que no exista ya un producto de envío
+            existe_envio = any(
+                any(patron in producto.get('descripcion', '').lower() for patron in patrones_envio)
+                for producto in productos
+            )
+            
+            if not existe_envio:
+                # Determinar el siguiente número de línea
+                max_linea = max((p.get('linea', 0) for p in productos), default=0)
+                
+                producto_envio = {
+                    "linea": max_linea + 1,
+                    "codigo": "ENVIO-TVC",
+                    "descripcion": "Costo de Envio TVC",
+                    "cantidad": 1,
+                    "unidad": "SERVICIO",
+                    "precioUnitario": costo_envio,
+                    "importe": costo_envio
+                }
+                
+                productos.append(producto_envio)
+                json_data['productos'] = productos
+                
+                print(f"   ✅ Producto de envío agregado como línea {max_linea + 1}: ${costo_envio:,.2f}", file=sys.stderr)
+                print(f"   📊 Total productos ahora: {len(productos)}", file=sys.stderr)
+            else:
+                print(f"   ⚠️  Producto de envío ya existe en la lista, no se duplica", file=sys.stderr)
+        else:
+            print(f"   ℹ️  No se detectaron costos de envío para este documento TVC", file=sys.stderr)
+        
+        return json.dumps(json_data, ensure_ascii=False, indent=2)
+        
+    except Exception as e:
+        print(f"   ⚠️  Error en post-procesamiento TVC: {e}", file=sys.stderr)
+        # En caso de error, devolver datos originales
+        return json.dumps(json_data, ensure_ascii=False, indent=2)
+
+def procesar_iva_portentum_aruba(json_data, texto_original):
+    """
+    Post-procesamiento para Portentum y Aruba:
+    Establecer IVA en 0 por defecto ya que son proveedores internacionales
+    """
+    try:
+        # Verificar si es proveedor Portentum o Aruba
+        proveedor = json_data.get('proveedor', '').upper()
+        texto_upper = texto_original.upper()
+        
+        es_portentum = 'PORTENTUM' in proveedor or 'PORTENTUM' in texto_upper
+        es_aruba = 'ARUBA' in proveedor or 'ARUBA' in texto_upper
+        
+        if es_portentum or es_aruba:
+            proveedor_tipo = "Portentum" if es_portentum else "Aruba"
+            print(f"   🌍 Detectado proveedor {proveedor_tipo}, estableciendo IVA = 0...", file=sys.stderr)
+            
+            # Establecer IVA en 0 en totales
+            totales = json_data.get('totales', {})
+            totales['iva'] = 0
+            json_data['totales'] = totales
+            
+            # Recalcular total si es necesario
+            subtotal = totales.get('subtotal', 0)
+            envio = totales.get('envio', 0)
+            flete = totales.get('flete', 0)
+            shipping = totales.get('shipping', 0)
+            
+            # Sumar todos los costos adicionales
+            costos_adicionales = envio + flete + shipping
+            nuevo_total = subtotal + costos_adicionales
+            
+            # Solo actualizar el total si es diferente (para evitar cambios innecesarios)
+            total_actual = totales.get('total', 0)
+            if abs(nuevo_total - total_actual) > 0.01:  # Tolerancia para diferencias de centavos
+                totales['total'] = nuevo_total
+                print(f"   📊 Total recalculado: ${nuevo_total:,.2f} (sin IVA)", file=sys.stderr)
+            
+            print(f"   ✅ IVA establecido en 0 para proveedor {proveedor_tipo}", file=sys.stderr)
+        
+        return json.dumps(json_data, ensure_ascii=False, indent=2)
+        
+    except Exception as e:
+        print(f"   ⚠️  Error en post-procesamiento IVA: {e}", file=sys.stderr)
+        # En caso de error, devolver datos originales
+        return json.dumps(json_data, ensure_ascii=False, indent=2)
+
 def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
     """Procesa el documento usando OpenAI GPT-4o para máxima velocidad y precisión."""
     print(f"🔍 DEBUG: Iniciando procesamiento con OpenAI", file=sys.stderr)
@@ -354,46 +509,135 @@ def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
     "precioUnitarioFinal": "number", // OPCIONAL: Precio después del descuento (calculado)
     "importe": "number" // OBLIGATORIO: Total de la línea
   }}],
-  "totales": {{"subtotal": "number", "iva": "number", "total": "number"}},
+  "totales": {{"subtotal": "number", "iva": "number", "total": "number", "envio": "number (OPCIONAL)", "flete": "number (OPCIONAL)", "shipping": "number (OPCIONAL)"}},
   "moneda": "string (Detecta la moneda, si no se especifica, asume 'MXN')"
 }}
+
+**IMPORTANTE - EXTRACCIÓN DE DATOS:**
+- Extrae los productos con sus precios exactos del documento
+- Para los totales, usa los valores que aparecen en el PDF (el modal los recalculará si es necesario)
+- **CRÍTICO PARA COSTOS DE ENVÍO**: Si el documento muestra costos de envío, flete, shipping o entrega por separado en los totales, inclúyelos en la sección "totales" con las claves correspondientes ("envio", "flete", "shipping")
+- **ESPECIAL TVC**: TVC frecuentemente incluye costos de envío separados - asegúrate de preservarlos en totales
+- **IMPORTANTE IVA**: Los proveedores Portentum y Aruba son internacionales, por lo que generalmente tienen IVA = 0. Si detectas estos proveedores, establece "iva": 0
+- Enfócate en la precisión de los datos de productos y precios
 
 **REGLAS CRÍTICAS PARA EXTRACCIÓN FLEXIBLE:**
 1.  **DETECCIÓN AUTOMÁTICA DEL FORMATO:**
     * Si el documento tiene columna "PRECIO LISTA" y "DESCUENTO" → usar `precioListaUnitario` + `descuentoPorcentaje`
     * Si el documento solo tiene "PRECIO UNITARIO" o "P.U." → usar `precioUnitario` directamente
+    * **ESPECIAL PORTENTUM**: Si existe "PRECIO COSTO" → usar como `precioUnitario` (precio real de venta)
+    * **ESPECIAL ARUBA**: Si existe "P.U. Canal" → usar como `precioUnitario` + usar "P. Extendido" como `importe`
+    * **IMPORTANTE**: Para Portentum, IGNORAR columnas "Precio Unitario" si existe "Precio costo"
+    * **IMPORTANTE**: Para Aruba, IGNORAR columnas "Precio Lista" y usar "P.U. Canal"
     * SIEMPRE extraer `importe` de la última columna de totales
+
+2.  **MANEJO DE VALORES FALTANTES Y PRODUCTOS ESPECIALES:**
+    * **PRODUCTOS CON "---" O VALORES VACÍOS**: 
+      - Si cantidad = "---" → usar cantidad = 0
+      - Si precioUnitario = "---" → usar precioUnitario = 0  
+      - Si importe = "---" → usar importe = 0
+      - **OBLIGATORIO**: INCLUIR estos productos en el JSON, NO los omitas
+      - Estos productos deben aparecer en la orden de compra final
+    * **PRODUCTOS DUPLICADOS**: 
+      - Si encuentras productos con el mismo código Y descripción, mantén ambos como líneas separadas
+      - Incrementa el número de línea secuencialmente (1, 2, 3...)
+      - NO fusiones productos duplicados, mantenlos como líneas independientes
+      - Ejemplo: Si "ENVIO" aparece 2 veces, crear línea 1 y línea 2 separadas
+    * **PRODUCTOS DE SERVICIO**: 
+      - Productos como "ENVIO", "EMPAQUE Y EMBARQUE", "SERVICIO" deben incluirse siempre
+      - Usar unidad = "SERVICIO" si no está especificada
+
+**EJEMPLO ESPECÍFICO PORTENTUM:**
+Si ves esta estructura en el documento:
+- Precio lista: 1,415.6200
+- % Dto.: 43.50  
+- Precio costo: 799.8300
+- Precio Unitario: 1415
+
+DEBES USAR:
+- precioUnitario = 799.8300 (desde "Precio costo")
+- precioListaUnitario = 1415.6200 (desde "Precio lista") 
+- descuentoPorcentaje = 0 (PORTENTUM no usa descuentos, precio costo ya es final)
+- IGNORAR completamente el valor "1415" de la columna "Precio Unitario"
+
+**EJEMPLO ESPECÍFICO ARUBA:**
+Si ves esta estructura en el documento:
+- Precio Lista: 44,260.00
+- P.U. Canal: 13,730.56
+- P. Extendido: 27,527.11
+
+DEBES USAR:
+- precioUnitario = 13730.56 (desde "P.U. Canal")
+- precioListaUnitario = 44260.00 (desde "Precio Lista")
+- importe = 27527.11 (desde "P. Extendido")
+- descuentoPorcentaje = 0 (precio canal ya es final)
 
 2.  **MAPEO DE CAMPOS POR PROVEEDOR:**
     * **TVC**: `precioUnitario` desde "PRECIO DISTRIBUIDOR" (sin descuentos, descuento = 0)
     * **SYSCOM**: `precioUnitario` desde "P.U." o "PRECIO UNITARIO" (YA incluye descuentos, descuento = 0)
     * **GRUPO DICE**: `precioListaUnitario` desde "PRECIO LISTA UNIT." + `descuentoPorcentaje` desde "DESCUENTO"
+    * **PORTENTUM**: `precioUnitario` desde "PRECIO COSTO" o "Precio costo" (NUNCA desde "Precio Unitario") + `precioListaUnitario` desde "PRECIO LISTA" + `descuentoPorcentaje` = 0 (sin descuentos)
+    * **ARUBA**: `precioUnitario` desde "P.U. Canal" + `importe` desde "P. Extendido" + `descuentoPorcentaje` = 0 (sin descuentos)
     * **UNIVERSAL**: `precioUnitario` desde cualquier columna de precio unitario
 
 4.  **PRIORIDAD DE EXTRACCIÓN:**
     * **Para TVC**: `precioUnitario` → "PRECIO DISTRIBUIDOR" (descuento automático = 0)
     * **Para SYSCOM**: `precioUnitario` → "P.U." o "PRECIO UNITARIO" (descuento automático = 0, precios YA incluyen descuentos)
+    * **Para PORTENTUM**: `precioUnitario` → "PRECIO COSTO" o "Precio costo" (descuento = 0, precio final)
+    * **Para ARUBA**: `precioUnitario` → "P.U. Canal" + `importe` → "P. Extendido" (descuento = 0)
     * **Para otros**: `precioUnitario` → Buscar en: "P.U.", "PRECIO UNITARIO", "PRECIO UNIT.", "UNIT PRICE"
     * `precioListaUnitario` → Buscar en: "PRECIO LISTA", "LISTA UNIT.", "PRICE LIST"
-    * `descuentoPorcentaje` → Buscar en: "DESCUENTO", "DESC %", "DISCOUNT" (excepto TVC y SYSCOM = 0)
-    * `importe` → Buscar en: "IMPORTE", "TOTAL", "PRECIO EXTENDIDO", "EXTENDED PRICE"
+    * `descuentoPorcentaje` → Buscar en: "DESCUENTO", "DESC %", "DISCOUNT" (excepto TVC, SYSCOM, PORTENTUM y ARUBA = 0)
+    * `importe` → Buscar en: "IMPORTE", "TOTAL", "PRECIO EXTENDIDO", "P. EXTENDIDO", "EXTENDED PRICE"
 
-5.  **REGLAS DE CÁLCULO:**
-    * **Para TVC**: usar `precioUnitario` desde "PRECIO DISTRIBUIDOR" + `descuentoPorcentaje` = 0
-    * **Para SYSCOM**: usar `precioUnitario` desde "P.U." + `descuentoPorcentaje` = 0 (precios YA con descuentos aplicados)
-    * **Para otros**: Si existe `precioUnitario` → usarlo directamente
-    * Si existe `precioListaUnitario` + `descuentoPorcentaje` → calcular `precioUnitarioFinal`
-    * `importe` SIEMPRE debe coincidir con `cantidad * precio_final`
+5.  **EXTRACCIÓN PRECISA:**
+    * Extrae `precioUnitario` tal como aparece en el documento
+    * Si hay `precioListaUnitario` y `descuentoPorcentaje`, extrae ambos valores
+    * `importe` debe ser el valor exacto que aparece en el documento
+    * Los cálculos y validaciones se harán en el frontend (modal)
 
-6.  **REGLA ESPECIAL PARA TVC Y SYSCOM:**
+6.  **REGLA ESPECIAL PARA PROVEEDORES ESPECÍFICOS:**
     * **TVC**: SIEMPRE buscar la columna "PRECIO DISTRIBUIDOR" o "PRECIO DISTRIBU."
     * **SYSCOM**: SIEMPRE buscar la columna "P.U." o "PRECIO UNITARIO"
+    * **PORTENTUM**: SIEMPRE buscar la columna "PRECIO COSTO" o "Precio costo" (NUNCA usar "Precio Unitario")
+    * **ARUBA**: SIEMPRE buscar la columna "P.U. Canal" para precio unitario y "P. Extendido" para importe
+    * **PRIORIDAD ABSOLUTA PORTENTUM**: Si encuentras "Precio costo" = 799.83 y "Precio Unitario" = 1415, USA 799.83
+    * **PRIORIDAD ABSOLUTA ARUBA**: Si encuentras "P.U. Canal" = 13730.56 y "Precio Lista" = 44260.00, USA 13730.56
     * Usar ese valor como `precioUnitario` final
-    * NUNCA aplicar descuentos adicionales (descuento = 0)
-    * El precio unitario ya incluye todos los descuentos aplicables
+    * Para TVC, SYSCOM, PORTENTUM y ARUBA: NUNCA aplicar descuentos adicionales (descuento = 0)
+    * Para PORTENTUM: El "PRECIO COSTO" ya es el precio final, sin descuentos adicionales
+    * Para ARUBA: El "P.U. Canal" ya es el precio final de canal, sin descuentos adicionales
+    * **REGLA CRÍTICA PORTENTUM**: Si hay múltiples columnas de precio (ej: "Precio Unitario" y "Precio costo"), SIEMPRE usar "Precio costo" como precioUnitario
+    * **REGLA CRÍTICA ARUBA**: Si hay múltiples columnas de precio (ej: "Precio Lista" y "P.U. Canal"), SIEMPRE usar "P.U. Canal" como precioUnitario
 
 **DOCUMENTO A PROCESAR:**
 (Nombre del archivo: {nombre_archivo})
+
+**INSTRUCCIÓN FINAL CRÍTICA:**
+Si el documento contiene las columnas "Precio costo" Y "Precio Unitario", debes usar SOLAMENTE el valor de "Precio costo" como precioUnitario en el JSON final. El valor de "Precio Unitario" debe ser completamente ignorado. Esta es una regla ABSOLUTA e inviolable para documentos Portentum.
+
+Si el documento contiene las columnas "P.U. Canal" Y "Precio Lista", debes usar SOLAMENTE el valor de "P.U. Canal" como precioUnitario en el JSON final. Además, usar "P. Extendido" como importe directo. Esta es una regla ABSOLUTA e inviolable para documentos Aruba.
+
+**PRIORIDAD: EXTRACCIÓN PRECISA SOBRE CÁLCULOS**
+- Enfócate en extraer los datos exactos del documento
+- No te preocupes por validar cálculos matemáticos
+- El frontend (modal) se encargará de todos los cálculos y recálculos
+- Tu trabajo es ser un extractor de datos preciso y confiable
+
+**REGLA CRÍTICA FINAL SOBRE PRODUCTOS:**
+- TODOS los productos del documento DEBEN aparecer en el JSON final, incluso si tienen valores "---" o están vacíos
+- Si un valor es "---", null, vacío o no existe, usa 0 como valor predeterminado
+- NUNCA omitas productos del JSON, independientemente de sus valores
+- Los productos duplicados deben mantenerse como líneas separadas con numeración secuencial
+- El sistema necesita ver TODOS los productos para la orden de compra final
+
+**REGLA CRÍTICA FINAL SOBRE COSTOS DE ENVÍO:**
+- Si encuentras costos de "ENVÍO", "FLETE", "SHIPPING", "ENTREGA" o similar en la sección de totales del documento, DEBES incluirlos en la sección "totales" del JSON
+- Usa las claves: "envio", "flete", "shipping" según corresponda
+- **ESPECIAL PARA TVC**: Es común que TVC incluya costos de envío separados en sus cotizaciones - asegúrate de preservarlos
+- Ejemplo: Si ves "Envío: $150.00" en totales, incluye "envio": 150.00 en el JSON
+- NO omitas estos costos aunque no aparezcan como productos separados
+
 ---
 {texto_completo}
 ---
@@ -424,8 +668,18 @@ def procesar_documento_con_openai(texto_completo, nombre_archivo, cache_dir):
         print(f"   ✓ Documento analizado por GPT-4o.", file=sys.stderr)
         print(f"   📊 Productos extraídos: {len(json_parseado.get('productos', []))}", file=sys.stderr)
         
-        guardar_en_cache(hash_texto, hash_estructura, resultado_str, cache_dir)
-        return resultado_str
+        # Post-procesamiento específico para TVC - agregar envío como producto
+        resultado_procesado = procesar_envio_tvc(json_parseado, texto_completo)
+        
+        # Post-procesamiento para Portentum y Aruba - establecer IVA en 0
+        resultado_final = procesar_iva_portentum_aruba(json.loads(resultado_procesado), texto_completo)
+        
+        # Guardar en cache el resultado final
+        try:
+            guardar_en_cache(hash_texto, hash_estructura, resultado_final, cache_dir)
+        except Exception as e:
+            print(f"⚠️ Error guardando en cache: {e}", file=sys.stderr)
+        return resultado_final
         
     except Exception as e:
         print(f"❌ Error procesando con OpenAI: {e}", file=sys.stderr)
@@ -461,10 +715,10 @@ if __name__ == "__main__":
         # innecesarias a la API si ya existe un resultado.
         hash_texto_raw = generar_hash_texto(texto_completo)
         hash_estructura_raw = generar_hash_estructura(texto_completo)
-        resultado_cache_raw, tipo_cache_raw = buscar_en_cache(hash_texto_raw, hash_estructura_raw, cache_dir)
-        if resultado_cache_raw:
-            print(resultado_cache_raw)
-            sys.exit(0)
+        # resultado_cache_raw, tipo_cache_raw = buscar_en_cache(hash_texto_raw, hash_estructura_raw, cache_dir) # DESACTIVADO PARA PRUEBAS
+        # if resultado_cache_raw:
+        #     print(resultado_cache_raw)
+        #     sys.exit(0)
 
         # Si no hay cache, aplicar preprocesamiento para códigos Syscom con guiones
         texto_completo = procesar_guiones_syscom(texto_completo)
@@ -490,7 +744,7 @@ if __name__ == "__main__":
             print("⚠️ El resultado final no es un JSON válido.", file=sys.stderr)
 
         # 🔧 DEBUG: Descomentar la siguiente línea para guardar JSON físico para debugging
-        # guardar_json_resultado(json_resultado, folio_extraido, os.path.basename(archivo_pdf))
+        guardar_json_resultado(json_resultado, folio_extraido, os.path.basename(archivo_pdf))
     
     except Exception as e:
         error_message = f"❌ ERROR CRÍTICO: {str(e)}"

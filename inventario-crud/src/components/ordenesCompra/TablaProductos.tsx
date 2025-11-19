@@ -6,6 +6,7 @@ interface TablaProductosProps {
   productos: any[];
   onActualizar: (index: number, campo: string, valor: any) => void;
   onAgregar: () => void;
+  onResetearDescuentos?: () => void;
   moneda: string;
 }
 
@@ -13,6 +14,7 @@ export const TablaProductos: React.FC<TablaProductosProps> = ({
   productos,
   onActualizar,
   onAgregar,
+  onResetearDescuentos,
   moneda
 }) => {
   return (
@@ -62,10 +64,46 @@ export const TablaProductos: React.FC<TablaProductosProps> = ({
           </tbody>
         </table>
       </div>
-      <div className="d-flex justify-content-end mt-3">
+      <div className="d-flex justify-content-end gap-2 mt-3">
+        {onResetearDescuentos && productos.length > 0 && (
+          <Button 
+            onClick={onResetearDescuentos}
+            title="Poner todos los descuentos en 0%"
+            style={{ 
+              backgroundColor: '#FF6B35', 
+              borderColor: '#FF6B35', 
+              color: 'white',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#E55A2B';
+              e.target.style.borderColor = '#E55A2B';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#FF6B35';
+              e.target.style.borderColor = '#FF6B35';
+            }}
+          >
+            <i className="fas fa-percent me-2"></i>
+            Resetear Descuentos
+          </Button>
+        )}
         <Button 
-          variant="primary" 
           onClick={onAgregar}
+          style={{ 
+            backgroundColor: '#17A2B8', 
+            borderColor: '#17A2B8', 
+            color: 'white',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#138496';
+            e.target.style.borderColor = '#138496';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = '#17A2B8';
+            e.target.style.borderColor = '#17A2B8';
+          }}
         >
           <i className="fas fa-plus me-2"></i>
           Agregar Producto
@@ -115,7 +153,7 @@ const FilaProducto: React.FC<FilaProductoProps> = React.memo(({
             onClick={handleEliminarProducto}
             title="Eliminar producto"
           >
-            <i className="fas fa-trash-alt"></i>
+            ×
           </Button>
         </div>
       </td>
@@ -170,17 +208,19 @@ const FilaProducto: React.FC<FilaProductoProps> = React.memo(({
         />
       </td>
       <td className="align-middle">
-        <Form.Control
-          type="number"
-          size="sm"
-          value={producto.descuento || ''}
-          onChange={(e) => handleInputChange('descuento', parseFloat(e.target.value) || 0)}
-          placeholder="0"
-          min="0"
-          max="100"
-          step="0.1"
-        />
-        <small className="text-muted">%</small>
+        <div className="d-flex align-items-center gap-1">
+          <Form.Control
+            type="number"
+            size="sm"
+            value={producto.descuento || ''}
+            onChange={(e) => handleInputChange('descuento', parseFloat(e.target.value) || 0)}
+            placeholder="0"
+            min="0"
+            max="100"
+            step="0.1"
+          />
+          <span className="text-muted">%</span>
+        </div>
       </td>
       <td className="align-middle">
         <div className="fw-bold text-end">
