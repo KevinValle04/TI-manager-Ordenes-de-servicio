@@ -124,18 +124,7 @@ const CotizacionCanalizacionList: React.FC = () => {
     }
   };
 
-  // Exportar lista completa de cotizaciones
-  const handleExportarListaPdf = async () => {
-    try {
-      const { exportarListaCotizacionesPDF } = await import('../../utils/pdfExporter');
-      exportarListaCotizacionesPDF(currentItems);
-    } catch (error) {
-      console.error('Error al exportar lista:', error);
-      alert('Error al exportar la lista. Por favor instale las dependencias de jsPDF.');
-    }
-  };
-
-  // Funciones de negocio
+  // Funciones CRUD
   const generatePresupuestoNumber = () => {
     const maxNumber = cotizaciones.reduce((max, cotizacion) => {
       const match = cotizacion.numeroPresupuesto.match(/PME-(\d+)/);
@@ -326,13 +315,6 @@ const CotizacionCanalizacionList: React.FC = () => {
           className="flex-grow-1"
         />
         <div className="d-flex gap-2">
-          <Button 
-            variant="outline-primary" 
-            onClick={() => handleExportarListaPdf()}
-            title="Exportar lista completa a PDF"
-          >
-            📄 Exportar Lista
-          </Button>
           <Button variant="success" onClick={handleNew}>
             Nueva Cotización
           </Button>

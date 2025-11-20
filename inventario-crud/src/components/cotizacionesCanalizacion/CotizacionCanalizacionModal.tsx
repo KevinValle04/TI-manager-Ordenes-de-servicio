@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
-import { createPortal } from 'react-dom';
+import { faGripVertical, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faGripVertical } from '@fortawesome/free-solid-svg-icons';
-import { CotizacionCanalizacion, Cliente, MaterialCanalizacion, RazonSocial } from '../../types';
+import React, { useEffect, useState } from 'react';
+import { Button, Form, Modal } from 'react-bootstrap';
+import { createPortal } from 'react-dom';
+import { Cliente, CotizacionCanalizacion, MaterialCanalizacion, RazonSocial } from '../../types';
 
 interface CotizacionCanalizacionModalProps {
   show: boolean;
@@ -478,15 +478,23 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
   };
 
   const handleSave = () => {
+    // Validar campos requeridos
+    if (!formData.cliente || formData.cliente.trim() === '') {
+      alert('El cliente es requerido');
+      return;
+    }
+
     // Filtrar items vacíos antes de guardar
     const itemsToSave = (formData.items || []).filter(item => 
       item.descripcion && item.descripcion.trim() !== ''
     );
     
-    // Crear una copia de formData con los items filtrados
+    // Crear una copia de formData con los items filtrados y campos limpiados
     const dataToSave = {
       ...formData,
-      items: itemsToSave
+      items: itemsToSave,
+      // Convertir strings vacías a undefined para campos opcionales ObjectId
+      razonSocial: formData.razonSocial && formData.razonSocial.trim() !== '' ? formData.razonSocial : undefined
     };
     
     onSave(dataToSave);

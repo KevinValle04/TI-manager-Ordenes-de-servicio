@@ -30,11 +30,25 @@ export const getCotizacionCanalizacionById = async (req: Request, res: Response)
 
 export const createCotizacionCanalizacion = async (req: Request, res: Response) => {
   try {
+    // Validar campos requeridos y convertir strings vacías a undefined
     const cotizacionData = {
       ...req.body,
       fechaCreacion: new Date(),
       fechaActualizacion: new Date()
     };
+
+    // Convertir strings vacías a undefined para campos ObjectId
+    if (cotizacionData.razonSocial === '') {
+      cotizacionData.razonSocial = undefined;
+    }
+    if (cotizacionData.cliente === '') {
+      cotizacionData.cliente = undefined;
+    }
+
+    // Validar campos requeridos
+    if (!cotizacionData.cliente) {
+      return res.status(400).json({ error: 'El cliente es requerido' });
+    }
     
     const cotizacion = new CotizacionCanalizacion(cotizacionData);
     
@@ -61,6 +75,14 @@ export const updateCotizacionCanalizacion = async (req: Request, res: Response) 
       ...req.body,
       fechaActualizacion: new Date()
     };
+
+    // Convertir strings vacías a undefined para campos ObjectId
+    if (updateData.razonSocial === '') {
+      updateData.razonSocial = undefined;
+    }
+    if (updateData.cliente === '') {
+      updateData.cliente = undefined;
+    }
     
     const cotizacion = await CotizacionCanalizacion.findByIdAndUpdate(
       req.params.id, 
