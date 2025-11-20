@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { Proyecto, Colaborador, Cotizacion, OrdenCompra, Cliente, IInventoryItem, RazonSocial } from '../../types';
+import { Proyecto, Colaborador, Cotizacion, Entrega, OrdenCompra, Cliente, IInventoryItem, RazonSocial } from '../../types';
 import DataTable from '../common/DataTable';
 import PaginationCompact from '../common/PaginationCompact';
 import SearchBar from '../common/SearchBar';
 import ProyectoModal from './ProyectoModal';
 import ActividadesList from './ActividadesList';
 import CotizacionModal from '../cotizaciones/CotizacionModal';
+import EntregaModal from '../entregas/EntregaModal';
 import OrdenCompraForm from '../ordenesCompra/OrdenCompraForm';
 
 const ProyectoList: React.FC = () => {
@@ -20,18 +21,23 @@ const ProyectoList: React.FC = () => {
   
   // Estados para los modales de cotizaciones y órdenes de compra
   const [showCotizacionesModal, setShowCotizacionesModal] = useState(false);
+  const [showEntregasModal, setShowEntregasModal] = useState(false);
   const [showOrdenesModal, setShowOrdenesModal] = useState(false);
   const [showActividadesModal, setShowActividadesModal] = useState(false);
   const [selectedProyecto, setSelectedProyecto] = useState<Proyecto | null>(null);
   const [cotizacionesProyecto, setCotizacionesProyecto] = useState<Cotizacion[]>([]);
+  const [entregasProyecto, setEntregasProyecto] = useState<Entrega[]>([]);
   const [ordenesProyecto, setOrdenesProyecto] = useState<OrdenCompra[]>([]);
   const [loadingCotizaciones, setLoadingCotizaciones] = useState(false);
+  const [loadingEntregas, setLoadingEntregas] = useState(false);
   const [loadingOrdenes, setLoadingOrdenes] = useState(false);
   
   // Estados para editar cotizaciones y órdenes
   const [showEditCotizacionModal, setShowEditCotizacionModal] = useState(false);
+  const [showEditEntregaModal, setShowEditEntregaModal] = useState(false);
   const [showEditOrdenModal, setShowEditOrdenModal] = useState(false);
   const [editingCotizacion, setEditingCotizacion] = useState<Cotizacion | null>(null);
+  const [editingEntrega, setEditingEntrega] = useState<Entrega | null>(null);
   const [editingOrdenId, setEditingOrdenId] = useState<string | null>(null);
   
   // Datos auxiliares para edición
@@ -230,6 +236,24 @@ const ProyectoList: React.FC = () => {
     }
   };
 
+  const handleViewEntregas = async (proyecto: Proyecto) => {
+    setSelectedProyecto(proyecto);
+    setLoadingEntregas(true);
+    setShowEntregasModal(true);
+    
+    try {
+      const response = await fetch(`/api/proyectos/${proyecto._id}/entregas`);
+      if (!response.ok) throw new Error('Error al cargar entregas');
+      const data = await response.json();
+      setEntregasProyecto(data);
+    } catch (error) {
+      console.error('Error al cargar entregas:', error);
+      alert('Error al cargar las entregas del proyecto');
+    } finally {
+      setLoadingEntregas(false);
+    }
+  };
+
   const handleViewActividades = (proyecto: Proyecto) => {
     setSelectedProyecto(proyecto);
     setShowActividadesModal(true);
@@ -238,6 +262,11 @@ const ProyectoList: React.FC = () => {
   const handleEditCotizacion = (cotizacion: Cotizacion) => {
     setEditingCotizacion(cotizacion);
     setShowEditCotizacionModal(true);
+  };
+
+  const handleEditEntrega = (entrega: Entrega) => {
+    setEditingEntrega(entrega);
+    setShowEditEntregaModal(true);
   };
 
   const handleEditOrden = (orden: OrdenCompra) => {
@@ -274,6 +303,38 @@ const ProyectoList: React.FC = () => {
     } catch (error: any) {
       console.error('Error al guardar cotización:', error);
       alert(error.message || 'Error al guardar la cotización');
+    }
+  };
+
+  const handleSaveEntrega = async (data: Partial<Entrega>) => {
+    try {
+      const url = data._id 
+        ? `/api/entregas/${data._id}`
+        : '/api/entregas';
+      
+      const response = await fetch(url, {
+        method: data._id ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al guardar la entrega');
+      }
+
+      // Recargar entregas del proyecto
+      if (selectedProyecto) {
+        await handleViewEntregas(selectedProyecto);
+      }
+      
+      setShowEditEntregaModal(false);
+      setEditingEntrega(null);
+    } catch (error: any) {
+      console.error('Error al guardar entrega:', error);
+      alert(error.message || 'Error al guardar la entrega');
     }
   };
 
@@ -407,6 +468,18 @@ const ProyectoList: React.FC = () => {
             >
               <i className="fas fa-file-invoice me-1"></i>
               Cotizaciones
+            </Button>
+          </div>
+          <div className="d-flex gap-1">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => handleViewEntregas(proyecto)}
+              title="Ver entregas del proyecto"
+              className="flex-fill"
+            >
+              <i className="fas fa-truck me-1"></i>
+              Entregas
             </Button>
           </div>
           <div className="d-flex gap-1">
@@ -606,6 +679,83 @@ const ProyectoList: React.FC = () => {
         </Modal.Footer>
       </Modal>
 
+      {/* Modal de Entregas */}
+      <Modal 
+        show={showEntregasModal} 
+        onHide={() => setShowEntregasModal(false)}
+        size="xl"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <i className="fas fa-truck me-2"></i>
+            Entregas del Proyecto: {selectedProyecto?.nombre}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {loadingEntregas ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+          ) : entregasProyecto.length === 0 ? (
+            <div className="alert alert-info">
+              <i className="fas fa-info-circle me-2"></i>
+              No hay entregas asociadas a este proyecto
+            </div>
+          ) : (
+            <div className="table-responsive">
+              <table className="table table-hover">
+                <thead className="table-dark">
+                  <tr>
+                    <th>No. Presupuesto</th>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {entregasProyecto.map(entrega => (
+                    <tr key={entrega._id}>
+                      <td>{entrega.numeroPresupuesto}</td>
+                      <td>{typeof entrega.cliente === 'string' ? entrega.cliente : entrega.cliente?.nombreEmpresa}</td>
+                      <td>{new Date(entrega.fecha).toLocaleDateString('es-MX')}</td>
+                      <td>
+                        <div className="d-flex gap-1">
+                          <Button
+                            variant="warning"
+                            size="sm"
+                            onClick={() => handleEditEntrega(entrega)}
+                            title="Editar entrega"
+                          >
+                            <i className="fas fa-edit me-1"></i>
+                            Editar
+                          </Button>
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => window.open(`/api/entregas/${entrega._id}/pdf`, '_blank')}
+                            title="Ver PDF"
+                          >
+                            <i className="fas fa-file-pdf me-1"></i>
+                            PDF
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowEntregasModal(false)}>
+            Cerrar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       {/* Modal de Órdenes de Compra */}
       <Modal 
         show={showOrdenesModal} 
@@ -707,6 +857,24 @@ const ProyectoList: React.FC = () => {
           }}
           onSave={handleSaveCotizacion}
           editingCotizacion={editingCotizacion}
+          clientes={clientes}
+          inventarioItems={inventarioItems}
+          razonesSociales={razonesSociales}
+          proyectos={proyectos}
+          generatePresupuestoNumber={generatePresupuestoNumber}
+        />
+      )}
+
+      {/* Modal de Edición de Entrega */}
+      {showEditEntregaModal && (
+        <EntregaModal
+          show={showEditEntregaModal}
+          onHide={() => {
+            setShowEditEntregaModal(false);
+            setEditingEntrega(null);
+          }}
+          onSave={handleSaveEntrega}
+          editingEntrega={editingEntrega}
           clientes={clientes}
           inventarioItems={inventarioItems}
           razonesSociales={razonesSociales}
