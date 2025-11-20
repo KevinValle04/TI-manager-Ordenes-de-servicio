@@ -6,7 +6,8 @@ import {
   actualizarProyecto,
   eliminarProyecto,
   obtenerCotizacionesProyecto,
-  obtenerOrdenesCompraProyecto
+  obtenerOrdenesCompraProyecto,
+  obtenerEntregasProyecto
 } from '../controllers/proyectoController';
 import {
   obtenerActividadesProyecto,
@@ -38,6 +39,9 @@ router.get('/:id/cotizaciones', obtenerCotizacionesProyecto);
 
 // GET /api/proyectos/:id/ordenes-compra - Obtener órdenes de compra de un proyecto
 router.get('/:id/ordenes-compra', obtenerOrdenesCompraProyecto);
+
+// GET /api/proyectos/:id/entregas - Obtener entregas de un proyecto
+router.get('/:id/entregas', obtenerEntregasProyecto);
 
 // GET /api/proyectos/:proyectoId/actividades - Obtener todas las actividades de un proyecto
 router.get('/:proyectoId/actividades', obtenerActividadesProyecto);

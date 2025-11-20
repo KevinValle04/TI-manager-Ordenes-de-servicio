@@ -193,7 +193,42 @@ export interface Cotizacion {
   fechaActualizacion: Date | string;
 }
 
+export interface Entrega {
+  _id?: string;
+  numeroPresupuesto: string;
+  cliente: string | Cliente;
+  razonSocial?: string | RazonSocial; // Referencia a la razón social (opcional)
+  proyecto?: string | Proyecto; // Referencia al proyecto (opcional)
+  fecha: Date | string;
+  vigencia: Date | string;
+  subtotal: number;
+  iva: number; // Porcentaje de IVA (8%)
+  ivaImporte: number; // Monto del IVA
+  total: number;
+  estado: "Borrador" | "Enviada" | "Aceptada" | "Rechazada" | "Vencida";
+  items: ItemEntrega[];
+  comentarios?: string;
+  fechaCreacion: Date | string;
+  fechaActualizacion: Date | string;
+}
+
 export interface ItemCotizacion {
+  _id?: string;
+  clave: number;
+  marca?: string;
+  modelo?: string;
+  concepto: string;
+  cantidad: number;
+  unidad: "PZA" | "MTS" | "SERV" | "LOTE";
+  precioUnitario: number;
+  importe: number;
+  aplicarIva: boolean;
+  material?: string | IInventoryItem; // Referencia al material (opcional)
+  canalizacionId?: string; // ID de la canalización si aplica
+  esCanalizacion?: boolean;
+}
+
+export interface ItemEntrega {
   _id?: string;
   clave: number;
   marca?: string;

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Entrega - {{numeroPresupuesto}}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      font-size: 12px;
+    }
+
+    #tabla-entrega-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      color: #0F2A52;
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+
+    .info-section {
+      margin-bottom: 20px;
+      border: 1px solid #dee2e6;
+      padding: 15px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .info-item {
+      display: flex;
+      gap: 10px;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #0F2A52;
+      min-width: 120px;
+    }
+
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    .items-table th,
+    .items-table td {
+      border: 1px solid #dee2e6;
+      padding: 8px;
+    }
+
+    .items-table th {
+      background-color: #0F2A52;
+      color: white;
+      text-align: center;
+    }
+
+    .items-table td.text-right {
+      text-align: right;
+    }
+
+    .items-table td.text-center {
+      text-align: center;
+    }
+
+    .totals-section {
+      margin-left: auto;
+      width: 300px;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 10px;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .total-row.grand-total {
+      background-color: #0F2A52;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .comments-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #dee2e6;
+      background: #f8f9fa;
+    }
+
+    .signatures {
+      margin-top: 50px;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .signature-line {
+      width: 200px;
+      text-align: center;
+    }
+
+    .signature-line hr {
+      margin-bottom: 5px;
+    }
+
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 10px;
+      color: #6c757d;
+    }
+
+    .logo {
+      text-align: center;
+      margin: 10px 0 20px 0;
+    }
+
+    .logo img {
+      max-width: 200px;
+      height: auto;
+    }
+
+    .status-Borrador { color: #6c757d; }
+    .status-Enviada { color: #007bff; }
+    .status-Aceptada { color: #28a745; }
+    .status-Rechazada { color: #dc3545; }
+    .status-Vencida { color: #ffc107; }
+  </style>
+</head>
+<body>
+  <div id="tabla-entrega-wrapper">
+    {{#if logoPath}}
+    <div class="logo">
+      <img src="{{logoPath}}" alt="Logo Empresa">
+    </div>
+    {{/if}}
+    
+    <div class="header">
+      <h1>ENTREGA</h1>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">No. Entrega:</span>
+          <span>{{numeroPresupuesto}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Estado:</span>
+          <span class="status-{{estado}}">{{estado}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Fecha:</span>
+          <span>{{fecha}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Vigencia:</span>
+          <span>{{vigencia}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <h3>Información del Cliente</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Cliente:</span>
+          <span>{{cliente}}</span>
+        </div>
+        {{#if razonSocial}}
+        <div class="info-item">
+          <span class="info-label">Razón Social:</span>
+          <span>{{razonSocial.nombre}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">RFC:</span>
+          <span>{{razonSocial.rfc}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Email:</span>
+          <span>{{razonSocial.emailEmpresa}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Teléfono:</span>
+          <span>{{razonSocial.telEmpresa}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Dirección:</span>
+          <span>{{razonSocial.direccionEmpresa}}</span>
+        </div>
+        {{/if}}
+      </div>
+    </div>
+
+    <table class="items-table">
+      <thead>
+        <tr>
+          <th style="width: 5%">#</th>
+          <th style="width: 40%">Descripción</th>
+          <th style="width: 10%">Cantidad</th>
+          <th style="width: 10%">Unidad</th>
+          <th style="width: 12%">Precio Unit.</th>
+          <th style="width: 13%">Importe</th>
+          <th style="width: 10%">IVA</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each items}}
+        <tr>
+          <td class="text-center">{{increment @index}}</td>
+          <td>{{descripcion}}</td>
+          <td class="text-center">{{cantidad}}</td>
+          <td class="text-center">{{unidad}}</td>
+          <td class="text-right">{{precioUnitario}}</td>
+          <td class="text-right">{{subtotal}}</td>
+          <td class="text-right">{{#if aplicarIva}}{{formatCurrency iva}}{{else}}-{{/if}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+
+    <div class="totals-section">
+      <div class="total-row">
+        <span>Subtotal:</span>
+        <span>{{subtotal}}</span>
+      </div>
+      <div class="total-row">
+        <span>IVA ({{iva}}%):</span>
+        <span>{{formatCurrency ivaImporte}}</span>
+      </div>
+      <div class="total-row grand-total">
+        <span>Total:</span>
+        <span>{{total}}</span>
+      </div>
+    </div>
+
+    {{#if comentarios}}
+    <div class="comments-section">
+      <h4>Comentarios:</h4>
+      <p>{{comentarios}}</p>
+    </div>
+    {{/if}}
+
+    <div class="signatures">
+      <div class="signature-line">
+        <hr>
+        <span>Firma del Cliente</span>
+      </div>
+      <div class="signature-line">
+        <hr>
+        <span>Firma de Autorización</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Esta entrega es válida por el período especificado. Los precios están sujetos a cambios sin previo aviso.</p>
+      <p>Todos los precios están en Pesos Mexicanos (MXN)</p>
+    </div>
+  </div>
+</body>
+</html>

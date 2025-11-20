@@ -13,6 +13,7 @@ import vendedoresRoutes from './routes/vendedores'
 import materialCanalizacionRoutes from './routes/materialCanalizacion'
 import cotizacionCanalizacionRoutes from './routes/cotizacionCanalizacion'
 import cotizacionRoutes from './routes/cotizacion'
+import entregaRoutes from './routes/entrega'
 import inventoryRoutes from "./routes/inventoryRoutes";
 import inventoryMovementsRoutes from "./routes/inventoryMovementsRoutes";
 import inventoryExteriorRoutes from "./routes/inventoryExteriorRoutes";
@@ -51,6 +52,7 @@ app.use("/api/items", itemRoutes);
 app.use('/api/vendedores', vendedoresRoutes);
 app.use("/api/inventario", inventoryRoutes);
 app.use("/api/cotizaciones", cotizacionRoutes);
+app.use("/api/entregas", entregaRoutes);
 app.use("/api/inventory-movements", inventoryMovementsRoutes);
 app.use("/api/inventario-exterior", inventoryExteriorRoutes);
 app.use("/api/inventory-movements-exterior", inventoryMovementsExteriorRoutes);

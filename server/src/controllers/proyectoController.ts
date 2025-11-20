@@ -3,6 +3,7 @@ import { Proyecto, IProyecto } from '../models/Proyecto';
 import Colaborador from '../models/Colaborador';
 import Cotizacion from '../models/Cotizacion';
 import OrdenCompra from '../models/OrdenCompra';
+import Entrega from '../models/Entrega';
 
 // Obtener todos los proyectos
 export const obtenerProyectos = async (req: Request, res: Response): Promise<void> => {
@@ -173,3 +174,19 @@ export const obtenerOrdenesCompraProyecto = async (req: Request, res: Response):
     res.status(500).json({ message: 'Error al obtener órdenes de compra del proyecto', error });
   }
 };
+
+// Obtener entregas de un proyecto
+export const obtenerEntregasProyecto = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const entregas = await Entrega.find({ proyecto: req.params.id })
+      .populate('cliente')
+      .populate('razonSocial')
+      .sort({ fechaCreacion: -1 });
+    
+    res.json(entregas);
+  } catch (error) {
+    console.error('Error al obtener entregas del proyecto:', error);
+    res.status(500).json({ message: 'Error al obtener entregas del proyecto', error });
+  }
+};
+
