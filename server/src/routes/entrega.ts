@@ -1,7 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import { Router } from 'express';
 import {
-  cambiarEstadoEntrega,
   createEntrega,
   deleteEntrega,
   descargarPdfEntrega,
@@ -27,7 +26,6 @@ router.get('/search', asyncHandler(searchEntregas));
 router.get('/:id', asyncHandler(getEntregaById));
 router.post('/', asyncHandler(createEntrega));
 router.put('/:id', asyncHandler(updateEntrega));
-router.put('/:id/estado', asyncHandler(cambiarEstadoEntrega));
 router.delete('/:id', asyncHandler(deleteEntrega));
 
 // Rutas para PDFs

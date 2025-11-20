@@ -472,7 +472,7 @@ const ProyectoList: React.FC = () => {
           </div>
           <div className="d-flex gap-1">
             <Button
-              variant="success"
+              variant="secondary"
               size="sm"
               onClick={() => handleViewEntregas(proyecto)}
               title="Ver entregas del proyecto"
@@ -711,8 +711,6 @@ const ProyectoList: React.FC = () => {
                     <th>No. Presupuesto</th>
                     <th>Cliente</th>
                     <th>Fecha</th>
-                    <th>Total</th>
-                    <th>Estado</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -722,12 +720,6 @@ const ProyectoList: React.FC = () => {
                       <td>{entrega.numeroPresupuesto}</td>
                       <td>{typeof entrega.cliente === 'string' ? entrega.cliente : entrega.cliente?.nombreEmpresa}</td>
                       <td>{new Date(entrega.fecha).toLocaleDateString('es-MX')}</td>
-                      <td>${entrega.total.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</td>
-                      <td>
-                        <span className={`badge bg-${entrega.estado === 'Aceptada' ? 'success' : entrega.estado === 'Rechazada' ? 'danger' : entrega.estado === 'Enviada' ? 'primary' : 'secondary'}`}>
-                          {entrega.estado}
-                        </span>
-                      </td>
                       <td>
                         <div className="d-flex gap-1">
                           <Button

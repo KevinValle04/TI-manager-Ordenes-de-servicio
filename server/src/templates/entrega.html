@@ -157,16 +157,8 @@
           <span>{{numeroPresupuesto}}</span>
         </div>
         <div class="info-item">
-          <span class="info-label">Estado:</span>
-          <span class="status-{{estado}}">{{estado}}</span>
-        </div>
-        <div class="info-item">
           <span class="info-label">Fecha:</span>
           <span>{{fecha}}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Vigencia:</span>
-          <span>{{vigencia}}</span>
         </div>
       </div>
     </div>
@@ -207,43 +199,28 @@
       <thead>
         <tr>
           <th style="width: 5%">#</th>
-          <th style="width: 40%">Descripción</th>
+          <th style="width: 10%">Clave</th>
+          <th style="width: 15%">Marca</th>
+          <th style="width: 15%">Modelo</th>
+          <th style="width: 35%">Descripción</th>
           <th style="width: 10%">Cantidad</th>
           <th style="width: 10%">Unidad</th>
-          <th style="width: 12%">Precio Unit.</th>
-          <th style="width: 13%">Importe</th>
-          <th style="width: 10%">IVA</th>
         </tr>
       </thead>
       <tbody>
         {{#each items}}
         <tr>
           <td class="text-center">{{increment @index}}</td>
+          <td class="text-center">{{clave}}</td>
+          <td>{{marca}}</td>
+          <td>{{modelo}}</td>
           <td>{{descripcion}}</td>
           <td class="text-center">{{cantidad}}</td>
           <td class="text-center">{{unidad}}</td>
-          <td class="text-right">{{precioUnitario}}</td>
-          <td class="text-right">{{subtotal}}</td>
-          <td class="text-right">{{#if aplicarIva}}{{formatCurrency iva}}{{else}}-{{/if}}</td>
         </tr>
         {{/each}}
       </tbody>
     </table>
-
-    <div class="totals-section">
-      <div class="total-row">
-        <span>Subtotal:</span>
-        <span>{{subtotal}}</span>
-      </div>
-      <div class="total-row">
-        <span>IVA ({{iva}}%):</span>
-        <span>{{formatCurrency ivaImporte}}</span>
-      </div>
-      <div class="total-row grand-total">
-        <span>Total:</span>
-        <span>{{total}}</span>
-      </div>
-    </div>
 
     {{#if comentarios}}
     <div class="comments-section">
@@ -264,8 +241,7 @@
     </div>
 
     <div class="footer">
-      <p>Esta entrega es válida por el período especificado. Los precios están sujetos a cambios sin previo aviso.</p>
-      <p>Todos los precios están en Pesos Mexicanos (MXN)</p>
+      <p>Este documento certifica la entrega de los artículos mencionados.</p>
     </div>
   </div>
 </body>

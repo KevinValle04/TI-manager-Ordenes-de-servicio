@@ -7,20 +7,13 @@ export interface EntregaPdfData {
   numeroPresupuesto: string;
   cliente: string;
   fecha: string;
-  vigencia: string;
-  subtotal: number;
-  iva: number;
-  ivaImporte: number;
-  total: number;
-  estado: string;
   items: Array<{
+    clave: number;
+    marca?: string;
+    modelo?: string;
     descripcion: string;
     cantidad: number;
     unidad: string;
-    precioUnitario: number;
-    subtotal: number;
-    aplicarIva: boolean;
-    iva?: number;
   }>;
   comentarios?: string;
   razonSocial?: {
@@ -33,13 +26,6 @@ export interface EntregaPdfData {
 }
 
 export class EntregaPdfGenerator {
-  private formatoMoneda(valor: number): string {
-    return new Intl.NumberFormat('es-MX', {
-      style: 'currency',
-      currency: 'MXN'
-    }).format(valor);
-  }
-
   private formatoFecha(fecha: string): string {
     return new Date(fecha).toLocaleDateString('es-MX', {
       year: 'numeric',
@@ -49,30 +35,8 @@ export class EntregaPdfGenerator {
   }
 
   private async obtenerPlantillaHtml(): Promise<string> {
-    // Registrar helpers de Handlebars
-    handlebars.registerHelper('multiply', (a: number, b: number) => {
-      return a * b;
-    });
-    
-    handlebars.registerHelper('divide', (a: number, b: number) => {
-      return a / b;
-    });
-    
-    handlebars.registerHelper('formatCurrency', (value: number) => {
-      return this.formatoMoneda(value);
-    });
-
     handlebars.registerHelper('increment', (value: number) => {
       return value + 1;
-    });
-    
-    handlebars.registerHelper('reduce', (array, prop, initial) => {
-      return array.reduce((acc: number, item: any) => acc + (item[prop] || 0), initial);
-    });
-
-    const formatCurrency = this.formatoMoneda.bind(this);
-    handlebars.registerHelper('formatCurrency', (value: number) => {
-      return formatCurrency(value);
     });
 
     const rutaPlantilla = path.join(__dirname, '../templates/entrega.html');
@@ -99,14 +63,7 @@ export class EntregaPdfGenerator {
         ...datos,
         logoPath: logoBase64,
         fecha: this.formatoFecha(datos.fecha),
-        vigencia: this.formatoFecha(datos.vigencia),
-        subtotal: this.formatoMoneda(datos.subtotal),
-        total: this.formatoMoneda(datos.total),
-        items: datos.items.map(item => ({
-          ...item,
-          precioUnitario: this.formatoMoneda(item.precioUnitario),
-          subtotal: this.formatoMoneda(item.subtotal)
-        }))
+        items: datos.items
       };
 
       // Obtener y compilar plantilla

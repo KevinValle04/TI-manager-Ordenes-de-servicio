@@ -7,10 +7,7 @@ import { Entrega, Cliente, IInventoryItem, RazonSocial, ItemEntrega, Proyecto } 
 
 type EntregaFormData = Omit<Entrega, 'fechaCreacion' | 'fechaActualizacion'> & {
   fecha: string;
-  vigencia: string;
   items: ItemEntrega[];
-  iva: number;
-  ivaImporte: number;
 }
 
 interface EntregaModalProps {
@@ -41,24 +38,14 @@ const EntregaModal = ({
     razonSocial: '',
     numeroPresupuesto: '',
     fecha: new Date().toISOString().split('T')[0],
-    vigencia: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     items: [{
       clave: 1,
       marca: '',
       modelo: '',
       concepto: '',
       cantidad: 1,
-      unidad: 'PZA' as const,
-      precioUnitario: 0,
-      importe: 0,
-      material: '',
-      aplicarIva: true
+      unidad: 'PZA' as const
     }],
-    subtotal: 0,
-    iva: 8,
-    ivaImporte: 0,
-    total: 0,
-    estado: 'Borrador',
     comentarios: ''
   };
 
@@ -107,13 +94,7 @@ const EntregaModal = ({
       modelo: canalizacion.numeroPresupuesto,
       concepto: `Canalización: ${canalizacion.numeroPresupuesto} - ${canalizacion.cliente}`,
       cantidad: 1,
-      unidad: 'PZA' as const,
-      precioUnitario: canalizacion.total,
-      importe: canalizacion.total,
-      material: '',
-      canalizacionId: canalizacion._id, // Referencia a la canalización original
-      esCanalizacion: true,
-      aplicarIva: false // Las canalizaciones no aplican IVA por defecto
+      unidad: 'PZA' as const
     };
 
     setFormData(prev => ({
@@ -124,17 +105,11 @@ const EntregaModal = ({
         modelo: '',
         concepto: '',
         cantidad: 1,
-        unidad: 'PZA',
-        precioUnitario: 0,
-        importe: 0,
-        material: '',
-        esCanalizacion: false,
-        aplicarIva: true
+        unidad: 'PZA'
       }]
     }));
 
     setShowCanalizacionModal(false);
-    calculateTotals();
   };
 
   // Efecto para cargar datos de edición
@@ -146,7 +121,6 @@ const EntregaModal = ({
       setFormData({
         ...editingEntrega,
         fecha: editingEntrega.fecha ? new Date(editingEntrega.fecha).toISOString().split('T')[0] : '',
-        vigencia: editingEntrega.vigencia ? new Date(editingEntrega.vigencia).toISOString().split('T')[0] : '',
         cliente: typeof editingEntrega.cliente === 'string' 
           ? editingEntrega.cliente 
           : editingEntrega.cliente?._id || '',
@@ -202,10 +176,11 @@ const EntregaModal = ({
         concepto: '',
         cantidad: 1,
         unidad: 'PZA' as const,
-        precioUnitario: 0,
-        importe: 0,
-        material: '',
-        aplicarIva: true
+        marca: '',
+        modelo: '',
+        concepto: '',
+        cantidad: 1,
+        unidad: 'PZA'
       }];
     }
     return items;
@@ -253,17 +228,12 @@ const EntregaModal = ({
     items.splice(draggedItem, 1);
     items.splice(dropIndex, 0, draggedElement);
 
-    // Asegurar fila vacía al final y actualizar totales
+    // Asegurar fila vacía al final
     const updatedItems = ensureEmptyRow(items);
-    const newSubtotal = updatedItems.reduce((sum, item) => sum + (item.importe || 0), 0);
-    const ivaImporte = newSubtotal * (formData.iva / 100);
-    const newTotal = newSubtotal + ivaImporte;
 
     setFormData({
       ...formData,
-      items: updatedItems,
-      subtotal: newSubtotal,
-      total: newTotal
+      items: updatedItems
     });
   };
 
@@ -272,7 +242,6 @@ const EntregaModal = ({
       ...prev,
       items: prev.items.filter((_, i) => i !== index)
     }));
-    calculateTotals();
   };
 
   // Manejo de clientes
@@ -414,11 +383,7 @@ const EntregaModal = ({
             modelo: selectedItem.modelo,
             concepto: concepto,
             unidad,
-            precioUnitario: selectedItem.precioUnitario,
-            material: value,
-            cantidad,
-            importe: cantidad * selectedItem.precioUnitario,
-            aplicarIva: true
+            cantidad
           };
         }
       } else {
@@ -429,12 +394,6 @@ const EntregaModal = ({
           unidad: currentItem.unidad || 'PZA' as const,
           clave: currentItem.clave || index + 1
         };
-
-        // Recalcular importe si cambia cantidad o precio
-        if (['cantidad', 'precioUnitario'].includes(name)) {
-          updatedItem.importe = 
-            Number(updatedItem.cantidad || 0) * Number(updatedItem.precioUnitario || 0);
-        }
 
         newItems[index] = updatedItem;
       }
@@ -449,28 +408,7 @@ const EntregaModal = ({
         items: updatedItems
       };
     });
-    calculateTotals();
   };
-
-  const calculateTotals = () => {
-    setFormData(prev => {
-      const subtotal = prev.items?.reduce((sum, item) => sum + (item.importe || 0), 0) || 0;
-      // Solo calcular IVA para los items que tienen aplicarIva=true
-      const subtotalConIva = prev.items?.reduce((sum, item) => sum + (item.aplicarIva ? (item.importe || 0) : 0), 0) || 0;
-      const ivaImporte = subtotalConIva * (prev.iva / 100);
-      const total = subtotal + ivaImporte;
-      return {
-        ...prev,
-        subtotal,
-        ivaImporte,
-        total
-      };
-    });
-  };
-
-  useEffect(() => {
-    calculateTotals();
-  }, [formData.items]);
 
   return createPortal(
     <>
@@ -573,35 +511,6 @@ const EntregaModal = ({
             <div className="row mb-3">
               <div className="col-md-6">
                 <Form.Group>
-                  <Form.Label>Vigencia</Form.Label>
-                  <Form.Control
-                    type="date"
-                    name="vigencia"
-                    value={typeof formData.vigencia === 'string' ? formData.vigencia : ''}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-              </div>
-              <div className="col-md-6">
-                <Form.Group>
-                  <Form.Label>Estado</Form.Label>
-                  <Form.Select
-                    name="estado"
-                    value={formData.estado || 'Borrador'}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="Borrador">Borrador</option>
-                    <option value="Enviada">Enviada</option>
-                    <option value="Aceptada">Aceptada</option>
-                    <option value="Rechazada">Rechazada</option>
-                    <option value="Vencida">Vencida</option>
-                  </Form.Select>
-                </Form.Group>
-              </div>
-              <div className="col-md-6">
-                <Form.Group>
                   <Form.Label>
                     Proyecto <small className="text-muted">(Opcional)</small>
                   </Form.Label>
@@ -687,7 +596,6 @@ const EntregaModal = ({
                             <th>No. Presupuesto</th>
                             <th>Comentarios/Título</th>
                             <th>Cliente</th>
-                            <th>Total</th>
                             <th>Acciones</th>
                           </tr>
                         </thead>
@@ -701,10 +609,6 @@ const EntregaModal = ({
                                 </div>
                               </td>
                               <td>{canalizacion.cliente}</td>
-                              <td>${canalizacion.total.toLocaleString('es-MX', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                              })}</td>
                               <td>
                                 <Button
                                   variant="primary"
@@ -739,12 +643,9 @@ const EntregaModal = ({
                       <th style={{ width: '80px' }}>CLAVE</th>
                       <th style={{ width: '20%' }}>MARCA</th>
                       <th style={{ width: '20%' }}>MODELO</th>
-                      <th style={{ width: '25%' }}>CONCEPTO</th>
-                      <th style={{ width: '60px' }}>U</th>
-                      <th style={{ width: '80px' }}>CANT</th>
-                      <th style={{ width: '120px' }}>P.U</th>
-                      <th style={{ width: '120px' }}>IMPORTE</th>
-                      <th style={{ width: '60px' }}>IVA</th>
+                      <th style={{ width: '30%' }}>CONCEPTO</th>
+                      <th style={{ width: '80px' }}>U</th>
+                      <th style={{ width: '100px' }}>CANT</th>
                       <th style={{ width: '80px' }}>Acciones</th>
                     </tr>
                   </thead>
@@ -978,27 +879,6 @@ const EntregaModal = ({
                           />
                         </td>
                         <td>
-                          <Form.Control
-                            type="number"
-                            value={item.precioUnitario}
-                            onChange={(e) => handleItemChange(index, 'precioUnitario', parseFloat(e.target.value) || 0)}
-                            min="0"
-                            step="0.01"
-                          />
-                        </td>
-                        <td>
-                          <span className="fw-bold">${(item.importe || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                        </td>
-                        <td>
-                          <Form.Check
-                            type="checkbox"
-                            checked={item.aplicarIva}
-                            onChange={(e) => handleItemChange(index, 'aplicarIva', e.target.checked)}
-                            disabled={item.esCanalizacion}
-                            title={item.esCanalizacion ? 'No se puede aplicar IVA a canalizaciones' : 'Aplicar IVA a este producto'}
-                          />
-                        </td>
-                        <td>
                           <Button
                             variant="outline-danger"
                             size="sm"
@@ -1013,36 +893,6 @@ const EntregaModal = ({
                     ))}
                   </tbody>
                 </table>
-              </div>
-            </div>
-
-            {/* Totales */}
-            <div className="row">
-              <div className="col-md-12 d-flex justify-content-end">
-                <div className="col-md-6">
-                  <div className="card">
-                    <div className="card-header bg-primary text-white">
-                      <h6 className="mb-0">
-                        <i className="fas fa-calculator me-2"></i>
-                        Resumen de Totales
-                      </h6>
-                    </div>
-                    <div className="card-body">
-                      <div className="d-flex justify-content-between py-2 border-bottom">
-                        <span>Subtotal:</span>
-                        <span className="fw-bold">${(formData.subtotal || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                      </div>
-                      <div className="d-flex justify-content-between py-2 border-bottom">
-                        <span>IVA ({formData.iva}%):</span>
-                        <span className="text-info fw-bold">${(formData.ivaImporte || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                      </div>
-                      <div className="d-flex justify-content-between py-3 bg-light rounded mt-2">
-                        <span className="fw-bold text-primary">Total:</span>
-                        <span className="fw-bold text-primary fs-5">${(formData.total || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </Form>

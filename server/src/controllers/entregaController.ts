@@ -6,20 +6,13 @@ const prepararDatosPdf = (entrega: IEntrega): EntregaPdfData => ({
   numeroPresupuesto: entrega.numeroPresupuesto,
   cliente: entrega.cliente,
   fecha: entrega.fecha.toISOString(),
-  vigencia: entrega.vigencia.toISOString(),
-  subtotal: entrega.subtotal,
-  iva: entrega.iva,
-  ivaImporte: entrega.ivaImporte,
-  total: entrega.total,
-  estado: entrega.estado,
   items: entrega.items.map(item => ({
+    clave: item.clave,
+    marca: item.marca,
+    modelo: item.modelo,
     descripcion: item.concepto,
     cantidad: item.cantidad,
-    unidad: item.unidad,
-    precioUnitario: item.precioUnitario,
-    subtotal: item.importe,
-    aplicarIva: item.aplicarIva || false,
-    iva: item.aplicarIva ? item.importe * (entrega.iva/100) : 0
+    unidad: item.unidad
   })),
   comentarios: entrega.comentarios,
   razonSocial: entrega.razonSocial as any
@@ -60,12 +53,6 @@ export const createEntrega = async (req: Request, res: Response) => {
     };
     
     const entrega = new Entrega(entregaData);
-    
-    // Calcular totales automáticamente si hay items
-    if (entrega.items && entrega.items.length > 0) {
-      entrega.calcularTotales();
-    }
-    
     await entrega.save();
     
     res.status(201).json(entrega);
@@ -91,12 +78,6 @@ export const updateEntrega = async (req: Request, res: Response) => {
     
     if (!entrega) {
       return res.status(404).json({ error: 'Entrega no encontrada' });
-    }
-    
-    // Recalcular totales si hay items
-    if (entrega.items && entrega.items.length > 0) {
-      entrega.calcularTotales();
-      await entrega.save();
     }
     
     res.json(entrega);
@@ -133,8 +114,7 @@ export const searchEntregas = async (req: Request, res: Response) => {
     const entregas = await Entrega.find({
       $or: [
         { numeroPresupuesto: { $regex: searchTerm, $options: 'i' } },
-        { cliente: { $regex: searchTerm, $options: 'i' } },
-        { estado: { $regex: searchTerm, $options: 'i' } }
+        { cliente: { $regex: searchTerm, $options: 'i' } }
       ]
     }).populate('razonSocial', 'nombre');
     
@@ -142,32 +122,6 @@ export const searchEntregas = async (req: Request, res: Response) => {
   } catch (err) {
     console.error('Error al buscar entregas:', err);
     res.status(500).json({ error: 'Error al buscar entregas' });
-  }
-};
-
-export const cambiarEstadoEntrega = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const { estado } = req.body;
-    
-    if (!estado) {
-      return res.status(400).json({ error: 'Estado no proporcionado' });
-    }
-    
-    const entrega = await Entrega.findByIdAndUpdate(
-      id,
-      { estado, fechaActualizacion: new Date() },
-      { new: true }
-    );
-    
-    if (!entrega) {
-      return res.status(404).json({ error: 'Entrega no encontrada' });
-    }
-    
-    res.json(entrega);
-  } catch (err) {
-    console.error('Error al cambiar estado de entrega:', err);
-    res.status(500).json({ error: 'Error al cambiar estado de entrega' });
   }
 };
 

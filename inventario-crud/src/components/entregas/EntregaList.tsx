@@ -144,8 +144,7 @@ const EntregaList: React.FC = () => {
       Entrega.numeroPresupuesto.toLowerCase().includes(lowerTerm) ||
       (typeof Entrega.cliente === 'string' 
         ? Entrega.cliente.toLowerCase().includes(lowerTerm)
-        : Entrega.cliente.nombreEmpresa.toLowerCase().includes(lowerTerm)) ||
-      Entrega.estado.toLowerCase().includes(lowerTerm)
+        : Entrega.cliente.nombreEmpresa.toLowerCase().includes(lowerTerm))
     );
     
     setFilteredEntregas(filtered);
@@ -192,30 +191,6 @@ const EntregaList: React.FC = () => {
       key: 'fecha', 
       label: 'Fecha',
       render: (Entrega: Entrega) => new Date(Entrega.fecha).toLocaleDateString()
-    },
-    { 
-      key: 'vigencia', 
-      label: 'Vigencia',
-      render: (Entrega: Entrega) => new Date(Entrega.vigencia).toLocaleDateString()
-    },
-    { 
-      key: 'subtotal', 
-      label: 'Subtotal',
-      render: (Entrega: Entrega) => `$${Entrega.subtotal.toFixed(2)}`
-    },
-    { 
-      key: 'total', 
-      label: 'Total',
-      render: (Entrega: Entrega) => `$${Entrega.total.toFixed(2)}`
-    },
-    { 
-      key: 'estado', 
-      label: 'Estado',
-      render: (Entrega: Entrega) => (
-        <span className={`badge bg-${getEstadoClass(Entrega.estado)}`}>
-          {Entrega.estado}
-        </span>
-      )
     },
     {
       key: 'acciones',
@@ -269,17 +244,6 @@ const EntregaList: React.FC = () => {
       return max;
     }, 0);
     return `P-${String(maxNumber + 1).padStart(4, '0')}`;
-  };
-
-  const getEstadoClass = (estado: string) => {
-    switch (estado) {
-      case 'Borrador': return 'secondary';
-      case 'Enviada': return 'primary';
-      case 'Aceptada': return 'success';
-      case 'Rechazada': return 'danger';
-      case 'Vencida': return 'warning';
-      default: return 'secondary';
-    }
   };
 
   // Cálculos de paginación
