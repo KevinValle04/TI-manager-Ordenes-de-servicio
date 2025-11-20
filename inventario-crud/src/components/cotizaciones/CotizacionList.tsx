@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { Cliente, Cotizacion, IInventoryItem, RazonSocial, Proyecto } from '../../types';
+import { Cliente, Cotizacion, IInventoryItem, Proyecto, RazonSocial } from '../../types';
 import DataTable from '../common/DataTable';
 import PaginationCompact from '../common/PaginationCompact';
 import SearchBar from '../common/SearchBar';
@@ -304,15 +304,38 @@ const CotizacionList: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Error al guardar la cotización');
+        const errorData = await response.json().catch(() => ({}));
+        
+        // Mostrar mensaje de error específico del servidor
+        let errorMessage = 'Error al guardar la cotización';
+        if (errorData.details) {
+          errorMessage = errorData.details;
+        } else if (errorData.error) {
+          errorMessage = errorData.error;
+        }
+        
+        // Si hay errores específicos de validación, mostrar el primero
+        if (errorData.errores && errorData.errores.length > 0) {
+          errorMessage = errorData.errores[0].mensaje;
+        }
+        
+        alert(`${errorMessage}`);
+        throw new Error(errorMessage);
       }
 
+      const result = await response.json();
+      console.log('Cotización guardada exitosamente:', result);
+      
       fetchCotizaciones();
       setShowModal(false);
       setEditingCotizacion(null);
+      
+      // Mostrar mensaje de éxito
+      alert(`Cotización ${data._id ? 'actualizada' : 'creada'} exitosamente`);
+      
     } catch (error) {
-      console.error('Error al guardar:', error);
-      alert('Error al guardar la cotización');
+      console.error('Error al guardar cotización:', error);
+      // El error ya se mostró en el bloque anterior
     }
   };
 
@@ -320,7 +343,10 @@ const CotizacionList: React.FC = () => {
     <div className="container-fluid mt-3">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2>Cotizaciones</h2>
-        <Button onClick={() => setShowModal(true)}>Nueva Cotización</Button>
+        <Button onClick={() => {
+          setEditingCotizacion(null); // Limpiar cualquier cotización en edición
+          setShowModal(true);
+        }}>Nueva Cotización</Button>
       </div>
 
       <SearchBar
@@ -352,7 +378,10 @@ const CotizacionList: React.FC = () => {
       {/* Modal de formulario */}
       <CotizacionModal
         show={showModal}
-        onHide={() => setShowModal(false)}
+        onHide={() => {
+          setShowModal(false);
+          setEditingCotizacion(null); // Limpiar estado de edición al cerrar modal
+        }}
         onSave={handleSave}
         editingCotizacion={editingCotizacion}
         clientes={clientes}

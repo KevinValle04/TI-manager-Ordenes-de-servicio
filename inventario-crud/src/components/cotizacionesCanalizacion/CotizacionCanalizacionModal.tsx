@@ -506,13 +506,13 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
   };
 
   return (
-    <Modal show={show} onHide={handleClose} size="xl" centered>
+    <Modal show={show} onHide={handleClose} size="xl" centered style={{ maxWidth: '99vw', maxHeight: '95vh' }}>
       <Modal.Header closeButton className="bg-light border-bottom">
         <Modal.Title>
           {editingCotizacion ? 'Editar' : 'Nueva'} Cotización de Canalización
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body className="px-4 py-3">
+      <Modal.Body className="px-4 py-3" style={{ maxHeight: '85vh', overflowY: 'auto' }}>
         <Form>
           {/* Primera fila: Cliente y Razón Social */}
           <div className="row">
@@ -652,17 +652,17 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
                 Productos en la Cotización
               </h5>
             </div>
-            <div className="table-responsive">
-              <table className="table table-striped table-hover">
-                <thead className="table-dark">
-                  <tr>
-                    <th style={{ width: '3%' }}>⋮⋮</th>
-                    <th style={{ width: '5%' }}>#</th>
-                    <th style={{ width: '35%' }}>Descripción</th>
-                    <th style={{ width: '10%' }}>Cantidad</th>
-                    <th style={{ width: '15%' }}>Precio Unitario</th>
-                    <th style={{ width: '15%' }}>Importe</th>
-                    <th style={{ width: '17%' }}>Acciones</th>
+            <div className="table-responsive" style={{ maxHeight: '500px', overflowY: 'auto' }}>
+              <table className="table table-striped table-hover" style={{ minWidth: '1200px', fontSize: '14px' }}>
+                <thead className="table-dark sticky-top">
+                  <tr style={{ height: '50px' }}>
+                    <th style={{ width: '40px', minWidth: '40px', fontSize: '14px' }}>⋮⋮</th>
+                    <th style={{ width: '50px', minWidth: '50px', fontSize: '14px' }}>#</th>
+                    <th style={{ width: '500px', minWidth: '400px', fontSize: '14px' }}>Descripción</th>
+                    <th style={{ width: '140px', minWidth: '120px', fontSize: '14px' }}>Cantidad</th>
+                    <th style={{ width: '180px', minWidth: '150px', fontSize: '14px' }}>Precio Unitario</th>
+                    <th style={{ width: '180px', minWidth: '150px', fontSize: '14px' }}>Importe</th>
+                    <th style={{ width: '80px', minWidth: '80px', fontSize: '14px' }}>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -676,7 +676,8 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
                       onDrop={(e) => handleDrop(e, index)}
                       style={{
                         cursor: item.descripcion !== '' ? 'move' : 'default',
-                        backgroundColor: draggedItem === index ? '#f8f9fa' : 'transparent'
+                        backgroundColor: draggedItem === index ? '#f8f9fa' : 'transparent',
+                        height: '60px'
                       }}
                     >
                       <td className="text-center" style={{ cursor: item.descripcion !== '' ? 'grab' : 'default' }}>
@@ -699,6 +700,12 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
                             onBlur={() => hideProductSuggestions(index)}
                             placeholder="Descripción del producto..."
                             autoComplete="off"
+                            style={{ 
+                              minWidth: '400px', 
+                              fontSize: '15px', 
+                              padding: '10px 15px',
+                              height: 'auto'
+                            }}
                           />
                         </div>
                       </td>
@@ -709,6 +716,12 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
                           onChange={(e) => handleItemChange(index, 'cantidad', parseFloat(e.target.value) || 1)}
                           min="1"
                           step="1"
+                          style={{ 
+                            minWidth: '100px', 
+                            fontSize: '15px', 
+                            padding: '10px 15px',
+                            height: 'auto'
+                          }}
                         />
                       </td>
                       <td>
@@ -718,10 +731,23 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
                           onChange={(e) => handleItemChange(index, 'precioUnitario', parseFloat(e.target.value) || 0)}
                           min="0"
                           step="0.01"
+                          style={{ 
+                            minWidth: '140px', 
+                            fontSize: '15px', 
+                            padding: '10px 15px',
+                            height: 'auto'
+                          }}
                         />
                       </td>
                       <td>
-                        <span className="fw-bold">${(item.subtotal || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        <div className="text-end fw-bold" style={{ 
+                          padding: '10px 15px', 
+                          minWidth: '140px',
+                          fontSize: '15px',
+                          lineHeight: '1.5'
+                        }}>
+                          ${(item.subtotal || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </div>
                       </td>
                       <td>
                         <Button

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import Cotizacion, { ICotizacion, IItemCotizacion } from '../models/Cotizacion';
-import { CotizacionPdfGenerator, CotizacionPdfData } from '../services/cotizacionPdfGenerator';
+import Cotizacion, { ICotizacion } from '../models/Cotizacion';
+import { CotizacionPdfData, CotizacionPdfGenerator } from '../services/cotizacionPdfGenerator';
 
 const prepararDatosPdf = (cotizacion: ICotizacion): CotizacionPdfData => ({
   numeroPresupuesto: cotizacion.numeroPresupuesto,
@@ -53,8 +53,29 @@ export const getCotizacionById = async (req: Request, res: Response) => {
 
 export const createCotizacion = async (req: Request, res: Response) => {
   try {
+    // Validar campos requeridos
+    const { cliente, numeroPresupuesto } = req.body;
+    
+    if (!cliente || cliente.trim() === '') {
+      return res.status(400).json({ 
+        error: 'Validación fallida', 
+        details: 'El campo Cliente es requerido'
+      });
+    }
+    
+    if (!numeroPresupuesto || numeroPresupuesto.trim() === '') {
+      return res.status(400).json({ 
+        error: 'Validación fallida', 
+        details: 'El campo Número de Presupuesto es requerido'
+      });
+    }
+    
+    // Limpiar datos antes de crear la cotización
     const cotizacionData = {
       ...req.body,
+      // Convertir strings vacías a undefined para campos ObjectId opcionales
+      razonSocial: req.body.razonSocial && req.body.razonSocial.trim() !== '' ? req.body.razonSocial : undefined,
+      proyecto: req.body.proyecto && req.body.proyecto.trim() !== '' ? req.body.proyecto : undefined,
       fechaCreacion: new Date(),
       fechaActualizacion: new Date()
     };
@@ -69,17 +90,77 @@ export const createCotizacion = async (req: Request, res: Response) => {
     await cotizacion.save();
     
     res.status(201).json(cotizacion);
-  } catch (err) {
+  } catch (err: any) {
     console.error('Error al crear cotización:', err);
-    res.status(500).json({ error: 'Error al crear cotización' });
+    
+    // Manejar errores de validación de Mongoose
+    if (err.name === 'ValidationError') {
+      const errores = Object.keys(err.errors).map(key => {
+        const error = err.errors[key];
+        let mensaje = '';
+        
+        switch (key) {
+          case 'razonSocial':
+            mensaje = 'La Razón Social seleccionada no es válida. Por favor, selecciona una razón social de la lista o deja el campo vacío.';
+            break;
+          case 'proyecto':
+            mensaje = 'El Proyecto seleccionado no es válido. Por favor, selecciona un proyecto de la lista o deja el campo vacío.';
+            break;
+          case 'cliente':
+            mensaje = 'El campo Cliente es requerido y no puede estar vacío.';
+            break;
+          case 'numeroPresupuesto':
+            mensaje = 'El campo Número de Presupuesto es requerido y no puede estar vacío.';
+            break;
+          default:
+            mensaje = `Error en el campo ${key}: ${error.message}`;
+        }
+        
+        return { campo: key, mensaje };
+      });
+      
+      return res.status(400).json({ 
+        error: 'Error de validación', 
+        details: errores.length === 1 ? errores[0].mensaje : 'Múltiples errores de validación',
+        errores 
+      });
+    }
+    
+    // Error genérico
+    res.status(500).json({ 
+      error: 'Error interno del servidor', 
+      details: 'No se pudo crear la cotización. Por favor, intenta nuevamente.'
+    });
   }
 };
 
 export const updateCotizacion = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    
+    // Validar campos requeridos
+    const { cliente, numeroPresupuesto } = req.body;
+    
+    if (!cliente || cliente.trim() === '') {
+      return res.status(400).json({ 
+        error: 'Validación fallida', 
+        details: 'El campo Cliente es requerido'
+      });
+    }
+    
+    if (!numeroPresupuesto || numeroPresupuesto.trim() === '') {
+      return res.status(400).json({ 
+        error: 'Validación fallida', 
+        details: 'El campo Número de Presupuesto es requerido'
+      });
+    }
+    
+    // Limpiar datos antes de actualizar
     const updateData = {
       ...req.body,
+      // Convertir strings vacías a undefined para campos ObjectId opcionales
+      razonSocial: req.body.razonSocial && req.body.razonSocial.trim() !== '' ? req.body.razonSocial : undefined,
+      proyecto: req.body.proyecto && req.body.proyecto.trim() !== '' ? req.body.proyecto : undefined,
       fechaActualizacion: new Date()
     };
     
@@ -90,7 +171,10 @@ export const updateCotizacion = async (req: Request, res: Response) => {
     );
     
     if (!cotizacion) {
-      return res.status(404).json({ error: 'Cotización no encontrada' });
+      return res.status(404).json({ 
+        error: 'Cotización no encontrada',
+        details: 'No se encontró una cotización con el ID especificado'
+      });
     }
     
     // Recalcular totales si hay items
@@ -100,9 +184,47 @@ export const updateCotizacion = async (req: Request, res: Response) => {
     }
     
     res.json(cotizacion);
-  } catch (err) {
+  } catch (err: any) {
     console.error('Error al actualizar cotización:', err);
-    res.status(500).json({ error: 'Error al actualizar cotización' });
+    
+    // Manejar errores de validación de Mongoose
+    if (err.name === 'ValidationError') {
+      const errores = Object.keys(err.errors).map(key => {
+        const error = err.errors[key];
+        let mensaje = '';
+        
+        switch (key) {
+          case 'razonSocial':
+            mensaje = 'La Razón Social seleccionada no es válida. Por favor, selecciona una razón social de la lista o deja el campo vacío.';
+            break;
+          case 'proyecto':
+            mensaje = 'El Proyecto seleccionado no es válido. Por favor, selecciona un proyecto de la lista o deja el campo vacío.';
+            break;
+          case 'cliente':
+            mensaje = 'El campo Cliente es requerido y no puede estar vacío.';
+            break;
+          case 'numeroPresupuesto':
+            mensaje = 'El campo Número de Presupuesto es requerido y no puede estar vacío.';
+            break;
+          default:
+            mensaje = `Error en el campo ${key}: ${error.message}`;
+        }
+        
+        return { campo: key, mensaje };
+      });
+      
+      return res.status(400).json({ 
+        error: 'Error de validación', 
+        details: errores.length === 1 ? errores[0].mensaje : 'Múltiples errores de validación',
+        errores 
+      });
+    }
+    
+    // Error genérico
+    res.status(500).json({ 
+      error: 'Error interno del servidor', 
+      details: 'No se pudo actualizar la cotización. Por favor, intenta nuevamente.'
+    });
   }
 };
 

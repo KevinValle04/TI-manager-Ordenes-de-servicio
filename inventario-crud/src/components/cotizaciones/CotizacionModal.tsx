@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { Modal, Button, Form } from 'react-bootstrap';
+import { faGripVertical, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faGripVertical } from '@fortawesome/free-solid-svg-icons';
-import { Cotizacion, Cliente, IInventoryItem, RazonSocial, ItemCotizacion, Proyecto } from '../../types';
+import React, { useEffect, useState } from 'react';
+import { Button, Form, Modal } from 'react-bootstrap';
+import { createPortal } from 'react-dom';
+import { Cliente, Cotizacion, IInventoryItem, ItemCotizacion, Proyecto, RazonSocial } from '../../types';
 
 type CotizacionFormData = Omit<Cotizacion, 'fechaCreacion' | 'fechaActualizacion'> & {
   fecha: string;
@@ -143,6 +143,31 @@ const CotizacionModal = ({
       const razonSocialObj = typeof editingCotizacion.razonSocial === 'object' ? editingCotizacion.razonSocial : null;
       setRazonSocialDisplayText(razonSocialObj?.nombre || '');
       
+      // Asegurar que los items tengan al menos una fila vacía
+      let itemsToSet = editingCotizacion.items || [];
+      if (itemsToSet.length === 0) {
+        itemsToSet = [{
+          clave: 1,
+          marca: '',
+          modelo: '',
+          concepto: '',
+          cantidad: 1,
+          unidad: 'PZA' as const,
+          precioUnitario: 0,
+          importe: 0,
+          material: '',
+          aplicarIva: true
+        }];
+      } else {
+        // Asegurar que todos los items tengan clave correcta
+        itemsToSet = itemsToSet.map((item, index) => ({
+          ...item,
+          clave: item.clave || index + 1
+        }));
+        // Asegurar fila vacía al final
+        itemsToSet = ensureEmptyRow(itemsToSet);
+      }
+      
       setFormData({
         ...editingCotizacion,
         fecha: editingCotizacion.fecha ? new Date(editingCotizacion.fecha).toISOString().split('T')[0] : '',
@@ -153,14 +178,52 @@ const CotizacionModal = ({
         razonSocial: typeof editingCotizacion.razonSocial === 'string' 
           ? editingCotizacion.razonSocial 
           : editingCotizacion.razonSocial?._id || '',
+        items: itemsToSet
       } as CotizacionFormData);
     } else {
-      setFormData(prev => ({
-        ...prev,
-        numeroPresupuesto: generatePresupuestoNumber()
-      }));
+      // Resetear completamente el formulario para nueva cotización
+      const today = new Date().toISOString().split('T')[0];
+      const vigencia = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      
+      setFormData({
+        cliente: '',
+        razonSocial: '',
+        numeroPresupuesto: generatePresupuestoNumber(),
+        fecha: today,
+        vigencia: vigencia,
+        items: [{
+          clave: 1,
+          marca: '',
+          modelo: '',
+          concepto: '',
+          cantidad: 1,
+          unidad: 'PZA' as const,
+          precioUnitario: 0,
+          importe: 0,
+          material: '',
+          aplicarIva: true
+        }],
+        subtotal: 0,
+        iva: 8,
+        ivaImporte: 0,
+        total: 0,
+        estado: 'Borrador',
+        comentarios: ''
+      });
+      
+      // Limpiar también el estado de razón social
+      setRazonSocialDisplayText('');
+      
+      // Limpiar estados de autocompletado
+      setClienteSuggestions([]);
+      setShowClienteSuggestions(false);
+      setRazonSocialSuggestions([]);
+      setShowRazonSocialSuggestions(false);
+      setProductSuggestions({});
+      setShowProductSuggestions({});
+      setActiveRow(null);
     }
-  }, [editingCotizacion, generatePresupuestoNumber]);
+  }, [editingCotizacion, generatePresupuestoNumber, show]);
 
   // Debug: Ver items de inventario cargados
   useEffect(() => {
@@ -474,13 +537,13 @@ const CotizacionModal = ({
 
   return createPortal(
     <>
-      <Modal show={show} onHide={onHide} size="xl" centered>
+      <Modal show={show} onHide={onHide} size="xl" centered style={{ maxWidth: '99vw', maxHeight: '95vh' }}>
         <Modal.Header closeButton className="bg-light border-bottom">
           <Modal.Title>
             {editingCotizacion ? 'Editar' : 'Nueva'} Cotización
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body className="px-4 py-3">
+        <Modal.Body className="px-4 py-3" style={{ maxHeight: '85vh', overflowY: 'auto' }}>
           <Form>
             <div className="row">
               <div className="col-md-4">
@@ -732,18 +795,18 @@ const CotizacionModal = ({
                 border: '1px solid #dee2e6',
                 borderRadius: '0.25rem'
               }}>
-                <table className="table table-striped table-hover mb-0" style={{ minWidth: '1200px' }}>
+                <table className="table table-striped table-hover mb-0" style={{ minWidth: '1400px', fontSize: '14px' }}>
                   <thead className="table-dark" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                     <tr>
                       <th style={{ width: '40px' }}>⋮⋮</th>
                       <th style={{ width: '80px' }}>CLAVE</th>
-                      <th style={{ width: '20%' }}>MARCA</th>
-                      <th style={{ width: '20%' }}>MODELO</th>
-                      <th style={{ width: '25%' }}>CONCEPTO</th>
-                      <th style={{ width: '60px' }}>U</th>
-                      <th style={{ width: '80px' }}>CANT</th>
-                      <th style={{ width: '120px' }}>P.U</th>
-                      <th style={{ width: '120px' }}>IMPORTE</th>
+                      <th style={{ width: '200px', minWidth: '180px' }}>MARCA</th>
+                      <th style={{ width: '250px', minWidth: '220px' }}>MODELO</th>
+                      <th style={{ width: '400px', minWidth: '350px' }}>CONCEPTO</th>
+                      <th style={{ width: '90px', minWidth: '80px' }}>U</th>
+                      <th style={{ width: '100px', minWidth: '90px' }}>CANT</th>
+                      <th style={{ width: '150px', minWidth: '130px' }}>P.U</th>
+                      <th style={{ width: '150px', minWidth: '130px' }}>IMPORTE</th>
                       <th style={{ width: '60px' }}>IVA</th>
                       <th style={{ width: '80px' }}>Acciones</th>
                     </tr>
@@ -781,6 +844,7 @@ const CotizacionModal = ({
                               onFocus={() => handleProductFocus(index)}
                               placeholder="Marca..."
                               autoComplete="off"
+                              style={{ fontSize: '14px', padding: '8px 12px', minWidth: '150px' }}
                             />
                             {showProductSuggestions[index] && productSuggestions[index]?.length > 0 && (
                               <div className="position-absolute w-100 bg-white border rounded shadow-sm" 
@@ -841,6 +905,7 @@ const CotizacionModal = ({
                               onFocus={() => handleProductFocus(index)}
                               placeholder="Modelo..."
                               autoComplete="off"
+                              style={{ fontSize: '14px', padding: '8px 12px', minWidth: '200px' }}
                             />
                             {showProductSuggestions[index] && productSuggestions[index]?.length > 0 && (
                               <div className="position-absolute w-100 bg-white border rounded shadow-sm" 
@@ -901,6 +966,7 @@ const CotizacionModal = ({
                               onFocus={() => handleProductFocus(index)}
                               placeholder="Concepto..."
                               autoComplete="off"
+                              style={{ fontSize: '14px', padding: '8px 12px', minWidth: '320px' }}
                             />
                             {showProductSuggestions[index] && productSuggestions[index]?.length > 0 && (
                               <div className="position-absolute w-100 bg-white border rounded shadow-sm" 
@@ -961,6 +1027,7 @@ const CotizacionModal = ({
                           <Form.Select
                             value={item.unidad}
                             onChange={(e) => handleItemChange(index, 'unidad', e.target.value)}
+                            style={{ fontSize: '14px', padding: '8px 12px', minWidth: '70px' }}
                           >
                             <option value="PZA">PZA</option>
                             <option value="MTS">MTS</option>
@@ -975,6 +1042,7 @@ const CotizacionModal = ({
                             onChange={(e) => handleItemChange(index, 'cantidad', parseFloat(e.target.value) || 1)}
                             min="1"
                             step="1"
+                            style={{ fontSize: '14px', padding: '8px 12px', minWidth: '80px' }}
                           />
                         </td>
                         <td>
@@ -984,10 +1052,11 @@ const CotizacionModal = ({
                             onChange={(e) => handleItemChange(index, 'precioUnitario', parseFloat(e.target.value) || 0)}
                             min="0"
                             step="0.01"
+                            style={{ fontSize: '14px', padding: '8px 12px', minWidth: '120px' }}
                           />
                         </td>
                         <td>
-                          <span className="fw-bold">${(item.importe || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          <span className="fw-bold" style={{ fontSize: '14px', padding: '8px 12px', display: 'block', minWidth: '120px', textAlign: 'right' }}>${(item.importe || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </td>
                         <td>
                           <Form.Check
