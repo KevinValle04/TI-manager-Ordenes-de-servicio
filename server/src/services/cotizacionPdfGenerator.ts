@@ -1,11 +1,18 @@
 import fs from 'fs';
-import path from 'path';
 import handlebars from 'handlebars';
+import path from 'path';
 import puppeteer from 'puppeteer';
 
 export interface CotizacionPdfData {
   numeroPresupuesto: string;
-  cliente: string;
+  cliente: {
+    nombre: string;
+    compania: string;
+    direccion: string;
+    ciudad: string;
+    telefono: string;
+    email: string;
+  };
   fecha: string;
   vigencia: string;
   subtotal: number;
@@ -15,6 +22,9 @@ export interface CotizacionPdfData {
   estado: string;
   items: Array<{
     descripcion: string;
+    marca?: string;
+    modelo?: string;
+    concepto?: string;
     cantidad: number;
     unidad: string;
     precioUnitario: number;
@@ -29,6 +39,11 @@ export interface CotizacionPdfData {
     emailEmpresa: string;
     telEmpresa: string;
     direccionEmpresa: string;
+  };
+  vendedor?: {
+    nombre?: string;
+    email?: string;
+    telefono?: string;
   };
 }
 
@@ -94,10 +109,49 @@ export class CotizacionPdfGenerator {
         console.warn('Error cargando logo:', logoError);
       }
 
+      // Cargar otras imágenes (bottom / footers) y convertir a base64
+      const bottom1Path = path.join(__dirname, '../templates/img/bottom.png');
+      const bottom2Path = path.join(__dirname, '../templates/img/bottom-2.png');
+      const downPath = path.join(__dirname, '../templates/img/down.png');
+
+      let bottom1Base64 = '';
+      let bottom2Base64 = '';
+      let downBase64 = '';
+
+      try {
+        if (fs.existsSync(bottom1Path)) {
+          const buf = fs.readFileSync(bottom1Path);
+          bottom1Base64 = `data:image/png;base64,${buf.toString('base64')}`;
+        }
+      } catch (e) {
+        console.warn('No se pudo cargar bottom.png:', e);
+      }
+
+      try {
+        if (fs.existsSync(bottom2Path)) {
+          const buf = fs.readFileSync(bottom2Path);
+          bottom2Base64 = `data:image/png;base64,${buf.toString('base64')}`;
+        }
+      } catch (e) {
+        console.warn('No se pudo cargar bottom-2.png:', e);
+      }
+
+      try {
+        if (fs.existsSync(downPath)) {
+          const buf = fs.readFileSync(downPath);
+          downBase64 = `data:image/png;base64,${buf.toString('base64')}`;
+        }
+      } catch (e) {
+        console.warn('No se pudo cargar down.png:', e);
+      }
+
       // Preparar datos para la plantilla
       const datosFormateados = {
         ...datos,
         logoPath: logoBase64,
+        bottom1: bottom1Base64,
+        bottom2: bottom2Base64,
+        downImg: downBase64,
         fecha: this.formatoFecha(datos.fecha),
         vigencia: this.formatoFecha(datos.vigencia),
         subtotal: this.formatoMoneda(datos.subtotal),

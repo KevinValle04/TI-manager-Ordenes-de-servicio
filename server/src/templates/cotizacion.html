@@ -39,6 +39,11 @@
       gap: 10px;
     }
 
+    /* Forzar una sola columna cuando se necesite */
+    .info-grid.single-column {
+      grid-template-columns: 1fr;
+    }
+
     .info-item {
       display: flex;
       gap: 10px;
@@ -119,7 +124,7 @@
 
     .footer {
       margin-top: 30px;
-      text-align: center;
+      text-align: left;
       font-size: 10px;
       color: #6c757d;
     }
@@ -172,59 +177,90 @@
     </div>
 
     <div class="info-section">
-      <h3>Información del Cliente</h3>
-      <div class="info-grid">
+      <h3>Datos del Vendedor</h3>
+      <div class="info-grid single-column">
         <div class="info-item">
-          <span class="info-label">Cliente:</span>
-          <span>{{cliente}}</span>
-        </div>
-        {{#if razonSocial}}
-        <div class="info-item">
-          <span class="info-label">Razón Social:</span>
-          <span>{{razonSocial.nombre}}</span>
+          <span class="info-label">Nombre:</span>
+          <span>{{vendedor.nombre}}</span>
         </div>
         <div class="info-item">
-          <span class="info-label">RFC:</span>
-          <span>{{razonSocial.rfc}}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Email:</span>
-          <span>{{razonSocial.emailEmpresa}}</span>
+          <span class="info-label">Correo:</span>
+          <span>{{vendedor.email}}</span>
         </div>
         <div class="info-item">
           <span class="info-label">Teléfono:</span>
-          <span>{{razonSocial.telEmpresa}}</span>
+          <span>{{vendedor.telefono}}</span>
         </div>
-        <div class="info-item">
-          <span class="info-label">Dirección:</span>
-          <span>{{razonSocial.direccionEmpresa}}</span>
-        </div>
-        {{/if}}
       </div>
     </div>
+
+    <div class="info-section" style="position:relative; padding-bottom:40px;">
+      <h3>Información del Cliente</h3>
+      <div class="client-row" style="display:flex; gap:16px; align-items:flex-start;">
+        <div style="flex:1;">
+          <div class="info-grid single-column">
+            <div class="info-item">
+              <span class="info-label">Nombre:</span>
+              <span>{{cliente.nombre}}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Compañía:</span>
+              <span>{{cliente.compania}}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Dirección:</span>
+              <span>{{cliente.direccion}}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Ciudad:</span>
+              <span>{{cliente.ciudad}}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Teléfono:</span>
+              <span>{{cliente.telefono}}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Email:</span>
+              <span>{{cliente.email}}</span>
+            </div>
+          </div>
+        </div>
+        <!-- imagen ahora posicionada absolutamene dentro del recuadro del cliente -->
+      </div>
+      {{#if downImg}}
+        <div style="position:absolute; right:16px; bottom:16px; left:auto;">
+          <img src="{{downImg}}" alt="Certificaciones" style="width:270px; height:auto; display:block;" />
+        </div>
+      {{/if}}
+      </div>
+    </div>
+    </div>
+
 
     <table class="items-table">
       <thead>
         <tr>
           <th style="width: 5%">#</th>
-          <th style="width: 40%">Descripción</th>
-          <th style="width: 10%">Cantidad</th>
-          <th style="width: 10%">Unidad</th>
-          <th style="width: 12%">Precio Unit.</th>
+          <th style="width: 8%">Marca</th>
+          <th style="width: 8%">Modelo</th>
+          <th style="width: 30%">Concepto</th>
+          <th style="width: 8%">Unidad</th>
+          <th style="width: 8%">Cantidad</th>
+          <th style="width: 10%">Precio Unit.</th>
           <th style="width: 13%">Importe</th>
-          <th style="width: 10%">IVA</th>
         </tr>
       </thead>
       <tbody>
         {{#each items}}
         <tr>
           <td class="text-center">{{increment @index}}</td>
-          <td>{{descripcion}}</td>
-          <td class="text-center">{{cantidad}}</td>
+          <td>{{marca}}</td>
+          <td>{{modelo}}</td>
+          <td>{{concepto}}</td>
           <td class="text-center">{{unidad}}</td>
+          <td class="text-center">{{cantidad}}</td>
           <td class="text-right">{{precioUnitario}}</td>
           <td class="text-right">{{subtotal}}</td>
-          <td class="text-right">{{#if aplicarIva}}{{formatCurrency iva}}{{else}}-{{/if}}</td>
         </tr>
         {{/each}}
       </tbody>
@@ -264,8 +300,26 @@
     </div>
 
     <div class="footer">
-      <p>Esta cotización es válida por el período especificado. Los precios están sujetos a cambios sin previo aviso.</p>
-      <p>Todos los precios están en Pesos Mexicanos (MXN)</p>
+      
+      <p>NOTA: Los precios son en pesos.</p>
+      <p>Anticipo del 50% el otro 50% cuando se termine y valide el trabajo.</p>
+      <p>Los precios pueden cambiar sin previo aviso</p>
+      <p>Tipo de cambio Bancario al dia de la Factura</p>
+      <p>Esta Cotizacion tiene una duracion de 10 dias</p>
+      <p>Entrega de materiales y equipos de 5-8 dias</p>
+      <p>Deposito por Transferencia Bancaria en Cuenta en Pesos Mexicanos</p>
+      <p>Los equipos tiene garantia de 1 año</p>
+
+      <!-- Footer: apilar bottom y bottom-2 verticalmente al final del documento.
+           Las imágenes se muestran a ancho completo para cubrir el ancho imprimible. -->
+      <div style="margin-top:40px; display:flex; flex-direction:column; align-items:stretch; gap:0; width:calc(100% + 40px); margin-left:-20px;">
+        {{#if bottom1}}
+          <img src="{{bottom1}}" alt="Bottom" style="width:100%; max-width:none; height:auto; display:block;" />
+        {{/if}}
+        {{#if bottom2}}
+          <img src="{{bottom2}}" alt="Bottom 2" style="width:100%; max-width:none; height:auto; display:block;" />
+        {{/if}}
+      </div>
     </div>
   </div>
 </body>

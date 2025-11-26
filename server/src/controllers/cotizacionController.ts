@@ -1,10 +1,28 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
+import Cliente from '../models/Cliente';
 import Cotizacion, { ICotizacion } from '../models/Cotizacion';
 import { CotizacionPdfData, CotizacionPdfGenerator } from '../services/cotizacionPdfGenerator';
 
 const prepararDatosPdf = (cotizacion: ICotizacion): CotizacionPdfData => ({
   numeroPresupuesto: cotizacion.numeroPresupuesto,
-  cliente: cotizacion.cliente,
+  cliente: (() => {
+    const c: any = cotizacion.cliente;
+    if (!c) return { nombre: '', compania: '', direccion: '', ciudad: '', telefono: '', email: '' };
+    // Si viene como string (nombre), mapearlo al campo nombre
+    if (typeof c === 'string') {
+      return { nombre: c, compania: '', direccion: '', ciudad: '', telefono: '', email: '' };
+    }
+    // Si es un objeto (populado), mapear campos disponibles
+    return {
+      nombre: (c.contactos && c.contactos[0] && c.contactos[0].nombre) || c.nombre || '',
+      compania: c.nombreEmpresa || '',
+      direccion: c.direccion || '',
+      ciudad: c.ciudad || '',
+      telefono: c.telefono || (c.contactos && c.contactos[0] && c.contactos[0].contacto && c.contactos[0].contacto.telefono) || '',
+      email: c.email || (c.contactos && c.contactos[0] && c.contactos[0].contacto && c.contactos[0].contacto.correo) || ''
+    };
+  })(),
   fecha: cotizacion.fecha.toISOString(),
   vigencia: cotizacion.vigencia.toISOString(),
   subtotal: cotizacion.subtotal,
@@ -13,22 +31,36 @@ const prepararDatosPdf = (cotizacion: ICotizacion): CotizacionPdfData => ({
   total: cotizacion.total,
   estado: cotizacion.estado,
   items: cotizacion.items.map(item => ({
-    descripcion: item.concepto,
-    cantidad: item.cantidad,
+    descripcion: item.concepto || '',
+    marca: item.marca || '',
+    modelo: item.modelo || '',
+    concepto: item.concepto || '',
     unidad: item.unidad,
+    cantidad: item.cantidad,
     precioUnitario: item.precioUnitario,
     subtotal: item.importe,
     aplicarIva: item.aplicarIva || false,
     iva: item.aplicarIva ? item.importe * (cotizacion.iva/100) : 0
   })),
   comentarios: cotizacion.comentarios,
-  razonSocial: cotizacion.razonSocial as any
+  razonSocial: cotizacion.razonSocial as any,
+  vendedor: (() => {
+    const v: any = (cotizacion as any).vendedor;
+    if (!v) return undefined;
+    // Mapear propiedades para que coincidan con lo que espera la plantilla
+    return {
+      nombre: v.nombre || '',
+      email: v.correo || v.email || '',
+      telefono: v.telefono || ''
+    };
+  })()
 });
 
 export const getCotizaciones = async (req: Request, res: Response) => {
   try {
     const cotizaciones = await Cotizacion.find()
       .populate('razonSocial', 'nombre rfc emailEmpresa telEmpresa direccionEmpresa')
+      .populate('cliente', 'nombreEmpresa')
       .sort({ fechaActualizacion: -1 });
     res.json(cotizaciones);
   } catch (err) {
@@ -40,7 +72,8 @@ export const getCotizaciones = async (req: Request, res: Response) => {
 export const getCotizacionById = async (req: Request, res: Response) => {
   try {
     const cotizacion = await Cotizacion.findById(req.params.id)
-      .populate('razonSocial', 'nombre rfc emailEmpresa telEmpresa direccionEmpresa emailFacturacion direccionEnvio');
+      .populate('razonSocial', 'nombre rfc emailEmpresa telEmpresa direccionEmpresa emailFacturacion direccionEnvio')
+      .populate('cliente', 'nombreEmpresa direccion telefono contactos');
     if (!cotizacion) {
       return res.status(404).json({ error: 'Cotización no encontrada' });
     }
@@ -76,6 +109,7 @@ export const createCotizacion = async (req: Request, res: Response) => {
       // Convertir strings vacías a undefined para campos ObjectId opcionales
       razonSocial: req.body.razonSocial && req.body.razonSocial.trim() !== '' ? req.body.razonSocial : undefined,
       proyecto: req.body.proyecto && req.body.proyecto.trim() !== '' ? req.body.proyecto : undefined,
+      vendedor: req.body.vendedor && req.body.vendedor.trim() !== '' ? req.body.vendedor : undefined,
       fechaCreacion: new Date(),
       fechaActualizacion: new Date()
     };
@@ -161,6 +195,7 @@ export const updateCotizacion = async (req: Request, res: Response) => {
       // Convertir strings vacías a undefined para campos ObjectId opcionales
       razonSocial: req.body.razonSocial && req.body.razonSocial.trim() !== '' ? req.body.razonSocial : undefined,
       proyecto: req.body.proyecto && req.body.proyecto.trim() !== '' ? req.body.proyecto : undefined,
+      vendedor: req.body.vendedor && req.body.vendedor.trim() !== '' ? req.body.vendedor : undefined,
       fechaActualizacion: new Date()
     };
     
@@ -299,13 +334,44 @@ export const getPdfCotizacion = async (req: Request, res: Response) => {
     const { id } = req.params;
     
     const cotizacion = await Cotizacion.findById(id)
-      .populate('razonSocial', 'nombre rfc emailEmpresa telEmpresa direccionEmpresa');
-    
+      .populate('razonSocial', 'nombre rfc emailEmpresa telEmpresa direccionEmpresa')
+      .populate('vendedor', 'nombre correo telefono')
+      .populate('cliente', 'nombreEmpresa direccion telefono contactos');
     if (!cotizacion) {
       return res.status(404).json({ error: 'Cotización no encontrada' });
     }
 
-    const datosPdf = prepararDatosPdf(cotizacion);
+    // Resolver cliente si en la cotización está guardado como ObjectId string
+    if (cotizacion) {
+      const clienteField: any = (cotizacion as any).cliente;
+      console.log('=== DEBUG CLIENTE PDF ===');
+      console.log('Cliente original:', clienteField);
+      console.log('Tipo:', typeof clienteField);
+      console.log('Es ObjectId válido?', mongoose.Types.ObjectId.isValid(clienteField));
+      
+      if (clienteField && typeof clienteField === 'string' && mongoose.Types.ObjectId.isValid(clienteField)) {
+        try {
+          const clienteDoc = await Cliente.findById(clienteField).lean();
+          console.log('Cliente encontrado en DB:', clienteDoc);
+          if (clienteDoc) {
+            (cotizacion as any).cliente = clienteDoc;
+            console.log('Cliente asignado a cotización:', (cotizacion as any).cliente);
+          } else {
+            console.warn('No se encontró cliente con id:', clienteField);
+          }
+        } catch (err) {
+          console.warn('Error al buscar cliente por id:', clienteField, err);
+        }
+      } else {
+        console.log('Cliente ya está populado o es objeto:', clienteField);
+      }
+      console.log('========================');
+    }
+
+    const datosPdf = prepararDatosPdf(cotizacion as any);
+    console.log('=== DATOS PREPARADOS PARA PDF ===');
+    console.log('Cliente en datosPdf:', JSON.stringify(datosPdf.cliente, null, 2));
+    console.log('=================================');
 
     const pdfGenerator = new CotizacionPdfGenerator();
     const pdfBuffer = await pdfGenerator.generarPdfCotizacion(datosPdf);
@@ -330,13 +396,42 @@ export const descargarPdfCotizacion = async (req: Request, res: Response) => {
     const { id } = req.params;
     
     const cotizacion = await Cotizacion.findById(id)
-      .populate('razonSocial', 'nombre rfc emailEmpresa telEmpresa direccionEmpresa');
-    
+      .populate('razonSocial', 'nombre rfc emailEmpresa telEmpresa direccionEmpresa')
+      .populate('vendedor', 'nombre correo telefono')
+      .populate('cliente', 'nombreEmpresa direccion telefono contactos');
     if (!cotizacion) {
       return res.status(404).json({ error: 'Cotización no encontrada' });
     }
 
-    const datosPdf = prepararDatosPdf(cotizacion);
+    if (cotizacion) {
+      const clienteField: any = (cotizacion as any).cliente;
+      console.log('=== DEBUG CLIENTE PDF DESCARGA ===');
+      console.log('Cliente original:', clienteField);
+      console.log('Tipo:', typeof clienteField);
+      console.log('Es ObjectId válido?', mongoose.Types.ObjectId.isValid(clienteField));
+      
+      if (clienteField && typeof clienteField === 'string' && mongoose.Types.ObjectId.isValid(clienteField)) {
+        try {
+          const clienteDoc = await Cliente.findById(clienteField).lean();
+          console.log('Cliente encontrado en DB:', clienteDoc);
+          if (clienteDoc) {
+            (cotizacion as any).cliente = clienteDoc;
+          } else {
+            console.warn('No se encontró cliente con id:', clienteField);
+          }
+        } catch (err) {
+          console.warn('Error al buscar cliente por id:', clienteField, err);
+        }
+      } else {
+        console.log('Cliente ya está populado o es objeto:', clienteField);
+      }
+      console.log('==================================');
+    }
+
+    const datosPdf = prepararDatosPdf(cotizacion as any);
+    console.log('=== DATOS PREPARADOS PARA PDF DESCARGA ===');
+    console.log('Cliente en datosPdf:', JSON.stringify(datosPdf.cliente, null, 2));
+    console.log('==========================================');
 
     const pdfGenerator = new CotizacionPdfGenerator();
     const pdfBuffer = await pdfGenerator.generarPdfCotizacion(datosPdf);
