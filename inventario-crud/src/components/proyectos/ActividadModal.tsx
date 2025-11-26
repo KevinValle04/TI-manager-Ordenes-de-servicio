@@ -17,12 +17,27 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
   editingActividad,
   colaboradores
 }) => {
+  // Colores predefinidos para las tarjetas
+  const coloresPredefinidos = [
+    { valor: '#0d6efd', nombre: 'Azul' },
+    { valor: '#198754', nombre: 'Verde' },
+    { valor: '#ffc107', nombre: 'Amarillo' },
+    { valor: '#dc3545', nombre: 'Rojo' },
+    { valor: '#6f42c1', nombre: 'Morado' },
+    { valor: '#fd7e14', nombre: 'Naranja' },
+    { valor: '#20c997', nombre: 'Turquesa' },
+    { valor: '#d63384', nombre: 'Rosa' },
+    { valor: '#6c757d', nombre: 'Gris' },
+    { valor: '#0dcaf0', nombre: 'Cyan' }
+  ];
+
   interface FormDataType {
     descripcion: string;
     fechaInicio: string;
     fechaFinal: string;
     estado: 'Pendiente' | 'En progreso' | 'Completada' | 'Cancelada';
     colaboradores: string[];
+    color: string;
   }
 
   const [formData, setFormData] = useState<FormDataType>({
@@ -30,7 +45,8 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
     fechaInicio: '',
     fechaFinal: '',
     estado: 'Pendiente',
-    colaboradores: []
+    colaboradores: [],
+    color: '#0d6efd'
   });
 
   useEffect(() => {
@@ -42,7 +58,8 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
         estado: editingActividad.estado || 'Pendiente',
         colaboradores: Array.isArray(editingActividad.colaboradores)
           ? editingActividad.colaboradores.map(c => typeof c === 'string' ? c : c._id!)
-          : []
+          : [],
+        color: editingActividad.color || '#0d6efd'
       });
     } else {
       setFormData({
@@ -50,7 +67,8 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
         fechaInicio: '',
         fechaFinal: '',
         estado: 'Pendiente',
-        colaboradores: []
+        colaboradores: [],
+        color: '#0d6efd'
       });
     }
   }, [editingActividad, show]);
@@ -157,19 +175,51 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
             </div>
           </div>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Estado de la Actividad</Form.Label>
-            <Form.Select
-              name="estado"
-              value={formData.estado}
-              onChange={handleChange}
-            >
-              <option value="Pendiente">Pendiente</option>
-              <option value="En progreso">En progreso</option>
-              <option value="Completada">Completada</option>
-              <option value="Cancelada">Cancelada</option>
-            </Form.Select>
-          </Form.Group>
+          <div className="row">
+            <div className="col-md-8">
+              <Form.Group className="mb-3">
+                <Form.Label>Estado de la Actividad</Form.Label>
+                <Form.Select
+                  name="estado"
+                  value={formData.estado}
+                  onChange={handleChange}
+                >
+                  <option value="Pendiente">Pendiente</option>
+                  <option value="En progreso">En progreso</option>
+                  <option value="Completada">Completada</option>
+                  <option value="Cancelada">Cancelada</option>
+                </Form.Select>
+              </Form.Group>
+            </div>
+
+            <div className="col-md-4">
+              <Form.Group className="mb-3">
+                <Form.Label>Color de la Tarjeta</Form.Label>
+                <div className="d-flex flex-wrap gap-2">
+                  {coloresPredefinidos.map((colorOption) => (
+                    <div
+                      key={colorOption.valor}
+                      onClick={() => setFormData(prev => ({ ...prev, color: colorOption.valor }))}
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        backgroundColor: colorOption.valor,
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        border: formData.color === colorOption.valor ? '3px solid #000' : '2px solid #dee2e6',
+                        transition: 'all 0.2s ease',
+                        boxShadow: formData.color === colorOption.valor ? '0 0 0 3px rgba(0,0,0,0.1)' : 'none'
+                      }}
+                      title={colorOption.nombre}
+                    />
+                  ))}
+                </div>
+                <Form.Text className="text-muted">
+                  Color del borde izquierdo
+                </Form.Text>
+              </Form.Group>
+            </div>
+          </div>
 
           <Form.Group className="mb-3">
             <Form.Label>Colaboradores Implicados</Form.Label>

@@ -70,7 +70,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   transition: all 0.2s ease;
   cursor: grab;
-  border-left: 4px solid #0d6efd;
+  border-left: 4px solid; /* Color se define inline */
 }
 
 .kanban-card:hover {
@@ -230,23 +230,6 @@
   background-color: rgba(0, 0, 0, 0.1);
   border-color: #0d6efd;
   color: #0d6efd;
-}
-
-/* Colores de estado para las tarjetas */
-.kanban-card[data-estado="Pendiente"] {
-  border-left-color: #6c757d;
-}
-
-.kanban-card[data-estado="En progreso"] {
-  border-left-color: #0d6efd;
-}
-
-.kanban-card[data-estado="Completada"] {
-  border-left-color: #198754;
-}
-
-.kanban-card[data-estado="Cancelada"] {
-  border-left-color: #dc3545;
 }
 
 /* Responsive */

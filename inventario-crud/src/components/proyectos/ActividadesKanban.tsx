@@ -23,6 +23,7 @@ interface KanbanCard extends Card {
   fechaFinal: string;
   colaboradores: string[] | Colaborador[];
   actividadData: Actividad;
+  color?: string; // Color personalizado
 }
 
 const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
@@ -81,7 +82,8 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
             fechaInicio: formatDate(act.fechaInicio),
             fechaFinal: formatDate(act.fechaFinal),
             colaboradores: act.colaboradores,
-            actividadData: act
+            actividadData: act,
+            color: act.color || '#0d6efd'
           }))
       }));
 
@@ -222,7 +224,10 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
       <div 
         className="kanban-card" 
         onClick={() => handleEditCard(card)}
-        style={{ cursor: 'pointer' }}
+        style={{ 
+          cursor: 'pointer',
+          borderLeft: `4px solid ${card.color || '#0d6efd'}`
+        }}
       >
         <div className="kanban-card-header">
           <h6 className="kanban-card-title">{card.title}</h6>

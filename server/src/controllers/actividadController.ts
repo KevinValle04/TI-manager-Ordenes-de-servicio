@@ -49,7 +49,7 @@ export const obtenerActividadPorId = async (req: Request, res: Response): Promis
 export const crearActividad = async (req: Request, res: Response): Promise<void> => {
   try {
     const { proyectoId } = req.params;
-    const { descripcion, fechaInicio, fechaFinal, estado, colaboradores } = req.body;
+    const { descripcion, fechaInicio, fechaFinal, estado, colaboradores, color } = req.body;
 
     // Verificar que el proyecto existe
     const proyecto = await Proyecto.findById(proyectoId);
@@ -87,7 +87,8 @@ export const crearActividad = async (req: Request, res: Response): Promise<void>
       fechaInicio,
       fechaFinal,
       estado: estado || 'Pendiente',
-      colaboradores: colaboradores || []
+      colaboradores: colaboradores || [],
+      color: color || '#0d6efd'
     });
 
     const actividadGuardada = await nuevaActividad.save();
@@ -105,7 +106,7 @@ export const crearActividad = async (req: Request, res: Response): Promise<void>
 // Actualizar una actividad
 export const actualizarActividad = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { descripcion, fechaInicio, fechaFinal, estado, colaboradores } = req.body;
+    const { descripcion, fechaInicio, fechaFinal, estado, colaboradores, color } = req.body;
 
     // Validar que los colaboradores existen
     if (colaboradores && colaboradores.length > 0) {
@@ -126,7 +127,8 @@ export const actualizarActividad = async (req: Request, res: Response): Promise<
         fechaInicio,
         fechaFinal,
         estado,
-        colaboradores
+        colaboradores,
+        color
       },
       { new: true, runValidators: true }
     )
