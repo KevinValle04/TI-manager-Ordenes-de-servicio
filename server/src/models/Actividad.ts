@@ -7,6 +7,7 @@ export interface IActividad extends Document {
   fechaFinal: Date;
   estado: 'Pendiente' | 'En progreso' | 'Completada' | 'Cancelada';
   colaboradores: mongoose.Types.ObjectId[]; // Array de IDs de colaboradores
+  color?: string; // Color personalizado para la tarjeta
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -39,7 +40,12 @@ const ActividadSchema: Schema = new Schema(
     colaboradores: [{
       type: Schema.Types.ObjectId,
       ref: 'Colaborador'
-    }]
+    }],
+    color: {
+      type: String,
+      default: '#0d6efd', // Color por defecto (azul)
+      trim: true
+    }
   },
   {
     timestamps: true

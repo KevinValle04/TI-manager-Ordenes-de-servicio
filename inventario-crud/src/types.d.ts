@@ -252,6 +252,7 @@ export interface Actividad {
   fechaFinal: Date | string;
   estado: 'Pendiente' | 'En progreso' | 'Completada' | 'Cancelada';
   colaboradores: string[] | Colaborador[]; // Array de IDs o colaboradores populados
+  color?: string; // Color personalizado para la tarjeta
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }
