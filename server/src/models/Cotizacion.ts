@@ -13,6 +13,7 @@ export interface ICotizacion extends Document {
   ivaImporte: number; // Monto del IVA
   total: number;
   estado: 'Borrador' | 'Enviada' | 'Aceptada' | 'Rechazada' | 'Vencida';
+  moneda?: string; // Moneda de la cotización (MXN o USD)
   items: IItemCotizacion[];
   comentarios?: string;
   fechaCreacion: Date;
@@ -152,6 +153,11 @@ const CotizacionSchema = new Schema<ICotizacion>({
     required: true,
     enum: ['Borrador', 'Enviada', 'Aceptada', 'Rechazada', 'Vencida'],
     default: 'Borrador'
+  },
+  moneda: {
+    type: String,
+    enum: ['MXN', 'USD'],
+    default: 'MXN'
   },
   items: [ItemCotizacionSchema],
   comentarios: { 

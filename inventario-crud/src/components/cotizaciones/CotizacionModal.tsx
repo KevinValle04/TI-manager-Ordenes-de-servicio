@@ -158,6 +158,11 @@ const CotizacionModal = ({
       const razonSocialObj = typeof editingCotizacion.razonSocial === 'object' ? editingCotizacion.razonSocial : null;
       setRazonSocialDisplayText(razonSocialObj?.nombre || '');
       
+      // Cargar moneda si existe
+      if (editingCotizacion.moneda) {
+        setMoneda(editingCotizacion.moneda as 'MXN' | 'USD');
+      }
+      
       // Cargar display text del cliente
       const clienteObj = typeof editingCotizacion.cliente === 'object' ? editingCotizacion.cliente : null;
       if (clienteObj) {
@@ -242,6 +247,7 @@ const CotizacionModal = ({
       // Limpiar también el estado de razón social
       setRazonSocialDisplayText('');
       setClienteDisplayText('');
+      setMoneda('MXN'); // Resetear moneda a MXN por defecto
       
       // Limpiar estados de autocompletado
       setClienteSuggestions([]);
@@ -278,6 +284,7 @@ const CotizacionModal = ({
     e.preventDefault();
     const filteredData = {
       ...formData,
+      moneda: moneda, // Agregar la moneda seleccionada
       items: formData.items.filter(item => item.concepto.trim() !== '')
     };
     onSave(filteredData);
@@ -577,6 +584,23 @@ const CotizacionModal = ({
       // Recalcular totales después de actualizar
       setTimeout(() => calculateTotals(), 50);
     }
+  };
+
+  // Función para cambiar el porcentaje de IVA
+  const handleIvaChange = (nuevoIva: number) => {
+    setFormData(prev => {
+      const subtotal = prev.items?.reduce((sum, item) => sum + (item.importe || 0), 0) || 0;
+      const subtotalConIva = prev.items?.reduce((sum, item) => sum + (item.aplicarIva ? (item.importe || 0) : 0), 0) || 0;
+      const ivaImporte = subtotalConIva * (nuevoIva / 100);
+      const total = subtotal + ivaImporte;
+      return {
+        ...prev,
+        iva: nuevoIva,
+        subtotal,
+        ivaImporte,
+        total
+      };
+    });
   };
 
   const calculateTotals = () => {
@@ -1223,8 +1247,33 @@ const CotizacionModal = ({
                         <span>Subtotal:</span>
                         <span className="fw-bold">{formatearMoneda(formData.subtotal || 0)}</span>
                       </div>
-                      <div className="d-flex justify-content-between py-2 border-bottom">
-                        <span>IVA ({formData.iva}%):</span>
+                      <div className="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <div className="d-flex flex-column">
+                          <span className="mb-1">IVA:</span>
+                          <div className="btn-group btn-group-sm" role="group">
+                            <button
+                              type="button"
+                              className={`btn btn-sm ${formData.iva === 0 ? 'btn-info' : 'btn-outline-info'}`}
+                              onClick={() => handleIvaChange(0)}
+                            >
+                              0%
+                            </button>
+                            <button
+                              type="button"
+                              className={`btn btn-sm ${formData.iva === 8 ? 'btn-info' : 'btn-outline-info'}`}
+                              onClick={() => handleIvaChange(8)}
+                            >
+                              8%
+                            </button>
+                            <button
+                              type="button"
+                              className={`btn btn-sm ${formData.iva === 16 ? 'btn-info' : 'btn-outline-info'}`}
+                              onClick={() => handleIvaChange(16)}
+                            >
+                              16%
+                            </button>
+                          </div>
+                        </div>
                         <span className="text-info fw-bold">{formatearMoneda(formData.ivaImporte || 0)}</span>
                       </div>
                       <div className="d-flex justify-content-between py-3 bg-light rounded mt-2">

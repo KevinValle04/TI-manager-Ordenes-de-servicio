@@ -20,6 +20,7 @@ export interface CotizacionPdfData {
   ivaImporte: number;
   total: number;
   estado: string;
+  moneda?: string;
   items: Array<{
     descripcion: string;
     marca?: string;
@@ -48,11 +49,19 @@ export interface CotizacionPdfData {
 }
 
 export class CotizacionPdfGenerator {
-  private formatoMoneda(valor: number): string {
-    return new Intl.NumberFormat('es-MX', {
+  private formatoMoneda(valor: number, moneda: string = 'MXN'): string {
+    const locale = moneda === 'USD' ? 'en-US' : 'es-MX';
+    const formatted = new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency: 'MXN'
+      currency: moneda
     }).format(valor);
+    
+    // Si es USD, agregar explícitamente "USD" al final para mayor claridad
+    if (moneda === 'USD') {
+      return `${formatted} USD`;
+    }
+    
+    return formatted;
   }
 
   private formatoFecha(fecha: string): string {
@@ -146,6 +155,9 @@ export class CotizacionPdfGenerator {
       }
 
       // Preparar datos para la plantilla
+      const moneda = datos.moneda || 'MXN';
+      const nombreMoneda = moneda === 'USD' ? 'Dólares' : 'Pesos';
+      
       const datosFormateados = {
         ...datos,
         logoPath: logoBase64,
@@ -154,12 +166,13 @@ export class CotizacionPdfGenerator {
         downImg: downBase64,
         fecha: this.formatoFecha(datos.fecha),
         vigencia: this.formatoFecha(datos.vigencia),
-        subtotal: this.formatoMoneda(datos.subtotal),
-        total: this.formatoMoneda(datos.total),
+        subtotal: this.formatoMoneda(datos.subtotal, moneda),
+        total: this.formatoMoneda(datos.total, moneda),
+        nombreMoneda: nombreMoneda,
         items: datos.items.map(item => ({
           ...item,
-          precioUnitario: this.formatoMoneda(item.precioUnitario),
-          subtotal: this.formatoMoneda(item.subtotal)
+          precioUnitario: this.formatoMoneda(item.precioUnitario, moneda),
+          subtotal: this.formatoMoneda(item.subtotal, moneda)
         }))
       };
 

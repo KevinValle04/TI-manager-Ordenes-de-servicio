@@ -30,6 +30,7 @@ const prepararDatosPdf = (cotizacion: ICotizacion): CotizacionPdfData => ({
   ivaImporte: cotizacion.ivaImporte,
   total: cotizacion.total,
   estado: cotizacion.estado,
+  moneda: cotizacion.moneda || 'MXN',
   items: cotizacion.items.map(item => ({
     descripcion: item.concepto || '',
     marca: item.marca || '',

@@ -187,6 +187,7 @@ export interface Cotizacion {
   ivaImporte: number; // Monto del IVA
   total: number;
   estado: "Borrador" | "Enviada" | "Aceptada" | "Rechazada" | "Vencida";
+  moneda?: string; // Moneda de la cotización (MXN o USD)
   items: ItemCotizacion[];
   comentarios?: string;
   fechaCreacion: Date | string;
