@@ -138,8 +138,6 @@ export class CotizacionCanalizacionPdfGenerator {
         <body>
           <div id="tabla-cotizacion-wrapper" style="width:100%;overflow-x:auto;">
             
-            ${logoBase64 ? `<div style="text-align: center; margin: 10px 0 20px 0;"><img src="${logoBase64}" alt="Logo Empresa" style="max-width: 200px; height: auto;"></div>` : ''}
-            
             ${topImageBase64 ? `<img src="${topImageBase64}" alt="Header Corporativo" style="width: 100%; height: auto; max-height: 100px; display: block;">` : ''}
             
             <!-- TABLA DE ENCABEZADO OPTIMIZADA -->
