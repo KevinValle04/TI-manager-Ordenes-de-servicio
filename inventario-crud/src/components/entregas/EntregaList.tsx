@@ -252,6 +252,18 @@ const EntregaList: React.FC = () => {
   const currentItems = filteredEntregas.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredEntregas.length / itemsPerPage);
 
+  // Función para manejar el cierre del modal
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setEditingEntrega(null);
+  };
+
+  // Función para abrir modal de nueva entrega
+  const handleNewEntrega = () => {
+    setEditingEntrega(null);
+    setShowModal(true);
+  };
+
   // Función para guardar cotización
   const handleSave = async (data: Partial<Entrega>) => {
     try {
@@ -272,8 +284,7 @@ const EntregaList: React.FC = () => {
       }
 
       fetchEntregas();
-      setShowModal(false);
-      setEditingEntrega(null);
+      handleCloseModal();
     } catch (error) {
       console.error('Error al guardar:', error);
       alert('Error al guardar la entrega');
@@ -284,7 +295,7 @@ const EntregaList: React.FC = () => {
     <div className="container-fluid mt-3">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2>Entregas</h2>
-        <Button onClick={() => setShowModal(true)}>Nueva Entrega</Button>
+        <Button onClick={handleNewEntrega}>Nueva Entrega</Button>
       </div>
 
       <SearchBar
@@ -316,7 +327,7 @@ const EntregaList: React.FC = () => {
       {/* Modal de formulario */}
       <EntregaModal
         show={showModal}
-        onHide={() => setShowModal(false)}
+        onHide={handleCloseModal}
         onSave={handleSave}
         editingEntrega={editingEntrega}
         clientes={clientes}
