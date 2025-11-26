@@ -68,6 +68,9 @@ const CotizacionModal = ({
 
   // Estados del formulario
   const [formData, setFormData] = useState<CotizacionFormData>(defaultFormData);
+  
+  // Estado para la moneda
+  const [moneda, setMoneda] = useState<'MXN' | 'USD'>('MXN');
 
   // Estados para autocompletado
   const [clienteSuggestions, setClienteSuggestions] = useState<Cliente[]>([]);
@@ -89,6 +92,13 @@ const CotizacionModal = ({
   const [showCanalizacionModal, setShowCanalizacionModal] = useState(false);
   const [canalizaciones, setCanalizaciones] = useState<any[]>([]);
   const [canalizacionSearchTerm, setCanalizacionSearchTerm] = useState('');
+
+  // Función para formatear moneda según la moneda seleccionada
+  const formatearMoneda = (valor: number): string => {
+    const locale = moneda === 'USD' ? 'en-US' : 'es-MX';
+    const simbolo = '$';
+    return `${simbolo}${valor.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${moneda}`;
+  };
 
   // Función para buscar canalizaciones
   const searchCanalizaciones = async (searchTerm: string) => {
@@ -1186,24 +1196,40 @@ const CotizacionModal = ({
               <div className="col-md-12 d-flex justify-content-end">
                 <div className="col-md-6">
                   <div className="card">
-                    <div className="card-header bg-primary text-white">
+                    <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                       <h6 className="mb-0">
                         <i className="fas fa-calculator me-2"></i>
                         Resumen de Totales
                       </h6>
+                      <div className="btn-group btn-group-sm" role="group">
+                        <button
+                          type="button"
+                          className={`btn ${moneda === 'MXN' ? 'btn-light' : 'btn-outline-light'}`}
+                          onClick={() => setMoneda('MXN')}
+                        >
+                          MXN
+                        </button>
+                        <button
+                          type="button"
+                          className={`btn ${moneda === 'USD' ? 'btn-light' : 'btn-outline-light'}`}
+                          onClick={() => setMoneda('USD')}
+                        >
+                          USD
+                        </button>
+                      </div>
                     </div>
                     <div className="card-body">
                       <div className="d-flex justify-content-between py-2 border-bottom">
                         <span>Subtotal:</span>
-                        <span className="fw-bold">${(formData.subtotal || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        <span className="fw-bold">{formatearMoneda(formData.subtotal || 0)}</span>
                       </div>
                       <div className="d-flex justify-content-between py-2 border-bottom">
                         <span>IVA ({formData.iva}%):</span>
-                        <span className="text-info fw-bold">${(formData.ivaImporte || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        <span className="text-info fw-bold">{formatearMoneda(formData.ivaImporte || 0)}</span>
                       </div>
                       <div className="d-flex justify-content-between py-3 bg-light rounded mt-2">
                         <span className="fw-bold text-primary">Total:</span>
-                        <span className="fw-bold text-primary fs-5">${(formData.total || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        <span className="fw-bold text-primary fs-5">{formatearMoneda(formData.total || 0)}</span>
                       </div>
                     </div>
                   </div>
