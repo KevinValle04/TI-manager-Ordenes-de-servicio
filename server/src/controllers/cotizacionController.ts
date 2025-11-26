@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import Cliente from '../models/Cliente';
 import Cotizacion, { ICotizacion } from '../models/Cotizacion';
+import { CotizacionChecklistPdfData, CotizacionChecklistPdfGenerator } from '../services/cotizacionChecklistPdfGenerator';
 import { CotizacionPdfData, CotizacionPdfGenerator } from '../services/cotizacionPdfGenerator';
 
 const prepararDatosPdf = (cotizacion: ICotizacion): CotizacionPdfData => ({
@@ -447,6 +448,141 @@ export const descargarPdfCotizacion = async (req: Request, res: Response) => {
     console.error('Error al descargar PDF de cotización:', err);
     res.status(500).json({ 
       error: 'Error al descargar PDF de cotización',
+      detalles: err.message
+    });
+  }
+};
+
+// Función auxiliar para preparar datos del checklist
+const prepararDatosChecklistPdf = (cotizacion: ICotizacion): CotizacionChecklistPdfData => ({
+  numeroPresupuesto: cotizacion.numeroPresupuesto,
+  cliente: (() => {
+    const c: any = cotizacion.cliente;
+    if (!c) return { nombre: '', compania: '', direccion: '', ciudad: '', telefono: '', email: '' };
+    if (typeof c === 'string') {
+      return { nombre: c, compania: '', direccion: '', ciudad: '', telefono: '', email: '' };
+    }
+    return {
+      nombre: (c.contactos && c.contactos[0] && c.contactos[0].nombre) || c.nombre || '',
+      compania: c.nombreEmpresa || '',
+      direccion: c.direccion || '',
+      ciudad: c.ciudad || '',
+      telefono: c.telefono || (c.contactos && c.contactos[0] && c.contactos[0].contacto && c.contactos[0].contacto.telefono) || '',
+      email: c.email || (c.contactos && c.contactos[0] && c.contactos[0].contacto && c.contactos[0].contacto.correo) || ''
+    };
+  })(),
+  fecha: cotizacion.fecha.toISOString(),
+  vigencia: cotizacion.vigencia.toISOString(),
+  estado: cotizacion.estado,
+  items: cotizacion.items.map(item => ({
+    marca: item.marca || '',
+    modelo: item.modelo || '',
+    concepto: item.concepto || '',
+    cantidad: item.cantidad,
+    unidad: item.unidad
+  })),
+  comentarios: cotizacion.comentarios,
+  razonSocial: cotizacion.razonSocial as any,
+  vendedor: (() => {
+    const v: any = (cotizacion as any).vendedor;
+    if (!v) return undefined;
+    return {
+      nombre: v.nombre || '',
+      email: v.correo || v.email || '',
+      telefono: v.telefono || ''
+    };
+  })()
+});
+
+export const getPdfChecklistCotizacion = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    
+    const cotizacion = await Cotizacion.findById(id)
+      .populate('razonSocial', 'nombre rfc emailEmpresa telEmpresa direccionEmpresa')
+      .populate('vendedor', 'nombre correo telefono')
+      .populate('cliente', 'nombreEmpresa direccion telefono ciudad contactos');
+
+    if (!cotizacion) {
+      return res.status(404).json({ error: 'Cotización no encontrada' });
+    }
+
+    if (cotizacion) {
+      const clienteField: any = (cotizacion as any).cliente;
+      if (clienteField && typeof clienteField === 'string' && mongoose.Types.ObjectId.isValid(clienteField)) {
+        try {
+          const clienteDoc = await Cliente.findById(clienteField).lean();
+          if (clienteDoc) {
+            (cotizacion as any).cliente = clienteDoc;
+          }
+        } catch (err) {
+          console.warn('Error al buscar cliente por id:', clienteField, err);
+        }
+      }
+    }
+
+    const datosPdf = prepararDatosChecklistPdf(cotizacion as any);
+
+    const pdfGenerator = new CotizacionChecklistPdfGenerator();
+    const pdfBuffer = await pdfGenerator.generarPdfChecklistCotizacion(datosPdf);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="Checklist-Cotizacion-${cotizacion.numeroPresupuesto}.pdf"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
+
+    res.send(pdfBuffer);
+    
+  } catch (err: any) {
+    console.error('Error al generar PDF checklist de cotización:', err);
+    res.status(500).json({ 
+      error: 'Error al generar PDF checklist de cotización',
+      detalles: err.message
+    });
+  }
+};
+
+export const descargarPdfChecklistCotizacion = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    
+    const cotizacion = await Cotizacion.findById(id)
+      .populate('razonSocial', 'nombre rfc emailEmpresa telEmpresa direccionEmpresa')
+      .populate('vendedor', 'nombre correo telefono')
+      .populate('cliente', 'nombreEmpresa direccion telefono ciudad contactos');
+
+    if (!cotizacion) {
+      return res.status(404).json({ error: 'Cotización no encontrada' });
+    }
+
+    if (cotizacion) {
+      const clienteField: any = (cotizacion as any).cliente;
+      if (clienteField && typeof clienteField === 'string' && mongoose.Types.ObjectId.isValid(clienteField)) {
+        try {
+          const clienteDoc = await Cliente.findById(clienteField).lean();
+          if (clienteDoc) {
+            (cotizacion as any).cliente = clienteDoc;
+          }
+        } catch (err) {
+          console.warn('Error al buscar cliente por id:', clienteField, err);
+        }
+      }
+    }
+
+    const datosPdf = prepararDatosChecklistPdf(cotizacion as any);
+
+    const pdfGenerator = new CotizacionChecklistPdfGenerator();
+    const pdfBuffer = await pdfGenerator.generarPdfChecklistCotizacion(datosPdf);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="Checklist-Cotizacion-${cotizacion.numeroPresupuesto}.pdf"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
+
+    res.send(pdfBuffer);
+    
+  } catch (err: any) {
+    console.error('Error al descargar PDF checklist de cotización:', err);
+    res.status(500).json({ 
+      error: 'Error al descargar PDF checklist de cotización',
       detalles: err.message
     });
   }

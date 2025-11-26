@@ -145,6 +145,23 @@ const CotizacionList: React.FC = () => {
     window.open(`/api/cotizaciones/${cotizacion._id}/pdf/descargar`, "_blank");
   };
 
+  // Funciones para PDF Checklist
+  const handleVerPdfChecklist = (cotizacion: Cotizacion) => {
+    if (!cotizacion._id) {
+      alert("ID de cotización no válido");
+      return;
+    }
+    window.open(`/api/cotizaciones/${cotizacion._id}/pdf-checklist`, "_blank");
+  };
+
+  const handleDescargarPdfChecklist = (cotizacion: Cotizacion) => {
+    if (!cotizacion._id) {
+      alert("ID de cotización no válido");
+      return;
+    }
+    window.open(`/api/cotizaciones/${cotizacion._id}/pdf-checklist/descargar`, "_blank");
+  };
+
   // Funciones para la interfaz
   const handleSearch = (term: string) => {
     setSearchTerm(term);
@@ -239,33 +256,54 @@ const CotizacionList: React.FC = () => {
           <Button
             variant="primary"
             size="sm"
-            className="me-2"
+            className="me-1 mb-1"
             onClick={() => handleVerPdf(cotizacion)}
+            title="Ver PDF con precios"
           >
-            Ver PDF
+            <i className="fas fa-file-pdf me-1"></i>Ver PDF Precios
           </Button>
           <Button
             variant="success"
             size="sm"
-            className="me-2"
+            className="me-1 mb-1"
             onClick={() => handleDescargarPdf(cotizacion)}
+            title="Descargar PDF con precios"
           >
-            Descargar
+            <i className="fas fa-download me-1"></i>Descargar PDF
+          </Button>
+          <Button
+            variant="info"
+            size="sm"
+            className="me-1 mb-1"
+            onClick={() => handleVerPdfChecklist(cotizacion)}
+            title="Ver checklist sin precios"
+          >
+            <i className="fas fa-list-check me-1"></i>Ver Checklist
+          </Button>
+          <Button
+            variant="outline-info"
+            size="sm"
+            className="me-1 mb-1"
+            onClick={() => handleDescargarPdfChecklist(cotizacion)}
+            title="Descargar checklist sin precios"
+          >
+            <i className="fas fa-download me-1"></i>Descargar Checklist
           </Button>
           <Button
             variant="warning"
             size="sm"
-            className="me-2"
+            className="me-1 mb-1"
             onClick={() => handleEdit(cotizacion)}
           >
-            Editar
+            <i className="fas fa-edit me-1"></i>Editar
           </Button>
           <Button
             variant="danger"
             size="sm"
+            className="mb-1"
             onClick={() => handleDelete(cotizacion._id!)}
           >
-            Eliminar
+            <i className="fas fa-trash me-1"></i>Eliminar
           </Button>
         </>
       )
