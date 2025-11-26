@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { createPortal } from 'react-dom';
-import { Cliente, Cotizacion, IInventoryItem, ItemCotizacion, Proyecto, RazonSocial } from '../../types';
+import { Cliente, Cotizacion, IInventoryItem, ItemCotizacion, Proyecto, RazonSocial, Vendedor } from '../../types';
 
 type CotizacionFormData = Omit<Cotizacion, 'fechaCreacion' | 'fechaActualizacion'> & {
   fecha: string;
@@ -11,6 +11,7 @@ type CotizacionFormData = Omit<Cotizacion, 'fechaCreacion' | 'fechaActualizacion
   items: ItemCotizacion[];
   iva: number;
   ivaImporte: number;
+  vendedor?: string;
 }
 
 interface CotizacionModalProps {
@@ -22,6 +23,7 @@ interface CotizacionModalProps {
   inventarioItems: IInventoryItem[];
   razonesSociales: RazonSocial[];
   proyectos: Proyecto[];
+  vendedores: Vendedor[];
   generatePresupuestoNumber: () => string;
 }
 
@@ -34,11 +36,13 @@ const CotizacionModal = ({
   inventarioItems,
   razonesSociales,
   proyectos,
+  vendedores,
   generatePresupuestoNumber
 }: CotizacionModalProps): React.ReactPortal => {
   const defaultFormData: CotizacionFormData = {
     cliente: '',
     razonSocial: '',
+    vendedor: '',
     numeroPresupuesto: '',
     fecha: new Date().toISOString().split('T')[0],
     vigencia: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -71,6 +75,7 @@ const CotizacionModal = ({
   const [razonSocialSuggestions, setRazonSocialSuggestions] = useState<RazonSocial[]>([]);
   const [showRazonSocialSuggestions, setShowRazonSocialSuggestions] = useState(false);
   const [razonSocialDisplayText, setRazonSocialDisplayText] = useState('');
+  const [clienteDisplayText, setClienteDisplayText] = useState('');
   
   // Estados para productos
   const [productSuggestions, setProductSuggestions] = useState<{[key: number]: IInventoryItem[]}>({});
@@ -143,6 +148,16 @@ const CotizacionModal = ({
       const razonSocialObj = typeof editingCotizacion.razonSocial === 'object' ? editingCotizacion.razonSocial : null;
       setRazonSocialDisplayText(razonSocialObj?.nombre || '');
       
+      // Cargar display text del cliente
+      const clienteObj = typeof editingCotizacion.cliente === 'object' ? editingCotizacion.cliente : null;
+      if (clienteObj) {
+        setClienteDisplayText(clienteObj.nombreEmpresa || '');
+      } else if (typeof editingCotizacion.cliente === 'string') {
+        // Si es string, buscar el cliente por _id o por nombre para mostrar
+        const clienteEncontrado = clientes.find(c => c._id === editingCotizacion.cliente || c.nombreEmpresa === editingCotizacion.cliente);
+        setClienteDisplayText(clienteEncontrado?.nombreEmpresa || editingCotizacion.cliente);
+      }
+      
       // Asegurar que los items tengan al menos una fila vacía
       let itemsToSet = editingCotizacion.items || [];
       if (itemsToSet.length === 0) {
@@ -168,6 +183,7 @@ const CotizacionModal = ({
         itemsToSet = ensureEmptyRow(itemsToSet);
       }
       
+      const editingVendedor = (editingCotizacion as any)?.vendedor;
       setFormData({
         ...editingCotizacion,
         fecha: editingCotizacion.fecha ? new Date(editingCotizacion.fecha).toISOString().split('T')[0] : '',
@@ -178,6 +194,7 @@ const CotizacionModal = ({
         razonSocial: typeof editingCotizacion.razonSocial === 'string' 
           ? editingCotizacion.razonSocial 
           : editingCotizacion.razonSocial?._id || '',
+        vendedor: typeof editingVendedor === 'string' ? editingVendedor : editingVendedor?._id || '',
         items: itemsToSet
       } as CotizacionFormData);
     } else {
@@ -188,6 +205,7 @@ const CotizacionModal = ({
       setFormData({
         cliente: '',
         razonSocial: '',
+        vendedor: '',
         numeroPresupuesto: generatePresupuestoNumber(),
         fecha: today,
         vigencia: vigencia,
@@ -213,6 +231,7 @@ const CotizacionModal = ({
       
       // Limpiar también el estado de razón social
       setRazonSocialDisplayText('');
+      setClienteDisplayText('');
       
       // Limpiar estados de autocompletado
       setClienteSuggestions([]);
@@ -340,7 +359,8 @@ const CotizacionModal = ({
 
   // Manejo de clientes
   const handleClienteSearch = (value: string) => {
-    setFormData(prev => ({ ...prev, cliente: value }));
+    setClienteDisplayText(value);
+    // NO guardar en formData.cliente hasta que se seleccione de la lista
     
     if (value.length > 1) {
       const filtered = clientes.filter(cliente =>
@@ -354,7 +374,9 @@ const CotizacionModal = ({
   };
 
   const selectCliente = (cliente: Cliente) => {
-    setFormData(prev => ({ ...prev, cliente: cliente.nombreEmpresa }));
+    // Guardar SIEMPRE el _id, nunca el nombre
+    setFormData(prev => ({ ...prev, cliente: cliente._id || '' }));
+    setClienteDisplayText(cliente.nombreEmpresa);
     setShowClienteSuggestions(false);
   };
 
@@ -456,13 +478,12 @@ const CotizacionModal = ({
   };
 
   const handleItemChange = (index: number, name: keyof ItemCotizacion, value: any) => {
-    setFormData(prev => {
-      const newItems = [...prev.items];
-      
-      if (name === 'material' && value) {
-        // Si se está seleccionando un material del catálogo
-        const selectedItem = inventarioItems.find(item => item._id === value);
-        if (selectedItem) {
+    if (name === 'material' && value) {
+      // Si se está seleccionando un material del catálogo
+      const selectedItem = inventarioItems.find(item => item._id === value);
+      if (selectedItem) {
+        setFormData(prev => {
+          const newItems = [...prev.items];
           const unidad = (selectedItem.unidad === 'PZA' || selectedItem.unidad === 'MTS') ? selectedItem.unidad : 'PZA' as const;
           const cantidad = newItems[index]?.cantidad || 1;
           const concepto = [
@@ -470,6 +491,7 @@ const CotizacionModal = ({
             selectedItem.marca,
             selectedItem.modelo
           ].filter(Boolean).join(' - ');
+          
           newItems[index] = {
             ...newItems[index],
             clave: index + 1,
@@ -483,8 +505,38 @@ const CotizacionModal = ({
             importe: cantidad * selectedItem.precioUnitario,
             aplicarIva: true
           };
-        }
-      } else {
+          
+          // Asegurar que hay una fila vacía al final
+          const updatedItems = ensureEmptyRow(newItems).map((item, idx) => ({
+            ...item,
+            clave: idx + 1
+          }));
+          
+          console.log('Items después de agregar producto:', updatedItems.length);
+          
+          return {
+            ...prev,
+            items: updatedItems
+          };
+        });
+        
+        // Cerrar el dropdown de sugerencias después de seleccionar
+        setShowProductSuggestions(prev => ({
+          ...prev,
+          [index]: false
+        }));
+        setProductSuggestions(prev => ({
+          ...prev,
+          [index]: []
+        }));
+        
+        // Recalcular totales
+        setTimeout(() => calculateTotals(), 50);
+      }
+    } else {
+      // Otros cambios de campos
+      setFormData(prev => {
+        const newItems = [...prev.items];
         const currentItem = newItems[index];
         const updatedItem: ItemCotizacion = {
           ...currentItem,
@@ -500,19 +552,21 @@ const CotizacionModal = ({
         }
 
         newItems[index] = updatedItem;
-      }
 
-      const updatedItems = ensureEmptyRow(newItems).map((item, idx) => ({
-        ...item,
-        clave: idx + 1
-      }));
+        const updatedItems = ensureEmptyRow(newItems).map((item, idx) => ({
+          ...item,
+          clave: idx + 1
+        }));
 
-      return {
-        ...prev,
-        items: updatedItems
-      };
-    });
-    calculateTotals();
+        return {
+          ...prev,
+          items: updatedItems
+        };
+      });
+      
+      // Recalcular totales después de actualizar
+      setTimeout(() => calculateTotals(), 50);
+    }
   };
 
   const calculateTotals = () => {
@@ -531,19 +585,32 @@ const CotizacionModal = ({
     });
   };
 
-  useEffect(() => {
-    calculateTotals();
-  }, [formData.items]);
-
   return createPortal(
     <>
-      <Modal show={show} onHide={onHide} size="xl" centered style={{ maxWidth: '99vw', maxHeight: '95vh' }}>
+      <Modal 
+        show={show} 
+        onHide={onHide} 
+        size="xl" 
+        centered={false}
+        style={{ 
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw', 
+          height: '100vh', 
+          maxWidth: '100vw', 
+          maxHeight: '100vh', 
+          margin: 0,
+          zIndex: 9999
+        }}
+        dialogClassName="w-100 h-100 m-0 mw-100"
+      >
         <Modal.Header closeButton className="bg-light border-bottom">
           <Modal.Title>
             {editingCotizacion ? 'Editar' : 'Nueva'} Cotización
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body className="px-4 py-3" style={{ maxHeight: '85vh', overflowY: 'auto' }}>
+        <Modal.Body className="px-4 py-3" style={{ height: 'calc(100vh - 120px)', overflowY: 'auto', overflowX: 'hidden' }}>
           <Form>
             <div className="row">
               <div className="col-md-4">
@@ -552,7 +619,7 @@ const CotizacionModal = ({
                   <div className="position-relative">
                     <Form.Control
                       type="text"
-                      value={typeof formData.cliente === 'string' ? formData.cliente : formData.cliente?.nombreEmpresa || ''}
+                      value={clienteDisplayText}
                       onChange={(e) => handleClienteSearch(e.target.value)}
                       placeholder="Buscar cliente..."
                       autoComplete="off"
@@ -615,7 +682,6 @@ const CotizacionModal = ({
                     type="text"
                     value={formData.numeroPresupuesto}
                     onChange={(e) => setFormData(prev => ({ ...prev, numeroPresupuesto: e.target.value }))}
-                    readOnly={!editingCotizacion}
                   />
                 </Form.Group>
               </div>
@@ -629,6 +695,24 @@ const CotizacionModal = ({
                     onChange={handleChange}
                     required
                   />
+                </Form.Group>
+              </div>
+            </div>
+
+            <div className="row mb-2">
+              <div className="col-md-4">
+                <Form.Group className="mb-2">
+                  <Form.Label>Vendedor</Form.Label>
+                  <Form.Select
+                    name="vendedor"
+                    value={typeof formData.vendedor === 'string' ? formData.vendedor : ''}
+                    onChange={handleChange}
+                  >
+                    <option value="">Seleccionar vendedor</option>
+                    {vendedores && vendedores.map(v => (
+                      <option key={v._id} value={v._id}>{v.nombre || v._id}</option>
+                    ))}
+                  </Form.Select>
                 </Form.Group>
               </div>
             </div>
@@ -866,12 +950,16 @@ const CotizacionModal = ({
                                         importe: (formData.items[index].cantidad || 1) * suggestion.precioUnitario,
                                         aplicarIva: true
                                       };
-                                      setFormData(prev => ({
-                                        ...prev,
-                                        items: prev.items.map((item, i) => 
+                                      setFormData(prev => {
+                                        const newItems = prev.items.map((item, i) => 
                                           i === index ? updatedItem : item
-                                        )
-                                      }));
+                                        );
+                                        const itemsConFilaVacia = ensureEmptyRow(newItems);
+                                        return {
+                                          ...prev,
+                                          items: itemsConFilaVacia
+                                        };
+                                      });
                                       setShowProductSuggestions(prev => ({
                                         ...prev,
                                         [index]: false
@@ -927,12 +1015,16 @@ const CotizacionModal = ({
                                         importe: (formData.items[index].cantidad || 1) * suggestion.precioUnitario,
                                         aplicarIva: true
                                       };
-                                      setFormData(prev => ({
-                                        ...prev,
-                                        items: prev.items.map((item, i) => 
+                                      setFormData(prev => {
+                                        const newItems = prev.items.map((item, i) => 
                                           i === index ? updatedItem : item
-                                        )
-                                      }));
+                                        );
+                                        const itemsConFilaVacia = ensureEmptyRow(newItems);
+                                        return {
+                                          ...prev,
+                                          items: itemsConFilaVacia
+                                        };
+                                      });
                                       setShowProductSuggestions(prev => ({
                                         ...prev,
                                         [index]: false
@@ -989,12 +1081,16 @@ const CotizacionModal = ({
                                         aplicarIva: true
                                       };
                                       
-                                      setFormData(prev => ({
-                                        ...prev,
-                                        items: prev.items.map((item, i) => 
+                                      setFormData(prev => {
+                                        const newItems = prev.items.map((item, i) => 
                                           i === index ? updatedItem : item
-                                        )
-                                      }));
+                                        );
+                                        const itemsConFilaVacia = ensureEmptyRow(newItems);
+                                        return {
+                                          ...prev,
+                                          items: itemsConFilaVacia
+                                        };
+                                      });
                                       
                                       setShowProductSuggestions(prev => ({
                                         ...prev,

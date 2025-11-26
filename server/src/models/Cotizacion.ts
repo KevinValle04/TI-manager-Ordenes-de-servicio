@@ -1,9 +1,10 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
 export interface ICotizacion extends Document {
   numeroPresupuesto: string;
-  cliente: string;
+  cliente: string | any; // Puede ser ObjectId o string para compatibilidad
   razonSocial?: string; // Referencia al ID de la razón social (opcional)
+  vendedor?: string; // Referencia al ID del vendedor (opcional)
   proyecto?: string; // Referencia al ID del proyecto (opcional)
   fecha: Date;
   vigencia: Date;
@@ -95,13 +96,18 @@ const CotizacionSchema = new Schema<ICotizacion>({
     trim: true 
   },
   cliente: { 
-    type: String, 
-    required: true,
-    trim: true 
+    type: Schema.Types.ObjectId,
+    ref: 'Cliente',
+    required: true
   },
   razonSocial: { 
     type: Schema.Types.ObjectId,
     ref: 'RazonSocial',
+    required: false
+  },
+  vendedor: {
+    type: Schema.Types.ObjectId,
+    ref: 'Vendedor',
     required: false
   },
   proyecto: {

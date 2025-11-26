@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { Cliente, Cotizacion, IInventoryItem, Proyecto, RazonSocial } from '../../types';
+import { Cliente, Cotizacion, IInventoryItem, Proyecto, RazonSocial, Vendedor } from '../../types';
 import DataTable from '../common/DataTable';
 import PaginationCompact from '../common/PaginationCompact';
 import SearchBar from '../common/SearchBar';
@@ -27,6 +27,7 @@ const CotizacionList: React.FC = () => {
   const [inventarioItems, setInventarioItems] = useState<IInventoryItem[]>([]);
   const [razonesSociales, setRazonesSociales] = useState<RazonSocial[]>([]);
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
+  const [vendedores, setVendedores] = useState<Vendedor[]>([]);
 
   // Efectos
   useEffect(() => {
@@ -35,6 +36,7 @@ const CotizacionList: React.FC = () => {
     fetchInventarioItems();
     fetchRazonesSociales();
     fetchProyectos();
+    fetchVendedores();
   }, []);
 
   useEffect(() => {
@@ -111,6 +113,18 @@ const CotizacionList: React.FC = () => {
     } catch (error) {
       console.error('Error al cargar proyectos:', error);
       setProyectos([]);
+    }
+  };
+
+  const fetchVendedores = async () => {
+    try {
+      const response = await fetch('/api/vendedores');
+      if (!response.ok) throw new Error('Error al cargar vendedores');
+      const data = await response.json();
+      setVendedores(data);
+    } catch (error) {
+      console.error('Error al cargar vendedores:', error);
+      setVendedores([]);
     }
   };
 
@@ -341,19 +355,20 @@ const CotizacionList: React.FC = () => {
 
   return (
     <div className="container-fluid mt-3">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2>Cotizaciones</h2>
+      <div className="d-flex justify-content-end mb-3">
         <Button onClick={() => {
           setEditingCotizacion(null); // Limpiar cualquier cotización en edición
           setShowModal(true);
         }}>Nueva Cotización</Button>
       </div>
 
-      <SearchBar
-        value={searchTerm}
-        onChange={handleSearch}
-        placeholder="Buscar por número, cliente o estado..."
-      />
+      <div style={{ paddingBottom: '16px' }}>
+        <SearchBar
+          value={searchTerm}
+          onChange={handleSearch}
+          placeholder="Buscar por número, cliente o estado..."
+        />
+      </div>
 
       {loading ? (
         <p>Cargando...</p>
@@ -388,6 +403,7 @@ const CotizacionList: React.FC = () => {
         inventarioItems={inventarioItems}
         razonesSociales={razonesSociales}
         proyectos={proyectos}
+        vendedores={vendedores}
         generatePresupuestoNumber={generatePresupuestoNumber}
       />
     </div>

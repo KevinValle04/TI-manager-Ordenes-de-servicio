@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { Proyecto, Colaborador, Cotizacion, Entrega, OrdenCompra, Cliente, IInventoryItem, RazonSocial } from '../../types';
+import { Cliente, Colaborador, Cotizacion, Entrega, IInventoryItem, OrdenCompra, Proyecto, RazonSocial, Vendedor } from '../../types';
 import DataTable from '../common/DataTable';
 import PaginationCompact from '../common/PaginationCompact';
 import SearchBar from '../common/SearchBar';
-import ProyectoModal from './ProyectoModal';
-import ActividadesList from './ActividadesList';
 import CotizacionModal from '../cotizaciones/CotizacionModal';
 import EntregaModal from '../entregas/EntregaModal';
 import OrdenCompraForm from '../ordenesCompra/OrdenCompraForm';
+import ActividadesList from './ActividadesList';
+import ProyectoModal from './ProyectoModal';
 
 const ProyectoList: React.FC = () => {
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
@@ -44,6 +44,7 @@ const ProyectoList: React.FC = () => {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [inventarioItems, setInventarioItems] = useState<IInventoryItem[]>([]);
   const [razonesSociales, setRazonesSociales] = useState<RazonSocial[]>([]);
+  const [vendedores, setVendedores] = useState<Vendedor[]>([]);
   
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -55,6 +56,7 @@ const ProyectoList: React.FC = () => {
     fetchClientes();
     fetchInventarioItems();
     fetchRazonesSociales();
+    fetchVendedores();
   }, []);
 
   useEffect(() => {
@@ -125,6 +127,18 @@ const ProyectoList: React.FC = () => {
     } catch (error) {
       console.error('Error al cargar razones sociales:', error);
       setRazonesSociales([]);
+    }
+  };
+
+  const fetchVendedores = async () => {
+    try {
+      const response = await fetch('/api/vendedores');
+      if (!response.ok) throw new Error('Error al cargar vendedores');
+      const data = await response.json();
+      setVendedores(data);
+    } catch (error) {
+      console.error('Error al cargar vendedores:', error);
+      setVendedores([]);
     }
   };
 
@@ -861,6 +875,7 @@ const ProyectoList: React.FC = () => {
           inventarioItems={inventarioItems}
           razonesSociales={razonesSociales}
           proyectos={proyectos}
+          vendedores={vendedores}
           generatePresupuestoNumber={generatePresupuestoNumber}
         />
       )}

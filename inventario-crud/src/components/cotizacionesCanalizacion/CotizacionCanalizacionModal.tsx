@@ -506,13 +506,30 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
   };
 
   return (
-    <Modal show={show} onHide={handleClose} size="xl" centered style={{ maxWidth: '99vw', maxHeight: '95vh' }}>
+    <Modal 
+      show={show} 
+      onHide={handleClose} 
+      size="xl" 
+      centered={false}
+      style={{ 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw', 
+        height: '100vh', 
+        maxWidth: '100vw', 
+        maxHeight: '100vh', 
+        margin: 0,
+        zIndex: 9999
+      }}
+      dialogClassName="w-100 h-100 m-0 mw-100"
+    >
       <Modal.Header closeButton className="bg-light border-bottom">
         <Modal.Title>
           {editingCotizacion ? 'Editar' : 'Nueva'} Cotización de Canalización
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body className="px-4 py-3" style={{ maxHeight: '85vh', overflowY: 'auto' }}>
+      <Modal.Body className="px-4 py-3" style={{ height: 'calc(100vh - 120px)', overflowY: 'auto', overflowX: 'hidden' }}>
         <Form>
           {/* Primera fila: Cliente y Razón Social */}
           <div className="row">
