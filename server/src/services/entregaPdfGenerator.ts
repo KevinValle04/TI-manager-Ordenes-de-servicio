@@ -4,7 +4,7 @@ import handlebars from 'handlebars';
 import puppeteer from 'puppeteer';
 
 export interface EntregaPdfData {
-  numeroPresupuesto: string;
+  numeroEntrega: string;
   cliente: string;
   fecha: string;
   items: Array<{

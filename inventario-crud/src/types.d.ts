@@ -196,7 +196,7 @@ export interface Cotizacion {
 
 export interface Entrega {
   _id?: string;
-  numeroPresupuesto: string;
+  numeroEntrega: string;
   cliente: string | Cliente;
   razonSocial?: string | RazonSocial; // Referencia a la razón social (opcional)
   proyecto?: string | Proyecto; // Referencia al proyecto (opcional)

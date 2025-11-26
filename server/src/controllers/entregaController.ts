@@ -3,7 +3,7 @@ import Entrega, { IEntrega, IItemEntrega } from '../models/Entrega';
 import { EntregaPdfGenerator, EntregaPdfData } from '../services/entregaPdfGenerator';
 
 const prepararDatosPdf = (entrega: IEntrega): EntregaPdfData => ({
-  numeroPresupuesto: entrega.numeroPresupuesto,
+  numeroEntrega: entrega.numeroEntrega,
   cliente: entrega.cliente,
   fecha: entrega.fecha.toISOString(),
   items: entrega.items.map(item => ({
@@ -113,7 +113,7 @@ export const searchEntregas = async (req: Request, res: Response) => {
     
     const entregas = await Entrega.find({
       $or: [
-        { numeroPresupuesto: { $regex: searchTerm, $options: 'i' } },
+        { numeroEntrega: { $regex: searchTerm, $options: 'i' } },
         { cliente: { $regex: searchTerm, $options: 'i' } }
       ]
     }).populate('razonSocial', 'nombre');
@@ -143,7 +143,7 @@ export const getPdfEntrega = async (req: Request, res: Response) => {
     const pdfBuffer = await pdfGenerator.generarPdfEntrega(datosPdf);
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `inline; filename="Entrega-${entrega.numeroPresupuesto}.pdf"`);
+    res.setHeader('Content-Disposition', `inline; filename="Entrega-${entrega.numeroEntrega}.pdf"`);
     res.setHeader('Content-Length', pdfBuffer.length);
 
     res.send(pdfBuffer);
@@ -174,7 +174,7 @@ export const descargarPdfEntrega = async (req: Request, res: Response) => {
     const pdfBuffer = await pdfGenerator.generarPdfEntrega(datosPdf);
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="Entrega-${entrega.numeroPresupuesto}.pdf"`);
+    res.setHeader('Content-Disposition', `attachment; filename="Entrega-${entrega.numeroEntrega}.pdf"`);
     res.setHeader('Content-Length', pdfBuffer.length);
 
     res.send(pdfBuffer);

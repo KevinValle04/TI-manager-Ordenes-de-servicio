@@ -19,7 +19,7 @@ interface EntregaModalProps {
   inventarioItems: IInventoryItem[];
   razonesSociales: RazonSocial[];
   proyectos: Proyecto[];
-  generatePresupuestoNumber: () => string;
+  generateEntregaNumber: (clienteNombre: string) => string;
 }
 
 const EntregaModal = ({
@@ -31,12 +31,12 @@ const EntregaModal = ({
   inventarioItems,
   razonesSociales,
   proyectos,
-  generatePresupuestoNumber
+  generateEntregaNumber
 }: EntregaModalProps): React.ReactPortal => {
   const defaultFormData: EntregaFormData = {
     cliente: '',
     razonSocial: '',
-    numeroPresupuesto: '',
+    numeroEntrega: '',
     fecha: new Date().toISOString().split('T')[0],
     items: [{
       clave: 1,
@@ -129,12 +129,13 @@ const EntregaModal = ({
           : editingEntrega.razonSocial?._id || '',
       } as EntregaFormData);
     } else {
+      // Para nueva entrega, generar número basado en el cliente cuando se seleccione
       setFormData(prev => ({
         ...prev,
-        numeroPresupuesto: generatePresupuestoNumber()
+        numeroEntrega: ''
       }));
     }
-  }, [editingEntrega, generatePresupuestoNumber]);
+  }, [editingEntrega]);
 
   // Debug: Ver items de inventario cargados
   useEffect(() => {
@@ -175,15 +176,15 @@ const EntregaModal = ({
         modelo: '',
         concepto: '',
         cantidad: 1,
-        unidad: 'PZA' as const,
-        marca: '',
-        modelo: '',
-        concepto: '',
-        cantidad: 1,
-        unidad: 'PZA'
+        unidad: 'PZA' as const
       }];
     }
     return items;
+  };
+
+  // Función auxiliar para calcular totales (no se usa en entregas pero evita errores)
+  const calculateTotals = () => {
+    // Esta función puede quedarse vacía ya que las entregas no calculan totales
   };
 
   // Funciones de manejo de drag & drop
@@ -260,7 +261,12 @@ const EntregaModal = ({
   };
 
   const selectCliente = (cliente: Cliente) => {
-    setFormData(prev => ({ ...prev, cliente: cliente.nombreEmpresa }));
+    const clienteNombre = cliente.nombreEmpresa;
+    setFormData(prev => ({ 
+      ...prev, 
+      cliente: clienteNombre,
+      numeroEntrega: editingEntrega ? prev.numeroEntrega : generateEntregaNumber(clienteNombre)
+    }));
     setShowClienteSuggestions(false);
   };
 
@@ -398,6 +404,7 @@ const EntregaModal = ({
         newItems[index] = updatedItem;
       }
 
+      // Siempre asegurar que haya una fila vacía al final
       const updatedItems = ensureEmptyRow(newItems).map((item, idx) => ({
         ...item,
         clave: idx + 1
@@ -408,6 +415,41 @@ const EntregaModal = ({
         items: updatedItems
       };
     });
+  };
+
+  // Función para seleccionar un producto desde las sugerencias
+  const selectProductSuggestion = (index: number, suggestion: IInventoryItem) => {
+    setFormData(prev => {
+      const newItems = [...prev.items];
+      const updatedItem: ItemEntrega = {
+        ...newItems[index],
+        marca: suggestion.marca,
+        modelo: suggestion.modelo,
+        concepto: suggestion.descripcion,
+        unidad: (suggestion.unidad === 'PZA' || suggestion.unidad === 'MTS') ? suggestion.unidad as 'PZA' | 'MTS' : 'PZA',
+        precioUnitario: suggestion.precioUnitario,
+        material: suggestion._id,
+        importe: (newItems[index].cantidad || 1) * suggestion.precioUnitario,
+        aplicarIva: true
+      };
+      newItems[index] = updatedItem;
+
+      // Asegurar que haya una fila vacía al final
+      const updatedItems = ensureEmptyRow(newItems).map((item, idx) => ({
+        ...item,
+        clave: idx + 1
+      }));
+
+      return {
+        ...prev,
+        items: updatedItems
+      };
+    });
+    
+    setShowProductSuggestions(prev => ({
+      ...prev,
+      [index]: false
+    }));
   };
 
   return createPortal(
@@ -485,11 +527,11 @@ const EntregaModal = ({
               </div>
               <div className="col-md-4">
                 <Form.Group className="mb-2">
-                  <Form.Label>No. Presupuesto</Form.Label>
+                  <Form.Label>No. de Entrega</Form.Label>
                   <Form.Control
                     type="text"
-                    value={formData.numeroPresupuesto}
-                    onChange={(e) => setFormData(prev => ({ ...prev, numeroPresupuesto: e.target.value }))}
+                    value={formData.numeroEntrega}
+                    onChange={(e) => setFormData(prev => ({ ...prev, numeroEntrega: e.target.value }))}
                     readOnly={!editingEntrega}
                   />
                 </Form.Group>
@@ -574,7 +616,7 @@ const EntregaModal = ({
                   <Form.Group className="mb-3">
                     <Form.Control
                       type="text"
-                      placeholder="Buscar por comentario, número de presupuesto o cliente..."
+                      placeholder="Buscar por comentario, número de canalización o cliente..."
                       value={canalizacionSearchTerm}
                       onChange={(e) => searchCanalizaciones(e.target.value)}
                       autoFocus
@@ -692,28 +734,7 @@ const EntregaModal = ({
                                     className="p-2 border-bottom cursor-pointer hover-bg-light"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      const updatedItem: ItemEntrega = {
-                                        ...formData.items[index],
-                                        marca: suggestion.marca,
-                                        modelo: suggestion.modelo,
-                                        concepto: suggestion.descripcion,
-                                        unidad: (suggestion.unidad === 'PZA' || suggestion.unidad === 'MTS') ? suggestion.unidad as 'PZA' | 'MTS' : 'PZA',
-                                        precioUnitario: suggestion.precioUnitario,
-                                        material: suggestion._id,
-                                        importe: (formData.items[index].cantidad || 1) * suggestion.precioUnitario,
-                                        aplicarIva: true
-                                      };
-                                      setFormData(prev => ({
-                                        ...prev,
-                                        items: prev.items.map((item, i) => 
-                                          i === index ? updatedItem : item
-                                        )
-                                      }));
-                                      setShowProductSuggestions(prev => ({
-                                        ...prev,
-                                        [index]: false
-                                      }));
-                                      setTimeout(() => calculateTotals(), 100);
+                                      selectProductSuggestion(index, suggestion);
                                     }}
                                     style={{ cursor: 'pointer' }}
                                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
@@ -752,28 +773,7 @@ const EntregaModal = ({
                                     className="p-2 border-bottom cursor-pointer hover-bg-light"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      const updatedItem: ItemEntrega = {
-                                        ...formData.items[index],
-                                        marca: suggestion.marca,
-                                        modelo: suggestion.modelo,
-                                        concepto: suggestion.descripcion,
-                                        unidad: (suggestion.unidad === 'PZA' || suggestion.unidad === 'MTS') ? suggestion.unidad as 'PZA' | 'MTS' : 'PZA',
-                                        precioUnitario: suggestion.precioUnitario,
-                                        material: suggestion._id,
-                                        importe: (formData.items[index].cantidad || 1) * suggestion.precioUnitario,
-                                        aplicarIva: true
-                                      };
-                                      setFormData(prev => ({
-                                        ...prev,
-                                        items: prev.items.map((item, i) => 
-                                          i === index ? updatedItem : item
-                                        )
-                                      }));
-                                      setShowProductSuggestions(prev => ({
-                                        ...prev,
-                                        [index]: false
-                                      }));
-                                      setTimeout(() => calculateTotals(), 100);
+                                      selectProductSuggestion(index, suggestion);
                                     }}
                                     style={{ cursor: 'pointer' }}
                                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
@@ -811,32 +811,7 @@ const EntregaModal = ({
                                     key={suggestion._id}
                                     className="p-2 border-bottom cursor-pointer hover-bg-light"
                                     onClick={() => {
-                                      // Actualizar todos los campos del item con la información del producto seleccionado
-                                      const updatedItem: ItemEntrega = {
-                                        ...formData.items[index],
-                                        marca: suggestion.marca,
-                                        modelo: suggestion.modelo,
-                                        concepto: suggestion.descripcion,
-                                        unidad: suggestion.unidad as 'PZA' | 'MTS',
-                                        precioUnitario: suggestion.precioUnitario,
-                                        material: suggestion._id,
-                                        importe: (formData.items[index].cantidad || 1) * suggestion.precioUnitario,
-                                        aplicarIva: true
-                                      };
-                                      
-                                      setFormData(prev => ({
-                                        ...prev,
-                                        items: prev.items.map((item, i) => 
-                                          i === index ? updatedItem : item
-                                        )
-                                      }));
-                                      
-                                      setShowProductSuggestions(prev => ({
-                                        ...prev,
-                                        [index]: false
-                                      }));
-                                      
-                                      calculateTotals();
+                                      selectProductSuggestion(index, suggestion);
                                     }}
                                     style={{ cursor: 'pointer' }}
                                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}

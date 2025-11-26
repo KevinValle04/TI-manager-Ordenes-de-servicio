@@ -141,7 +141,7 @@ const EntregaList: React.FC = () => {
     
     const lowerTerm = term.toLowerCase();
     const filtered = entregas.filter(Entrega => 
-      Entrega.numeroPresupuesto.toLowerCase().includes(lowerTerm) ||
+      Entrega.numeroEntrega.toLowerCase().includes(lowerTerm) ||
       (typeof Entrega.cliente === 'string' 
         ? Entrega.cliente.toLowerCase().includes(lowerTerm)
         : Entrega.cliente.nombreEmpresa.toLowerCase().includes(lowerTerm))
@@ -178,7 +178,7 @@ const EntregaList: React.FC = () => {
 
   // Definición de columnas
   const columns = [
-    { key: 'numeroPresupuesto', label: 'No. Presupuesto' },
+    { key: 'numeroEntrega', label: 'No. de Entrega' },
     { 
       key: 'cliente', 
       label: 'Cliente',
@@ -233,17 +233,65 @@ const EntregaList: React.FC = () => {
     }
   ];
 
-  // Funciones de negocio
-  const generatePresupuestoNumber = () => {
-    const maxNumber = entregas.reduce((max, Entrega) => {
-      const match = Entrega.numeroPresupuesto.match(/P-(\d+)/);
+  const generateEntregaNumber = (clienteNombre: string) => {
+    if (!clienteNombre || clienteNombre.trim() === '') {
+      return 'XX-XX-0001';
+    }
+    
+    // Limpiar el nombre del cliente (eliminar espacios y caracteres especiales)
+    const nombreLimpio = clienteNombre.toUpperCase().replace(/[^A-Z]/g, '');
+    
+    if (nombreLimpio.length < 2) {
+      return 'XX-XX-0001';
+    }
+    
+    // Obtener las primeras 2 letras
+    const primerasLetras = nombreLimpio.substring(0, 2);
+    
+    // Obtener las últimas 2 letras
+    const ultimasLetras = nombreLimpio.substring(nombreLimpio.length - 2);
+    
+    // Construir el prefijo del cliente
+    const prefijoCliente = `${primerasLetras}-${ultimasLetras}`;
+    
+    // Filtrar entregas que pertenezcan al mismo cliente
+    // Comparar por nombre de cliente exacto (normalizado)
+    const entregasDelCliente = entregas.filter(entrega => {
+      const clienteEntrega = typeof entrega.cliente === 'string' 
+        ? entrega.cliente 
+        : entrega.cliente?.nombreEmpresa || '';
+      
+      // Normalizar ambos nombres para comparación
+      const nombreEntregaNormalizado = clienteEntrega.toUpperCase().trim();
+      const nombreClienteNormalizado = clienteNombre.toUpperCase().trim();
+      
+      return nombreEntregaNormalizado === nombreClienteNormalizado;
+    });
+    
+    console.log('=== GENERACIÓN NÚMERO DE ENTREGA ===');
+    console.log('Cliente:', clienteNombre);
+    console.log('Prefijo generado:', prefijoCliente);
+    console.log('Total entregas en sistema:', entregas.length);
+    console.log('Entregas del cliente:', entregasDelCliente.length);
+    
+    // Encontrar el número más alto para este cliente específico
+    const maxNumber = entregasDelCliente.reduce((max, entrega) => {
+      // Extraer el número del formato XX-XX-####
+      const match = entrega.numeroEntrega.match(/(\d+)$/);
       if (match) {
         const num = parseInt(match[1]);
+        console.log(`  - Entrega ${entrega.numeroEntrega}: número ${num}`);
         return num > max ? num : max;
       }
       return max;
     }, 0);
-    return `P-${String(maxNumber + 1).padStart(4, '0')}`;
+    
+    const nuevoNumero = `${prefijoCliente}-${String(maxNumber + 1).padStart(4, '0')}`;
+    console.log('Último número encontrado:', maxNumber);
+    console.log('Nuevo número generado:', nuevoNumero);
+    console.log('====================================');
+    
+    return nuevoNumero;
   };
 
   // Cálculos de paginación
@@ -334,7 +382,7 @@ const EntregaList: React.FC = () => {
         inventarioItems={inventarioItems}
         razonesSociales={razonesSociales}
         proyectos={proyectos}
-        generatePresupuestoNumber={generatePresupuestoNumber}
+        generateEntregaNumber={generateEntregaNumber}
       />
     </div>
   );

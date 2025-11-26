@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IEntrega extends Document {
-  numeroPresupuesto: string;
+  numeroEntrega: string;
   cliente: string;
   razonSocial?: string; // Referencia al ID de la razón social (opcional)
   proyecto?: string; // Referencia al ID del proyecto (opcional)
@@ -53,7 +53,7 @@ const ItemEntregaSchema = new Schema<IItemEntrega>({
 });
 
 const EntregaSchema = new Schema<IEntrega>({
-  numeroPresupuesto: { 
+  numeroEntrega: { 
     type: String, 
     required: true,
     unique: true,
