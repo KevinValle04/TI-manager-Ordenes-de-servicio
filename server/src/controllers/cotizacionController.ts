@@ -4,6 +4,7 @@ import Cliente from '../models/Cliente';
 import Cotizacion, { ICotizacion } from '../models/Cotizacion';
 import { CotizacionChecklistPdfData, CotizacionChecklistPdfGenerator } from '../services/cotizacionChecklistPdfGenerator';
 import { CotizacionPdfData, CotizacionPdfGenerator } from '../services/cotizacionPdfGenerator';
+import { generarNumeroPresupuesto, validarNumeroPresupuestoUnico } from '../utils/presupuestoGenerator';
 
 const prepararDatosPdf = (cotizacion: ICotizacion): CotizacionPdfData => ({
   numeroPresupuesto: cotizacion.numeroPresupuesto,
@@ -102,7 +103,7 @@ export const getCotizacionById = async (req: Request, res: Response) => {
 export const createCotizacion = async (req: Request, res: Response) => {
   try {
     // Validar campos requeridos
-    const { cliente, numeroPresupuesto } = req.body;
+    const { cliente } = req.body;
     
     if (!cliente || cliente.trim() === '') {
       return res.status(400).json({ 
@@ -111,16 +112,35 @@ export const createCotizacion = async (req: Request, res: Response) => {
       });
     }
     
-    if (!numeroPresupuesto || numeroPresupuesto.trim() === '') {
-      return res.status(400).json({ 
-        error: 'Validación fallida', 
-        details: 'El campo Número de Presupuesto es requerido'
-      });
+    // Generar número de presupuesto automáticamente
+    let numeroPresupuesto: string;
+    
+    // Si no se proporciona número de presupuesto, generarlo automáticamente
+    if (!req.body.numeroPresupuesto || req.body.numeroPresupuesto.trim() === '') {
+      numeroPresupuesto = await generarNumeroPresupuesto(req.body.razonSocial);
+      
+      // Verificar que sea único, si no lo es, generar otro
+      let intentos = 0;
+      while (!(await validarNumeroPresupuestoUnico(numeroPresupuesto)) && intentos < 5) {
+        numeroPresupuesto = await generarNumeroPresupuesto(req.body.razonSocial);
+        intentos++;
+      }
+    } else {
+      numeroPresupuesto = req.body.numeroPresupuesto.trim();
+      
+      // Verificar que el número manual sea único
+      if (!(await validarNumeroPresupuestoUnico(numeroPresupuesto))) {
+        return res.status(400).json({ 
+          error: 'Validación fallida', 
+          details: 'El número de presupuesto ya existe'
+        });
+      }
     }
     
     // Limpiar datos antes de crear la cotización
     const cotizacionData = {
       ...req.body,
+      numeroPresupuesto, // Usar el número generado o validado
       // Convertir strings vacías a undefined para campos ObjectId opcionales
       razonSocial: req.body.razonSocial && req.body.razonSocial.trim() !== '' ? req.body.razonSocial : undefined,
       proyecto: req.body.proyecto && req.body.proyecto.trim() !== '' ? req.body.proyecto : undefined,
@@ -597,6 +617,43 @@ export const descargarPdfChecklistCotizacion = async (req: Request, res: Respons
     res.status(500).json({ 
       error: 'Error al descargar PDF checklist de cotización',
       detalles: err.message
+    });
+  }
+};
+
+/**
+ * Genera un nuevo número de presupuesto automáticamente
+ */
+export const generateNumeroPresupuesto = async (req: Request, res: Response) => {
+  try {
+    const { razonSocial, nombreEmpresa } = req.body;
+    
+    // Generar número de presupuesto usando razonSocial ID o nombre de empresa directamente
+    let numeroPresupuesto = await generarNumeroPresupuesto(razonSocial, nombreEmpresa);
+    
+    // Verificar que sea único, si no lo es, generar otro
+    let intentos = 0;
+    while (!(await validarNumeroPresupuestoUnico(numeroPresupuesto)) && intentos < 10) {
+      numeroPresupuesto = await generarNumeroPresupuesto(razonSocial, nombreEmpresa);
+      intentos++;
+    }
+    
+    if (intentos >= 10) {
+      return res.status(500).json({ 
+        error: 'No se pudo generar un número único después de múltiples intentos'
+      });
+    }
+    
+    res.json({ 
+      numeroPresupuesto,
+      mensaje: 'Número de presupuesto generado exitosamente'
+    });
+    
+  } catch (error: any) {
+    console.error('Error generando número de presupuesto:', error);
+    res.status(500).json({ 
+      error: 'Error al generar número de presupuesto',
+      detalles: error.message
     });
   }
 };
