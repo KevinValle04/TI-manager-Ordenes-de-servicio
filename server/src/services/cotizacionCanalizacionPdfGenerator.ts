@@ -24,8 +24,30 @@ export interface CotizacionCanalizacionPdfData {
     rfc: string;
     emailEmpresa: string;
     telEmpresa: string;
+    celularEmpresa?: string;
     direccionEmpresa: string;
+    emailFacturacion?: string;
+    direccionesEnvio?: Array<{
+      nombre: string;
+      telefono: string;
+      direccion: string;
+      contacto: string;
+    }>;
   };
+  clienteInfo?: {
+    nombreEmpresa: string;
+    direccion: string;
+    telefono: string;
+    contactos: Array<{
+      nombre: string;
+      puesto: string;
+      contacto: {
+        correo: string;
+        telefono: string;
+        extension?: string;
+      };
+    }>;
+  } | null;
 }
 
 export class CotizacionCanalizacionPdfGenerator {
@@ -73,13 +95,26 @@ export class CotizacionCanalizacionPdfGenerator {
       const estado = datos.estado || 'Borrador';
       const comentarios = datos.comentarios || 'Sin observaciones adicionales';
       
-      // Información del cliente (con valores por defecto si no existe)
+      // Información del cliente
+      const clienteInfo = datos.clienteInfo;
+      const nombreCliente = clienteInfo?.nombreEmpresa || cliente;
+      const direccionCliente = clienteInfo?.direccion || 'Dirección no especificada';
+      const telefonoCliente = clienteInfo?.telefono || 'Teléfono no proporcionado';
+      
+      // Obtener primer contacto del cliente
+      const primerContacto = clienteInfo?.contactos?.[0];
+      const nombreContacto = primerContacto?.nombre || 'No especificado';
+      const puestoContacto = primerContacto?.puesto || 'No especificado';
+      const telefonoContacto = primerContacto?.contacto?.telefono || 'No especificado';
+      
+      // Información de la razón social
       const razonSocial = datos.razonSocial;
-      const nombreEmpresa = razonSocial?.nombre || cliente;
-      const rfcEmpresa = razonSocial?.rfc || 'RFC no proporcionado';
-      const direccionEmpresa = razonSocial?.direccionEmpresa || 'Dirección no especificada';
-      const telEmpresa = razonSocial?.telEmpresa || 'Teléfono no proporcionado';
-      const emailEmpresa = razonSocial?.emailEmpresa || 'Email no proporcionado';
+      const nombreEmpresa = razonSocial?.nombre || 'No especificado';
+      const rfcEmpresa = razonSocial?.rfc || 'No proporcionado';
+      const direccionEmpresa = razonSocial?.direccionEmpresa || 'No especificada';
+      const telEmpresa = razonSocial?.telEmpresa || 'No proporcionado';
+      const emailEmpresa = razonSocial?.emailEmpresa || 'No proporcionado';
+      const emailFacturacion = razonSocial?.emailFacturacion || emailEmpresa;
 
       // Generar filas de items tipo checklist
       const filasItems = datos.items
@@ -152,13 +187,11 @@ export class CotizacionCanalizacionPdfGenerator {
                   <td style="background: #f8f9fa; font-weight: bold; padding: 2px 5px; border: 1px solid #ccc; font-size: 7pt; text-align: center; width: 100px;">${fecha}</td>
                 </tr>
                 
-                <!-- Fila 2: Vigencia y Estado -->
+                <!-- Fila 2: Vigencia (sin Estado) -->
                 <tr>
                   <td colspan="3" style="border: none;"></td>
                   <td style="padding: 2px 5px; font-size: 7pt; font-weight: bold; background: #e9ecef; border: 1px solid #ccc;">Vigencia</td>
-                  <td style="background: #f8f9fa; font-weight: bold; padding: 2px 5px; border: 1px solid #ccc; font-size: 7pt; text-align: center;">${vigencia}</td>
-                  <td style="padding: 2px 5px; font-size: 7pt; font-weight: bold; background: #e9ecef; border: 1px solid #ccc;">Estado</td>
-                  <td style="background: #f8f9fa; font-weight: bold; padding: 2px 5px; border: 1px solid #ccc; font-size: 7pt; text-align: center; color: #0F2A52;">${estado}</td>
+                  <td colspan="3" style="background: #f8f9fa; font-weight: bold; padding: 2px 5px; border: 1px solid #ccc; font-size: 7pt; text-align: center;">${vigencia}</td>
                 </tr>
                 
                 <!-- Espaciador mínimo -->
@@ -170,22 +203,40 @@ export class CotizacionCanalizacionPdfGenerator {
                 <tr>
                   <td colspan="3" style="background-color: #0F2A52; color: white; font-weight: bold; padding: 3px 6px; border: 1px solid #0F2A52; font-size: 7.5pt; text-transform: uppercase;">INFORMACIÓN DEL CLIENTE</td>
                   <td style="border: none; width: 8px;"></td>
-                  <td colspan="3" style="background-color: #0F2A52; color: white; font-weight: bold; padding: 3px 6px; border: 1px solid #0F2A52; font-size: 7.5pt; text-transform: uppercase;">DATOS DE CONTACTO</td>
+                  <td colspan="3" style="background-color: #0F2A52; color: white; font-weight: bold; padding: 3px 6px; border: 1px solid #0F2A52; font-size: 7.5pt; text-transform: uppercase;">RAZÓN SOCIAL</td>
                 </tr>
                 
-                <!-- Fila 4: Datos del cliente y contacto en paralelo -->
+                <!-- Fila 4: Datos del cliente y razón social en paralelo -->
                 <tr>
                   <td colspan="3" style="padding: 4px 6px; background: #f8fafc; border: 1px solid #ddd; font-size: 7pt; line-height: 1.3; vertical-align: top;">
-                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">Cliente:</strong> ${cliente}</div>
-                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">Empresa:</strong> ${nombreEmpresa}</div>
-                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">RFC:</strong> ${rfcEmpresa}</div>
-                    <div><strong style="color: #0F2A52;">Dirección:</strong> ${direccionEmpresa}</div>
+                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">Empresa:</strong> ${nombreCliente}</div>
+                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">Dirección:</strong> ${direccionCliente}</div>
+                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">Teléfono:</strong> ${telefonoCliente}</div>
+                    <div style="margin-bottom: 3px; border-bottom: 1px solid #ddd; padding-bottom: 2px;"></div>
+                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">Contacto:</strong> ${nombreContacto}</div>
+                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">Puesto:</strong> ${puestoContacto}</div>
+                    <div><strong style="color: #0F2A52;">Celular:</strong> ${telefonoContacto}</div>
                   </td>
                   <td style="border: none;"></td>
                   <td colspan="3" style="padding: 4px 6px; background: #f8fafc; border: 1px solid #ddd; font-size: 7pt; line-height: 1.3; vertical-align: top;">
-                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">Teléfono:</strong> ${telEmpresa}</div>
+                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">Nombre:</strong> ${nombreEmpresa}</div>
+                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">RFC:</strong> ${rfcEmpresa}</div>
                     <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">Email:</strong> ${emailEmpresa}</div>
-                    <div style="margin-top: 8px;"><strong style="color: #0F2A52;">Tipo:</strong> Checklist de materiales</div>
+                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">Teléfono:</strong> ${telEmpresa}</div>
+                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">Dirección:</strong> ${direccionEmpresa}</div>
+                    <div><strong style="color: #0F2A52;">Email Facturación:</strong> ${emailFacturacion}</div>
+                  </td>
+                </tr>
+                
+                <!-- Espaciador -->
+                <tr>
+                  <td colspan="7" style="border: none; height: 6px;"></td>
+                </tr>
+                
+                <!-- Fila para Tipo y Comentarios separados -->
+                <tr>
+                  <td colspan="7" style="padding: 4px 6px; background: #f8f9fa; border: 1px solid #ddd; font-size: 7pt; line-height: 1.3;">
+                    <div style="margin-bottom: 2px;"><strong style="color: #0F2A52;">Tipo de Listado:</strong> Materiales de canalización</div>
                     <div><strong style="color: #0F2A52;">Observaciones:</strong> ${comentarios}</div>
                   </td>
                 </tr>
