@@ -71,6 +71,10 @@ export const createCotizacionCanalizacion = async (req: Request, res: Response) 
 
 export const updateCotizacionCanalizacion = async (req: Request, res: Response) => {
   try {
+    console.log('=== UPDATE COTIZACIÓN CANALIZACIÓN ===');
+    console.log('ID:', req.params.id);
+    console.log('Body recibido:', JSON.stringify(req.body, null, 2));
+    
     const updateData = {
       ...req.body,
       fechaActualizacion: new Date()
@@ -84,6 +88,8 @@ export const updateCotizacionCanalizacion = async (req: Request, res: Response) 
       updateData.cliente = undefined;
     }
     
+    console.log('Update data procesado:', JSON.stringify(updateData, null, 2));
+    
     const cotizacion = await CotizacionCanalizacion.findByIdAndUpdate(
       req.params.id, 
       updateData, 
@@ -91,8 +97,11 @@ export const updateCotizacionCanalizacion = async (req: Request, res: Response) 
     ).populate('razonSocial', 'nombre rfc emailEmpresa telEmpresa direccionEmpresa emailFacturacion direccionEnvio');
     
     if (!cotizacion) {
+      console.log('Cotización no encontrada con ID:', req.params.id);
       return res.status(404).json({ error: 'Cotización de canalización no encontrada' });
     }
+    
+    console.log('Cotización actualizada:', cotizacion._id);
     
     // Recalcular totales si hay items
     if (cotizacion.items && cotizacion.items.length > 0) {
@@ -100,13 +109,19 @@ export const updateCotizacionCanalizacion = async (req: Request, res: Response) 
       await cotizacion.save();
     }
     
+    console.log('=== UPDATE EXITOSO ===');
     res.json(cotizacion);
   } catch (err: any) {
     console.error('Error al actualizar cotización de canalización:', err);
+    console.error('Stack trace:', err.stack);
     if (err.code === 11000) {
       res.status(400).json({ error: 'El número de folio ya existe' });
     } else {
-      res.status(400).json({ error: 'Error al actualizar cotización de canalización' });
+      res.status(400).json({ 
+        error: 'Error al actualizar cotización de canalización',
+        detalles: err.message,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+      });
     }
   }
 };

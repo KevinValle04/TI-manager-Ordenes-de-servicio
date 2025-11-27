@@ -40,3 +40,14 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Modal personalizado - ancho ajustado al contenido */
+.modal-90w {
+  max-width: 1200px !important;
+  width: auto !important;
+}
+
+.modal-90w .modal-content {
+  height: auto;
+  max-height: 90vh;
+}

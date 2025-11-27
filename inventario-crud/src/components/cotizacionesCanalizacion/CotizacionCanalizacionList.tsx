@@ -190,11 +190,19 @@ const CotizacionCanalizacionList: React.FC = () => {
 
   const handleSave = async (formData: Partial<CotizacionCanalizacion>) => {
     try {
+      console.log('=== HANDLE SAVE ===');
+      console.log('Editing cotizacion:', editingCotizacion);
+      console.log('Form data:', formData);
+      
       const url = editingCotizacion 
         ? `/api/cotizaciones-canalizacion/${editingCotizacion._id}`
         : '/api/cotizaciones-canalizacion';
       
       const method = editingCotizacion ? 'PUT' : 'POST';
+      
+      console.log('URL:', url);
+      console.log('Method:', method);
+      console.log('Payload:', JSON.stringify(formData, null, 2));
       
       const response = await fetch(url, {
         method,
@@ -202,12 +210,19 @@ const CotizacionCanalizacionList: React.FC = () => {
         body: JSON.stringify(formData)
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
       if (!response.ok) {
         const errorData = await response.text();
         console.error('Error del servidor:', errorData);
         alert(`Error al guardar cotización: ${response.status} - ${errorData}`);
         return;
       }
+
+      const result = await response.json();
+      console.log('Result:', result);
+      console.log('=== SAVE EXITOSO ===');
 
       setShowModal(false);
       fetchCotizaciones();

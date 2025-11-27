@@ -478,8 +478,16 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
   };
 
   const handleSave = () => {
+    console.log('=== HANDLE SAVE MODAL ===');
+    console.log('Editing cotizacion:', editingCotizacion);
+    console.log('Form data:', formData);
+    
     // Validar campos requeridos
-    if (!formData.cliente || formData.cliente.trim() === '') {
+    const clienteStr = typeof formData.cliente === 'string' 
+      ? formData.cliente 
+      : formData.cliente?.nombreEmpresa || '';
+    
+    if (!clienteStr || clienteStr.trim() === '') {
       alert('El cliente es requerido');
       return;
     }
@@ -489,13 +497,28 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
       item.descripcion && item.descripcion.trim() !== ''
     );
     
+    console.log('Items to save:', itemsToSave);
+    
+    // Obtener el ID de la razón social si es un objeto, o el string si ya es un ID
+    let razonSocialId: string | undefined = undefined;
+    if (formData.razonSocial) {
+      if (typeof formData.razonSocial === 'string') {
+        razonSocialId = formData.razonSocial.trim() !== '' ? formData.razonSocial : undefined;
+      } else if (typeof formData.razonSocial === 'object' && '_id' in formData.razonSocial) {
+        razonSocialId = (formData.razonSocial as any)._id;
+      }
+    }
+    
     // Crear una copia de formData con los items filtrados y campos limpiados
     const dataToSave = {
       ...formData,
+      cliente: clienteStr, // Asegurar que sea un string
       items: itemsToSave,
-      // Convertir strings vacías a undefined para campos opcionales ObjectId
-      razonSocial: formData.razonSocial && formData.razonSocial.trim() !== '' ? formData.razonSocial : undefined
+      razonSocial: razonSocialId // Ya es el ID o undefined
     };
+    
+    console.log('Data to save final:', dataToSave);
+    console.log('Calling onSave...');
     
     onSave(dataToSave);
   };
@@ -510,32 +533,24 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
       show={show} 
       onHide={handleClose} 
       size="xl" 
-      centered={false}
+      centered={true}
       style={{ 
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw', 
-        height: '100vh', 
-        maxWidth: '100vw', 
-        maxHeight: '100vh', 
-        margin: 0,
         zIndex: 9999
       }}
-      dialogClassName="w-100 h-100 m-0 mw-100"
+      dialogClassName="modal-90w"
     >
-      <Modal.Header closeButton className="bg-light border-bottom">
-        <Modal.Title>
+      <Modal.Header closeButton className="bg-light border-bottom px-2 py-2">
+        <Modal.Title style={{ fontSize: '1.1rem' }}>
           {editingCotizacion ? 'Editar' : 'Nueva'} Cotización de Canalización
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body className="px-4 py-3" style={{ height: 'calc(100vh - 120px)', overflowY: 'auto', overflowX: 'hidden' }}>
+      <Modal.Body className="px-2 py-2" style={{ maxHeight: '70vh', overflowY: 'auto', overflowX: 'hidden' }}>
         <Form>
           {/* Primera fila: Cliente y Razón Social */}
           <div className="row">
             <div className="col-md-4">
               <Form.Group className="mb-2">
-                <Form.Label>Cliente</Form.Label>
+                <Form.Label style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>Cliente</Form.Label>
                 <div className="position-relative">
                   <Form.Control
                     type="text"
@@ -543,6 +558,7 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
                     onChange={(e) => handleClienteSearch(e.target.value)}
                     placeholder="Buscar cliente..."
                     autoComplete="off"
+                    style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                   />
                   {showClienteSuggestions && clienteSuggestions.length > 0 && (
                     <div className="position-absolute w-100 bg-white border border-top-0 rounded-bottom shadow-sm" style={{ zIndex: 1000, maxHeight: '200px', overflowY: 'auto' }}>
@@ -566,7 +582,7 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
             </div>
             <div className="col-md-4">
               <Form.Group className="mb-2">
-                <Form.Label>Razón Social</Form.Label>
+                <Form.Label style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>Razón Social</Form.Label>
                 <div className="position-relative">
                   <Form.Control
                     type="text"
@@ -574,6 +590,7 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
                     onChange={(e) => handleRazonSocialSearch(e.target.value)}
                     placeholder="Buscar razón social..."
                     autoComplete="off"
+                    style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                   />
                   {showRazonSocialSuggestions && razonSocialSuggestions.length > 0 && (
                     <div className="position-absolute w-100 bg-white border border-top-0 rounded-bottom shadow-sm" style={{ zIndex: 1000, maxHeight: '200px', overflowY: 'auto' }}>
@@ -597,12 +614,13 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
             </div>
                         <div className="col-md-4">
               <Form.Group className="mb-2">
-                <Form.Label>No. Presupuesto</Form.Label>
+                <Form.Label style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>No. Presupuesto</Form.Label>
                 <Form.Control
                   type="text"
                   value={formData.numeroPresupuesto}
                   onChange={(e) => setFormData({ ...formData, numeroPresupuesto: e.target.value })}
                   readOnly={!editingCotizacion}
+                  style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                 />
               </Form.Group>
             </div>
@@ -616,35 +634,38 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
           {/* Tercera fila: Fecha, Vigencia, Utilidad y Estado */}
           <div className="row">
                         <div className="col-md-6">
-              <Form.Group className="mb-3">
-                <Form.Label>Comentarios</Form.Label>
+              <Form.Group className="mb-2">
+                <Form.Label style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>Comentarios</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={2}
                   value={formData.comentarios}
                   onChange={(e) => setFormData({ ...formData, comentarios: e.target.value })}
                   placeholder="Comentarios adicionales sobre la cotización..."
+                  style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                 />
               </Form.Group>
             </div>
             <div className="col-md-3">
               <Form.Group className="mb-2">
-                <Form.Label>Utilidad (%)</Form.Label>
+                <Form.Label style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>Utilidad (%)</Form.Label>
                 <Form.Control
                   type="number"
                   value={formData.utilidad}
                   onChange={(e) => updateUtilidad(parseFloat(e.target.value) || 0)}
                   min="0"
                   step="0.1"
+                  style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                 />
               </Form.Group>
             </div>
             <div className="col-md-3">
               <Form.Group className="mb-2">
-                <Form.Label>Estado</Form.Label>
+                <Form.Label style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>Estado</Form.Label>
                 <Form.Select
                   value={formData.estado}
                   onChange={(e) => setFormData({ ...formData, estado: e.target.value as CotizacionCanalizacion['estado'] })}
+                  style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                 >
                   <option value="Borrador">Borrador</option>
                   <option value="Enviada">Enviada</option>
@@ -662,24 +683,24 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
           </div>
 
           {/* Tabla de productos */}
-          <div className="mb-4">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <h5 className="text-primary mb-0">
+          <div className="mb-3">
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <h6 className="text-primary mb-0" style={{ fontSize: '0.95rem' }}>
                 <i className="fas fa-shopping-cart me-2"></i>
                 Productos en la Cotización
-              </h5>
+              </h6>
             </div>
-            <div className="table-responsive" style={{ maxHeight: '500px', overflowY: 'auto' }}>
-              <table className="table table-striped table-hover" style={{ minWidth: '1200px', fontSize: '14px' }}>
+            <div className="table-responsive" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+              <table className="table table-striped table-hover" style={{ minWidth: '1000px', fontSize: '0.8rem' }}>
                 <thead className="table-dark sticky-top">
-                  <tr style={{ height: '50px' }}>
-                    <th style={{ width: '40px', minWidth: '40px', fontSize: '14px' }}>⋮⋮</th>
-                    <th style={{ width: '50px', minWidth: '50px', fontSize: '14px' }}>#</th>
-                    <th style={{ width: '500px', minWidth: '400px', fontSize: '14px' }}>Descripción</th>
-                    <th style={{ width: '140px', minWidth: '120px', fontSize: '14px' }}>Cantidad</th>
-                    <th style={{ width: '180px', minWidth: '150px', fontSize: '14px' }}>Precio Unitario</th>
-                    <th style={{ width: '180px', minWidth: '150px', fontSize: '14px' }}>Importe</th>
-                    <th style={{ width: '80px', minWidth: '80px', fontSize: '14px' }}>Acciones</th>
+                  <tr style={{ height: '38px' }}>
+                    <th style={{ width: '35px', minWidth: '35px', fontSize: '0.8rem', padding: '0.4rem' }}>⋮⋮</th>
+                    <th style={{ width: '40px', minWidth: '40px', fontSize: '0.8rem', padding: '0.4rem' }}>#</th>
+                    <th style={{ width: '450px', minWidth: '350px', fontSize: '0.8rem', padding: '0.4rem' }}>Descripción</th>
+                    <th style={{ width: '110px', minWidth: '100px', fontSize: '0.8rem', padding: '0.4rem' }}>Cantidad</th>
+                    <th style={{ width: '140px', minWidth: '120px', fontSize: '0.8rem', padding: '0.4rem' }}>Precio Unitario</th>
+                    <th style={{ width: '140px', minWidth: '120px', fontSize: '0.8rem', padding: '0.4rem' }}>Importe</th>
+                    <th style={{ width: '70px', minWidth: '70px', fontSize: '0.8rem', padding: '0.4rem' }}>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -694,7 +715,7 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
                       style={{
                         cursor: item.descripcion !== '' ? 'move' : 'default',
                         backgroundColor: draggedItem === index ? '#f8f9fa' : 'transparent',
-                        height: '60px'
+                        height: '45px'
                       }}
                     >
                       <td className="text-center" style={{ cursor: item.descripcion !== '' ? 'grab' : 'default' }}>
@@ -706,8 +727,8 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
                           />
                         )}
                       </td>
-                      <td>{index + 1}</td>
-                      <td>
+                      <td style={{ padding: '0.4rem' }}>{index + 1}</td>
+                      <td style={{ padding: '0.4rem' }}>
                         <div className="position-relative">
                           <Form.Control
                             type="text"
@@ -718,15 +739,15 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
                             placeholder="Descripción del producto..."
                             autoComplete="off"
                             style={{ 
-                              minWidth: '400px', 
-                              fontSize: '15px', 
-                              padding: '10px 15px',
+                              minWidth: '350px', 
+                              fontSize: '0.8rem', 
+                              padding: '0.375rem 0.5rem',
                               height: 'auto'
                             }}
                           />
                         </div>
                       </td>
-                      <td>
+                      <td style={{ padding: '0.4rem' }}>
                         <Form.Control
                           type="number"
                           value={item.cantidad}
@@ -734,14 +755,14 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
                           min="1"
                           step="1"
                           style={{ 
-                            minWidth: '100px', 
-                            fontSize: '15px', 
-                            padding: '10px 15px',
+                            minWidth: '80px', 
+                            fontSize: '0.8rem', 
+                            padding: '0.375rem 0.5rem',
                             height: 'auto'
                           }}
                         />
                       </td>
-                      <td>
+                      <td style={{ padding: '0.4rem' }}>
                         <Form.Control
                           type="number"
                           value={item.precioUnitario}
@@ -749,24 +770,24 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
                           min="0"
                           step="0.01"
                           style={{ 
-                            minWidth: '140px', 
-                            fontSize: '15px', 
-                            padding: '10px 15px',
+                            minWidth: '100px', 
+                            fontSize: '0.8rem', 
+                            padding: '0.375rem 0.5rem',
                             height: 'auto'
                           }}
                         />
                       </td>
-                      <td>
+                      <td style={{ padding: '0.4rem' }}>
                         <div className="text-end fw-bold" style={{ 
-                          padding: '10px 15px', 
-                          minWidth: '140px',
-                          fontSize: '15px',
+                          padding: '0.375rem 0.5rem', 
+                          minWidth: '100px',
+                          fontSize: '0.8rem',
                           lineHeight: '1.5'
                         }}>
                           ${(item.subtotal || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
                       </td>
-                      <td>
+                      <td style={{ padding: '0.4rem' }}>
                         <Button
                           variant="outline-danger"
                           size="sm"
@@ -794,26 +815,26 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
           {/* Totales */}
           <div className="row">
             <div className="col-md-12 d-flex justify-content-end">
-              <div className="col-md-6">
+              <div className="col-md-5">
                 <div className="card">
-                  <div className="card-header bg-primary text-white">
-                    <h6 className="mb-0">
+                  <div className="card-header bg-primary text-white" style={{ padding: '0.5rem' }}>
+                    <h6 className="mb-0" style={{ fontSize: '0.9rem' }}>
                       <i className="fas fa-calculator me-2"></i>
                       Resumen de Totales
                     </h6>
                   </div>
-                  <div className="card-body">
-                    <div className="d-flex justify-content-between py-2 border-bottom">
+                  <div className="card-body" style={{ padding: '0.75rem' }}>
+                    <div className="d-flex justify-content-between py-1 border-bottom" style={{ fontSize: '0.85rem' }}>
                       <span>Subtotal:</span>
                       <span className="fw-bold">${(formData.subtotal || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
-                    <div className="d-flex justify-content-between py-2 border-bottom">
+                    <div className="d-flex justify-content-between py-1 border-bottom" style={{ fontSize: '0.85rem' }}>
                       <span>Utilidad ({formData.utilidad}%):</span>
                       <span className="text-success fw-bold">+${(((formData.subtotal || 0) * (formData.utilidad || 0)) / 100).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
-                    <div className="d-flex justify-content-between py-3 bg-light rounded mt-2">
+                    <div className="d-flex justify-content-between py-2 bg-light rounded mt-2" style={{ fontSize: '0.9rem' }}>
                       <span className="fw-bold text-primary">Total:</span>
-                      <span className="fw-bold text-primary fs-5">${(formData.total || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span className="fw-bold text-primary fs-6">${(formData.total || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                   </div>
                 </div>
@@ -822,7 +843,7 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
           </div>
         </Form>
       </Modal.Body>
-      <Modal.Footer>
+      <Modal.Footer className="px-2 py-2">
         <Button variant="secondary" onClick={handleClose}>
           Cancelar
         </Button>

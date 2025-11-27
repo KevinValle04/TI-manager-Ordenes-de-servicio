@@ -140,100 +140,59 @@ export class CotizacionCanalizacionPdfGenerator {
             
             ${topImageBase64 ? `<img src="${topImageBase64}" alt="Header Corporativo" style="width: 100%; height: auto; max-height: 100px; display: block;">` : ''}
             
-            <!-- TABLA DE ENCABEZADO OPTIMIZADA -->
-            <table id="tabla-top" style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+            <!-- TABLA DE ENCABEZADO ULTRA COMPACTA -->
+            <table id="tabla-top" style="width: 100%; border-collapse: collapse; margin-bottom: 8px;">
               <tbody>
-                <!-- Título de la cotización -->
+                <!-- Fila 1: Título y datos del documento -->
                 <tr>
-                  <td colspan="6" style="border: none; padding: 2px;"></td>
-                  <td colspan="4" style="font-weight: bold; color: #0F2A52; text-align: right; font-size: 13pt; padding: 5px;">Lista de Materiales - Canalización</td>
+                  <td colspan="3" style="font-weight: bold; color: #0F2A52; text-align: left; font-size: 11pt; padding: 3px 0; vertical-align: middle;">Lista de Materiales - Canalización</td>
+                  <td style="padding: 2px 5px; font-size: 7pt; font-weight: bold; background: #e9ecef; border: 1px solid #ccc; width: 70px;">No. Lista</td>
+                  <td style="background: #f8f9fa; font-weight: bold; padding: 2px 5px; border: 1px solid #ccc; font-size: 7pt; text-align: center; width: 100px;">${numeroPresupuesto}</td>
+                  <td style="padding: 2px 5px; font-size: 7pt; font-weight: bold; background: #e9ecef; border: 1px solid #ccc; width: 60px;">Fecha</td>
+                  <td style="background: #f8f9fa; font-weight: bold; padding: 2px 5px; border: 1px solid #ccc; font-size: 7pt; text-align: center; width: 100px;">${fecha}</td>
                 </tr>
                 
-                <!-- Información del documento expandida -->
+                <!-- Fila 2: Vigencia y Estado -->
                 <tr>
-                  <td colspan="4" style="border: none; padding: 1px;"></td>
-                  <td colspan="2" style="border: none;"></td>
-                  <td style="padding: 4px 8px; font-size: 8.5pt; font-weight: bold; background: #e9ecef; border: 1px solid #ccc;">No. Lista</td>
-                  <td colspan="3" style="background: #f8f9fa; font-weight: bold; padding: 4px 8px; border: 1px solid #ccc; font-size: 8.5pt; text-align: center;">${numeroPresupuesto}</td>
-                </tr>
-                <tr>
-                  <td colspan="4" style="border: none; padding: 1px;"></td>
-                  <td colspan="2" style="border: none;"></td>
-                  <td style="padding: 4px 8px; font-size: 8.5pt; font-weight: bold; background: #e9ecef; border: 1px solid #ccc;">Fecha</td>
-                  <td colspan="3" style="background: #f8f9fa; font-weight: bold; padding: 4px 8px; border: 1px solid #ccc; font-size: 8.5pt; text-align: center;">${fecha}</td>
-                </tr>
-                <tr>
-                  <td colspan="4" style="border: none; padding: 1px;"></td>
-                  <td colspan="2" style="border: none;"></td>
-                  <td style="padding: 4px 8px; font-size: 8.5pt; font-weight: bold; background: #e9ecef; border: 1px solid #ccc;">Vigencia</td>
-                  <td colspan="3" style="background: #f8f9fa; font-weight: bold; padding: 4px 8px; border: 1px solid #ccc; font-size: 8.5pt; text-align: center;">${vigencia}</td>
-                </tr>
-                <tr>
-                  <td colspan="4" style="border: none; padding: 1px;"></td>
-                  <td colspan="2" style="border: none;"></td>
-                  <td style="padding: 4px 8px; font-size: 8.5pt; font-weight: bold; background: #e9ecef; border: 1px solid #ccc;">Estado</td>
-                  <td colspan="3" style="background: #f8f9fa; font-weight: bold; padding: 4px 8px; border: 1px solid #ccc; font-size: 8.5pt; text-align: center; color: #0F2A52;">${estado}</td>
+                  <td colspan="3" style="border: none;"></td>
+                  <td style="padding: 2px 5px; font-size: 7pt; font-weight: bold; background: #e9ecef; border: 1px solid #ccc;">Vigencia</td>
+                  <td style="background: #f8f9fa; font-weight: bold; padding: 2px 5px; border: 1px solid #ccc; font-size: 7pt; text-align: center;">${vigencia}</td>
+                  <td style="padding: 2px 5px; font-size: 7pt; font-weight: bold; background: #e9ecef; border: 1px solid #ccc;">Estado</td>
+                  <td style="background: #f8f9fa; font-weight: bold; padding: 2px 5px; border: 1px solid #ccc; font-size: 7pt; text-align: center; color: #0F2A52;">${estado}</td>
                 </tr>
                 
-                <!-- Espaciador pequeño -->
+                <!-- Espaciador mínimo -->
                 <tr>
-                  <td colspan="10" style="border: none; height: 6px;"></td>
+                  <td colspan="7" style="border: none; height: 4px;"></td>
                 </tr>
                 
-                <!-- SECCIÓN CLIENTE COMPACTA -->
+                <!-- Fila 3: Headers de información en dos columnas -->
                 <tr>
-                  <td colspan="5" style="background-color: #0F2A52; color: white; font-weight: bold; padding: 5px 8px; border: 1px solid #0F2A52; font-size: 9pt; text-transform: uppercase;">INFORMACIÓN DEL CLIENTE</td>
-                  <td colspan="5" style="border: none;"></td>
+                  <td colspan="3" style="background-color: #0F2A52; color: white; font-weight: bold; padding: 3px 6px; border: 1px solid #0F2A52; font-size: 7.5pt; text-transform: uppercase;">INFORMACIÓN DEL CLIENTE</td>
+                  <td style="border: none; width: 8px;"></td>
+                  <td colspan="3" style="background-color: #0F2A52; color: white; font-weight: bold; padding: 3px 6px; border: 1px solid #0F2A52; font-size: 7.5pt; text-transform: uppercase;">DATOS DE CONTACTO</td>
                 </tr>
+                
+                <!-- Fila 4: Datos del cliente y contacto en paralelo -->
                 <tr>
-                  <td colspan="5" style="padding: 6px 8px; background: #f8fafc; border: 1px solid #ddd; font-size: 8.5pt; line-height: 1.2;">
-                    <div style="margin-bottom: 2px;"><strong style="color: #0F2A52;">Cliente:</strong> ${cliente}</div>
-                    <div style="margin-bottom: 2px;"><strong style="color: #0F2A52;">Empresa:</strong> ${nombreEmpresa}</div>
-                    <div style="margin-bottom: 2px;"><strong style="color: #0F2A52;">RFC:</strong> ${rfcEmpresa}</div>
+                  <td colspan="3" style="padding: 4px 6px; background: #f8fafc; border: 1px solid #ddd; font-size: 7pt; line-height: 1.3; vertical-align: top;">
+                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">Cliente:</strong> ${cliente}</div>
+                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">Empresa:</strong> ${nombreEmpresa}</div>
+                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">RFC:</strong> ${rfcEmpresa}</div>
                     <div><strong style="color: #0F2A52;">Dirección:</strong> ${direccionEmpresa}</div>
                   </td>
-                  <td colspan="5" style="border: none;"></td>
-                </tr>
-                
-                <!-- Espaciador pequeño -->
-                <tr>
-                  <td colspan="10" style="border: none; height: 4px;"></td>
-                </tr>
-                
-                <!-- SECCIÓN CONTACTO COMPACTA -->
-                <tr>
-                  <td colspan="5" style="background-color: #0F2A52; color: white; font-weight: bold; padding: 5px 8px; border: 1px solid #0F2A52; font-size: 9pt; text-transform: uppercase;">DATOS DE CONTACTO</td>
-                  <td colspan="5" style="border: none;"></td>
-                </tr>
-                <tr>
-                  <td colspan="5" style="padding: 6px 8px; background: #f8fafc; border: 1px solid #ddd; font-size: 8.5pt; line-height: 1.2;">
-                    <div style="margin-bottom: 2px;"><strong style="color: #0F2A52;">Teléfono:</strong> ${telEmpresa}</div>
-                    <div><strong style="color: #0F2A52;">Email:</strong> ${emailEmpresa}</div>
+                  <td style="border: none;"></td>
+                  <td colspan="3" style="padding: 4px 6px; background: #f8fafc; border: 1px solid #ddd; font-size: 7pt; line-height: 1.3; vertical-align: top;">
+                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">Teléfono:</strong> ${telEmpresa}</div>
+                    <div style="margin-bottom: 1px;"><strong style="color: #0F2A52;">Email:</strong> ${emailEmpresa}</div>
+                    <div style="margin-top: 8px;"><strong style="color: #0F2A52;">Tipo:</strong> Checklist de materiales</div>
+                    <div><strong style="color: #0F2A52;">Observaciones:</strong> ${comentarios}</div>
                   </td>
-                  <td colspan="5" style="border: none;"></td>
                 </tr>
                 
-                <!-- Espaciador pequeño -->
+                <!-- Espaciador final mínimo -->
                 <tr>
-                  <td colspan="10" style="border: none; height: 4px;"></td>
-                </tr>
-                
-                <!-- SECCIÓN DETALLES COMPACTA -->
-                <tr>
-                  <td colspan="5" style="background-color: #0F2A52; color: white; font-weight: bold; padding: 5px 8px; border: 1px solid #0F2A52; font-size: 9pt; text-transform: uppercase;">DETALLES DE COTIZACIÓN</td>
-                  <td colspan="5" style="border: none;"></td>
-                </tr>
-                <tr>
-                  <td colspan="5" style="padding: 6px 8px; background: #f8fafc; border: 1px solid #ddd; font-size: 8.5pt; line-height: 1.2;">
-                    <div style="margin-bottom: 2px;"><strong style="color: #0F2A52;">Tipo de listado:</strong> Checklist de materiales</div>
-                    <div><strong style="color: #0F2A52;">Válida hasta:</strong> ${vigencia}</div>
-                  </td>
-                  <td colspan="5" style="border: none;"></td>
-                </tr>
-                
-                <!-- Espaciador final -->
-                <tr>
-                  <td colspan="10" style="border: none; height: 8px;"></td>
+                  <td colspan="7" style="border: none; height: 6px;"></td>
                 </tr>
               </tbody>
             </table>
@@ -250,29 +209,6 @@ export class CotizacionCanalizacionPdfGenerator {
               </thead>
               <tbody>
                 ${filasItems}
-              </tbody>
-            </table>
-
-            <!-- INFORMACIÓN ADICIONAL COMPACTA -->
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px; border: 1px solid #0F2A52;">
-              <thead>
-                <tr>
-                  <th colspan="2" style="background: #0F2A52; color: white; padding: 6px 10px; font-size: 9pt; text-transform: uppercase; text-align: left;">INFORMACIÓN ADICIONAL</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style="background-color: #f8fafc; font-weight: bold; padding: 5px 8px; border-bottom: 1px solid #ddd; font-size: 8.5pt; width: 140px; color: #0F2A52;">OBSERVACIONES</td>
-                  <td style="padding: 5px 8px; border-bottom: 1px solid #ddd; font-size: 8.5pt; background: white;">${comentarios}</td>
-                </tr>
-                <tr>
-                  <td style="background-color: #f8fafc; font-weight: bold; padding: 5px 8px; border-bottom: 1px solid #ddd; font-size: 8.5pt; color: #0F2A52;">PROPÓSITO</td>
-                  <td style="padding: 5px 8px; border-bottom: 1px solid #ddd; font-size: 8.5pt; background: white;">Lista de verificación de materiales de canalización eléctrica</td>
-                </tr>
-                <tr>
-                  <td style="background-color: #f8fafc; font-weight: bold; padding: 5px 8px; border-bottom: 1px solid #ddd; font-size: 8.5pt; color: #0F2A52;">INSTRUCCIONES</td>
-                  <td style="padding: 5px 8px; border-bottom: 1px solid #ddd; font-size: 8.5pt; background: white;">Marcar con ✓ los materiales conforme se vayan verificando o entregando</td>
-                </tr>
               </tbody>
             </table>
 
