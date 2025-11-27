@@ -4,73 +4,92 @@
   <meta charset="UTF-8">
   <title>Cotización - {{numeroPresupuesto}}</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      font-size: 12px;
+      padding: 6px;
+      font-size: 5pt;
+      line-height: 1.1;
     }
 
     #tabla-cotizacion-wrapper {
-      max-width: 1200px;
-      margin: 0 auto;
+      max-width: 100%;
     }
 
     .header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 6px;
     }
 
     .header h1 {
       color: #0F2A52;
-      font-size: 24px;
-      margin-bottom: 5px;
+      font-size: 8pt;
+      margin: 1px 0;
     }
 
     .info-section {
-      margin-bottom: 20px;
-      border: 1px solid #dee2e6;
-      padding: 15px;
+      margin-bottom: 6px;
+      border: none;
+      padding: 4px 6px;
+      page-break-inside: avoid;
+    }
+
+    .info-section h3 {
+      font-size: 5.5pt;
+      margin: 0 0 2px 0;
+      color: #0F2A52;
+      font-weight: bold;
     }
 
     .info-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      gap: 3px 8px;
     }
 
-    /* Forzar una sola columna cuando se necesite */
     .info-grid.single-column {
       grid-template-columns: 1fr;
     }
 
     .info-item {
       display: flex;
-      gap: 10px;
+      gap: 3px;
+      font-size: 5pt;
+      line-height: 1.2;
     }
 
     .info-label {
       font-weight: bold;
       color: #0F2A52;
-      min-width: 120px;
+      min-width: 65px;
+      flex-shrink: 0;
     }
 
     .items-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 20px;
+      margin-bottom: 4px;
+      font-size: 6pt;
     }
 
     .items-table th,
     .items-table td {
-      border: 1px solid #dee2e6;
-      padding: 8px;
+      border: 1px solid #ccc;
+      padding: 2px 4px;
+      line-height: 1.2;
     }
 
     .items-table th {
       background-color: #0F2A52;
       color: white;
       text-align: center;
+      font-size: 6pt;
+      font-weight: bold;
     }
 
     .items-table td.text-right {
@@ -83,59 +102,66 @@
 
     .totals-section {
       margin-left: auto;
-      width: 300px;
+      width: 220px;
+      margin-bottom: 6px;
     }
 
     .total-row {
       display: flex;
       justify-content: space-between;
-      padding: 5px 10px;
-      border-bottom: 1px solid #dee2e6;
+      padding: 2px 6px;
+      border-bottom: 1px solid #ccc;
+      font-size: 6pt;
     }
 
     .total-row.grand-total {
       background-color: #0F2A52;
       color: white;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 6pt;
     }
 
     .comments-section {
-      margin: 20px 0;
-      padding: 15px;
-      border: 1px solid #dee2e6;
+      margin: 4px 0;
+      padding: 3px 4px;
+      border: 1px solid #ccc;
       background: #f8f9fa;
+      font-size: 5pt;
+      line-height: 1.2;
     }
 
     .signatures {
-      margin-top: 50px;
+      margin-top: 10px;
       display: flex;
       justify-content: space-around;
     }
 
     .signature-line {
-      width: 200px;
+      width: 140px;
       text-align: center;
+      font-size: 5pt;
     }
 
     .signature-line hr {
-      margin-bottom: 5px;
+      margin-bottom: 2px;
+      border: none;
+      border-top: 1px solid #000;
     }
 
     .footer {
-      margin-top: 30px;
+      margin-top: 4px;
       text-align: left;
-      font-size: 10px;
+      font-size: 4.5pt;
       color: #6c757d;
     }
 
     .logo {
       text-align: center;
-      margin: 10px 0 20px 0;
+      margin: 2px 0 4px 0;
     }
 
     .logo img {
-      max-width: 200px;
+      max-width: 90px;
       height: auto;
     }
 
@@ -148,88 +174,125 @@
 </head>
 <body>
   <div id="tabla-cotizacion-wrapper">
-    {{#if logoPath}}
-    <div class="logo">
-      <img src="{{logoPath}}" alt="Logo Empresa">
-    </div>
+    {{#if topImg}}
+    <img src="{{topImg}}" alt="Header" style="width: 100%; height: auto; display: block; margin-bottom: 4px;">
     {{/if}}
     
-    <div class="header">
-      <h1>COTIZACIÓN</h1>
-      <div class="info-grid">
-        <div class="info-item">
-          <span class="info-label">No. Cotización:</span>
-          <span>{{numeroPresupuesto}}</span>
+    <!-- Título COTIZACIÓN arriba del cuadro -->
+    <h1 style="margin: 0 0 3px 0; font-size: 8pt; color: #0F2A52; text-align: right;">COTIZACIÓN</h1>
+
+    <!-- Primera fila: Datos del Vendedor y Datos de Cotización -->
+    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+      <div class="info-section" style="flex: 1; margin-bottom: 0;">
+        <h3>Datos del Vendedor</h3>
+        <div class="info-grid single-column">
+          <div class="info-item">
+            <span class="info-label">Nombre:</span>
+            <span>{{vendedor.nombre}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Correo:</span>
+            <span>{{vendedor.email}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Teléfono:</span>
+            <span>{{vendedor.telefono}}</span>
+          </div>
         </div>
-        <div class="info-item">
-          <span class="info-label">Estado:</span>
-          <span class="status-{{estado}}">{{estado}}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Fecha:</span>
-          <span>{{fecha}}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Vigencia:</span>
-          <span>{{vigencia}}</span>
+      </div>
+
+      <!-- Datos de cotización como info-section -->
+      <div class="info-section" style="flex: 1; margin-bottom: 0; text-align: right;">
+        <h3 style="text-align: right;">Datos de Cotización</h3>
+        <div class="info-grid single-column" style="text-align: right;">
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">No. Cotización:</span>
+            <span>{{numeroPresupuesto}}</span>
+          </div>
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">Fecha:</span>
+            <span>{{fecha}}</span>
+          </div>
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">Vigencia:</span>
+            <span>{{vigencia}}</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="info-section">
-      <h3>Datos del Vendedor</h3>
-      <div class="info-grid single-column">
-        <div class="info-item">
-          <span class="info-label">Nombre:</span>
-          <span>{{vendedor.nombre}}</span>
+    <!-- Segunda fila: Datos de la Empresa y Información del Cliente -->
+    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+      {{#if razonSocial}}
+      <div class="info-section" style="flex: 1; margin-bottom: 0; position: relative;">
+        <h3>Datos de la Empresa</h3>
+        <div class="info-grid single-column">
+          <div class="info-item">
+            <span class="info-label">Razón Social:</span>
+            <span>{{razonSocial.nombre}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">RFC:</span>
+            <span>{{razonSocial.rfc}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Dirección:</span>
+            <span>{{razonSocial.direccionEmpresa}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Teléfono:</span>
+            <span>{{razonSocial.telEmpresa}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email:</span>
+            <span>{{razonSocial.emailEmpresa}}</span>
+          </div>
         </div>
-        <div class="info-item">
-          <span class="info-label">Correo:</span>
-          <span>{{vendedor.email}}</span>
+      </div>
+      {{/if}}
+
+      <div class="info-section" style="flex: 1; margin-bottom: 0; position: relative;">
+        <h3>Información del Cliente</h3>
+        <div class="info-grid single-column">
+          <div class="info-item">
+            <span class="info-label">Nombre:</span>
+            <span>{{cliente.nombre}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Compañía:</span>
+            <span>{{cliente.compania}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Dirección:</span>
+            <span>{{cliente.direccion}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Ciudad:</span>
+            <span>{{cliente.ciudad}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Teléfono:</span>
+            <span>{{cliente.telefono}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email:</span>
+            <span>{{cliente.email}}</span>
+          </div>
         </div>
-        <div class="info-item">
-          <span class="info-label">Teléfono:</span>
-          <span>{{vendedor.telefono}}</span>
+        <!-- Imagen down.png en la parte inferior derecha del cliente -->
+        <div style="position: absolute; bottom: 5px; right: 5px; width: 130px;">
+          <img src="{{downImg}}" alt="Certificaciones Cliente" style="width: 100%; height: auto;">
         </div>
       </div>
     </div>
-
-    <div class="info-section" style="position:relative; padding-bottom:40px;">
-      <h3>Información del Cliente</h3>
-      <div class="client-row" style="display:flex; gap:16px; align-items:flex-start;">
-        <div style="flex:1;">
-          <div class="info-grid single-column">
-            <div class="info-item">
-              <span class="info-label">Nombre:</span>
-              <span>{{cliente.nombre}}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">Compañía:</span>
-              <span>{{cliente.compania}}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">Dirección:</span>
-              <span>{{cliente.direccion}}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">Ciudad:</span>
-              <span>{{cliente.ciudad}}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">Teléfono:</span>
-              <span>{{cliente.telefono}}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">Email:</span>
-              <span>{{cliente.email}}</span>
             </div>
           </div>
         </div>
         <!-- imagen ahora posicionada absolutamene dentro del recuadro del cliente -->
       </div>
       {{#if downImg}}
-        <div style="position:absolute; right:16px; bottom:16px; left:auto;">
-          <img src="{{downImg}}" alt="Certificaciones" style="width:270px; height:auto; display:block;" />
+        <div style="position:absolute; right:8px; bottom:8px; left:auto;">
+          <img src="{{downImg}}" alt="Certificaciones" style="width:160px; height:auto; display:block;" />
         </div>
       {{/if}}
       </div>
@@ -240,7 +303,7 @@
     <table class="items-table">
       <thead>
         <tr>
-          <th style="width: 5%">#</th>
+          <th style="width: 5%">Clave</th>
           <th style="width: 8%">Marca</th>
           <th style="width: 8%">Modelo</th>
           <th style="width: 30%">Concepto</th>
@@ -281,6 +344,11 @@
       </div>
     </div>
 
+    <!-- Espacio para firmas después de los totales -->
+    <div style="margin-top: 120px; margin-bottom: 20px;">
+      <!-- Espacio en blanco para firmar -->
+    </div>
+
     {{#if comentarios}}
     <div class="comments-section">
       <h4>Comentarios:</h4>
@@ -289,11 +357,11 @@
     {{/if}}
 
     <div class="signatures">
-      <div class="signature-line">
+      <div class="signature-line" style="margin-bottom: 40px;">
         <hr>
         <span>Firma del Cliente</span>
       </div>
-      <div class="signature-line">
+      <div class="signature-line" style="margin-bottom: 40px;">
         <hr>
         <span>Firma de Autorización</span>
       </div>

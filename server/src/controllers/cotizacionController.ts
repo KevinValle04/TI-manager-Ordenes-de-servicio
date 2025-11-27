@@ -45,7 +45,20 @@ const prepararDatosPdf = (cotizacion: ICotizacion): CotizacionPdfData => ({
     iva: item.aplicarIva ? item.importe * (cotizacion.iva/100) : 0
   })),
   comentarios: cotizacion.comentarios,
-  razonSocial: cotizacion.razonSocial as any,
+  razonSocial: (() => {
+    const rs: any = cotizacion.razonSocial;
+    if (!rs) return undefined;
+    // Si es string (solo ID), no podemos hacer mucho
+    if (typeof rs === 'string') return undefined;
+    // Si es un objeto populado, mapear los campos
+    return {
+      nombre: rs.nombre || '',
+      rfc: rs.rfc || '',
+      emailEmpresa: rs.emailEmpresa || '',
+      telEmpresa: rs.telEmpresa || '',
+      direccionEmpresa: rs.direccionEmpresa || ''
+    };
+  })(),
   vendedor: (() => {
     const v: any = (cotizacion as any).vendedor;
     if (!v) return undefined;
