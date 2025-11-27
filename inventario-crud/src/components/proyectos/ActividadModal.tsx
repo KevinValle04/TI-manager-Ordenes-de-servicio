@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Button, Form, Modal } from 'react-bootstrap';
 import { Actividad, Colaborador } from '../../types';
 
 interface ActividadModalProps {
@@ -222,7 +222,7 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
           </div>
 
           <Form.Group className="mb-3">
-            <Form.Label>Colaboradores Implicados</Form.Label>
+            <Form.Label>Empleados Implicados</Form.Label>
             <div style={{ 
               maxHeight: '200px', 
               overflowY: 'auto', 
@@ -232,7 +232,7 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
             }}>
               {colaboradores.length === 0 ? (
                 <div className="text-muted text-center py-2">
-                  No hay colaboradores disponibles
+                  No hay empleados disponibles
                 </div>
               ) : (
                 colaboradores.map(colab => (

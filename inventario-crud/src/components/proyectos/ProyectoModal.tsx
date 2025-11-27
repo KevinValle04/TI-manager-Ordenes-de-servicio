@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
-import { Proyecto, Colaborador } from '../../types';
+import React, { useEffect, useState } from 'react';
+import { Button, Form, Modal } from 'react-bootstrap';
+import { Colaborador, Proyecto } from '../../types';
 
 interface ProyectoModalProps {
   show: boolean;
@@ -192,7 +192,7 @@ const ProyectoModal: React.FC<ProyectoModalProps> = ({
             <div className="col-md-12 mb-3">
               <Form.Group>
                 <Form.Label>
-                  Colaboradores Participantes
+                  Empleados Participantes
                 </Form.Label>
                 <div 
                   className="border rounded p-3" 
@@ -205,7 +205,7 @@ const ProyectoModal: React.FC<ProyectoModalProps> = ({
                   {colaboradoresActivos.length === 0 ? (
                     <div className="text-muted text-center py-3">
                       <i className="fas fa-users me-2"></i>
-                      No hay colaboradores activos disponibles
+                      No hay empleados activos disponibles
                     </div>
                   ) : (
                     <div className="row">
@@ -232,7 +232,7 @@ const ProyectoModal: React.FC<ProyectoModalProps> = ({
                 {formData.colaboradores && (formData.colaboradores as string[]).length > 0 && (
                   <small className="text-muted mt-2 d-block">
                     <i className="fas fa-check-circle text-success me-1"></i>
-                    {(formData.colaboradores as string[]).length} colaborador(es) seleccionado(s)
+                    {(formData.colaboradores as string[]).length} empleado(s) seleccionado(s)
                   </small>
                 )}
               </Form.Group>

@@ -4,7 +4,7 @@ import InventoryListExterior from "../components/inventario/InventoryListExterio
 const InventarioExterior: React.FC = () => {
     return (
     <div>
-      <h2>Inventario Exterior</h2>
+      <h2>Almacén Exterior</h2>
       <InventoryListExterior />
     </div>
   );
