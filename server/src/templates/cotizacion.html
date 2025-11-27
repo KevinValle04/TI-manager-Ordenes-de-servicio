@@ -349,13 +349,6 @@
       <!-- Espacio en blanco para firmar -->
     </div>
 
-    {{#if comentarios}}
-    <div class="comments-section">
-      <h4>Comentarios:</h4>
-      <p>{{comentarios}}</p>
-    </div>
-    {{/if}}
-
     <div class="signatures">
       <div class="signature-line" style="margin-bottom: 40px;">
         <hr>
@@ -377,6 +370,13 @@
       <p>Entrega de materiales y equipos de 5-8 dias</p>
       <p>Deposito por Transferencia Bancaria en Cuenta en Pesos Mexicanos</p>
       <p>Los equipos tiene garantia de 1 año</p>
+
+      {{#if comentarios}}
+      <div class="comments-section" style="margin-top: 20px;">
+        <h4>Comentarios:</h4>
+        <p>{{comentarios}}</p>
+      </div>
+      {{/if}}
 
       <!-- Footer: apilar bottom y bottom-2 verticalmente al final del documento.
            Las imágenes se muestran a ancho completo para cubrir el ancho imprimible. -->
