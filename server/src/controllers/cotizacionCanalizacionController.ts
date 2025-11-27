@@ -217,13 +217,17 @@ export const getPdfCotizacionCanalizacion = async (req: Request, res: Response) 
   try {
     const { id } = req.params;
     
-    // Buscar la cotización con datos poblados
+    // Buscar la cotización con datos poblados (cliente y razón social)
     const cotizacion = await CotizacionCanalizacion.findById(id)
-      .populate('razonSocial', 'nombre rfc emailEmpresa telEmpresa direccionEmpresa');
+      .populate('razonSocial', 'nombre rfc emailEmpresa telEmpresa celularEmpresa direccionEmpresa emailFacturacion direccionesEnvio');
     
     if (!cotizacion) {
       return res.status(404).json({ error: 'Cotización de canalización no encontrada' });
     }
+    
+    // Buscar información del cliente por nombre
+    const Cliente = require('../models/Cliente').default;
+    const clienteInfo = await Cliente.findOne({ nombreEmpresa: cotizacion.cliente });
 
     // Preparar datos para el PDF
     const datosPdf = {
@@ -243,7 +247,13 @@ export const getPdfCotizacionCanalizacion = async (req: Request, res: Response) 
         subtotal: item.subtotal
       })),
       comentarios: cotizacion.comentarios,
-      razonSocial: cotizacion.razonSocial as any
+      razonSocial: cotizacion.razonSocial as any,
+      clienteInfo: clienteInfo ? {
+        nombreEmpresa: clienteInfo.nombreEmpresa,
+        direccion: clienteInfo.direccion,
+        telefono: clienteInfo.telefono,
+        contactos: clienteInfo.contactos
+      } : null
     };
 
     // Generar PDF
@@ -272,13 +282,17 @@ export const descargarPdfCotizacionCanalizacion = async (req: Request, res: Resp
   try {
     const { id } = req.params;
     
-    // Buscar la cotización con datos poblados
+    // Buscar la cotización con datos poblados (cliente y razón social)
     const cotizacion = await CotizacionCanalizacion.findById(id)
-      .populate('razonSocial', 'nombre rfc emailEmpresa telEmpresa direccionEmpresa');
+      .populate('razonSocial', 'nombre rfc emailEmpresa telEmpresa celularEmpresa direccionEmpresa emailFacturacion direccionesEnvio');
     
     if (!cotizacion) {
       return res.status(404).json({ error: 'Cotización de canalización no encontrada' });
     }
+    
+    // Buscar información del cliente por nombre
+    const Cliente = require('../models/Cliente').default;
+    const clienteInfo = await Cliente.findOne({ nombreEmpresa: cotizacion.cliente });
 
     // Preparar datos para el PDF
     const datosPdf = {
@@ -298,7 +312,13 @@ export const descargarPdfCotizacionCanalizacion = async (req: Request, res: Resp
         subtotal: item.subtotal
       })),
       comentarios: cotizacion.comentarios,
-      razonSocial: cotizacion.razonSocial as any
+      razonSocial: cotizacion.razonSocial as any,
+      clienteInfo: clienteInfo ? {
+        nombreEmpresa: clienteInfo.nombreEmpresa,
+        direccion: clienteInfo.direccion,
+        telefono: clienteInfo.telefono,
+        contactos: clienteInfo.contactos
+      } : null
     };
 
     // Generar PDF
