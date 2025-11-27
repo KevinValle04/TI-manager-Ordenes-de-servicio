@@ -1,17 +1,17 @@
 
 // src/components/inventario/InventoryListExterior.tsx
-import { useState, useEffect } from "react";
 import axios from "axios";
-import { IInventoryItem } from "../../types";
-import { Button, Modal, Form, Table, Row, Col } from "react-bootstrap";
-import SearchBar from "../common/SearchBar";
-import DataTable, { DataTableColumn } from "../common/DataTable";
 import { jwtDecode } from 'jwt-decode';
-import ExportExcelButton from "../common/ExportExcelButton";
-import PaginationCompact from "../common/PaginationCompact";
-import ItemModal from "../common/ItemModal";
-import BajaModal from "../common/BajaModal";
+import { useEffect, useState } from "react";
+import { Button, Col, Form, Modal, Row, Table } from "react-bootstrap";
+import { IInventoryItem } from "../../types";
 import AltaModal from "../common/AltaModal";
+import BajaModal from "../common/BajaModal";
+import DataTable, { DataTableColumn } from "../common/DataTable";
+import ExportExcelButton from "../common/ExportExcelButton";
+import ItemModal from "../common/ItemModal";
+import PaginationCompact from "../common/PaginationCompact";
+import SearchBar from "../common/SearchBar";
 
 // Componente funcional para la página de inventario exterior
 const InventoryListExterior: React.FC = () => {
@@ -365,8 +365,60 @@ const InventoryListExterior: React.FC = () => {
     setMovPage(1);
   }, [movimientos, movDesde, movHasta]);
 
+  // Calcular totales del inventario
+  const calcularTotales = () => {
+    const precioUnitarioTotal = filteredItems.reduce((sum, item) => sum + (item.precioUnitario || 0), 0);
+    const precioTotalInventario = filteredItems.reduce((sum, item) => {
+      const precioTotal = (item.precioUnitario || 0) * (item.cantidad || 0);
+      return sum + precioTotal;
+    }, 0);
+    return { precioUnitarioTotal, precioTotalInventario };
+  };
+
+  const { precioUnitarioTotal, precioTotalInventario } = calcularTotales();
+
   return (
     <div className="container-fluid mt-4 px-1 px-sm-3">
+      {/* Resumen de precios del inventario */}
+      <div className="row mb-3">
+        <div className="col-md-6 mb-2">
+          <div className="card border-primary" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
+            <div className="card-body py-3">
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 className="text-muted mb-1" style={{ fontSize: "0.85rem" }}>Precio Unitario Total</h6>
+                  <h4 className="mb-0 text-primary" style={{ fontWeight: 600 }}>
+                    ${precioUnitarioTotal.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </h4>
+                  <small className="text-muted">Suma de todos los precios unitarios</small>
+                </div>
+                <div className="text-primary" style={{ fontSize: "2.5rem", opacity: 0.2 }}>
+                  <i className="fas fa-dollar-sign"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-6 mb-2">
+          <div className="card border-success" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
+            <div className="card-body py-3">
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 className="text-muted mb-1" style={{ fontSize: "0.85rem" }}>Precio Total del Inventario</h6>
+                  <h4 className="mb-0 text-success" style={{ fontWeight: 600 }}>
+                    ${precioTotalInventario.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </h4>
+                  <small className="text-muted">Precio unitario × cantidad de cada producto</small>
+                </div>
+                <div className="text-success" style={{ fontSize: "2.5rem", opacity: 0.2 }}>
+                  <i className="fas fa-coins"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-stretch gap-2 mb-3">
         <SearchBar
           value={searchTerm}

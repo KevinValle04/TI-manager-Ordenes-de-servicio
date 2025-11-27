@@ -538,7 +538,7 @@ const ColaboradorList: React.FC = () => {
               setSelectedFile(null);
             }}
           >
-            Agregar Colaborador
+            Agregar Empleado
           </Button>
         )}
       </div>
@@ -608,7 +608,7 @@ const ColaboradorList: React.FC = () => {
 
       <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
         <Modal.Header closeButton className="bg-light border-bottom">
-          <Modal.Title>{editId ? 'Editar Colaborador' : 'Agregar Colaborador'}</Modal.Title>
+          <Modal.Title>{editId ? 'Editar Empleado' : 'Agregar Empleado'}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="px-4 py-3">
           <Form>

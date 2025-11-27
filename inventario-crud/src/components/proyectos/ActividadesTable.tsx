@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Table, Badge } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Badge, Button, Table } from 'react-bootstrap';
 import { Actividad, Colaborador, Proyecto } from '../../types';
 import ActividadModal from './ActividadModal';
 
@@ -116,7 +116,7 @@ const ActividadesTable: React.FC<ActividadesTableProps> = ({
 
   const getColaboradoresNames = (actividad: Actividad) => {
     if (!actividad.colaboradores || actividad.colaboradores.length === 0) {
-      return <span className="text-muted">Sin colaboradores</span>;
+      return <span className="text-muted">Sin empleados</span>;
     }
 
     const colaboradoresList = actividad.colaboradores.map(c => {
@@ -178,7 +178,7 @@ const ActividadesTable: React.FC<ActividadesTableProps> = ({
                 <th>Fecha Inicio</th>
                 <th>Fecha Final</th>
                 <th>Estado</th>
-                <th>Colaboradores</th>
+                <th>Empleados</th>
                 <th>Acciones</th>
               </tr>
             </thead>

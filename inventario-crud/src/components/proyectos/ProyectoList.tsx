@@ -389,7 +389,7 @@ const ProyectoList: React.FC = () => {
 
   const getColaboradoresNames = (proyecto: Proyecto) => {
     if (!proyecto.colaboradores || proyecto.colaboradores.length === 0) {
-      return <span className="text-muted">Sin colaboradores</span>;
+      return <span className="text-muted">Sin empleados</span>;
     }
 
     const colaboradoresList = proyecto.colaboradores.map(c => {
@@ -443,7 +443,7 @@ const ProyectoList: React.FC = () => {
     },
     { 
       key: 'colaboradores', 
-      label: 'Colaboradores',
+      label: 'Empleados',
       render: (proyecto: Proyecto) => getColaboradoresNames(proyecto)
     },
     { 

@@ -1,26 +1,26 @@
 // src/layout/MainLayout.tsx
+import { jwtDecode } from "jwt-decode";
+import { useEffect, useState } from "react";
+import {
+    FaBars,
+    FaBolt,
+    FaBoxes,
+    FaBuilding,
+    FaCog,
+    FaFileAlt,
+    FaFileInvoiceDollar,
+    FaProjectDiagram,
+    FaShoppingCart,
+    FaTachometerAlt,
+    FaTools,
+    FaTruck,
+    FaUser,
+    FaUsers,
+    FaUserTie,
+    FaWarehouse
+} from "react-icons/fa";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import "./MainLayout.css";
-import { useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
-import { 
-  FaBars, 
-  FaCog, 
-  FaUser,
-  FaTachometerAlt, 
-  FaBoxes, 
-  FaWarehouse, 
-  FaBolt, 
-  FaProjectDiagram, 
-  FaFileInvoiceDollar, 
-  FaUsers, 
-  FaUserTie, 
-  FaFileAlt, 
-  FaShoppingCart,
-  FaTruck,
-  FaBuilding,
-  FaTools
-} from "react-icons/fa";
 
 const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> = ({ username, onLogout }) => {
   const location = useLocation();
@@ -62,12 +62,12 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
         { path: "/solicitudes-herramientas", label: "Solicitudes de Herramientas", icon: <FaTools size={14} /> },
       ],
     }] : []),
-    // Colaboradores
+    // Empleados
     {
-      label: "Colaboradores",
+      label: "Empleados",
       icon: <FaUsers size={16} />,
       items: [
-        { path: "/colaboradores", label: "Colaboradores", icon: <FaUsers size={14} /> },
+        { path: "/colaboradores", label: "Empleados", icon: <FaUsers size={14} /> },
       ],
     },
     // Guías
@@ -90,11 +90,11 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
       ],
     },
     {
-      label: "Inventario",
+      label: "Almacén",
       icon: <FaBoxes size={16} />,
       items: [
-        { path: "/inventario", label: "Inventario Interior", icon: <FaWarehouse size={14} /> },
-        { path: "/inventarioExterior", label: "Inventario Exterior", icon: <FaWarehouse size={14} /> },
+        { path: "/inventario", label: "Almacén Interior", icon: <FaWarehouse size={14} /> },
+        { path: "/inventarioExterior", label: "Almacén Exterior", icon: <FaWarehouse size={14} /> },
         ...((token && !(jwtDecode(token) as any).isAdmin) ? [
           { path: "/solicitudes-inventario", label: "Solicitudes", icon: <FaFileAlt size={14} /> }
         ] : []),
