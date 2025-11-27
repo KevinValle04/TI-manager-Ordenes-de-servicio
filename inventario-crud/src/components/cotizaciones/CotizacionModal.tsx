@@ -886,10 +886,13 @@ const CotizacionModal = ({
               </div>
 
               {/* Modal de búsqueda de canalizaciones */}
+              {/* {console.log('Renderizando modal con showCanalizacionModal:', showCanalizacionModal)} */}
               <Modal 
-                show={showCanalizacionModal} 
+                show={showCanalizacionModal}
                 onHide={() => setShowCanalizacionModal(false)}
                 size="lg"
+                style={{ zIndex: 9999 }}
+                backdrop="static"
               >
                 <Modal.Header closeButton>
                   <Modal.Title>Buscar Canalización</Modal.Title>
