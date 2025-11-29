@@ -2,169 +2,350 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Cotización de Canalización - {{numeroPresupuesto}}</title>
-  <link rel="stylesheet" href="cotizacionCanalizacion.css">
+  <title>Presupuesto de Canalización - {{numeroPresupuesto}}</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      padding: 6px;
+      font-size: 5pt;
+      line-height: 1.1;
+    }
+
+    #tabla-cotizacion-wrapper {
+      max-width: 100%;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .header h1 {
+      color: #0F2A52;
+      font-size: 8pt;
+      margin: 1px 0;
+    }
+
+    .info-section {
+      margin-bottom: 6px;
+      border: none;
+      padding: 4px 6px;
+      page-break-inside: avoid;
+    }
+
+    .info-section h3 {
+      font-size: 5.5pt;
+      margin: 0 0 2px 0;
+      color: #0F2A52;
+      font-weight: bold;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 3px 8px;
+    }
+
+    .info-grid.single-column {
+      grid-template-columns: 1fr;
+    }
+
+    .info-item {
+      display: flex;
+      gap: 3px;
+      font-size: 5pt;
+      line-height: 1.2;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #0F2A52;
+      min-width: 65px;
+      flex-shrink: 0;
+    }
+
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 4px;
+      font-size: 6pt;
+    }
+
+    .items-table th,
+    .items-table td {
+      border: 1px solid #ccc;
+      padding: 2px 4px;
+      line-height: 1.2;
+    }
+
+    .items-table th {
+      background-color: #0F2A52;
+      color: white;
+      text-align: center;
+      font-size: 6pt;
+      font-weight: bold;
+    }
+
+    .items-table td.text-right {
+      text-align: right;
+    }
+
+    .items-table td.text-center {
+      text-align: center;
+    }
+
+    .totals-section {
+      margin-left: auto;
+      width: 220px;
+      margin-bottom: 6px;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px 6px;
+      border-bottom: 1px solid #ccc;
+      font-size: 6pt;
+    }
+
+    .total-row.grand-total {
+      background-color: #0F2A52;
+      color: white;
+      font-weight: bold;
+      font-size: 6pt;
+    }
+
+    .comments-section {
+      margin: 4px 0;
+      padding: 3px 4px;
+      border: 1px solid #ccc;
+      background: #f8f9fa;
+      font-size: 6pt;
+      line-height: 1.2;
+    }
+
+    .signatures {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .signature-line {
+      width: 140px;
+      text-align: center;
+      font-size: 5pt;
+    }
+
+    .signature-line hr {
+      margin-bottom: 2px;
+      border: none;
+      border-top: 1px solid #000;
+    }
+
+    .footer {
+      margin-top: 4px;
+      text-align: left;
+      font-size: 6pt;
+      color: #6c757d;
+    }
+
+    .logo {
+      text-align: center;
+      margin: 2px 0 4px 0;
+    }
+
+    .logo img {
+      max-width: 90px;
+      height: auto;
+    }
+
+    .status-Borrador { color: #6c757d; }
+    .status-Enviada { color: #007bff; }
+    .status-Aceptada { color: #28a745; }
+    .status-Rechazada { color: #dc3545; }
+    .status-Vencida { color: #ffc107; }
+  </style>
 </head>
 <body>
-  <div id="tabla-cotizacion-wrapper" style="width:100%;overflow-x:auto;">
+  <div id="tabla-cotizacion-wrapper">
+    {{#if topImg}}
+    <img src="{{topImg}}" alt="Header" style="width: 100%; height: auto; display: block; margin-bottom: 4px;">
+    {{/if}}
     
-    <!-- ===== IMAGEN SUPERIOR CORPORATIVA ===== -->
-    <img src="img/top.png" alt="Header Corporativo">
-    
-    <!-- ===== TABLA DE ENCABEZADO ESTILO ORDEN COMPRA ===== -->
-    <table id="tabla-top">
-      <tbody>
-        <tr>
-          <td class="columnaA"></td>
-          <td class="columnaB"></td>
-          <td class="columnaC"></td>
-          <td class="columnaD"></td>
-          <td class="columnaE"></td>
-          <td class="columnaF"></td>
-          <td class="columnaG"></td>
-          <td class="columnaH"></td>
-          <td class="columnaI"></td>
-          <td class="columnaJ"></td>
-        </tr>
-        <tr>
-          <td colspan="8"></td><td colspan="2" class="td-text-archivo" style="font-size: 15pt !important;">Cotización de Canalización</td>
-        </tr>
-        <tr>
-          <td colspan="6" class="td-info"></td><td></td><td></td><td class="td-info-text">No. Cotización</td><td class="td-doc-info">{{numeroPresupuesto}}</td>
-        </tr>
-        <tr>
-          <td colspan="6" class="td-info-text"></td><td></td><td></td><td class="td-info-text">Fecha</td><td class="td-doc-info">{{fecha}}</td>
-        </tr>
-        <tr>
-          <td colspan="6" class="td-info-text"></td><td></td><td></td><td class="td-info-text">Vigencia</td><td class="td-doc-info">{{vigencia}}</td>
-        </tr>
-        <tr>
-          <td colspan="6" class="td-info-text"></td><td></td><td></td><td class="td-info-text">Estado</td><td class="td-doc-info status-{{estado}}">{{estado}}</td>
-        </tr>
-        <tr>
-          <td colspan="2" class="td-info">CLIENTE</td><td></td><td></td><td></td><td></td>
-        </tr>
-        <tr>
-          <td></td><td></td><td colspan="6" class="td-info-text">{{cliente}}</td><td></td><td></td>
-        </tr>
-        {{#if razonSocial}}
-        <tr>
-          <td></td><td></td><td colspan="6" class="td-info-text">{{razonSocial.nombre}}</td><td></td><td></td>
-        </tr>
-        <tr>
-          <td></td><td></td><td colspan="6" class="td-info-text">RFC: {{razonSocial.rfc}}</td><td></td><td></td>
-        </tr>
-        {{#if razonSocial.direccionEmpresa}}
-        <tr>
-          <td></td><td></td><td colspan="6" class="td-info-text">{{razonSocial.direccionEmpresa}}</td><td></td><td></td>
-        </tr>
-        {{/if}}
-        {{/if}}
-        <tr>
-          <td colspan="2" class="td-info">CONTACTO</td><td colspan="6" class="td-info-text"></td><td></td><td></td>
-        </tr>
-        {{#if razonSocial}}
-        {{#if razonSocial.telEmpresa}}
-        <tr>
-          <td></td><td></td><td colspan="6" class="td-info-text">Tel: {{razonSocial.telEmpresa}}</td><td></td><td></td>
-        </tr>
-        {{/if}}
-        {{#if razonSocial.emailEmpresa}}
-        <tr>
-          <td></td><td></td><td colspan="6" class="td-info-text">Email: {{razonSocial.emailEmpresa}}</td><td></td><td></td>
-        </tr>
-        {{/if}}
-        {{/if}}
-        <tr>
-          <td colspan="2" class="td-info">DETALLES COTIZACIÓN</td><td colspan="6" class="td-info-text"></td><td></td><td></td>
-        </tr>
-        <tr>
-          <td></td><td></td><td colspan="6" class="td-info-text">Utilidad: {{utilidad}}</td><td></td><td></td>
-        </tr>
-        <tr>
-          <td></td><td></td><td colspan="6" class="td-info-text">Válida hasta: {{vigencia}}</td><td></td><td></td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Título PRESUPUESTO DE CANALIZACIÓN arriba del cuadro -->
+    <h1 style="margin: 0 0 3px 0; font-size: 8pt; color: #0F2A52; text-align: right;">PRESUPUESTO DE CANALIZACIÓN</h1>
 
-    <!-- ===== TABLA DE ITEMS ===== -->
-    <table class="tabla-items">
+    <!-- Primera fila: Datos de la Empresa y Datos de Presupuesto -->
+    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+      {{#if razonSocial}}
+      <div class="info-section" style="flex: 1; margin-bottom: 0;">
+        <h3>Datos de la Empresa</h3>
+        <div class="info-grid single-column">
+          <div class="info-item">
+            <span class="info-label">Razón Social:</span>
+            <span>{{razonSocial.nombre}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">RFC:</span>
+            <span>{{razonSocial.rfc}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Dirección:</span>
+            <span>{{razonSocial.direccionEmpresa}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Teléfono:</span>
+            <span>{{razonSocial.telEmpresa}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email:</span>
+            <span>{{razonSocial.emailEmpresa}}</span>
+          </div>
+        </div>
+      </div>
+      {{/if}}
+
+      <!-- Datos de presupuesto como info-section -->
+      <div class="info-section" style="flex: 1; margin-bottom: 0; text-align: right;">
+        <div class="info-grid single-column" style="text-align: right;">
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">No. Presupuesto:</span>
+            <span>{{numeroPresupuesto}}</span>
+          </div>
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">Fecha:</span>
+            <span>{{fecha}}</span>
+          </div>
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">Vigencia:</span>
+            <span>{{vigencia}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Segunda fila: Información del Cliente -->
+    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+      <div class="info-section" style="flex: 1; margin-bottom: 0; position: relative;">
+        <h3>Información del Cliente</h3>
+        <div class="info-grid single-column">
+          <div class="info-item">
+            <span class="info-label">Empresa:</span>
+            <span>{{cliente.nombreEmpresa}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Dirección:</span>
+            <span>{{cliente.direccion}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Teléfono:</span>
+            <span>{{cliente.telefono}}</span>
+          </div>
+          {{#if cliente.contacto}}
+          <div class="info-item">
+            <span class="info-label">Contacto:</span>
+            <span>{{cliente.contacto.nombre}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Puesto:</span>
+            <span>{{cliente.contacto.puesto}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Tel. Contacto:</span>
+            <span>{{cliente.contacto.telefono}}</span>
+          </div>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+
+    <!-- Tercera fila: Tipo de Listado y Concepto -->
+    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+      <div class="info-section" style="flex: 1; margin-bottom: 0; position: relative;">
+        <h3>Detalles del Presupuesto</h3>
+        <div class="info-grid single-column">
+          <div class="info-item">
+            <span class="info-label">Tipo de Listado:</span>
+            <span>Materiales de canalización</span>
+          </div>
+          {{#if comentarios}}
+          <div class="info-item">
+            <span class="info-label">Concepto:</span>
+            <span>{{comentarios}}</span>
+          </div>
+          {{/if}}
+        </div>
+      </div>
+      
+      <!-- Imagen a la misma altura que los detalles del presupuesto -->
+      <div class="info-section" style="flex: 1; margin-bottom: 0; position: relative;">
+        <!-- Imagen down.png en la parte inferior derecha -->
+        {{#if downImg}}
+        <div style="position: absolute; bottom: 5px; right: 5px; width: 160px;">
+          <img src="{{downImg}}" alt="Certificaciones Cliente" style="width: 100%; height: auto;">
+        </div>
+        {{/if}}
+      </div>
+    </div>
+
+    <!-- Tabla de materiales de canalización -->
+    <table class="items-table">
       <thead>
         <tr>
-          <th style="width: 45%;">DESCRIPCIÓN DEL MATERIAL</th>
-          <th style="width: 12%;">CANT.</th>
-          <th style="width: 12%;">UNIDAD</th>
-          <th style="width: 15%;">PRECIO UNIT</th>
-          <th style="width: 16%;">IMPORTE</th>
+          <th style="width: 5%">No.</th>
+          <th style="width: 70%">Descripción del Material</th>
+          <th style="width: 12.5%">Cantidad</th>
+          <th style="width: 12.5%">Unidad</th>
         </tr>
       </thead>
       <tbody>
-        {{filasItems}}
+        {{#each items}}
+        <tr>
+          <td class="text-center">{{increment @index}}</td>
+          <td>{{descripcion}}</td>
+          <td class="text-center">{{cantidad}}</td>
+          <td class="text-center">{{unidad}}</td>
+        </tr>
+        {{/each}}
       </tbody>
     </table>
 
-    <!-- ===== TABLA DE TOTALES ===== -->
-    <table class="tabla-totales">
-      <tbody>
-        <tr>
-          <td colspan="4" style="border: none; text-align: right; font-weight: bold; padding: 8px;">SUBTOTAL</td>
-          <td style="border: 1px solid #000; background: #f8f9fa; text-align: right; padding: 8px; font-weight: bold;">{{subtotal}}</td>
-        </tr>
-        <tr>
-          <td colspan="4" style="border: none; text-align: right; font-weight: bold; padding: 8px;">UTILIDAD</td>
-          <td style="border: 1px solid #000; background: #fff; text-align: right; padding: 8px; font-weight: bold;">{{utilidadMonto}}</td>
-        </tr>
-        <tr>
-          <td colspan="4" style="border: none; text-align: right; font-weight: bold; padding: 8px; font-size: 12px; color: #0F2A52;">TOTAL</td>
-          <td style="border: 1px solid #000; background: #0F2A52; color: white; text-align: right; padding: 8px; font-weight: bold; font-size: 12px;">{{total}}</td>
-        </tr>
-      </tbody>
-    </table>
 
-    <!-- ===== INFORMACIÓN ADICIONAL ===== -->
-    <table class="tabla-info-adicional">
-      <tbody>
-        {{#if comentarios}}
-        <tr>
-          <td class="td-info-label">Concepto</td>
-          <td class="td-info-value">{{comentarios}}</td>
-        </tr>
-        {{/if}}
-        <tr>
-          <td class="td-info-label">Uso de Cotización</td>
-          <td class="td-info-value">Materiales de canalización eléctrica</td>
-        </tr>
-        <tr>
-          <td class="td-info-label">Forma de pago</td>
-          <td class="td-info-value">Por definir</td>
-        </tr>
-        <tr>
-          <td class="td-info-label">Moneda</td>
-          <td class="td-info-value">Pesos Mexicanos (MXN)</td>
-        </tr>
-      </tbody>
-    </table>
 
-    <!-- ===== SECCIÓN DE FIRMAS ===== -->
-    <div style="margin-top: 80px; text-align: center;">
-      <table style="width: 100%; margin-top: 40px;">
-        <tr>
-          <td style="width: 45%; text-align: center; vertical-align: bottom;">
-            <div style="border-bottom: 1px solid #000; width: 200px; margin: 0 auto 8px auto; height: 20px;"></div>
-            <div style="font-weight: bold; font-size: 11px; text-transform: uppercase;">FIRMA DEL CLIENTE</div>
-          </td>
-          <td style="width: 10%;"></td>
-          <td style="width: 45%; text-align: center; vertical-align: bottom;">
-            <div style="border-bottom: 1px solid #000; width: 200px; margin: 0 auto 8px auto; height: 20px;"></div>
-            <div style="font-weight: bold; font-size: 11px; text-transform: uppercase;">FIRMA DEL VENDEDOR</div>
-          </td>
-        </tr>
-      </table>
+    <!-- Espacio para firmas después de los totales -->
+    <div style="margin-top: 120px; margin-bottom: 20px;">
+      <!-- Espacio en blanco para firmar -->
     </div>
 
-    <!-- ===== IMAGEN INFERIOR CORPORATIVA ===== -->
-    <img src="img/bottom.png" alt="Footer Corporativo" style="width: 100%; margin-top: 40px;">
-    
+    <div class="signatures">
+      <div class="signature-line" style="margin-bottom: 40px;">
+        <hr>
+        <span>Firma del Cliente</span>
+      </div>
+      <div class="signature-line" style="margin-bottom: 40px;">
+        <hr>
+        <span>Firma de Autorización</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      <!-- Footer: apilar bottom y bottom-2 verticalmente al final del documento.
+           Las imágenes se muestran a ancho completo para cubrir el ancho imprimible. -->
+      <div style="margin-top:40px; display:flex; flex-direction:column; align-items:stretch; gap:0; width:calc(100% + 40px); margin-left:-20px;">
+        {{#if bottom1}}
+          <img src="{{bottom1}}" alt="Bottom" style="width:100%; max-width:none; height:auto; display:block;" />
+        {{/if}}
+        {{#if bottom2}}
+          <img src="{{bottom2}}" alt="Bottom 2" style="width:100%; max-width:none; height:auto; display:block;" />
+        {{/if}}
+      </div>
+    </div>
   </div>
 </body>
 </html>
