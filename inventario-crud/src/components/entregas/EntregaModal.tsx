@@ -112,7 +112,7 @@ const EntregaModal = ({
     setShowCanalizacionModal(false);
   };
 
-  // Efecto para cargar datos de edición
+  // Efecto para cargar datos de edición O resetear para nueva entrega
   useEffect(() => {
     if (editingEntrega) {
       const razonSocialObj = typeof editingEntrega.razonSocial === 'object' ? editingEntrega.razonSocial : null;
@@ -128,14 +128,32 @@ const EntregaModal = ({
           ? editingEntrega.razonSocial 
           : editingEntrega.razonSocial?._id || '',
       } as EntregaFormData);
-    } else {
-      // Para nueva entrega, generar número basado en el cliente cuando se seleccione
-      setFormData(prev => ({
-        ...prev,
-        numeroEntrega: ''
-      }));
+    } else if (show) {
+      // Resetear completamente el formulario para nueva entrega cuando se abre el modal
+      setFormData({
+        cliente: '',
+        razonSocial: '',
+        numeroEntrega: '',
+        fecha: new Date().toISOString().split('T')[0],
+        items: [{
+          clave: 1,
+          marca: '',
+          modelo: '',
+          concepto: '',
+          cantidad: 1,
+          unidad: 'PZA' as const
+        }],
+        comentarios: ''
+      });
+      setRazonSocialDisplayText('');
+      setClienteSuggestions([]);
+      setShowClienteSuggestions(false);
+      setRazonSocialSuggestions([]);
+      setShowRazonSocialSuggestions(false);
+      setProductSuggestions({});
+      setShowProductSuggestions({});
     }
-  }, [editingEntrega]);
+  }, [editingEntrega, show]);
 
   // Debug: Ver items de inventario cargados
   useEffect(() => {
@@ -242,6 +260,23 @@ const EntregaModal = ({
     setFormData(prev => ({
       ...prev,
       items: prev.items.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleAddNewItem = () => {
+    setFormData(prev => ({
+      ...prev,
+      items: [
+        ...prev.items,
+        {
+          clave: '',
+          marca: '',
+          modelo: '',
+          concepto: '',
+          unidad: 'PZA',
+          cantidad: 1
+        }
+      ]
     }));
   };
 
@@ -454,18 +489,24 @@ const EntregaModal = ({
 
   return createPortal(
     <>
-      <Modal show={show} onHide={onHide} size="xl" centered>
-        <Modal.Header closeButton className="bg-light border-bottom">
-          <Modal.Title>
+      <Modal 
+        show={show} 
+        onHide={onHide} 
+        size="xl" 
+        centered={true}
+        dialogClassName="modal-90w"
+      >
+        <Modal.Header closeButton className="bg-light border-bottom px-2 py-2">
+          <Modal.Title style={{ fontSize: '1.1rem' }}>
             {editingEntrega ? 'Editar' : 'Nueva'} Entrega
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body className="px-4 py-3">
+        <Modal.Body className="px-2 py-2" style={{ maxHeight: '85vh', overflowY: 'auto', overflowX: 'hidden' }}>
           <Form>
             <div className="row">
               <div className="col-md-4">
                 <Form.Group className="mb-2">
-                  <Form.Label>Cliente</Form.Label>
+                  <Form.Label style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>Cliente</Form.Label>
                   <div className="position-relative">
                     <Form.Control
                       type="text"
@@ -473,6 +514,7 @@ const EntregaModal = ({
                       onChange={(e) => handleClienteSearch(e.target.value)}
                       placeholder="Buscar cliente..."
                       autoComplete="off"
+                      style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                     />
                     {showClienteSuggestions && clienteSuggestions.length > 0 && (
                       <div className="position-absolute w-100 bg-white border border-top-0 rounded-bottom shadow-sm" style={{ zIndex: 1000, maxHeight: '200px', overflowY: 'auto' }}>
@@ -496,7 +538,7 @@ const EntregaModal = ({
               </div>
               <div className="col-md-4">
                 <Form.Group className="mb-2">
-                  <Form.Label>Razón Social</Form.Label>
+                  <Form.Label style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>Razón Social</Form.Label>
                   <div className="position-relative">
                     <Form.Control
                       type="text"
@@ -504,6 +546,7 @@ const EntregaModal = ({
                       onChange={(e) => handleRazonSocialSearch(e.target.value)}
                       placeholder="Buscar razón social..."
                       autoComplete="off"
+                      style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                     />
                     {showRazonSocialSuggestions && razonSocialSuggestions.length > 0 && (
                       <div className="position-absolute w-100 bg-white border border-top-0 rounded-bottom shadow-sm" style={{ zIndex: 1000, maxHeight: '200px', overflowY: 'auto' }}>
@@ -527,24 +570,26 @@ const EntregaModal = ({
               </div>
               <div className="col-md-4">
                 <Form.Group className="mb-2">
-                  <Form.Label>No. de Entrega</Form.Label>
+                  <Form.Label style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>No. de Entrega</Form.Label>
                   <Form.Control
                     type="text"
                     value={formData.numeroEntrega}
                     onChange={(e) => setFormData(prev => ({ ...prev, numeroEntrega: e.target.value }))}
                     readOnly={!editingEntrega}
+                    style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                   />
                 </Form.Group>
               </div>
               <div className="col-md-6">
                 <Form.Group>
-                  <Form.Label>Fecha</Form.Label>
+                  <Form.Label style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>Fecha</Form.Label>
                   <Form.Control
                     type="date"
                     name="fecha"
                     value={typeof formData.fecha === 'string' ? formData.fecha : ''}
                     onChange={handleChange}
                     required
+                    style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                   />
                 </Form.Group>
               </div>
@@ -553,13 +598,14 @@ const EntregaModal = ({
             <div className="row mb-3">
               <div className="col-md-6">
                 <Form.Group>
-                  <Form.Label>
+                  <Form.Label style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>
                     Proyecto <small className="text-muted">(Opcional)</small>
                   </Form.Label>
                   <Form.Select
                     name="proyecto"
                     value={typeof formData.proyecto === 'string' ? formData.proyecto : formData.proyecto?._id || ''}
                     onChange={handleChange}
+                    style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                   >
                     <option value="">Sin proyecto asignado</option>
                     {proyectos.map(proyecto => (
@@ -575,13 +621,14 @@ const EntregaModal = ({
             <div className="row mb-3">
               <div className="col-md-12">
                 <Form.Group>
-                  <Form.Label>Comentarios</Form.Label>
+                  <Form.Label style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>Comentarios</Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={3}
                     name="comentarios"
                     value={formData.comentarios || ''}
                     onChange={handleChange}
+                    style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                   />
                 </Form.Group>
               </div>
@@ -590,13 +637,14 @@ const EntregaModal = ({
             {/* Tabla de productos */}
             <div className="mb-4">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="text-primary mb-0">
+                <h5 className="text-primary mb-0" style={{ fontSize: '1rem' }}>
                   <i className="fas fa-shopping-cart me-2"></i>
                   Productos en la Entrega
                 </h5>
                   <Button 
                   variant="outline-primary"
                   onClick={() => setShowCanalizacionModal(true)}
+                  style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                 >
                   <i className="fas fa-plus me-2"></i>
                   Añadir Canalización
@@ -671,24 +719,24 @@ const EntregaModal = ({
               </Modal>
               <div className="table-responsive" style={{ 
                 maxWidth: '100%', 
-                minHeight: '400px',
-                maxHeight: '600px', 
+                minHeight: '500px',
+                maxHeight: '65vh', 
                 overflowX: 'auto', 
                 overflowY: 'auto',
                 border: '1px solid #dee2e6',
                 borderRadius: '0.25rem'
               }}>
-                <table className="table table-striped table-hover mb-0" style={{ minWidth: '1200px' }}>
-                  <thead className="table-dark" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
-                    <tr>
-                      <th style={{ width: '40px' }}>⋮⋮</th>
-                      <th style={{ width: '80px' }}>CLAVE</th>
-                      <th style={{ width: '20%' }}>MARCA</th>
-                      <th style={{ width: '20%' }}>MODELO</th>
-                      <th style={{ width: '30%' }}>CONCEPTO</th>
-                      <th style={{ width: '80px' }}>U</th>
-                      <th style={{ width: '100px' }}>CANT</th>
-                      <th style={{ width: '80px' }}>Acciones</th>
+                <table className="table table-striped table-hover mb-0" style={{ minWidth: '1200px', fontSize: '0.8rem' }}>
+                  <thead className="table-dark" style={{ position: 'sticky', top: 0, zIndex: 10, fontSize: '0.8rem' }}>
+                    <tr style={{ height: '40px' }}>
+                      <th style={{ width: '40px', padding: '0.4rem' }}>⋮⋮</th>
+                      <th style={{ width: '80px', padding: '0.4rem' }}>CLAVE</th>
+                      <th style={{ width: '20%', padding: '0.4rem' }}>MARCA</th>
+                      <th style={{ width: '20%', padding: '0.4rem' }}>MODELO</th>
+                      <th style={{ width: '30%', padding: '0.4rem' }}>CONCEPTO</th>
+                      <th style={{ width: '80px', padding: '0.4rem' }}>U</th>
+                      <th style={{ width: '100px', padding: '0.4rem' }}>CANT</th>
+                      <th style={{ width: '80px', padding: '0.4rem' }}>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -705,7 +753,7 @@ const EntregaModal = ({
                           backgroundColor: draggedItem === index ? '#f8f9fa' : 'transparent'
                         }}
                       >
-                        <td className="text-center" style={{ cursor: item.concepto !== '' ? 'grab' : 'default' }}>
+                        <td className="text-center" style={{ cursor: item.concepto !== '' ? 'grab' : 'default', padding: '0.4rem' }}>
                           {item.concepto !== '' && (
                             <FontAwesomeIcon 
                               icon={faGripVertical} 
@@ -714,8 +762,8 @@ const EntregaModal = ({
                             />
                           )}
                         </td>
-                        <td>{item.clave || index + 1}</td>
-                        <td>
+                        <td style={{ padding: '0.4rem' }}>{item.clave || index + 1}</td>
+                        <td style={{ padding: '0.4rem' }}>
                           <div className="position-relative">
                             <Form.Control
                               type="text"
@@ -724,6 +772,7 @@ const EntregaModal = ({
                               onFocus={() => handleProductFocus(index)}
                               placeholder="Marca..."
                               autoComplete="off"
+                              style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                             />
                             {showProductSuggestions[index] && productSuggestions[index]?.length > 0 && (
                               <div className="position-absolute w-100 bg-white border rounded shadow-sm" 
@@ -754,7 +803,7 @@ const EntregaModal = ({
                             )}
                           </div>
                         </td>
-                        <td>
+                        <td style={{ padding: '0.4rem' }}>
                           <div className="position-relative">
                             <Form.Control
                               type="text"
@@ -763,6 +812,7 @@ const EntregaModal = ({
                               onFocus={() => handleProductFocus(index)}
                               placeholder="Modelo..."
                               autoComplete="off"
+                              style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                             />
                             {showProductSuggestions[index] && productSuggestions[index]?.length > 0 && (
                               <div className="position-absolute w-100 bg-white border rounded shadow-sm" 
@@ -793,7 +843,7 @@ const EntregaModal = ({
                             )}
                           </div>
                         </td>
-                        <td>
+                        <td style={{ padding: '0.4rem' }}>
                           <div className="position-relative">
                             <Form.Control
                               type="text"
@@ -802,6 +852,7 @@ const EntregaModal = ({
                               onFocus={() => handleProductFocus(index)}
                               placeholder="Concepto..."
                               autoComplete="off"
+                              style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                             />
                             {showProductSuggestions[index] && productSuggestions[index]?.length > 0 && (
                               <div className="position-absolute w-100 bg-white border rounded shadow-sm" 
@@ -833,10 +884,11 @@ const EntregaModal = ({
                             )}
                           </div>
                         </td>
-                        <td>
+                        <td style={{ padding: '0.4rem' }}>
                           <Form.Select
                             value={item.unidad}
                             onChange={(e) => handleItemChange(index, 'unidad', e.target.value)}
+                            style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                           >
                             <option value="PZA">PZA</option>
                             <option value="MTS">MTS</option>
@@ -844,22 +896,24 @@ const EntregaModal = ({
                             <option value="LOTE">LOTE</option>
                           </Form.Select>
                         </td>
-                        <td>
+                        <td style={{ padding: '0.4rem' }}>
                           <Form.Control
                             type="number"
                             value={item.cantidad}
                             onChange={(e) => handleItemChange(index, 'cantidad', parseFloat(e.target.value) || 1)}
                             min="1"
                             step="1"
+                            style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                           />
                         </td>
-                        <td>
+                        <td style={{ padding: '0.4rem' }}>
                           <Button
                             variant="outline-danger"
                             size="sm"
                             onClick={() => handleRemoveItem(index)}
                             disabled={formData.items?.length === 1 || (index === (formData.items?.length || 0) - 1 && item.concepto === '')}
                             title="Eliminar producto"
+                            style={{ fontSize: '0.875rem', padding: '0.25rem 0.5rem' }}
                           >
                             <FontAwesomeIcon icon={faTrash} />
                           </Button>
@@ -869,14 +923,25 @@ const EntregaModal = ({
                   </tbody>
                 </table>
               </div>
+              <div className="d-flex justify-content-center mt-2">
+                <Button 
+                  variant="outline-success" 
+                  size="sm"
+                  onClick={handleAddNewItem}
+                  style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
+                >
+                  <i className="fas fa-plus me-2"></i>
+                  Agregar Producto
+                </Button>
+              </div>
             </div>
           </Form>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={onHide}>
+        <Modal.Footer className="px-2 py-2">
+          <Button variant="secondary" onClick={onHide} style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}>
             Cancelar
           </Button>
-          <Button variant="primary" onClick={handleSubmit}>
+          <Button variant="primary" onClick={handleSubmit} style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}>
             {editingEntrega ? 'Actualizar' : 'Guardar'} Entrega
           </Button>
         </Modal.Footer>

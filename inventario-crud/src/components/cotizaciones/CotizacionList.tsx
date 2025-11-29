@@ -214,10 +214,12 @@ const CotizacionList: React.FC = () => {
     { 
       key: 'cliente', 
       label: 'Cliente',
-      render: (cotizacion: Cotizacion) => 
-        typeof cotizacion.cliente === 'string' 
+      render: (cotizacion: Cotizacion) => {
+        if (!cotizacion.cliente) return 'Sin cliente';
+        return typeof cotizacion.cliente === 'string' 
           ? cotizacion.cliente 
-          : cotizacion.cliente.nombreEmpresa
+          : cotizacion.cliente.nombreEmpresa;
+      }
     },
     { 
       key: 'fecha', 

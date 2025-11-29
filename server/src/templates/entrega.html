@@ -7,8 +7,8 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 20px;
-      font-size: 12px;
+      padding: 10px;
+      font-size: 10px;
     }
 
     #tabla-entrega-wrapper {
@@ -17,55 +17,79 @@
     }
 
     .header {
-      text-align: center;
-      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 5px 10px;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
     }
 
     .header h1 {
       color: #0F2A52;
-      font-size: 24px;
-      margin-bottom: 5px;
+      font-size: 16px;
+      margin: 0;
+    }
+
+    .header-info {
+      text-align: right;
+      font-size: 9px;
     }
 
     .info-section {
-      margin-bottom: 20px;
+      margin-bottom: 8px;
       border: 1px solid #dee2e6;
-      padding: 15px;
+      padding: 5px 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      font-size: 7pt;
     }
 
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+    .info-column h3 {
+      font-size: 8pt;
+      margin: 0 0 3px 0;
+      color: #0F2A52;
+      border-bottom: 1px solid #dee2e6;
+      padding-bottom: 2px;
     }
 
     .info-item {
       display: flex;
-      gap: 10px;
+      gap: 5px;
+      margin-bottom: 2px;
     }
 
     .info-label {
       font-weight: bold;
       color: #0F2A52;
-      min-width: 120px;
+      min-width: 80px;
+      font-size: 7pt;
+    }
+
+    .info-value {
+      font-size: 7pt;
     }
 
     .items-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
+      font-size: 7pt;
     }
 
     .items-table th,
     .items-table td {
       border: 1px solid #dee2e6;
-      padding: 8px;
+      padding: 4px;
     }
 
     .items-table th {
       background-color: #0F2A52;
       color: white;
       text-align: center;
+      font-size: 7pt;
     }
 
     .items-table td.text-right {
@@ -76,36 +100,25 @@
       text-align: center;
     }
 
-    .totals-section {
-      margin-left: auto;
-      width: 300px;
-    }
-
-    .total-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 5px 10px;
-      border-bottom: 1px solid #dee2e6;
-    }
-
-    .total-row.grand-total {
-      background-color: #0F2A52;
-      color: white;
-      font-weight: bold;
-      font-size: 14px;
-    }
-
     .comments-section {
-      margin: 20px 0;
-      padding: 15px;
+      margin: 8px 0;
+      padding: 5px 10px;
       border: 1px solid #dee2e6;
       background: #f8f9fa;
+      font-size: 7pt;
+    }
+
+    .comments-section h4 {
+      margin: 0 0 3px 0;
+      font-size: 8pt;
+      color: #0F2A52;
     }
 
     .signatures {
-      margin-top: 50px;
+      margin-top: 20px;
       display: flex;
       justify-content: space-around;
+      font-size: 8pt;
     }
 
     .signature-line {
@@ -118,93 +131,104 @@
     }
 
     .footer {
-      margin-top: 30px;
+      margin-top: 15px;
       text-align: center;
-      font-size: 10px;
+      font-size: 7pt;
       color: #6c757d;
     }
 
     .logo {
-      text-align: center;
-      margin: 10px 0 20px 0;
-    }
-
-    .logo img {
-      max-width: 200px;
+      max-width: 120px;
       height: auto;
     }
-
-    .status-Borrador { color: #6c757d; }
-    .status-Enviada { color: #007bff; }
-    .status-Aceptada { color: #28a745; }
-    .status-Rechazada { color: #dc3545; }
-    .status-Vencida { color: #ffc107; }
   </style>
 </head>
 <body>
   <div id="tabla-entrega-wrapper">
-    {{#if logoPath}}
-    <div class="logo">
-      <img src="{{logoPath}}" alt="Logo Empresa">
-    </div>
-    {{/if}}
-    
     <div class="header">
-      <h1>ENTREGA</h1>
-      <div class="info-grid">
-        <div class="info-item">
-          <span class="info-label">No. de Entrega:</span>
-          <span>{{numeroEntrega}}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Fecha:</span>
-          <span>{{fecha}}</span>
-        </div>
+      <div>
+        {{#if logoPath}}
+        <img src="{{logoPath}}" alt="Logo" class="logo">
+        {{/if}}
+      </div>
+      <div>
+        <h1>ENTREGA</h1>
+      </div>
+      <div class="header-info">
+        <div><strong>No. Entrega:</strong> {{numeroEntrega}}</div>
+        <div><strong>Fecha:</strong> {{fecha}}</div>
       </div>
     </div>
 
     <div class="info-section">
-      <h3>Información del Cliente</h3>
-      <div class="info-grid">
+      <div class="info-column">
+        <h3>INFORMACIÓN DEL CLIENTE</h3>
+        {{#if clienteInfo}}
         <div class="info-item">
-          <span class="info-label">Cliente:</span>
-          <span>{{cliente}}</span>
-        </div>
-        {{#if razonSocial}}
-        <div class="info-item">
-          <span class="info-label">Razón Social:</span>
-          <span>{{razonSocial.nombre}}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">RFC:</span>
-          <span>{{razonSocial.rfc}}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Email:</span>
-          <span>{{razonSocial.emailEmpresa}}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Teléfono:</span>
-          <span>{{razonSocial.telEmpresa}}</span>
+          <span class="info-label">Empresa:</span>
+          <span class="info-value">{{clienteInfo.nombreEmpresa}}</span>
         </div>
         <div class="info-item">
           <span class="info-label">Dirección:</span>
-          <span>{{razonSocial.direccionEmpresa}}</span>
+          <span class="info-value">{{clienteInfo.direccion}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Teléfono:</span>
+          <span class="info-value">{{clienteInfo.telefono}}</span>
+        </div>
+        {{else}}
+        <div class="info-item">
+          <span class="info-label">Cliente:</span>
+          <span class="info-value">{{cliente}}</span>
         </div>
         {{/if}}
       </div>
+      
+      {{#if clienteInfo.contactos.[0]}}
+      <div class="info-column">
+        <h3>INFORMACIÓN DE CONTACTO</h3>
+        <div class="info-item">
+          <span class="info-label">Contacto:</span>
+          <span class="info-value">{{clienteInfo.contactos.[0].nombre}}</span>
+        </div>
+        {{#if clienteInfo.contactos.[0].puesto}}
+        <div class="info-item">
+          <span class="info-label">Puesto:</span>
+          <span class="info-value">{{clienteInfo.contactos.[0].puesto}}</span>
+        </div>
+        {{/if}}
+        {{#if clienteInfo.contactos.[0].contacto.correo}}
+        <div class="info-item">
+          <span class="info-label">Email:</span>
+          <span class="info-value">{{clienteInfo.contactos.[0].contacto.correo}}</span>
+        </div>
+        {{/if}}
+        {{#if clienteInfo.contactos.[0].contacto.telefono}}
+        <div class="info-item">
+          <span class="info-label">Teléfono:</span>
+          <span class="info-value">{{clienteInfo.contactos.[0].contacto.telefono}}</span>
+        </div>
+        {{/if}}
+        {{#if clienteInfo.contactos.[0].contacto.extension}}
+        <div class="info-item">
+          <span class="info-label">Ext:</span>
+          <span class="info-value">{{clienteInfo.contactos.[0].contacto.extension}}</span>
+        </div>
+        {{/if}}
+      </div>
+      {{/if}}
     </div>
 
     <table class="items-table">
       <thead>
         <tr>
           <th style="width: 5%">#</th>
-          <th style="width: 10%">Clave</th>
-          <th style="width: 15%">Marca</th>
-          <th style="width: 15%">Modelo</th>
-          <th style="width: 35%">Descripción</th>
-          <th style="width: 10%">Cantidad</th>
-          <th style="width: 10%">Unidad</th>
+          <th style="width: 8%">CLAVE</th>
+          <th style="width: 12%">MARCA</th>
+          <th style="width: 12%">MODELO</th>
+          <th style="width: 43%">DESCRIPCIÓN</th>
+          <th style="width: 10%">CANT</th>
+          <th style="width: 10%">U</th>
         </tr>
       </thead>
       <tbody>
@@ -225,7 +249,7 @@
     {{#if comentarios}}
     <div class="comments-section">
       <h4>Comentarios:</h4>
-      <p>{{comentarios}}</p>
+      <p style="margin: 0;">{{comentarios}}</p>
     </div>
     {{/if}}
 

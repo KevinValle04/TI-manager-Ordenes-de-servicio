@@ -16,6 +16,20 @@ export interface EntregaPdfData {
     unidad: string;
   }>;
   comentarios?: string;
+  clienteInfo?: {
+    nombreEmpresa: string;
+    direccion: string;
+    telefono: string;
+    contactos: Array<{
+      nombre: string;
+      puesto?: string;
+      contacto: {
+        correo?: string;
+        telefono?: string;
+        extension?: string;
+      };
+    }>;
+  };
   razonSocial?: {
     nombre: string;
     rfc: string;
