@@ -93,8 +93,8 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
       label: "Almacén",
       icon: <FaBoxes size={16} />,
       items: [
-        { path: "/inventario", label: "Almacén Interior", icon: <FaWarehouse size={14} /> },
-        { path: "/inventarioExterior", label: "Almacén Exterior", icon: <FaWarehouse size={14} /> },
+        { path: "/inventario", label: "Almacén Interno", icon: <FaWarehouse size={14} /> },
+        { path: "/inventarioExterior", label: "Almacén Externo", icon: <FaWarehouse size={14} /> },
         ...((token && !(jwtDecode(token) as any).isAdmin) ? [
           { path: "/solicitudes-inventario", label: "Solicitudes", icon: <FaFileAlt size={14} /> }
         ] : []),
