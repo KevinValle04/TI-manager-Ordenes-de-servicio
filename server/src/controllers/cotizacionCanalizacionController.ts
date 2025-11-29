@@ -229,6 +229,22 @@ export const getPdfCotizacionCanalizacion = async (req: Request, res: Response) 
     const Cliente = require('../models/Cliente').default;
     const clienteInfo = await Cliente.findOne({ nombreEmpresa: cotizacion.cliente });
 
+    // Preparar razón social de forma segura
+    let razonSocialData = undefined;
+    if (cotizacion.razonSocial && typeof cotizacion.razonSocial === 'object' && '_id' in cotizacion.razonSocial) {
+      const rs = cotizacion.razonSocial as any;
+      razonSocialData = {
+        nombre: rs.nombre || '',
+        rfc: rs.rfc || '',
+        emailEmpresa: rs.emailEmpresa || '',
+        telEmpresa: rs.telEmpresa || '',
+        celularEmpresa: rs.celularEmpresa || '',
+        direccionEmpresa: rs.direccionEmpresa || '',
+        emailFacturacion: rs.emailFacturacion || '',
+        direccionesEnvio: rs.direccionesEnvio || []
+      };
+    }
+
     // Preparar datos para el PDF
     const datosPdf = {
       numeroPresupuesto: cotizacion.numeroPresupuesto,
@@ -247,7 +263,7 @@ export const getPdfCotizacionCanalizacion = async (req: Request, res: Response) 
         subtotal: item.subtotal
       })),
       comentarios: cotizacion.comentarios,
-      razonSocial: cotizacion.razonSocial as any,
+      razonSocial: razonSocialData,
       clienteInfo: clienteInfo ? {
         nombreEmpresa: clienteInfo.nombreEmpresa,
         direccion: clienteInfo.direccion,
@@ -294,6 +310,22 @@ export const descargarPdfCotizacionCanalizacion = async (req: Request, res: Resp
     const Cliente = require('../models/Cliente').default;
     const clienteInfo = await Cliente.findOne({ nombreEmpresa: cotizacion.cliente });
 
+    // Preparar razón social de forma segura
+    let razonSocialData = undefined;
+    if (cotizacion.razonSocial && typeof cotizacion.razonSocial === 'object' && '_id' in cotizacion.razonSocial) {
+      const rs = cotizacion.razonSocial as any;
+      razonSocialData = {
+        nombre: rs.nombre || '',
+        rfc: rs.rfc || '',
+        emailEmpresa: rs.emailEmpresa || '',
+        telEmpresa: rs.telEmpresa || '',
+        celularEmpresa: rs.celularEmpresa || '',
+        direccionEmpresa: rs.direccionEmpresa || '',
+        emailFacturacion: rs.emailFacturacion || '',
+        direccionesEnvio: rs.direccionesEnvio || []
+      };
+    }
+
     // Preparar datos para el PDF
     const datosPdf = {
       numeroPresupuesto: cotizacion.numeroPresupuesto,
@@ -312,7 +344,7 @@ export const descargarPdfCotizacionCanalizacion = async (req: Request, res: Resp
         subtotal: item.subtotal
       })),
       comentarios: cotizacion.comentarios,
-      razonSocial: cotizacion.razonSocial as any,
+      razonSocial: razonSocialData,
       clienteInfo: clienteInfo ? {
         nombreEmpresa: clienteInfo.nombreEmpresa,
         direccion: clienteInfo.direccion,
