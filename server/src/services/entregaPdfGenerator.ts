@@ -72,11 +72,80 @@ export class EntregaPdfGenerator {
         console.warn('Error cargando logo:', logoError);
       }
 
+      // Cargar otras imágenes (bottom / footers) y convertir a base64
+      const topPath = path.join(__dirname, '../templates/img/top.png');
+      const bottom1Path = path.join(__dirname, '../templates/img/bottom.png');
+      const bottom2Path = path.join(__dirname, '../templates/img/bottom-2.png');
+      const downPath = path.join(__dirname, '../templates/img/down.png');
+
+      let topBase64 = '';
+      let bottom1Base64 = '';
+      let bottom2Base64 = '';
+      let downBase64 = '';
+
+      try {
+        if (fs.existsSync(topPath)) {
+          const buf = fs.readFileSync(topPath);
+          topBase64 = `data:image/png;base64,${buf.toString('base64')}`;
+        }
+      } catch (e) {
+        console.warn('No se pudo cargar top.png:', e);
+      }
+
+      try {
+        if (fs.existsSync(bottom1Path)) {
+          const buf = fs.readFileSync(bottom1Path);
+          bottom1Base64 = `data:image/png;base64,${buf.toString('base64')}`;
+        }
+      } catch (e) {
+        console.warn('No se pudo cargar bottom.png:', e);
+      }
+
+      try {
+        if (fs.existsSync(bottom2Path)) {
+          const buf = fs.readFileSync(bottom2Path);
+          bottom2Base64 = `data:image/png;base64,${buf.toString('base64')}`;
+        }
+      } catch (e) {
+        console.warn('No se pudo cargar bottom-2.png:', e);
+      }
+
+      try {
+        if (fs.existsSync(downPath)) {
+          const buf = fs.readFileSync(downPath);
+          downBase64 = `data:image/png;base64,${buf.toString('base64')}`;
+        }
+      } catch (e) {
+        console.warn('No se pudo cargar down.png:', e);
+      }
+
+      // Preparar información del cliente
+      const clienteInfo = datos.clienteInfo;
+      const primerContacto = clienteInfo?.contactos?.[0];
+      
+      const clienteData = {
+        nombreEmpresa: clienteInfo?.nombreEmpresa || datos.cliente,
+        direccion: clienteInfo?.direccion || 'Dirección no especificada',
+        telefono: clienteInfo?.telefono || 'Teléfono no proporcionado',
+        contacto: primerContacto ? {
+          nombre: primerContacto.nombre || 'No especificado',
+          puesto: primerContacto.puesto || 'No especificado',
+          telefono: primerContacto.contacto?.telefono || 'No especificado'
+        } : null
+      };
+
       // Preparar datos para la plantilla
       const datosFormateados = {
-        ...datos,
         logoPath: logoBase64,
+        topImg: topBase64,
+        bottom1: bottom1Base64,
+        bottom2: bottom2Base64,
+        downImg: downBase64,
+        numeroEntrega: datos.numeroEntrega,
         fecha: this.formatoFecha(datos.fecha),
+        comentarios: datos.comentarios,
+        razonSocial: datos.razonSocial,
+        cliente: clienteData,
         items: datos.items
       };
 

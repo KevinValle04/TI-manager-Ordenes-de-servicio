@@ -4,92 +4,92 @@
   <meta charset="UTF-8">
   <title>Entrega - {{numeroEntrega}}</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 10px;
-      font-size: 10px;
+      padding: 6px;
+      font-size: 5pt;
+      line-height: 1.1;
     }
 
     #tabla-entrega-wrapper {
-      max-width: 1200px;
-      margin: 0 auto;
+      max-width: 100%;
     }
 
     .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      padding: 5px 10px;
-      background: #f8f9fa;
-      border: 1px solid #dee2e6;
+      text-align: center;
+      margin-bottom: 6px;
     }
 
     .header h1 {
       color: #0F2A52;
-      font-size: 16px;
-      margin: 0;
-    }
-
-    .header-info {
-      text-align: right;
-      font-size: 9px;
+      font-size: 8pt;
+      margin: 1px 0;
     }
 
     .info-section {
-      margin-bottom: 8px;
-      border: 1px solid #dee2e6;
-      padding: 5px 10px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 5px;
-      font-size: 7pt;
+      margin-bottom: 6px;
+      border: none;
+      padding: 4px 6px;
+      page-break-inside: avoid;
     }
 
-    .info-column h3 {
-      font-size: 8pt;
-      margin: 0 0 3px 0;
+    .info-section h3 {
+      font-size: 5.5pt;
+      margin: 0 0 2px 0;
       color: #0F2A52;
-      border-bottom: 1px solid #dee2e6;
-      padding-bottom: 2px;
+      font-weight: bold;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 3px 8px;
+    }
+
+    .info-grid.single-column {
+      grid-template-columns: 1fr;
     }
 
     .info-item {
       display: flex;
-      gap: 5px;
-      margin-bottom: 2px;
+      gap: 3px;
+      font-size: 5pt;
+      line-height: 1.2;
     }
 
     .info-label {
       font-weight: bold;
       color: #0F2A52;
-      min-width: 80px;
-      font-size: 7pt;
-    }
-
-    .info-value {
-      font-size: 7pt;
+      min-width: 65px;
+      flex-shrink: 0;
     }
 
     .items-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 10px;
-      font-size: 7pt;
+      margin-bottom: 4px;
+      font-size: 6pt;
     }
 
     .items-table th,
     .items-table td {
-      border: 1px solid #dee2e6;
-      padding: 4px;
+      border: 1px solid #ccc;
+      padding: 2px 4px;
+      line-height: 1.2;
     }
 
     .items-table th {
       background-color: #0F2A52;
       color: white;
       text-align: center;
-      font-size: 7pt;
+      font-size: 6pt;
+      font-weight: bold;
     }
 
     .items-table td.text-right {
@@ -101,143 +101,154 @@
     }
 
     .comments-section {
-      margin: 8px 0;
-      padding: 5px 10px;
-      border: 1px solid #dee2e6;
+      margin: 4px 0;
+      padding: 3px 4px;
+      border: 1px solid #ccc;
       background: #f8f9fa;
-      font-size: 7pt;
-    }
-
-    .comments-section h4 {
-      margin: 0 0 3px 0;
-      font-size: 8pt;
-      color: #0F2A52;
+      font-size: 6pt;
+      line-height: 1.2;
     }
 
     .signatures {
-      margin-top: 20px;
+      margin-top: 10px;
       display: flex;
       justify-content: space-around;
-      font-size: 8pt;
     }
 
     .signature-line {
-      width: 200px;
+      width: 140px;
       text-align: center;
+      font-size: 5pt;
     }
 
     .signature-line hr {
-      margin-bottom: 5px;
+      margin-bottom: 2px;
+      border: none;
+      border-top: 1px solid #000;
     }
 
     .footer {
-      margin-top: 15px;
-      text-align: center;
-      font-size: 7pt;
+      margin-top: 4px;
+      text-align: left;
+      font-size: 6pt;
       color: #6c757d;
     }
 
     .logo {
-      max-width: 120px;
+      text-align: center;
+      margin: 2px 0 4px 0;
+    }
+
+    .logo img {
+      max-width: 90px;
       height: auto;
     }
   </style>
 </head>
 <body>
   <div id="tabla-entrega-wrapper">
-    <div class="header">
-      <div>
-        {{#if logoPath}}
-        <img src="{{logoPath}}" alt="Logo" class="logo">
-        {{/if}}
-      </div>
-      <div>
-        <h1>ENTREGA</h1>
-      </div>
-      <div class="header-info">
-        <div><strong>No. Entrega:</strong> {{numeroEntrega}}</div>
-        <div><strong>Fecha:</strong> {{fecha}}</div>
+    {{#if topImg}}
+    <img src="{{topImg}}" alt="Header" style="width: 100%; height: auto; display: block; margin-bottom: 4px;">
+    {{/if}}
+    
+    <!-- Título ENTREGA arriba del cuadro -->
+    <h1 style="margin: 0 0 3px 0; font-size: 8pt; color: #0F2A52; text-align: right;">ENTREGA</h1>
+
+    <!-- Primera fila: Datos de Entrega -->
+    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+      <!-- Datos de entrega como info-section -->
+      <div class="info-section" style="flex: 1; margin-bottom: 0; text-align: right;">
+        <div class="info-grid single-column" style="text-align: right;">
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">No. Entrega:</span>
+            <span>{{numeroEntrega}}</span>
+          </div>
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">Fecha:</span>
+            <span>{{fecha}}</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="info-section">
-      <div class="info-column">
-        <h3>INFORMACIÓN DEL CLIENTE</h3>
-        {{#if clienteInfo}}
-        <div class="info-item">
-          <span class="info-label">Empresa:</span>
-          <span class="info-value">{{clienteInfo.nombreEmpresa}}</span>
+    <!-- Segunda fila: Información del Cliente -->
+    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+      <div class="info-section" style="flex: 1; margin-bottom: 0; position: relative;">
+        <h3>Información del Cliente</h3>
+        <div class="info-grid single-column">
+          <div class="info-item">
+            <span class="info-label">Empresa:</span>
+            <span>{{cliente.nombreEmpresa}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Dirección:</span>
+            <span>{{cliente.direccion}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Teléfono:</span>
+            <span>{{cliente.telefono}}</span>
+          </div>
+          {{#if cliente.contacto}}
+          <div class="info-item">
+            <span class="info-label">Contacto:</span>
+            <span>{{cliente.contacto.nombre}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Puesto:</span>
+            <span>{{cliente.contacto.puesto}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Tel. Contacto:</span>
+            <span>{{cliente.contacto.telefono}}</span>
+          </div>
+          {{/if}}
         </div>
-        <div class="info-item">
-          <span class="info-label">Dirección:</span>
-          <span class="info-value">{{clienteInfo.direccion}}</span>
+      </div>
+    </div>
+
+    <!-- Tercera fila: Tipo de Listado -->
+    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+      <div class="info-section" style="flex: 1; margin-bottom: 0; position: relative;">
+        <h3>Detalles de la Entrega</h3>
+        <div class="info-grid single-column">
+          <div class="info-item">
+            <span class="info-label">Tipo de Documento:</span>
+            <span>Entrega de materiales</span>
+          </div>
+          {{#if comentarios}}
+          <div class="info-item">
+            <span class="info-label">Observaciones:</span>
+            <span>{{comentarios}}</span>
+          </div>
+          {{/if}}
         </div>
-        <div class="info-item">
-          <span class="info-label">Teléfono:</span>
-          <span class="info-value">{{clienteInfo.telefono}}</span>
-        </div>
-        {{else}}
-        <div class="info-item">
-          <span class="info-label">Cliente:</span>
-          <span class="info-value">{{cliente}}</span>
-        </div>
-        {{/if}}
       </div>
       
-      {{#if clienteInfo.contactos.[0]}}
-      <div class="info-column">
-        <h3>INFORMACIÓN DE CONTACTO</h3>
-        <div class="info-item">
-          <span class="info-label">Contacto:</span>
-          <span class="info-value">{{clienteInfo.contactos.[0].nombre}}</span>
-        </div>
-        {{#if clienteInfo.contactos.[0].puesto}}
-        <div class="info-item">
-          <span class="info-label">Puesto:</span>
-          <span class="info-value">{{clienteInfo.contactos.[0].puesto}}</span>
-        </div>
-        {{/if}}
-        {{#if clienteInfo.contactos.[0].contacto.correo}}
-        <div class="info-item">
-          <span class="info-label">Email:</span>
-          <span class="info-value">{{clienteInfo.contactos.[0].contacto.correo}}</span>
-        </div>
-        {{/if}}
-        {{#if clienteInfo.contactos.[0].contacto.telefono}}
-        <div class="info-item">
-          <span class="info-label">Teléfono:</span>
-          <span class="info-value">{{clienteInfo.contactos.[0].contacto.telefono}}</span>
-        </div>
-        {{/if}}
-        {{#if clienteInfo.contactos.[0].contacto.extension}}
-        <div class="info-item">
-          <span class="info-label">Ext:</span>
-          <span class="info-value">{{clienteInfo.contactos.[0].contacto.extension}}</span>
+      <!-- Imagen a la misma altura que los detalles de la entrega -->
+      <div class="info-section" style="flex: 1; margin-bottom: 0; position: relative;">
+        <!-- Imagen down.png en la parte inferior derecha -->
+        {{#if downImg}}
+        <div style="position: absolute; bottom: 5px; right: 5px; width: 160px;">
+          <img src="{{downImg}}" alt="Certificaciones Cliente" style="width: 100%; height: auto;">
         </div>
         {{/if}}
       </div>
-      {{/if}}
     </div>
 
+    <!-- Tabla de materiales entregados -->
     <table class="items-table">
       <thead>
         <tr>
-          <th style="width: 5%">#</th>
-          <th style="width: 8%">CLAVE</th>
-          <th style="width: 12%">MARCA</th>
-          <th style="width: 12%">MODELO</th>
-          <th style="width: 43%">DESCRIPCIÓN</th>
-          <th style="width: 10%">CANT</th>
-          <th style="width: 10%">U</th>
+          <th style="width: 5%">No.</th>
+          <th style="width: 70%">Descripción del Material</th>
+          <th style="width: 12.5%">Cantidad</th>
+          <th style="width: 12.5%">Unidad</th>
         </tr>
       </thead>
       <tbody>
         {{#each items}}
         <tr>
           <td class="text-center">{{increment @index}}</td>
-          <td class="text-center">{{clave}}</td>
-          <td>{{marca}}</td>
-          <td>{{modelo}}</td>
           <td>{{descripcion}}</td>
           <td class="text-center">{{cantidad}}</td>
           <td class="text-center">{{unidad}}</td>
@@ -246,26 +257,33 @@
       </tbody>
     </table>
 
-    {{#if comentarios}}
-    <div class="comments-section">
-      <h4>Comentarios:</h4>
-      <p style="margin: 0;">{{comentarios}}</p>
+    <!-- Espacio para firmas después de la tabla -->
+    <div style="margin-top: 120px; margin-bottom: 20px;">
+      <!-- Espacio en blanco para firmar -->
     </div>
-    {{/if}}
 
     <div class="signatures">
-      <div class="signature-line">
+      <div class="signature-line" style="margin-bottom: 40px;">
         <hr>
         <span>Firma del Cliente</span>
       </div>
-      <div class="signature-line">
+      <div class="signature-line" style="margin-bottom: 40px;">
         <hr>
         <span>Firma de Autorización</span>
       </div>
     </div>
 
     <div class="footer">
-      <p>Este documento certifica la entrega de los artículos mencionados.</p>
+      <!-- Footer: apilar bottom y bottom-2 verticalmente al final del documento.
+           Las imágenes se muestran a ancho completo para cubrir el ancho imprimible. -->
+      <div style="margin-top:40px; display:flex; flex-direction:column; align-items:stretch; gap:0; width:calc(100% + 40px); margin-left:-20px;">
+        {{#if bottom1}}
+          <img src="{{bottom1}}" alt="Bottom" style="width:100%; max-width:none; height:auto; display:block;" />
+        {{/if}}
+        {{#if bottom2}}
+          <img src="{{bottom2}}" alt="Bottom 2" style="width:100%; max-width:none; height:auto; display:block;" />
+        {{/if}}
+      </div>
     </div>
   </div>
 </body>
