@@ -635,13 +635,13 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
           <div className="row">
                         <div className="col-md-6">
               <Form.Group className="mb-2">
-                <Form.Label style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>Comentarios</Form.Label>
+                <Form.Label style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>Concepto</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={2}
                   value={formData.comentarios}
                   onChange={(e) => setFormData({ ...formData, comentarios: e.target.value })}
-                  placeholder="Comentarios adicionales sobre la cotización..."
+                  placeholder="Concepto del trabajo a realizar..."
                   style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                 />
               </Form.Group>
@@ -677,7 +677,7 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
             </div>
           </div>
 
-          {/* Tercera fila: Comentarios */}
+          {/* Tercera fila: Concepto */}
           <div className="row">
 
           </div>

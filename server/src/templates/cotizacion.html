@@ -126,7 +126,7 @@
       padding: 3px 4px;
       border: 1px solid #ccc;
       background: #f8f9fa;
-      font-size: 5pt;
+      font-size: 6pt;
       line-height: 1.2;
     }
 
@@ -151,7 +151,7 @@
     .footer {
       margin-top: 4px;
       text-align: left;
-      font-size: 4.5pt;
+      font-size: 6pt;
       color: #6c757d;
     }
 
@@ -181,50 +181,10 @@
     <!-- Título COTIZACIÓN arriba del cuadro -->
     <h1 style="margin: 0 0 3px 0; font-size: 8pt; color: #0F2A52; text-align: right;">COTIZACIÓN</h1>
 
-    <!-- Primera fila: Datos del Vendedor y Datos de Cotización -->
-    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
-      <div class="info-section" style="flex: 1; margin-bottom: 0;">
-        <h3>Datos del Vendedor</h3>
-        <div class="info-grid single-column">
-          <div class="info-item">
-            <span class="info-label">Nombre:</span>
-            <span>{{vendedor.nombre}}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Correo:</span>
-            <span>{{vendedor.email}}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Teléfono:</span>
-            <span>{{vendedor.telefono}}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Datos de cotización como info-section -->
-      <div class="info-section" style="flex: 1; margin-bottom: 0; text-align: right;">
-        <h3 style="text-align: right;">Datos de Cotización</h3>
-        <div class="info-grid single-column" style="text-align: right;">
-          <div class="info-item" style="justify-content: flex-end;">
-            <span class="info-label">No. Cotización:</span>
-            <span>{{numeroPresupuesto}}</span>
-          </div>
-          <div class="info-item" style="justify-content: flex-end;">
-            <span class="info-label">Fecha:</span>
-            <span>{{fecha}}</span>
-          </div>
-          <div class="info-item" style="justify-content: flex-end;">
-            <span class="info-label">Vigencia:</span>
-            <span>{{vigencia}}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Segunda fila: Datos de la Empresa y Información del Cliente -->
+    <!-- Primera fila: Datos de la Empresa y Datos de Cotización -->
     <div style="display: flex; gap: 6px; margin-bottom: 6px;">
       {{#if razonSocial}}
-      <div class="info-section" style="flex: 1; margin-bottom: 0; position: relative;">
+      <div class="info-section" style="flex: 1; margin-bottom: 0;">
         <h3>Datos de la Empresa</h3>
         <div class="info-grid single-column">
           <div class="info-item">
@@ -251,6 +211,27 @@
       </div>
       {{/if}}
 
+      <!-- Datos de cotización como info-section -->
+      <div class="info-section" style="flex: 1; margin-bottom: 0; text-align: right;">
+        <div class="info-grid single-column" style="text-align: right;">
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">No. Cotización:</span>
+            <span>{{numeroPresupuesto}}</span>
+          </div>
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">Fecha:</span>
+            <span>{{fecha}}</span>
+          </div>
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">Vigencia:</span>
+            <span>{{vigencia}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Segunda fila: Información del Cliente -->
+    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
       <div class="info-section" style="flex: 1; margin-bottom: 0; position: relative;">
         <h3>Información del Cliente</h3>
         <div class="info-grid single-column">
@@ -279,8 +260,29 @@
             <span>{{cliente.email}}</span>
           </div>
         </div>
-        <!-- Imagen down.png en la parte inferior derecha del cliente -->
-        <div style="position: absolute; bottom: 5px; right: 5px; width: 130px;">
+      </div>
+    </div>
+
+    <!-- Tercera fila: Datos del Vendedor -->
+    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+      <div class="info-section" style="flex: 1; margin-bottom: 0; position: relative;">
+        <h3>Datos del Vendedor</h3>
+        <div class="info-grid single-column">
+          <div class="info-item">
+            <span class="info-label">Nombre:</span>
+            <span>{{vendedor.nombre}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Teléfono:</span>
+            <span>{{vendedor.telefono}}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Imagen a la misma altura que los datos del vendedor -->
+      <div class="info-section" style="flex: 1; margin-bottom: 0; position: relative;">
+        <!-- Imagen down.png en la parte inferior derecha -->
+        <div style="position: absolute; bottom: 5px; right: 5px; width: 160px;">
           <img src="{{downImg}}" alt="Certificaciones Cliente" style="width: 100%; height: auto;">
         </div>
       </div>
