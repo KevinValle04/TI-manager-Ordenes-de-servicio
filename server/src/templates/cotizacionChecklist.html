@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Checklist Cotización - {{numeroPresupuesto}}</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      padding: 6px;
+      font-size: 5pt;
+      line-height: 1.1;
+    }
+
+    #tabla-cotizacion-wrapper {
+      max-width: 100%;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .header h1 {
+      color: #0F2A52;
+      font-size: 8pt;
+      margin: 1px 0;
+    }
+
+    .info-section {
+      margin-bottom: 6px;
+      border: none;
+      padding: 4px 6px;
+      page-break-inside: avoid;
+    }
+
+    .info-section h3 {
+      font-size: 5.5pt;
+      margin: 0 0 2px 0;
+      color: #0F2A52;
+      font-weight: bold;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 3px 8px;
+    }
+
+    .info-grid.single-column {
+      grid-template-columns: 1fr;
+    }
+
+    .info-item {
+      display: flex;
+      gap: 3px;
+      font-size: 5pt;
+      line-height: 1.2;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #0F2A52;
+      min-width: 65px;
+      flex-shrink: 0;
+    }
+
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 4px;
+      font-size: 6pt;
+    }
+
+    .items-table th,
+    .items-table td {
+      border: 1px solid #ccc;
+      padding: 2px 4px;
+      line-height: 1.2;
+    }
+
+    .items-table th {
+      background-color: #0F2A52;
+      color: white;
+      text-align: center;
+      font-size: 6pt;
+      font-weight: bold;
+    }
+
+    .items-table td.text-right {
+      text-align: right;
+    }
+
+    .items-table td.text-center {
+      text-align: center;
+    }
+
+    .comments-section {
+      margin: 4px 0;
+      padding: 3px 4px;
+      border: 1px solid #ccc;
+      background: #f8f9fa;
+      font-size: 6pt;
+      line-height: 1.2;
+    }
+
+    .signatures {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .signature-line {
+      width: 140px;
+      text-align: center;
+      font-size: 5pt;
+    }
+
+    .signature-line hr {
+      margin-bottom: 2px;
+      border: none;
+      border-top: 1px solid #000;
+    }
+
+    .footer {
+      margin-top: 4px;
+      text-align: left;
+      font-size: 6pt;
+      color: #6c757d;
+    }
+
+    .logo {
+      text-align: center;
+      margin: 2px 0 4px 0;
+    }
+
+    .logo img {
+      max-width: 90px;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="tabla-cotizacion-wrapper">
+    {{#if topImg}}
+    <img src="{{topImg}}" alt="Header" style="width: 100%; height: auto; display: block; margin-bottom: 4px;">
+    {{/if}}
+    
+    <!-- Título CHECKLIST COTIZACIÓN arriba del cuadro -->
+    <h1 style="margin: 0 0 3px 0; font-size: 8pt; color: #0F2A52; text-align: right;">CHECKLIST COTIZACIÓN</h1>
+
+    <!-- Datos de Cotización -->
+    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+      <div class="info-section" style="flex: 1; margin-bottom: 0; text-align: right;">
+        <div class="info-grid single-column" style="text-align: right;">
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">No. Cotización:</span>
+            <span>{{numeroPresupuesto}}</span>
+          </div>
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">Fecha:</span>
+            <span>{{fecha}}</span>
+          </div>
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">Vigencia:</span>
+            <span>{{vigencia}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tipo de Listado y Concepto -->
+    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+      <div class="info-section" style="flex: 1; margin-bottom: 0; position: relative;">
+        <h3>Detalles del Checklist</h3>
+        <div class="info-grid single-column">
+          <div class="info-item">
+            <span class="info-label">Tipo de Listado:</span>
+            <span>Lista de verificación de productos cotizados</span>
+          </div>
+          {{#if comentarios}}
+          <div class="info-item">
+            <span class="info-label">Observaciones:</span>
+            <span>{{comentarios}}</span>
+          </div>
+          {{/if}}
+        </div>
+      </div>
+      
+      <!-- Imagen a la misma altura que los detalles -->
+      <div class="info-section" style="flex: 1; margin-bottom: 0; position: relative;">
+        <!-- Imagen down.png en la parte inferior derecha -->
+        {{#if downImg}}
+        <div style="position: absolute; bottom: 5px; right: 5px; width: 160px;">
+          <img src="{{downImg}}" alt="Certificaciones Cliente" style="width: 100%; height: auto;">
+        </div>
+        {{/if}}
+      </div>
+    </div>
+
+    <!-- Tabla de productos tipo checklist -->
+    <table class="items-table">
+      <thead>
+        <tr>
+          <th style="width: 5%">✓</th>
+          <th style="width: 70%">Descripción del Producto</th>
+          <th style="width: 12.5%">Cantidad</th>
+          <th style="width: 12.5%">Unidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each items}}
+        <tr>
+          <td class="text-center">☐</td>
+          <td>{{descripcion}}</td>
+          <td class="text-center">{{cantidad}}</td>
+          <td class="text-center">{{unidad}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+
+    <!-- Espacio para firmas después de la tabla -->
+    <div style="margin-top: 120px; margin-bottom: 20px;">
+      <!-- Espacio en blanco para firmar -->
+    </div>
+
+    <div class="signatures">
+      <div class="signature-line" style="margin-bottom: 40px;">
+        <hr>
+        <span>Firma del Cliente</span>
+      </div>
+      <div class="signature-line" style="margin-bottom: 40px;">
+        <hr>
+        <span>Firma de Autorización</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      <!-- Footer: apilar bottom y bottom-2 verticalmente al final del documento.
+           Las imágenes se muestran a ancho completo para cubrir el ancho imprimible. -->
+      <div style="margin-top:40px; display:flex; flex-direction:column; align-items:stretch; gap:0; width:calc(100% + 40px); margin-left:-20px;">
+        {{#if bottom1}}
+          <img src="{{bottom1}}" alt="Bottom" style="width:100%; max-width:none; height:auto; display:block;" />
+        {{/if}}
+        {{#if bottom2}}
+          <img src="{{bottom2}}" alt="Bottom 2" style="width:100%; max-width:none; height:auto; display:block;" />
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</body>
+</html>
