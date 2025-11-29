@@ -119,13 +119,24 @@ export class CotizacionPdfGenerator {
       }
 
       // Cargar otras imágenes (bottom / footers) y convertir a base64
+      const topPath = path.join(__dirname, '../templates/img/top.png');
       const bottom1Path = path.join(__dirname, '../templates/img/bottom.png');
       const bottom2Path = path.join(__dirname, '../templates/img/bottom-2.png');
       const downPath = path.join(__dirname, '../templates/img/down.png');
 
+      let topBase64 = '';
       let bottom1Base64 = '';
       let bottom2Base64 = '';
       let downBase64 = '';
+
+      try {
+        if (fs.existsSync(topPath)) {
+          const buf = fs.readFileSync(topPath);
+          topBase64 = `data:image/png;base64,${buf.toString('base64')}`;
+        }
+      } catch (e) {
+        console.warn('No se pudo cargar top.png:', e);
+      }
 
       try {
         if (fs.existsSync(bottom1Path)) {
@@ -161,6 +172,7 @@ export class CotizacionPdfGenerator {
       const datosFormateados = {
         ...datos,
         logoPath: logoBase64,
+        topImg: topBase64,
         bottom1: bottom1Base64,
         bottom2: bottom2Base64,
         downImg: downBase64,
@@ -169,6 +181,7 @@ export class CotizacionPdfGenerator {
         subtotal: this.formatoMoneda(datos.subtotal, moneda),
         total: this.formatoMoneda(datos.total, moneda),
         nombreMoneda: nombreMoneda,
+        razonSocial: datos.razonSocial, // Pasar datos de razón social
         items: datos.items.map(item => ({
           ...item,
           precioUnitario: this.formatoMoneda(item.precioUnitario, moneda),

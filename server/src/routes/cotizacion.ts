@@ -6,6 +6,7 @@ import {
     deleteCotizacion,
     descargarPdfChecklistCotizacion,
     descargarPdfCotizacion,
+    generateNumeroPresupuesto,
     getCotizacionById,
     getCotizaciones,
     getPdfChecklistCotizacion,
@@ -26,6 +27,7 @@ function asyncHandler(fn: (req: Request, res: Response, next: NextFunction) => P
 // Rutas para cotizaciones
 router.get('/', asyncHandler(getCotizaciones));
 router.get('/search', asyncHandler(searchCotizaciones));
+router.post('/generate-numero', asyncHandler(generateNumeroPresupuesto)); // Nueva ruta para generar número
 router.get('/:id', asyncHandler(getCotizacionById));
 router.post('/', asyncHandler(createCotizacion));
 router.put('/:id', asyncHandler(updateCotizacion));

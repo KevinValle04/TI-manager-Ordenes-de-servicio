@@ -93,6 +93,47 @@ const CotizacionModal = ({
   const [canalizaciones, setCanalizaciones] = useState<any[]>([]);
   const [canalizacionSearchTerm, setCanalizacionSearchTerm] = useState('');
 
+  // Función para generar número automáticamente
+  const generarNumeroAutomatico = async (razonSocialId?: string, nombreEmpresa?: string) => {
+    try {
+      console.log('=== GENERANDO NÚMERO AUTOMÁTICO ===');
+      console.log('razonSocialId:', razonSocialId);
+      console.log('nombreEmpresa:', nombreEmpresa);
+      
+      const requestBody = razonSocialId 
+        ? { razonSocial: razonSocialId }
+        : { nombreEmpresa: nombreEmpresa };
+        
+      console.log('Enviando requestBody:', requestBody);
+        
+      const response = await fetch('http://localhost:6051/api/cotizaciones/generate-numero', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
+      });
+      
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Número generado desde API:', data.numeroPresupuesto);
+        setFormData(prev => ({ ...prev, numeroPresupuesto: data.numeroPresupuesto }));
+      } else {
+        const errorData = await response.text();
+        console.error('Error en API response:', response.status, errorData);
+        // Mostrar mensaje de error en lugar de usar fallback
+        alert('Error al generar número automático. Servidor no disponible.');
+      }
+    } catch (error) {
+      console.error('Error conectando con el servidor:', error);
+      // Mostrar mensaje de error en lugar de usar fallback
+      alert('No se pudo conectar con el servidor. Verifica que esté ejecutándose.');
+    }
+  };
+
   // Función para formatear moneda según la moneda seleccionada
   const formatearMoneda = (valor: number): string => {
     const locale = moneda === 'USD' ? 'en-US' : 'es-MX';
@@ -221,7 +262,7 @@ const CotizacionModal = ({
         cliente: '',
         razonSocial: '',
         vendedor: '',
-        numeroPresupuesto: generatePresupuestoNumber(),
+        numeroPresupuesto: '', // Iniciar vacío, se generará al seleccionar cliente
         fecha: today,
         vigencia: vigencia,
         items: [{
@@ -395,6 +436,11 @@ const CotizacionModal = ({
     setFormData(prev => ({ ...prev, cliente: cliente._id || '' }));
     setClienteDisplayText(cliente.nombreEmpresa);
     setShowClienteSuggestions(false);
+    
+    // Generar número automáticamente cuando se selecciona un cliente
+    if (!editingCotizacion && cliente.nombreEmpresa) {
+      generarNumeroAutomatico(undefined, cliente.nombreEmpresa);
+    }
   };
 
   // Manejo de razones sociales
@@ -420,6 +466,11 @@ const CotizacionModal = ({
     setFormData(prev => ({ ...prev, razonSocial: razonSocial._id || '' }));
     setRazonSocialDisplayText(razonSocial.nombre);
     setShowRazonSocialSuggestions(false);
+    
+    // Generar número automáticamente cuando se selecciona una razón social
+    if (!editingCotizacion && razonSocial._id) {
+      generarNumeroAutomatico(razonSocial._id);
+    }
   };
 
   // Manejo de productos
@@ -711,11 +762,12 @@ const CotizacionModal = ({
               </div>
               <div className="col-md-4">
                 <Form.Group className="mb-2">
-                  <Form.Label>No. Presupuesto</Form.Label>
+                  <Form.Label>No. Cotización</Form.Label>
                   <Form.Control
                     type="text"
                     value={formData.numeroPresupuesto}
                     onChange={(e) => setFormData(prev => ({ ...prev, numeroPresupuesto: e.target.value }))}
+                    placeholder="Selecciona un cliente para generar"
                   />
                 </Form.Group>
               </div>
@@ -834,10 +886,13 @@ const CotizacionModal = ({
               </div>
 
               {/* Modal de búsqueda de canalizaciones */}
+              {/* {console.log('Renderizando modal con showCanalizacionModal:', showCanalizacionModal)} */}
               <Modal 
-                show={showCanalizacionModal} 
+                show={showCanalizacionModal}
                 onHide={() => setShowCanalizacionModal(false)}
                 size="lg"
+                style={{ zIndex: 9999 }}
+                backdrop="static"
               >
                 <Modal.Header closeButton>
                   <Modal.Title>Buscar Canalización</Modal.Title>

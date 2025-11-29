@@ -237,7 +237,7 @@ export class CotizacionCanalizacionPdfGenerator {
                 <tr>
                   <td colspan="7" style="padding: 4px 6px; background: #f8f9fa; border: 1px solid #ddd; font-size: 7pt; line-height: 1.3;">
                     <div style="margin-bottom: 2px;"><strong style="color: #0F2A52;">Tipo de Listado:</strong> Materiales de canalización</div>
-                    <div><strong style="color: #0F2A52;">Observaciones:</strong> ${comentarios}</div>
+                    <div><strong style="color: #0F2A52;">Concepto:</strong> ${comentarios}</div>
                   </td>
                 </tr>
                 
