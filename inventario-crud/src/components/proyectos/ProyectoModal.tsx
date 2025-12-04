@@ -117,7 +117,7 @@ const ProyectoModal: React.FC<ProyectoModalProps> = ({
   const colaboradoresActivos = colaboradores.filter(c => c.activo);
 
   return (
-    <Modal show={show} onHide={handleClose} size="lg" centered>
+    <Modal show={show} onHide={handleClose} size="lg" centered fullscreen="md-down">
       <Modal.Header closeButton className="bg-primary text-white">
         <Modal.Title>
           <i className="fas fa-project-diagram me-2"></i>
@@ -143,7 +143,7 @@ const ProyectoModal: React.FC<ProyectoModalProps> = ({
               </Form.Group>
             </div>
 
-            <div className="col-md-6 mb-3">
+            <div className="col-md-6 col-12 mb-3">
               <Form.Group>
                 <Form.Label>
                   Fecha de Inicio <span className="text-danger">*</span>
@@ -158,7 +158,7 @@ const ProyectoModal: React.FC<ProyectoModalProps> = ({
               </Form.Group>
             </div>
 
-            <div className="col-md-6 mb-3">
+            <div className="col-md-6 col-12 mb-3">
               <Form.Group>
                 <Form.Label>
                   Fecha de Terminación <span className="text-danger">*</span>
@@ -210,7 +210,7 @@ const ProyectoModal: React.FC<ProyectoModalProps> = ({
                   ) : (
                     <div className="row">
                       {colaboradoresActivos.map(colaborador => (
-                        <div key={colaborador._id} className="col-md-6 mb-2">
+                        <div key={colaborador._id} className="col-md-6 col-12 mb-2">
                           <Form.Check
                             type="checkbox"
                             id={`colaborador-${colaborador._id}`}

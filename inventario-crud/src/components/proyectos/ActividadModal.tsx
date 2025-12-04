@@ -119,7 +119,7 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
   };
 
   return (
-    <Modal show={show} onHide={onHide} size="lg">
+    <Modal show={show} onHide={onHide} size="lg" fullscreen="md-down">
       <Modal.Header closeButton>
         <Modal.Title>
           <i className="fas fa-tasks me-2"></i>
@@ -144,7 +144,7 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
           </Form.Group>
 
           <div className="row">
-            <div className="col-md-6">
+            <div className="col-md-6 col-12 mb-3 mb-md-0">
               <Form.Group className="mb-3">
                 <Form.Label>
                   Fecha de Inicio <span className="text-danger">*</span>
@@ -159,7 +159,7 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
               </Form.Group>
             </div>
 
-            <div className="col-md-6">
+            <div className="col-md-6 col-12">
               <Form.Group className="mb-3">
                 <Form.Label>
                   Fecha Final <span className="text-danger">*</span>
@@ -176,7 +176,7 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
           </div>
 
           <div className="row">
-            <div className="col-md-8">
+            <div className="col-md-8 col-12 mb-3 mb-md-0">
               <Form.Group className="mb-3">
                 <Form.Label>Estado de la Actividad</Form.Label>
                 <Form.Select
@@ -192,7 +192,7 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
               </Form.Group>
             </div>
 
-            <div className="col-md-4">
+            <div className="col-md-4 col-12">
               <Form.Group className="mb-3">
                 <Form.Label>Color de la Tarjeta</Form.Label>
                 <div className="d-flex flex-wrap gap-2">

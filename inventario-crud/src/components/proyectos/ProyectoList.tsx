@@ -9,6 +9,7 @@ import EntregaModal from '../entregas/EntregaModal';
 import OrdenCompraForm from '../ordenesCompra/OrdenCompraForm';
 import ActividadesList from './ActividadesList';
 import ProyectoModal from './ProyectoModal';
+import '../../styles/Proyectos.css';
 
 const ProyectoList: React.FC = () => {
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
@@ -369,6 +370,15 @@ const ProyectoList: React.FC = () => {
     return `PRES-${year}${month}-${random}`;
   };
 
+  const generateEntregaNumber = (clienteNombre: string) => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    const clientePrefix = clienteNombre.substring(0, 3).toUpperCase();
+    return `ENT-${clientePrefix}-${year}${month}-${random}`;
+  };
+
   const getEstadoBadgeClass = (estado?: string) => {
     switch (estado) {
       case 'En progreso': return 'primary';
@@ -540,9 +550,133 @@ const ProyectoList: React.FC = () => {
   const currentItems = filteredProyectos.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredProyectos.length / itemsPerPage);
 
+  // Componente de card para vista móvil
+  const ProyectoCardMobile: React.FC<{ proyecto: Proyecto }> = ({ proyecto }) => (
+    <div className="proyecto-card-mobile">
+      <div className="proyecto-card-mobile-header">
+        <div className="proyecto-card-mobile-title">{proyecto.nombre}</div>
+        {proyecto.descripcion && (
+          <div className="proyecto-card-mobile-description">{proyecto.descripcion}</div>
+        )}
+      </div>
+      
+      <div className="proyecto-card-mobile-body">
+        <div className="proyecto-card-mobile-row">
+          <span className="proyecto-card-mobile-label">Fecha Inicio:</span>
+          <span className="proyecto-card-mobile-value">{formatDate(proyecto.fechaInicio)}</span>
+        </div>
+        
+        <div className="proyecto-card-mobile-row">
+          <span className="proyecto-card-mobile-label">Fecha Término:</span>
+          <span className="proyecto-card-mobile-value">{formatDate(proyecto.fechaTerminacion)}</span>
+        </div>
+        
+        <div className="proyecto-card-mobile-row">
+          <span className="proyecto-card-mobile-label">Estado:</span>
+          <span className="proyecto-card-mobile-value">
+            <span className={`badge bg-${getEstadoBadgeClass(proyecto.estado)}`}>
+              {proyecto.estado || 'En progreso'}
+            </span>
+          </span>
+        </div>
+        
+        <div className="proyecto-card-mobile-row">
+          <span className="proyecto-card-mobile-label">Empleados:</span>
+          <div className="proyecto-card-mobile-value">
+            {proyecto.colaboradores && proyecto.colaboradores.length > 0 ? (
+              <div className="proyecto-card-mobile-colaboradores">
+                {proyecto.colaboradores.slice(0, 2).map((c, idx) => {
+                  const nombre = typeof c === 'string' 
+                    ? colaboradores.find(col => col._id === c)?.nombre || 'N/A'
+                    : c.nombre;
+                  return (
+                    <div key={idx}>
+                      <i className="fas fa-user me-1"></i>{nombre}
+                    </div>
+                  );
+                })}
+                {proyecto.colaboradores.length > 2 && (
+                  <small className="text-muted">+{proyecto.colaboradores.length - 2} más</small>
+                )}
+              </div>
+            ) : (
+              <span className="text-muted">Sin empleados</span>
+            )}
+          </div>
+        </div>
+      </div>
+      
+      <div className="proyecto-card-mobile-actions">
+        <div className="proyecto-card-mobile-actions-grid">
+          <Button
+            variant="success"
+            size="sm"
+            onClick={() => handleViewActividades(proyecto)}
+            title="Ver actividades"
+          >
+            <i className="fas fa-tasks me-1"></i>
+            Actividades
+          </Button>
+          
+          <Button
+            variant="info"
+            size="sm"
+            onClick={() => handleViewCotizaciones(proyecto)}
+            title="Ver cotizaciones"
+          >
+            <i className="fas fa-file-invoice me-1"></i>
+            Cotizaciones
+          </Button>
+          
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => handleViewEntregas(proyecto)}
+            title="Ver entregas"
+          >
+            <i className="fas fa-truck me-1"></i>
+            Entregas
+          </Button>
+          
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => handleViewOrdenes(proyecto)}
+            title="Ver órdenes"
+          >
+            <i className="fas fa-shopping-cart me-1"></i>
+            Órdenes
+          </Button>
+        </div>
+        
+        <div className="proyecto-card-mobile-actions-full">
+          <Button
+            variant="warning"
+            size="sm"
+            onClick={() => handleEdit(proyecto)}
+            title="Editar proyecto"
+          >
+            <i className="fas fa-edit me-1"></i>
+            Editar
+          </Button>
+          
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={() => handleDelete(proyecto._id!)}
+            title="Eliminar proyecto"
+          >
+            <i className="fas fa-trash me-1"></i>
+            Eliminar
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="container-fluid mt-3">
-      <div className="d-flex justify-content-between align-items-center mb-3">
+    <div className="container-fluid mt-3 proyectos-container">
+      <div className="d-flex justify-content-between align-items-center mb-3 proyectos-header">
         <h2>
           <i className="fas fa-project-diagram me-2"></i>
           Proyectos
@@ -553,6 +687,7 @@ const ProyectoList: React.FC = () => {
             setEditingProyecto(null);
             setShowModal(true);
           }}
+          className="btn-nuevo-proyecto"
         >
           <i className="fas fa-plus me-2"></i>
           Nuevo Proyecto
@@ -583,12 +718,23 @@ const ProyectoList: React.FC = () => {
         </div>
       ) : (
         <>
-          <div className="table-responsive">
-            <DataTable
-              columns={columns}
-              data={currentItems}
-            />
+          {/* Vista de tabla para desktop */}
+          <div className="proyectos-table-desktop">
+            <div className="table-responsive">
+              <DataTable
+                columns={columns}
+                data={currentItems}
+              />
+            </div>
           </div>
+          
+          {/* Vista de cards para móvil */}
+          <div className="proyectos-cards-mobile">
+            {currentItems.map(proyecto => (
+              <ProyectoCardMobile key={proyecto._id} proyecto={proyecto} />
+            ))}
+          </div>
+          
           <PaginationCompact
             currentPage={currentPage}
             totalPages={totalPages}
@@ -613,11 +759,12 @@ const ProyectoList: React.FC = () => {
         show={showCotizacionesModal} 
         onHide={() => setShowCotizacionesModal(false)}
         size="xl"
+        fullscreen="md-down"
       >
         <Modal.Header closeButton>
           <Modal.Title>
             <i className="fas fa-file-invoice me-2"></i>
-            Cotizaciones del Proyecto: {selectedProyecto?.nombre}
+            Cotizaciones: {selectedProyecto?.nombre}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -639,8 +786,8 @@ const ProyectoList: React.FC = () => {
                   <tr>
                     <th>No. Presupuesto</th>
                     <th>Cliente</th>
-                    <th>Fecha</th>
-                    <th>Total</th>
+                    <th className="d-none d-md-table-cell">Fecha</th>
+                    <th className="d-none d-lg-table-cell">Total</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                   </tr>
@@ -650,23 +797,23 @@ const ProyectoList: React.FC = () => {
                     <tr key={cotizacion._id}>
                       <td>{cotizacion.numeroPresupuesto}</td>
                       <td>{typeof cotizacion.cliente === 'string' ? cotizacion.cliente : cotizacion.cliente?.nombreEmpresa}</td>
-                      <td>{new Date(cotizacion.fecha).toLocaleDateString('es-MX')}</td>
-                      <td>${cotizacion.total.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</td>
+                      <td className="d-none d-md-table-cell">{new Date(cotizacion.fecha).toLocaleDateString('es-MX')}</td>
+                      <td className="d-none d-lg-table-cell">${cotizacion.total.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</td>
                       <td>
                         <span className={`badge bg-${cotizacion.estado === 'Aceptada' ? 'success' : cotizacion.estado === 'Rechazada' ? 'danger' : cotizacion.estado === 'Enviada' ? 'primary' : 'secondary'}`}>
                           {cotizacion.estado}
                         </span>
                       </td>
                       <td>
-                        <div className="d-flex gap-1">
+                        <div className="d-flex gap-1 flex-wrap">
                           <Button
                             variant="warning"
                             size="sm"
                             onClick={() => handleEditCotizacion(cotizacion)}
                             title="Editar cotización"
                           >
-                            <i className="fas fa-edit me-1"></i>
-                            Editar
+                            <i className="fas fa-edit"></i>
+                            <span className="d-none d-lg-inline ms-1">Editar</span>
                           </Button>
                           <Button
                             variant="primary"
@@ -674,8 +821,8 @@ const ProyectoList: React.FC = () => {
                             onClick={() => window.open(`/api/cotizaciones/${cotizacion._id}/pdf`, '_blank')}
                             title="Ver PDF"
                           >
-                            <i className="fas fa-file-pdf me-1"></i>
-                            PDF
+                            <i className="fas fa-file-pdf"></i>
+                            <span className="d-none d-lg-inline ms-1">PDF</span>
                           </Button>
                         </div>
                       </td>
@@ -698,11 +845,12 @@ const ProyectoList: React.FC = () => {
         show={showEntregasModal} 
         onHide={() => setShowEntregasModal(false)}
         size="xl"
+        fullscreen="md-down"
       >
         <Modal.Header closeButton>
           <Modal.Title>
             <i className="fas fa-truck me-2"></i>
-            Entregas del Proyecto: {selectedProyecto?.nombre}
+            Entregas: {selectedProyecto?.nombre}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -722,28 +870,28 @@ const ProyectoList: React.FC = () => {
               <table className="table table-hover">
                 <thead className="table-dark">
                   <tr>
-                    <th>No. Presupuesto</th>
+                    <th>No. Entrega</th>
                     <th>Cliente</th>
-                    <th>Fecha</th>
+                    <th className="d-none d-md-table-cell">Fecha</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {entregasProyecto.map(entrega => (
                     <tr key={entrega._id}>
-                      <td>{entrega.numeroPresupuesto}</td>
+                      <td>{entrega.numeroEntrega}</td>
                       <td>{typeof entrega.cliente === 'string' ? entrega.cliente : entrega.cliente?.nombreEmpresa}</td>
-                      <td>{new Date(entrega.fecha).toLocaleDateString('es-MX')}</td>
+                      <td className="d-none d-md-table-cell">{new Date(entrega.fecha).toLocaleDateString('es-MX')}</td>
                       <td>
-                        <div className="d-flex gap-1">
+                        <div className="d-flex gap-1 flex-wrap">
                           <Button
                             variant="warning"
                             size="sm"
                             onClick={() => handleEditEntrega(entrega)}
                             title="Editar entrega"
                           >
-                            <i className="fas fa-edit me-1"></i>
-                            Editar
+                            <i className="fas fa-edit"></i>
+                            <span className="d-none d-lg-inline ms-1">Editar</span>
                           </Button>
                           <Button
                             variant="primary"
@@ -751,8 +899,8 @@ const ProyectoList: React.FC = () => {
                             onClick={() => window.open(`/api/entregas/${entrega._id}/pdf`, '_blank')}
                             title="Ver PDF"
                           >
-                            <i className="fas fa-file-pdf me-1"></i>
-                            PDF
+                            <i className="fas fa-file-pdf"></i>
+                            <span className="d-none d-lg-inline ms-1">PDF</span>
                           </Button>
                         </div>
                       </td>
@@ -775,11 +923,12 @@ const ProyectoList: React.FC = () => {
         show={showOrdenesModal} 
         onHide={() => setShowOrdenesModal(false)}
         size="xl"
+        fullscreen="md-down"
       >
         <Modal.Header closeButton>
           <Modal.Title>
             <i className="fas fa-shopping-cart me-2"></i>
-            Órdenes de Compra del Proyecto: {selectedProyecto?.nombre}
+            Órdenes de Compra: {selectedProyecto?.nombre}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -801,8 +950,8 @@ const ProyectoList: React.FC = () => {
                   <tr>
                     <th>No. Orden</th>
                     <th>Proveedor</th>
-                    <th>Fecha</th>
-                    <th>Razón Social</th>
+                    <th className="d-none d-md-table-cell">Fecha</th>
+                    <th className="d-none d-lg-table-cell">Razón Social</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -811,18 +960,18 @@ const ProyectoList: React.FC = () => {
                     <tr key={orden._id}>
                       <td>{orden.numeroOrden}</td>
                       <td>{typeof orden.proveedor === 'string' ? orden.proveedor : orden.proveedor?.empresa}</td>
-                      <td>{new Date(orden.fecha).toLocaleDateString('es-MX')}</td>
-                      <td>{typeof orden.razonSocial === 'string' ? orden.razonSocial : orden.razonSocial?.nombre}</td>
+                      <td className="d-none d-md-table-cell">{new Date(orden.fecha).toLocaleDateString('es-MX')}</td>
+                      <td className="d-none d-lg-table-cell">{typeof orden.razonSocial === 'string' ? orden.razonSocial : orden.razonSocial?.nombre}</td>
                       <td>
-                        <div className="d-flex gap-1">
+                        <div className="d-flex gap-1 flex-wrap">
                           <Button
                             variant="warning"
                             size="sm"
                             onClick={() => handleEditOrden(orden)}
                             title="Editar orden de compra"
                           >
-                            <i className="fas fa-edit me-1"></i>
-                            Editar
+                            <i className="fas fa-edit"></i>
+                            <span className="d-none d-lg-inline ms-1">Editar</span>
                           </Button>
                           {orden.rutaPdf ? (
                             <Button
@@ -831,8 +980,8 @@ const ProyectoList: React.FC = () => {
                               onClick={() => window.open(`/api/ordenes-compra/${orden._id}/pdf`, '_blank')}
                               title="Ver PDF"
                             >
-                              <i className="fas fa-file-pdf me-1"></i>
-                              PDF
+                              <i className="fas fa-file-pdf"></i>
+                              <span className="d-none d-lg-inline ms-1">PDF</span>
                             </Button>
                           ) : (
                             <span className="text-muted small">Sin PDF</span>
@@ -894,7 +1043,7 @@ const ProyectoList: React.FC = () => {
           inventarioItems={inventarioItems}
           razonesSociales={razonesSociales}
           proyectos={proyectos}
-          generatePresupuestoNumber={generatePresupuestoNumber}
+          generateEntregaNumber={generateEntregaNumber}
         />
       )}
 
