@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Button, ButtonGroup, ToggleButton } from 'react-bootstrap';
 import { Colaborador, Proyecto } from '../../types';
 import ActividadesKanban from './ActividadesKanban';
 import ActividadesTable from './ActividadesTable';
+import ActividadesMobile from './ActividadesMobile';
 
 interface ActividadesListProps {
   show: boolean;
@@ -20,8 +21,32 @@ const ActividadesList: React.FC<ActividadesListProps> = ({
   colaboradores
 }) => {
   const [viewMode, setViewMode] = useState<ViewMode>('kanban');
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Render Kanban in its own modal
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Si es móvil, mostrar solo la vista móvil optimizada
+  if (isMobile) {
+    return (
+      <ActividadesMobile
+        show={show}
+        onHide={onHide}
+        proyecto={proyecto}
+        colaboradores={colaboradores}
+      />
+    );
+  }
+
+  // Render Kanban in its own modal for desktop
   if (viewMode === 'kanban') {
     return (
       <Modal show={show} onHide={onHide} size="xl" fullscreen="xxl-down" dialogClassName="modal-90w">
@@ -45,7 +70,7 @@ const ActividadesList: React.FC<ActividadesListProps> = ({
     );
   }
 
-  // Render table view in a modal
+  // Render table view in a modal for desktop
   return (
     <Modal show={show} onHide={onHide} size="xl" fullscreen="lg-down">
       <Modal.Header closeButton>

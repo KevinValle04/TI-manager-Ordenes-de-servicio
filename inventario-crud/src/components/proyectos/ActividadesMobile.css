@@ -1,0 +1,408 @@
+/* Estilos para la vista móvil de actividades */
+
+.actividades-mobile-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem;
+  border-bottom: none;
+}
+
+.actividades-mobile-header .btn-close {
+  filter: brightness(0) invert(1);
+}
+
+.actividades-mobile-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.actividades-mobile-title i {
+  font-size: 1.5rem;
+}
+
+.actividades-mobile-title .title-text {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.actividades-mobile-title .title-subtitle {
+  font-size: 0.8125rem;
+  opacity: 0.9;
+  font-weight: 400;
+  display: block;
+}
+
+.actividades-mobile-body {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  overflow-y: auto;
+}
+
+.actividades-mobile-footer {
+  padding: 0.75rem;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Botón Nueva Actividad */
+.actividades-mobile-actions {
+  margin-bottom: 1rem;
+}
+
+.btn-nueva-actividad {
+  width: 100%;
+  padding: 0.875rem;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Filtros */
+.actividades-mobile-filters {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.actividades-mobile-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-chip {
+  flex: 0 0 auto;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 2px solid #dee2e6;
+  background: white;
+  color: #495057;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.filter-chip:active {
+  transform: scale(0.98);
+}
+
+.filter-chip.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 0.375rem;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  font-size: 0.75rem;
+  margin-left: 0.25rem;
+}
+
+.filter-chip.active .filter-count {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Lista de Actividades */
+.actividades-mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Card de Actividad */
+.actividad-card-mobile {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #6c757d;
+  transition: all 0.2s ease;
+}
+
+.actividad-card-mobile:active {
+  transform: scale(0.99);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.actividad-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  gap: 0.5rem;
+}
+
+.actividad-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.actividad-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.375rem 0.625rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.actividad-dates {
+  font-size: 0.8125rem;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.actividad-dates i {
+  font-size: 0.75rem;
+}
+
+.actividad-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.btn-icon:active {
+  transform: scale(0.95);
+}
+
+.btn-edit {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.btn-edit:active {
+  background: #bbdefb;
+}
+
+.btn-delete {
+  background: #ffebee;
+  color: #d32f2f;
+}
+
+.btn-delete:active {
+  background: #ffcdd2;
+}
+
+.actividad-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.actividad-descripcion {
+  font-size: 0.9375rem;
+  color: #212529;
+  line-height: 1.5;
+  margin: 0;
+  word-break: break-word;
+}
+
+.actividad-colaboradores {
+  display: flex;
+  align-items: center;
+  font-size: 0.8125rem;
+  color: #495057;
+  background: #f8f9fa;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+}
+
+.actividad-colaboradores i {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+/* Estado Vacío */
+.actividades-mobile-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #6c757d;
+}
+
+.actividades-mobile-empty i {
+  color: #dee2e6;
+  margin-bottom: 1rem;
+}
+
+.actividades-mobile-empty h5 {
+  color: #495057;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.actividades-mobile-empty p {
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Spinner de carga */
+.actividades-mobile-body .spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Responsive para pantallas muy pequeñas */
+@media (max-width: 375px) {
+  .actividades-mobile-title .title-text {
+    font-size: 1rem;
+  }
+
+  .actividades-mobile-title .title-subtitle {
+    font-size: 0.75rem;
+  }
+
+  .btn-nueva-actividad {
+    padding: 0.75rem;
+    font-size: 0.9375rem;
+  }
+
+  .filter-chip {
+    padding: 0.4rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+
+  .actividad-card-mobile {
+    padding: 0.875rem;
+  }
+
+  .actividad-badge {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .actividad-dates {
+    font-size: 0.75rem;
+  }
+
+  .btn-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8125rem;
+  }
+
+  .actividad-descripcion {
+    font-size: 0.875rem;
+  }
+
+  .actividad-colaboradores {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.625rem;
+  }
+}
+
+/* Mejoras de accesibilidad táctil */
+@media (hover: none) and (pointer: coarse) {
+  .filter-chip {
+    min-height: 44px;
+  }
+
+  .btn-icon {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .btn-nueva-actividad {
+    min-height: 48px;
+  }
+}
+
+/* Animaciones */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.actividad-card-mobile {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Dark mode support (opcional para futuro) */
+@media (prefers-color-scheme: dark) {
+  .actividades-mobile-body {
+    background-color: #1a1a1a;
+  }
+
+  .actividad-card-mobile {
+    background: #2d2d2d;
+    color: #f8f9fa;
+  }
+
+  .filter-chip {
+    background: #2d2d2d;
+    border-color: #495057;
+    color: #f8f9fa;
+  }
+
+  .filter-chip.active {
+    background: #667eea;
+    border-color: #667eea;
+  }
+
+  .actividad-descripcion {
+    color: #f8f9fa;
+  }
+
+  .actividad-colaboradores {
+    background: #1a1a1a;
+    color: #ced4da;
+  }
+
+  .actividades-mobile-empty {
+    color: #adb5bd;
+  }
+
+  .actividades-mobile-empty i {
+    color: #495057;
+  }
+}
