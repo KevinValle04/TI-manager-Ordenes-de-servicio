@@ -31,6 +31,9 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
   const [guardandoNota, setGuardandoNota] = useState(false);
   const [editandoNotaId, setEditandoNotaId] = useState<string | null>(null);
   const [textoEditandoNota, setTextoEditandoNota] = useState('');
+  const [archivoTemp, setArchivoTemp] = useState<File | null>(null);
+  const [mostrarModalRenombrar, setMostrarModalRenombrar] = useState(false);
+  const [nombreImagen, setNombreImagen] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -116,11 +119,35 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
       return;
     }
 
+    // Guardar archivo y mostrar modal para renombrar
+    setArchivoTemp(file);
+    // Extraer nombre sin extensión
+    const nombreSinExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+    setNombreImagen(nombreSinExt);
+    setMostrarModalRenombrar(true);
+  };
+
+  const handleConfirmarSubida = async () => {
+    if (!archivoTemp) return;
+
+    if (!nombreImagen.trim()) {
+      alert('Por favor ingresa un nombre para la imagen');
+      return;
+    }
+
     setUploadingImage(true);
+    setMostrarModalRenombrar(false);
 
     try {
+      // Obtener la extensión del archivo original
+      const extension = archivoTemp.name.substring(archivoTemp.name.lastIndexOf('.'));
+      const nuevoNombre = nombreImagen.trim() + extension;
+      
+      // Crear un nuevo archivo con el nombre personalizado
+      const archivoRenombrado = new File([archivoTemp], nuevoNombre, { type: archivoTemp.type });
+      
       const formData = new FormData();
-      formData.append('evidencia', file);
+      formData.append('evidencia', archivoRenombrado);
 
       const response = await fetch(`/api/actividades/${actividad._id}/evidencias`, {
         method: 'POST',
@@ -143,9 +170,26 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
       alert('Error al subir la imagen. Por favor intenta de nuevo.');
     } finally {
       setUploadingImage(false);
+      setArchivoTemp(null);
+      setNombreImagen('');
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+      if (cameraInputRef.current) {
+        cameraInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleCancelarSubida = () => {
+    setMostrarModalRenombrar(false);
+    setArchivoTemp(null);
+    setNombreImagen('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    if (cameraInputRef.current) {
+      cameraInputRef.current.value = '';
     }
   };
 
@@ -743,6 +787,54 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
             )}
           </div>
         </Modal.Body>
+      </Modal>
+
+      {/* Modal para renombrar imagen antes de subir */}
+      <Modal 
+        show={mostrarModalRenombrar} 
+        onHide={handleCancelarSubida}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <i className="fas fa-edit me-2"></i>
+            Renombrar Imagen
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group>
+            <Form.Label>Nombre de la imagen:</Form.Label>
+            <Form.Control
+              type="text"
+              value={nombreImagen}
+              onChange={(e) => setNombreImagen(e.target.value)}
+              placeholder="Ingresa el nombre de la imagen"
+              autoFocus
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleConfirmarSubida();
+                }
+              }}
+            />
+            <Form.Text className="text-muted">
+              {archivoTemp && `Extensión: ${archivoTemp.name.substring(archivoTemp.name.lastIndexOf('.'))}`}
+            </Form.Text>
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCancelarSubida}>
+            Cancelar
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={handleConfirmarSubida}
+            disabled={!nombreImagen.trim()}
+          >
+            <i className="fas fa-upload me-2"></i>
+            Subir Imagen
+          </Button>
+        </Modal.Footer>
       </Modal>
     </>
   );
