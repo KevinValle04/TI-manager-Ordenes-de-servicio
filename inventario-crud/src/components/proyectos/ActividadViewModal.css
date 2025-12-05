@@ -222,6 +222,11 @@
     margin-bottom: 0.5rem;
   }
 
+  .evidencia-info .d-flex {
+    display: flex !important;
+    flex-direction: row !important;
+  }
+
   .btn-delete-evidencia,
   .btn-download-evidencia {
     width: 32px;
@@ -235,6 +240,8 @@
     font-weight: bold;
     border: none;
     transition: all 0.2s ease;
+    flex: 1 1 0;
+    min-width: 32px;
   }
 
   .btn-download-evidencia {
@@ -523,6 +530,8 @@
     font-size: 1.1rem;
     width: 28px;
     height: 28px;
+    flex-shrink: 0;
+    min-width: 28px;
   }
 }
 
