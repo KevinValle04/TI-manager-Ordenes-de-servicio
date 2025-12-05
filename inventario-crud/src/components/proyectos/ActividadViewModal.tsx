@@ -323,7 +323,7 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
                               className="btn-download-evidencia flex-fill"
                               title="Descargar imagen"
                             >
-                              <i className="fas fa-download"></i>
+                              ⬇
                             </Button>
                             <Button
                               variant="danger"
@@ -332,7 +332,7 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
                               className="btn-delete-evidencia flex-fill"
                               title="Eliminar imagen"
                             >
-                              <i className="fas fa-times"></i>
+                              ✕
                             </Button>
                           </div>
                         </div>
