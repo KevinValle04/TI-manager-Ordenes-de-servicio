@@ -308,14 +308,33 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
                               {formatFileSize(evidencia.tamaño)} • {new Date(evidencia.fechaSubida).toLocaleDateString('es-MX')}
                             </small>
                           </div>
-                          <Button
-                            variant="danger"
-                            size="sm"
-                            onClick={() => handleDeleteEvidencia(evidencia._id!)}
-                            className="btn-delete-evidencia"
-                          >
-                            <i className="fas fa-trash"></i>
-                          </Button>
+                          <div className="d-flex gap-1 mt-2">
+                            <Button
+                              variant="info"
+                              size="sm"
+                              onClick={() => {
+                                const link = document.createElement('a');
+                                link.href = evidencia.url;
+                                link.download = evidencia.nombre;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                              }}
+                              className="btn-download-evidencia flex-fill"
+                              title="Descargar imagen"
+                            >
+                              <i className="fas fa-download"></i>
+                            </Button>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => handleDeleteEvidencia(evidencia._id!)}
+                              className="btn-delete-evidencia flex-fill"
+                              title="Eliminar imagen"
+                            >
+                              <i className="fas fa-times"></i>
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ))}
