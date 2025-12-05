@@ -7,7 +7,9 @@ import {
   actualizarActividad,
   eliminarActividad,
   subirEvidencia,
-  eliminarEvidencia
+  eliminarEvidencia,
+  agregarNota,
+  eliminarNota
 } from '../controllers/actividadController';
 
 const router = Router();
@@ -60,5 +62,11 @@ router.post('/:id/evidencias', upload.single('evidencia'), subirEvidencia);
 
 // DELETE /api/actividades/:id/evidencias/:evidenciaId - Eliminar una evidencia
 router.delete('/:id/evidencias/:evidenciaId', eliminarEvidencia);
+
+// POST /api/actividades/:id/notas - Agregar nota a una actividad
+router.post('/:id/notas', agregarNota);
+
+// DELETE /api/actividades/:id/notas/:notaId - Eliminar una nota
+router.delete('/:id/notas/:notaId', eliminarNota);
 
 export default router;

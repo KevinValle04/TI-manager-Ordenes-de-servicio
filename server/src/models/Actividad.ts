@@ -10,6 +10,13 @@ export interface IEvidenciaActividad {
   subidoPor?: string;
 }
 
+export interface INotaActividad {
+  _id?: mongoose.Types.ObjectId;
+  texto: string;
+  fechaCreacion: Date;
+  creadoPor?: string;
+}
+
 export interface IActividad extends Document {
   proyecto: mongoose.Types.ObjectId; // Referencia al proyecto
   descripcion: string;
@@ -19,6 +26,7 @@ export interface IActividad extends Document {
   colaboradores: mongoose.Types.ObjectId[]; // Array de IDs de colaboradores
   color?: string; // Color personalizado para la tarjeta
   evidencias?: IEvidenciaActividad[]; // Array de evidencias/fotos
+  notas?: INotaActividad[]; // Array de notas de texto
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -79,6 +87,19 @@ const ActividadSchema: Schema = new Schema(
         default: Date.now
       },
       subidoPor: {
+        type: String
+      }
+    }],
+    notas: [{
+      texto: {
+        type: String,
+        required: true
+      },
+      fechaCreacion: {
+        type: Date,
+        default: Date.now
+      },
+      creadoPor: {
         type: String
       }
     }]

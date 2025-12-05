@@ -123,6 +123,12 @@ const ActividadesMobile: React.FC<ActividadesMobileProps> = ({
     }
   };
 
+  const handleUpdateNotas = (notas: any[]) => {
+    if (viewingActividad) {
+      setViewingActividad({ ...viewingActividad, notas });
+    }
+  };
+
   const getEstadoBadgeClass = (estado: string) => {
     switch (estado) {
       case 'Completada': return 'success';
@@ -333,6 +339,7 @@ const ActividadesMobile: React.FC<ActividadesMobileProps> = ({
         onEdit={handleEditFromView}
         onDelete={() => viewingActividad?._id && handleDeleteActividad(viewingActividad._id)}
         onUpdateEvidencias={handleUpdateEvidencias}
+        onUpdateNotas={handleUpdateNotas}
       />
     </>
   );

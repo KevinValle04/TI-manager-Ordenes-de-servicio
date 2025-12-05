@@ -571,3 +571,129 @@
   width: 1rem;
   height: 1rem;
 }
+
+/* Estilos para Notas */
+.notas-container {
+  padding: 1rem;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.notas-form-section {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 2px dashed #dee2e6;
+}
+
+.notas-form-section .form-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.notas-form-section textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.notas-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #6c757d;
+  padding: 3rem 1rem;
+}
+
+.notas-empty i {
+  color: #dee2e6;
+}
+
+.notas-empty h5 {
+  margin-bottom: 0.5rem;
+  color: #495057;
+}
+
+.notas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.nota-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.nota-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.nota-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.nota-header small {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.btn-delete-nota {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 5px;
+}
+
+.btn-delete-nota:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+.nota-texto {
+  color: #495057;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Responsive para Notas */
+@media (max-width: 767.98px) {
+  .notas-container {
+    padding: 0.75rem;
+  }
+
+  .notas-form-section {
+    padding: 1rem;
+  }
+
+  .nota-card {
+    padding: 0.75rem;
+  }
+
+  .nota-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .btn-delete-nota {
+    align-self: flex-end;
+  }
+}

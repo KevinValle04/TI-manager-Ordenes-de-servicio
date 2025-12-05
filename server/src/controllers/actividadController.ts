@@ -269,3 +269,80 @@ export const eliminarEvidencia = async (req: Request, res: Response): Promise<vo
     res.status(500).json({ message: 'Error al eliminar evidencia', error });
   }
 };
+
+// Agregar una nota a una actividad
+export const agregarNota = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { texto, creadoPor } = req.body;
+
+    if (!texto || texto.trim() === '') {
+      res.status(400).json({ message: 'El texto de la nota es requerido' });
+      return;
+    }
+
+    // Verificar que la actividad existe
+    const actividad = await Actividad.findById(id);
+    if (!actividad) {
+      res.status(404).json({ message: 'Actividad no encontrada' });
+      return;
+    }
+
+    // Crear objeto de nota
+    const nuevaNota = {
+      _id: new mongoose.Types.ObjectId(),
+      texto: texto.trim(),
+      fechaCreacion: new Date(),
+      creadoPor: creadoPor || 'Sistema'
+    };
+
+    // Agregar nota al array
+    if (!actividad.notas) {
+      actividad.notas = [];
+    }
+    actividad.notas.push(nuevaNota);
+
+    await actividad.save();
+
+    res.status(201).json({
+      message: 'Nota agregada exitosamente',
+      nota: nuevaNota
+    });
+  } catch (error) {
+    console.error('Error al agregar nota:', error);
+    res.status(500).json({ message: 'Error al agregar nota', error });
+  }
+};
+
+// Eliminar una nota de una actividad
+export const eliminarNota = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id, notaId } = req.params;
+
+    // Buscar la actividad
+    const actividad = await Actividad.findById(id);
+    if (!actividad) {
+      res.status(404).json({ message: 'Actividad no encontrada' });
+      return;
+    }
+
+    // Buscar la nota
+    const notaIndex = actividad.notas?.findIndex(
+      (n: any) => n._id?.toString() === notaId
+    );
+
+    if (notaIndex === undefined || notaIndex === -1) {
+      res.status(404).json({ message: 'Nota no encontrada' });
+      return;
+    }
+
+    // Eliminar nota del array
+    actividad.notas!.splice(notaIndex, 1);
+    await actividad.save();
+
+    res.json({ message: 'Nota eliminada exitosamente' });
+  } catch (error) {
+    console.error('Error al eliminar nota:', error);
+    res.status(500).json({ message: 'Error al eliminar nota', error });
+  }
+};

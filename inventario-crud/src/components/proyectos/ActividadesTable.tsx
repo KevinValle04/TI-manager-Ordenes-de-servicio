@@ -120,6 +120,12 @@ const ActividadesTable: React.FC<ActividadesTableProps> = ({
     }
   };
 
+  const handleUpdateNotas = (notas: any[]) => {
+    if (viewingActividad) {
+      setViewingActividad({ ...viewingActividad, notas });
+    }
+  };
+
   const getEstadoBadgeClass = (estado: string) => {
     switch (estado) {
       case 'Pendiente': return 'secondary';
@@ -281,6 +287,7 @@ const ActividadesTable: React.FC<ActividadesTableProps> = ({
         onEdit={handleEditFromView}
         onDelete={() => viewingActividad?._id && handleDeleteActividad(viewingActividad._id)}
         onUpdateEvidencias={handleUpdateEvidencias}
+        onUpdateNotas={handleUpdateNotas}
       />
     </>
   );

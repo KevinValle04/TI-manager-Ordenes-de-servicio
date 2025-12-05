@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Modal, Button, Badge, Tabs, Tab, Form } from 'react-bootstrap';
-import { Actividad, Colaborador, EvidenciaActividad } from '../../types';
+import { Actividad, Colaborador, EvidenciaActividad, NotaActividad } from '../../types';
 import './ActividadViewModal.css';
 
 interface ActividadViewModalProps {
@@ -11,6 +11,7 @@ interface ActividadViewModalProps {
   onEdit: (actividad: Actividad) => void;
   onDelete: (id: string) => void;
   onUpdateEvidencias: (evidencias: EvidenciaActividad[]) => void;
+  onUpdateNotas: (notas: NotaActividad[]) => void;
 }
 
 const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
@@ -20,11 +21,14 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
   colaboradores,
   onEdit,
   onDelete,
-  onUpdateEvidencias
+  onUpdateEvidencias,
+  onUpdateNotas
 }) => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('detalles');
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [nuevaNota, setNuevaNota] = useState('');
+  const [guardandoNota, setGuardandoNota] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -170,6 +174,69 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
     if (bytes < 1024) return bytes + ' B';
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
+
+  const handleAgregarNota = async () => {
+    if (!nuevaNota.trim()) {
+      alert('Por favor escribe una nota');
+      return;
+    }
+
+    setGuardandoNota(true);
+
+    try {
+      const response = await fetch(`/api/actividades/${actividad._id}/notas`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          texto: nuevaNota.trim(),
+          creadoPor: 'Usuario' // Puedes cambiar esto por el usuario actual del sistema
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al agregar la nota');
+      }
+
+      const data = await response.json();
+      
+      // Agregar la nueva nota al array actual
+      const nuevasNotas = [...(actividad.notas || []), data.nota];
+      onUpdateNotas(nuevasNotas);
+      
+      setNuevaNota('');
+      alert('Nota agregada exitosamente');
+    } catch (error) {
+      console.error('Error al agregar nota:', error);
+      alert('Error al agregar la nota. Por favor intenta de nuevo.');
+    } finally {
+      setGuardandoNota(false);
+    }
+  };
+
+  const handleEliminarNota = async (notaId: string) => {
+    if (!window.confirm('¿Estás seguro de eliminar esta nota?')) return;
+
+    try {
+      const response = await fetch(`/api/actividades/${actividad._id}/notas/${notaId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al eliminar la nota');
+      }
+
+      // Filtrar la nota eliminada del array local
+      const nuevasNotas = (actividad.notas || []).filter(n => n._id !== notaId);
+      onUpdateNotas(nuevasNotas);
+      
+      alert('Nota eliminada exitosamente');
+    } catch (error) {
+      console.error('Error al eliminar nota:', error);
+      alert('Error al eliminar la nota. Por favor intenta de nuevo.');
+    }
   };
 
   return (
@@ -368,6 +435,100 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
                               ✕
                             </Button>
                           </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </Tab>
+
+            {/* Tab de Notas */}
+            <Tab 
+              eventKey="notas" 
+              title={
+                <>
+                  <i className="fas fa-sticky-note me-2"></i>
+                  Notas
+                  {actividad.notas && actividad.notas.length > 0 && (
+                    <Badge bg="info" className="ms-2">{actividad.notas.length}</Badge>
+                  )}
+                </>
+              }
+            >
+              <div className="notas-container">
+                {/* Formulario para agregar nueva nota */}
+                <div className="notas-form-section">
+                  <Form.Group className="mb-3">
+                    <Form.Label>
+                      <i className="fas fa-pencil-alt me-2"></i>
+                      Nueva Nota
+                    </Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={3}
+                      placeholder="Escribe una nota aquí..."
+                      value={nuevaNota}
+                      onChange={(e) => setNuevaNota(e.target.value)}
+                      disabled={guardandoNota}
+                    />
+                  </Form.Group>
+                  
+                  <Button
+                    variant="primary"
+                    onClick={handleAgregarNota}
+                    disabled={guardandoNota || !nuevaNota.trim()}
+                    className="w-100"
+                  >
+                    {guardandoNota ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Guardando...
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-plus me-2"></i>
+                        Agregar Nota
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                {/* Lista de notas */}
+                {!actividad.notas || actividad.notas.length === 0 ? (
+                  <div className="notas-empty">
+                    <i className="fas fa-sticky-note fa-3x mb-3"></i>
+                    <h5>No hay notas</h5>
+                    <p className="text-muted">Agrega notas para capturar información importante</p>
+                  </div>
+                ) : (
+                  <div className="notas-list">
+                    {actividad.notas.map((nota) => (
+                      <div key={nota._id} className="nota-card">
+                        <div className="nota-header">
+                          <small className="text-muted">
+                            <i className="fas fa-clock me-1"></i>
+                            {new Date(nota.fechaCreacion).toLocaleString('es-MX', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                            {nota.creadoPor && ` • ${nota.creadoPor}`}
+                          </small>
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => handleEliminarNota(nota._id!)}
+                            className="btn-delete-nota"
+                            title="Eliminar nota"
+                          >
+                            <i className="fas fa-trash"></i>
+                          </Button>
+                        </div>
+                        <div className="nota-texto">
+                          {nota.texto}
                         </div>
                       </div>
                     ))}

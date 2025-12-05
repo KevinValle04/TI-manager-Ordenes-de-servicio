@@ -255,6 +255,13 @@ export interface EvidenciaActividad {
   subidoPor?: string; // Usuario que subió la imagen
 }
 
+export interface NotaActividad {
+  _id?: string;
+  texto: string;
+  fechaCreacion: Date | string;
+  creadoPor?: string; // Usuario que creó la nota
+}
+
 export interface Actividad {
   _id?: string;
   proyecto: string | Proyecto; // Referencia al proyecto
@@ -265,6 +272,7 @@ export interface Actividad {
   colaboradores: string[] | Colaborador[]; // Array de IDs o colaboradores populados
   color?: string; // Color personalizado para la tarjeta
   evidencias?: EvidenciaActividad[]; // Imágenes de evidencia
+  notas?: NotaActividad[]; // Notas de texto
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }

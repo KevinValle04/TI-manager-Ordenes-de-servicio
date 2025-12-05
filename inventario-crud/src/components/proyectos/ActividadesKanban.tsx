@@ -222,6 +222,12 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
     }
   };
 
+  const handleUpdateNotas = (notas: any[]) => {
+    if (viewingActividad) {
+      setViewingActividad({ ...viewingActividad, notas });
+    }
+  };
+
   const getColaboradoresNames = (colaboradoresData: string[] | Colaborador[]) => {
     if (!colaboradoresData || colaboradoresData.length === 0) {
       return [];
@@ -393,6 +399,7 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
         onEdit={handleEditFromView}
         onDelete={() => viewingActividad?._id && handleDeleteCard(viewingActividad._id)}
         onUpdateEvidencias={handleUpdateEvidencias}
+        onUpdateNotas={handleUpdateNotas}
       />
     </>
   );
