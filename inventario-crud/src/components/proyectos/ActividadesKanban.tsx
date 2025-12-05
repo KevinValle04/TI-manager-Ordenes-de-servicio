@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Badge, ButtonGroup, ToggleButton } from 'react-bootstrap';
+import { Button, Badge } from 'react-bootstrap';
 import { ControlledBoard, Card, KanbanBoard, moveCard } from '@caldwell619/react-kanban';
 import '@caldwell619/react-kanban/dist/styles.css';
 import { Actividad, Colaborador, Proyecto } from '../../types';
@@ -12,8 +12,6 @@ interface ActividadesKanbanProps {
   onHide: () => void;
   proyecto: Proyecto | null;
   colaboradores: Colaborador[];
-  viewMode: 'kanban' | 'table';
-  setViewMode: (mode: 'kanban' | 'table') => void;
 }
 
 interface KanbanCard extends Card {
@@ -30,9 +28,7 @@ interface KanbanCard extends Card {
 const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
   show,
   proyecto,
-  colaboradores,
-  viewMode,
-  setViewMode
+  colaboradores
 }) => {
   const estadosConfig = [
     { id: 'Pendiente', title: 'Pendiente', color: '#6c757d' },
@@ -313,34 +309,7 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
   return (
     <>
       <div className="kanban-modal-body">
-        <div className="d-flex justify-content-between align-items-center mb-3 px-3">
-          <ButtonGroup>
-            <ToggleButton
-              id="view-kanban-inner"
-              type="radio"
-              variant="primary"
-              name="view"
-              value="kanban"
-              checked={viewMode === 'kanban'}
-              onChange={(e) => setViewMode(e.currentTarget.value as 'kanban' | 'table')}
-            >
-              <i className="fas fa-columns me-2"></i>
-              Kanban
-            </ToggleButton>
-            <ToggleButton
-              id="view-table-inner"
-              type="radio"
-              variant="outline-primary"
-              name="view"
-              value="table"
-              checked={viewMode === 'table'}
-              onChange={(e) => setViewMode(e.currentTarget.value as 'kanban' | 'table')}
-            >
-              <i className="fas fa-table me-2"></i>
-              Tabla
-            </ToggleButton>
-          </ButtonGroup>
-          
+        <div className="d-flex justify-content-end align-items-center mb-3 px-3">
           <Button
             variant="primary"
             onClick={() => {

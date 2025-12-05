@@ -690,24 +690,26 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
           </Tabs>
         </Modal.Body>
 
-        <Modal.Footer>
-          <Button variant="warning" onClick={() => {
-            onEdit(actividad);
-            onHide();
-          }}>
-            <i className="fas fa-edit me-2"></i>
-            Editar
-          </Button>
-          <Button variant="danger" onClick={() => {
-            if (window.confirm('¿Estás seguro de eliminar esta actividad?')) {
-              onDelete(actividad._id!);
+        {activeTab === 'detalles' && (
+          <Modal.Footer>
+            <Button variant="warning" onClick={() => {
+              onEdit(actividad);
               onHide();
-            }
-          }}>
-            <i className="fas fa-trash me-2"></i>
-            Eliminar
-          </Button>
-        </Modal.Footer>
+            }}>
+              <i className="fas fa-edit me-2"></i>
+              Editar
+            </Button>
+            <Button variant="danger" onClick={() => {
+              if (window.confirm('¿Estás seguro de eliminar esta actividad?')) {
+                onDelete(actividad._id!);
+                onHide();
+              }
+            }}>
+              <i className="fas fa-trash me-2"></i>
+              Eliminar
+            </Button>
+          </Modal.Footer>
+        )}
       </Modal>
 
       {/* Modal de imagen ampliada con navegación */}
