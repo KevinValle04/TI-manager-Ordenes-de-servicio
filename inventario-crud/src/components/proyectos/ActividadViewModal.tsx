@@ -26,6 +26,7 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
   const [activeTab, setActiveTab] = useState<string>('detalles');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   if (!actividad) return null;
 
@@ -232,25 +233,47 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
                     accept="image/*"
                     style={{ display: 'none' }}
                   />
-                  <Button
-                    variant="primary"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploadingImage}
-                    className="btn-upload-evidencia"
-                  >
-                    {uploadingImage ? (
-                      <>
-                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        Subiendo...
-                      </>
-                    ) : (
-                      <>
-                        <i className="fas fa-cloud-upload-alt me-2"></i>
-                        Subir Evidencia
-                      </>
-                    )}
-                  </Button>
-                  <small className="text-muted d-block mt-2">
+                  <input
+                    type="file"
+                    ref={cameraInputRef}
+                    onChange={handleFileSelect}
+                    accept="image/*"
+                    capture="environment"
+                    style={{ display: 'none' }}
+                  />
+                  
+                  <div className="d-flex gap-2 flex-wrap justify-content-center">
+                    <Button
+                      variant="primary"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingImage}
+                      className="btn-upload-evidencia"
+                    >
+                      {uploadingImage ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          Subiendo...
+                        </>
+                      ) : (
+                        <>
+                          <i className="fas fa-cloud-upload-alt me-2"></i>
+                          Subir Imagen
+                        </>
+                      )}
+                    </Button>
+                    
+                    <Button
+                      variant="success"
+                      onClick={() => cameraInputRef.current?.click()}
+                      disabled={uploadingImage}
+                      className="btn-camera-evidencia"
+                    >
+                      <i className="fas fa-camera me-2"></i>
+                      Tomar Foto
+                    </Button>
+                  </div>
+                  
+                  <small className="text-muted d-block mt-2 text-center">
                     Formatos aceptados: JPG, PNG, GIF. Tamaño máximo: 5MB
                   </small>
                 </div>
