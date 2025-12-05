@@ -541,12 +541,19 @@
   }
   
   .actividad-view-modal .modal-footer {
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.5rem;
+    justify-content: center;
   }
 
   .actividad-view-modal .modal-footer .btn {
-    width: 100%;
+    width: auto;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .actividad-view-modal .modal-footer .btn i {
+    margin-right: 0.25rem !important;
   }
 }
 

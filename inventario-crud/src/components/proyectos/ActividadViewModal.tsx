@@ -540,9 +540,6 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="secondary" onClick={onHide}>
-            Cerrar
-          </Button>
           <Button variant="warning" onClick={() => {
             onEdit(actividad);
             onHide();
