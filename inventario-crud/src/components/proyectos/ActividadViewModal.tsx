@@ -24,9 +24,39 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
 }) => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('detalles');
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePrevImage = React.useCallback(() => {
+    if (selectedImageIndex === null || !actividad?.evidencias) return;
+    const newIndex = selectedImageIndex > 0 ? selectedImageIndex - 1 : actividad.evidencias.length - 1;
+    setSelectedImageIndex(newIndex);
+  }, [selectedImageIndex, actividad?.evidencias]);
+
+  const handleNextImage = React.useCallback(() => {
+    if (selectedImageIndex === null || !actividad?.evidencias) return;
+    const newIndex = selectedImageIndex < actividad.evidencias.length - 1 ? selectedImageIndex + 1 : 0;
+    setSelectedImageIndex(newIndex);
+  }, [selectedImageIndex, actividad?.evidencias]);
+
+  const handleKeyDown = React.useCallback((e: KeyboardEvent) => {
+    if (selectedImageIndex === null) return;
+    if (e.key === 'ArrowLeft') {
+      handlePrevImage();
+    } else if (e.key === 'ArrowRight') {
+      handleNextImage();
+    } else if (e.key === 'Escape') {
+      setSelectedImageIndex(null);
+    }
+  }, [selectedImageIndex, handlePrevImage, handleNextImage]);
+
+  React.useEffect(() => {
+    if (selectedImageIndex !== null) {
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [selectedImageIndex, handleKeyDown]);
 
   if (!actividad) return null;
 
@@ -291,7 +321,10 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
                       <div key={evidencia._id} className="evidencia-card">
                         <div 
                           className="evidencia-image"
-                          onClick={() => setSelectedImage(evidencia.url)}
+                          onClick={() => {
+                            const index = actividad.evidencias!.findIndex(e => e._id === evidencia._id);
+                            setSelectedImageIndex(index);
+                          }}
                           style={{ cursor: 'pointer' }}
                         >
                           <img src={evidencia.url} alt={evidencia.nombre} />
@@ -323,7 +356,7 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
                               className="btn-download-evidencia flex-fill"
                               title="Descargar imagen"
                             >
-                              ⬇
+                              ↓
                             </Button>
                             <Button
                               variant="danger"
@@ -368,19 +401,80 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
         </Modal.Footer>
       </Modal>
 
-      {/* Modal de imagen ampliada */}
-      <Modal show={!!selectedImage} onHide={() => setSelectedImage(null)} size="xl" centered>
+      {/* Modal de imagen ampliada con navegación */}
+      <Modal 
+        show={selectedImageIndex !== null} 
+        onHide={() => setSelectedImageIndex(null)} 
+        size="xl" 
+        centered
+        className="image-viewer-modal"
+      >
         <Modal.Body className="p-0">
           <div className="image-viewer">
-            <Button 
-              variant="light" 
-              className="btn-close-viewer"
-              onClick={() => setSelectedImage(null)}
-            >
-              <i className="fas fa-times"></i>
-            </Button>
-            {selectedImage && (
-              <img src={selectedImage} alt="Evidencia ampliada" className="img-fluid" />
+            <div className="viewer-controls">
+              <Button 
+                variant="light" 
+                className="btn-download-viewer"
+                onClick={() => {
+                  if (selectedImageIndex !== null && actividad.evidencias) {
+                    const evidencia = actividad.evidencias[selectedImageIndex];
+                    const link = document.createElement('a');
+                    link.href = evidencia.url;
+                    link.download = evidencia.nombre;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }
+                }}
+                title="Descargar imagen"
+              >
+                ↓
+              </Button>
+              <Button 
+                variant="light" 
+                className="btn-close-viewer"
+                onClick={() => setSelectedImageIndex(null)}
+                title="Cerrar"
+              >
+                ✕
+              </Button>
+            </div>
+            
+            {selectedImageIndex !== null && actividad.evidencias && actividad.evidencias.length > 1 && (
+              <>
+                <Button
+                  variant="light"
+                  className="btn-nav-viewer btn-prev-viewer"
+                  onClick={handlePrevImage}
+                >
+                  ‹
+                </Button>
+                <Button
+                  variant="light"
+                  className="btn-nav-viewer btn-next-viewer"
+                  onClick={handleNextImage}
+                >
+                  ›
+                </Button>
+              </>
+            )}
+            
+            {selectedImageIndex !== null && actividad.evidencias && (
+              <div className="image-viewer-content">
+                <img 
+                  src={actividad.evidencias[selectedImageIndex].url} 
+                  alt={actividad.evidencias[selectedImageIndex].nombre}
+                  className="img-fluid" 
+                />
+                <div className="image-viewer-info">
+                  <span className="image-counter">
+                    {selectedImageIndex + 1} / {actividad.evidencias.length}
+                  </span>
+                  <span className="image-name">
+                    {actividad.evidencias[selectedImageIndex].nombre}
+                  </span>
+                </div>
+              </div>
             )}
           </div>
         </Modal.Body>

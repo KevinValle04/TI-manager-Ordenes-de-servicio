@@ -238,27 +238,27 @@
   }
 
   .btn-download-evidencia {
-    background-color: #17a2b8;
-    border-color: #17a2b8;
-    color: white;
+    background-color: #17a2b8 !important;
+    border-color: #17a2b8 !important;
+    color: white !important;
   }
 
   .btn-download-evidencia:hover {
-    background-color: #138496;
-    border-color: #117a8b;
-    color: white;
+    background-color: #138496 !important;
+    border-color: #117a8b !important;
+    color: white !important;
   }
 
   .btn-delete-evidencia {
-    background-color: #dc3545;
-    border-color: #dc3545;
-    color: white;
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: white !important;
   }
 
   .btn-delete-evidencia:hover {
-    background-color: #c82333;
-    border-color: #bd2130;
-    color: white;
+    background-color: #c82333 !important;
+    border-color: #bd2130 !important;
+    color: white !important;
   }/* Visor de imagen ampliada */
 .image-viewer {
   position: relative;
@@ -274,11 +274,18 @@
   width: auto;
 }
 
-.btn-close-viewer {
+/* Contenedor de controles del visor */
+.viewer-controls {
   position: absolute;
   top: 1rem;
   right: 1rem;
   z-index: 10;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-close-viewer,
+.btn-download-viewer {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -287,10 +294,144 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  font-size: 1.25rem;
+  font-weight: bold;
+  background-color: white !important;
+  color: #333 !important;
+  border: none !important;
+  transition: all 0.2s ease;
 }
 
-.btn-close-viewer i {
-  font-size: 1.25rem;
+.btn-download-viewer {
+  font-size: 1rem;
+}
+
+.btn-close-viewer:hover,
+.btn-download-viewer:hover {
+  background-color: #f8f9fa !important;
+  color: #000 !important;
+  transform: scale(1.1);
+}
+
+/* Botones de navegación del visor */
+.btn-nav-viewer {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  font-size: 2.5rem;
+  font-weight: bold;
+  line-height: 1;
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: #333 !important;
+  border: none !important;
+  transition: all 0.2s ease;
+}
+
+.btn-nav-viewer:hover {
+  background-color: white !important;
+  color: #000 !important;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.btn-prev-viewer {
+  left: 1rem;
+}
+
+.btn-next-viewer {
+  right: 1rem;
+}
+
+/* Info del visor de imágenes */
+.image-viewer-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-viewer-info {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  z-index: 10;
+}
+
+.image-counter {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.image-name {
+  font-size: 0.8rem;
+  opacity: 0.9;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .btn-nav-viewer {
+    width: 45px;
+    height: 45px;
+    font-size: 2rem;
+  }
+
+  .btn-prev-viewer {
+    left: 0.5rem;
+  }
+
+  .btn-next-viewer {
+    right: 0.5rem;
+  }
+
+  .viewer-controls {
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+
+  .btn-close-viewer,
+  .btn-download-viewer {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+
+  .btn-download-viewer {
+    font-size: 0.875rem;
+  }
+
+  .image-viewer-info {
+    bottom: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    max-width: 90%;
+  }
+
+  .image-name {
+    max-width: 200px;
+  }
 }
 
 /* Responsive para móviles */
@@ -355,12 +496,13 @@
   }
 
   .evidencias-upload-section .d-flex {
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .btn-upload-evidencia,
   .btn-camera-evidencia {
-    width: 100%;
+    width: auto;
+    flex: 1;
   }
 
   /* Hacer el grid más compacto en móvil */
