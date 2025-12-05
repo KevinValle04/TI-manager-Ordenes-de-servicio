@@ -29,6 +29,8 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [nuevaNota, setNuevaNota] = useState('');
   const [guardandoNota, setGuardandoNota] = useState(false);
+  const [editandoNotaId, setEditandoNotaId] = useState<string | null>(null);
+  const [textoEditandoNota, setTextoEditandoNota] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -185,6 +187,18 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
     setGuardandoNota(true);
 
     try {
+      // Obtener el nombre de usuario del localStorage
+      const userInfo = localStorage.getItem('userInfo');
+      let username = 'Usuario';
+      if (userInfo) {
+        try {
+          const parsed = JSON.parse(userInfo);
+          username = parsed.username || 'Usuario';
+        } catch (e) {
+          console.error('Error parsing userInfo:', e);
+        }
+      }
+
       const response = await fetch(`/api/actividades/${actividad._id}/notas`, {
         method: 'POST',
         headers: {
@@ -192,7 +206,7 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
         },
         body: JSON.stringify({
           texto: nuevaNota.trim(),
-          creadoPor: 'Usuario' // Puedes cambiar esto por el usuario actual del sistema
+          creadoPor: username
         }),
       });
 
@@ -236,6 +250,54 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
     } catch (error) {
       console.error('Error al eliminar nota:', error);
       alert('Error al eliminar la nota. Por favor intenta de nuevo.');
+    }
+  };
+
+  const handleIniciarEdicion = (nota: NotaActividad) => {
+    setEditandoNotaId(nota._id!);
+    setTextoEditandoNota(nota.texto);
+  };
+
+  const handleCancelarEdicion = () => {
+    setEditandoNotaId(null);
+    setTextoEditandoNota('');
+  };
+
+  const handleActualizarNota = async (notaId: string) => {
+    if (!textoEditandoNota.trim()) {
+      alert('El texto de la nota no puede estar vacío');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/actividades/${actividad._id}/notas/${notaId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          texto: textoEditandoNota.trim()
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al actualizar la nota');
+      }
+
+      const data = await response.json();
+      
+      // Actualizar la nota en el array local
+      const nuevasNotas = (actividad.notas || []).map(n => 
+        n._id === notaId ? { ...n, texto: data.nota.texto } : n
+      );
+      onUpdateNotas(nuevasNotas);
+      
+      setEditandoNotaId(null);
+      setTextoEditandoNota('');
+      alert('Nota actualizada exitosamente');
+    } catch (error) {
+      console.error('Error al actualizar nota:', error);
+      alert('Error al actualizar la nota. Por favor intenta de nuevo.');
     }
   };
 
@@ -517,19 +579,64 @@ const ActividadViewModal: React.FC<ActividadViewModalProps> = ({
                             })}
                             {nota.creadoPor && ` • ${nota.creadoPor}`}
                           </small>
-                          <Button
-                            variant="outline-danger"
-                            size="sm"
-                            onClick={() => handleEliminarNota(nota._id!)}
-                            className="btn-delete-nota"
-                            title="Eliminar nota"
-                          >
-                            <i className="fas fa-trash"></i>
-                          </Button>
+                          <div className="nota-actions">
+                            {editandoNotaId !== nota._id && (
+                              <Button
+                                variant="outline-primary"
+                                size="sm"
+                                onClick={() => handleIniciarEdicion(nota)}
+                                className="btn-edit-nota"
+                                title="Editar nota"
+                              >
+                                <i className="fas fa-edit"></i>
+                              </Button>
+                            )}
+                            <Button
+                              variant="outline-danger"
+                              size="sm"
+                              onClick={() => handleEliminarNota(nota._id!)}
+                              className="btn-delete-nota"
+                              title="Eliminar nota"
+                            >
+                              <i className="fas fa-trash"></i>
+                            </Button>
+                          </div>
                         </div>
-                        <div className="nota-texto">
-                          {nota.texto}
-                        </div>
+                        {editandoNotaId === nota._id ? (
+                          <div className="nota-edit-form">
+                            <Form.Control
+                              as="textarea"
+                              rows={3}
+                              value={textoEditandoNota}
+                              onChange={(e) => setTextoEditandoNota(e.target.value)}
+                              autoFocus
+                            />
+                            <div className="d-flex gap-2 mt-2">
+                              <Button
+                                variant="success"
+                                size="sm"
+                                onClick={() => handleActualizarNota(nota._id!)}
+                                className="flex-fill"
+                              >
+                                <i className="fas fa-check me-1"></i>
+                                Guardar
+                              </Button>
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={handleCancelarEdicion}
+                                className="flex-fill"
+                              >
+                                <i className="fas fa-times me-1"></i>
+                                Cancelar
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="nota-texto">
+                            {nota.texto}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

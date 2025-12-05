@@ -346,3 +346,45 @@ export const eliminarNota = async (req: Request, res: Response): Promise<void> =
     res.status(500).json({ message: 'Error al eliminar nota', error });
   }
 };
+
+// Actualizar una nota de una actividad
+export const actualizarNota = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id, notaId } = req.params;
+    const { texto } = req.body;
+
+    if (!texto || texto.trim() === '') {
+      res.status(400).json({ message: 'El texto de la nota es requerido' });
+      return;
+    }
+
+    // Buscar la actividad
+    const actividad = await Actividad.findById(id);
+    if (!actividad) {
+      res.status(404).json({ message: 'Actividad no encontrada' });
+      return;
+    }
+
+    // Buscar la nota
+    const nota = actividad.notas?.find(
+      (n: any) => n._id?.toString() === notaId
+    );
+
+    if (!nota) {
+      res.status(404).json({ message: 'Nota no encontrada' });
+      return;
+    }
+
+    // Actualizar el texto de la nota
+    nota.texto = texto.trim();
+    await actividad.save();
+
+    res.json({
+      message: 'Nota actualizada exitosamente',
+      nota: nota
+    });
+  } catch (error) {
+    console.error('Error al actualizar nota:', error);
+    res.status(500).json({ message: 'Error al actualizar nota', error });
+  }
+};

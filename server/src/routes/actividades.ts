@@ -9,7 +9,8 @@ import {
   subirEvidencia,
   eliminarEvidencia,
   agregarNota,
-  eliminarNota
+  eliminarNota,
+  actualizarNota
 } from '../controllers/actividadController';
 
 const router = Router();
@@ -65,6 +66,9 @@ router.delete('/:id/evidencias/:evidenciaId', eliminarEvidencia);
 
 // POST /api/actividades/:id/notas - Agregar nota a una actividad
 router.post('/:id/notas', agregarNota);
+
+// PUT /api/actividades/:id/notas/:notaId - Actualizar una nota
+router.put('/:id/notas/:notaId', actualizarNota);
 
 // DELETE /api/actividades/:id/notas/:notaId - Eliminar una nota
 router.delete('/:id/notas/:notaId', eliminarNota);
