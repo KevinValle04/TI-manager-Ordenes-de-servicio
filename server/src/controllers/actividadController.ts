@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import { Actividad, IActividad } from '../models/Actividad';
 import Colaborador from '../models/Colaborador';
 import { Proyecto } from '../models/Proyecto';
+import path from 'path';
+import fs from 'fs/promises';
+import mongoose from 'mongoose';
 
 // Obtener todas las actividades de un proyecto
 export const obtenerActividadesProyecto = async (req: Request, res: Response): Promise<void> => {
@@ -157,9 +160,112 @@ export const eliminarActividad = async (req: Request, res: Response): Promise<vo
       return;
     }
 
+    // Eliminar archivos de evidencias si existen
+    if (actividadEliminada.evidencias && actividadEliminada.evidencias.length > 0) {
+      for (const evidencia of actividadEliminada.evidencias) {
+        try {
+          const filePath = path.join(__dirname, '../../uploads/evidencias', path.basename(evidencia.url));
+          await fs.unlink(filePath);
+        } catch (error) {
+          console.error('Error al eliminar archivo de evidencia:', error);
+        }
+      }
+    }
+
     res.json({ message: 'Actividad eliminada exitosamente' });
   } catch (error) {
     console.error('Error al eliminar actividad:', error);
     res.status(500).json({ message: 'Error al eliminar actividad', error });
+  }
+};
+
+// Subir evidencia (imagen) a una actividad
+export const subirEvidencia = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const file = req.file;
+
+    if (!file) {
+      res.status(400).json({ message: 'No se ha proporcionado ningún archivo' });
+      return;
+    }
+
+    // Verificar que la actividad existe
+    const actividad = await Actividad.findById(id);
+    if (!actividad) {
+      res.status(404).json({ message: 'Actividad no encontrada' });
+      return;
+    }
+
+    // Crear objeto de evidencia
+    const nuevaEvidencia = {
+      _id: new mongoose.Types.ObjectId(),
+      nombre: file.originalname,
+      url: `/api/uploads/evidencias/${file.filename}`,
+      tipo: file.mimetype,
+      tamaño: file.size,
+      fechaSubida: new Date(),
+      subidoPor: req.body.subidoPor || 'Sistema'
+    };
+
+    // Agregar evidencia al array
+    if (!actividad.evidencias) {
+      actividad.evidencias = [];
+    }
+    actividad.evidencias.push(nuevaEvidencia);
+
+    await actividad.save();
+
+    res.status(201).json({
+      message: 'Evidencia subida exitosamente',
+      evidencia: nuevaEvidencia
+    });
+  } catch (error) {
+    console.error('Error al subir evidencia:', error);
+    res.status(500).json({ message: 'Error al subir evidencia', error });
+  }
+};
+
+// Eliminar una evidencia de una actividad
+export const eliminarEvidencia = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id, evidenciaId } = req.params;
+
+    // Buscar la actividad
+    const actividad = await Actividad.findById(id);
+    if (!actividad) {
+      res.status(404).json({ message: 'Actividad no encontrada' });
+      return;
+    }
+
+    // Buscar la evidencia
+    const evidenciaIndex = actividad.evidencias?.findIndex(
+      (e: any) => e._id?.toString() === evidenciaId
+    );
+
+    if (evidenciaIndex === undefined || evidenciaIndex === -1) {
+      res.status(404).json({ message: 'Evidencia no encontrada' });
+      return;
+    }
+
+    const evidencia = actividad.evidencias![evidenciaIndex];
+
+    // Eliminar el archivo físico
+    try {
+      const filePath = path.join(__dirname, '../../uploads/evidencias', path.basename(evidencia.url));
+      await fs.unlink(filePath);
+    } catch (error) {
+      console.error('Error al eliminar archivo físico:', error);
+      // Continuar aunque falle la eliminación del archivo
+    }
+
+    // Eliminar evidencia del array
+    actividad.evidencias!.splice(evidenciaIndex, 1);
+    await actividad.save();
+
+    res.json({ message: 'Evidencia eliminada exitosamente' });
+  } catch (error) {
+    console.error('Error al eliminar evidencia:', error);
+    res.status(500).json({ message: 'Error al eliminar evidencia', error });
   }
 };

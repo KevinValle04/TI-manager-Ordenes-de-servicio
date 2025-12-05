@@ -4,6 +4,7 @@ import { ControlledBoard, Card, KanbanBoard, moveCard } from '@caldwell619/react
 import '@caldwell619/react-kanban/dist/styles.css';
 import { Actividad, Colaborador, Proyecto } from '../../types';
 import ActividadModal from './ActividadModal';
+import ActividadViewModal from './ActividadViewModal';
 import './ActividadesKanban.css';
 
 interface ActividadesKanbanProps {
@@ -52,7 +53,9 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
   const [board, setBoard] = useState<KanbanBoard<KanbanCard>>(initialBoard);
   const [loading, setLoading] = useState(true); // Comenzar en true para la primera carga
   const [showActividadModal, setShowActividadModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [editingActividad, setEditingActividad] = useState<Actividad | null>(null);
+  const [viewingActividad, setViewingActividad] = useState<Actividad | null>(null);
 
   useEffect(() => {
     if (show && proyecto) {
@@ -178,16 +181,24 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
     }
   };
 
-  const handleEditCard = (card: KanbanCard) => {
-    setEditingActividad(card.actividadData);
-    setShowActividadModal(true);
+  const handleViewCard = (card: KanbanCard) => {
+    setViewingActividad(card.actividadData);
+    setShowViewModal(true);
   };
 
-  const handleDeleteCard = async (card: KanbanCard) => {
+  const handleEditFromView = () => {
+    if (viewingActividad) {
+      setEditingActividad(viewingActividad);
+      setShowViewModal(false);
+      setShowActividadModal(true);
+    }
+  };
+
+  const handleDeleteCard = async (id: string) => {
     if (!window.confirm('¿Está seguro de que desea eliminar esta actividad?')) return;
     
     try {
-      const response = await fetch(`/api/actividades/${card.id}`, {
+      const response = await fetch(`/api/actividades/${id}`, {
         method: 'DELETE'
       });
 
@@ -196,10 +207,18 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
         return;
       }
 
+      setShowViewModal(false);
+      setViewingActividad(null);
       fetchActividades();
     } catch (error) {
       alert('Error al eliminar la actividad');
       console.error('Error:', error);
+    }
+  };
+
+  const handleUpdateEvidencias = (evidencias: any[]) => {
+    if (viewingActividad) {
+      setViewingActividad({ ...viewingActividad, evidencias });
     }
   };
 
@@ -223,7 +242,7 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
     return (
       <div 
         className="kanban-card" 
-        onClick={() => handleEditCard(card)}
+        onClick={() => handleViewCard(card)}
         style={{ 
           cursor: 'pointer',
           borderLeft: `4px solid ${card.color || '#0d6efd'}`
@@ -236,17 +255,17 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
               className="btn btn-sm btn-link p-0 me-2"
               onClick={(e) => {
                 e.stopPropagation();
-                handleEditCard(card);
+                handleViewCard(card);
               }}
-              title="Editar"
+              title="Ver"
             >
-              <i className="fas fa-edit text-primary"></i>
+              <i className="fas fa-eye text-primary"></i>
             </button>
             <button
               className="btn btn-sm btn-link p-0"
               onClick={(e) => {
                 e.stopPropagation();
-                handleDeleteCard(card);
+                handleDeleteCard(card.id);
               }}
               title="Eliminar"
             >
@@ -361,6 +380,19 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
         onSave={handleSaveActividad}
         editingActividad={editingActividad}
         colaboradores={colaboradores}
+      />
+
+      <ActividadViewModal
+        show={showViewModal}
+        onHide={() => {
+          setShowViewModal(false);
+          setViewingActividad(null);
+        }}
+        actividad={viewingActividad}
+        colaboradores={colaboradores}
+        onEdit={handleEditFromView}
+        onDelete={() => viewingActividad?._id && handleDeleteCard(viewingActividad._id)}
+        onUpdateEvidencias={handleUpdateEvidencias}
       />
     </>
   );

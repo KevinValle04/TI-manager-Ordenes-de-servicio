@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Badge, Button, Modal, Accordion } from 'react-bootstrap';
 import { Actividad, Colaborador, Proyecto } from '../../types';
 import ActividadModal from './ActividadModal';
+import ActividadViewModal from './ActividadViewModal';
 import './ActividadesMobile.css';
 
 interface ActividadesMobileProps {
@@ -20,7 +21,9 @@ const ActividadesMobile: React.FC<ActividadesMobileProps> = ({
   const [actividades, setActividades] = useState<Actividad[]>([]);
   const [loading, setLoading] = useState(false);
   const [showActividadModal, setShowActividadModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [editingActividad, setEditingActividad] = useState<Actividad | null>(null);
+  const [viewingActividad, setViewingActividad] = useState<Actividad | null>(null);
   const [filterEstado, setFilterEstado] = useState<string>('Todas');
 
   useEffect(() => {
@@ -74,6 +77,19 @@ const ActividadesMobile: React.FC<ActividadesMobileProps> = ({
     }
   };
 
+  const handleViewActividad = (actividad: Actividad) => {
+    setViewingActividad(actividad);
+    setShowViewModal(true);
+  };
+
+  const handleEditFromView = () => {
+    if (viewingActividad) {
+      setEditingActividad(viewingActividad);
+      setShowViewModal(false);
+      setShowActividadModal(true);
+    }
+  };
+
   const handleEditActividad = (actividad: Actividad) => {
     setEditingActividad(actividad);
     setShowActividadModal(true);
@@ -92,10 +108,18 @@ const ActividadesMobile: React.FC<ActividadesMobileProps> = ({
         return;
       }
 
+      setShowViewModal(false);
+      setViewingActividad(null);
       fetchActividades();
     } catch (error) {
       alert('Error al eliminar la actividad');
       console.error('Error:', error);
+    }
+  };
+
+  const handleUpdateEvidencias = (evidencias: any[]) => {
+    if (viewingActividad) {
+      setViewingActividad({ ...viewingActividad, evidencias });
     }
   };
 
@@ -226,6 +250,7 @@ const ActividadesMobile: React.FC<ActividadesMobileProps> = ({
                   key={actividad._id} 
                   className="actividad-card-mobile"
                   style={{ borderLeftColor: actividad.color || '#6c757d' }}
+                  onClick={() => handleViewActividad(actividad)}
                 >
                   <div className="actividad-card-header">
                     <div className="actividad-card-info">
@@ -240,14 +265,20 @@ const ActividadesMobile: React.FC<ActividadesMobileProps> = ({
                     <div className="actividad-card-actions">
                       <button 
                         className="btn-icon btn-edit"
-                        onClick={() => handleEditActividad(actividad)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditActividad(actividad);
+                        }}
                         title="Editar"
                       >
                         <i className="fas fa-edit"></i>
                       </button>
                       <button 
                         className="btn-icon btn-delete"
-                        onClick={() => handleDeleteActividad(actividad._id!)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteActividad(actividad._id!);
+                        }}
                         title="Eliminar"
                       >
                         <i className="fas fa-trash"></i>
@@ -288,6 +319,20 @@ const ActividadesMobile: React.FC<ActividadesMobileProps> = ({
         onSave={handleSaveActividad}
         editingActividad={editingActividad}
         colaboradores={colaboradores}
+      />
+
+      {/* Modal de Visualización */}
+      <ActividadViewModal
+        show={showViewModal}
+        onHide={() => {
+          setShowViewModal(false);
+          setViewingActividad(null);
+        }}
+        actividad={viewingActividad}
+        colaboradores={colaboradores}
+        onEdit={handleEditFromView}
+        onDelete={() => viewingActividad?._id && handleDeleteActividad(viewingActividad._id)}
+        onUpdateEvidencias={handleUpdateEvidencias}
       />
     </>
   );

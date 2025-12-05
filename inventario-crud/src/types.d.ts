@@ -245,6 +245,16 @@ export interface Proyecto {
   updatedAt?: Date | string;
 }
 
+export interface EvidenciaActividad {
+  _id?: string;
+  nombre: string;
+  url: string;
+  tipo: string; // image/jpeg, image/png, etc.
+  tamaño: number; // En bytes
+  fechaSubida: Date | string;
+  subidoPor?: string; // Usuario que subió la imagen
+}
+
 export interface Actividad {
   _id?: string;
   proyecto: string | Proyecto; // Referencia al proyecto
@@ -254,6 +264,7 @@ export interface Actividad {
   estado: 'Pendiente' | 'En progreso' | 'Completada' | 'Cancelada';
   colaboradores: string[] | Colaborador[]; // Array de IDs o colaboradores populados
   color?: string; // Color personalizado para la tarjeta
+  evidencias?: EvidenciaActividad[]; // Imágenes de evidencia
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }

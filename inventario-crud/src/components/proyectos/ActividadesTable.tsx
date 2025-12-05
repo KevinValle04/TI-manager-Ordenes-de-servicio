@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Badge, Button, Table } from 'react-bootstrap';
 import { Actividad, Colaborador, Proyecto } from '../../types';
 import ActividadModal from './ActividadModal';
+import ActividadViewModal from './ActividadViewModal';
 
 interface ActividadesTableProps {
   show: boolean;
@@ -18,7 +19,9 @@ const ActividadesTable: React.FC<ActividadesTableProps> = ({
   const [actividades, setActividades] = useState<Actividad[]>([]);
   const [loading, setLoading] = useState(false);
   const [showActividadModal, setShowActividadModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [editingActividad, setEditingActividad] = useState<Actividad | null>(null);
+  const [viewingActividad, setViewingActividad] = useState<Actividad | null>(null);
 
   useEffect(() => {
     if (show && proyecto) {
@@ -71,6 +74,19 @@ const ActividadesTable: React.FC<ActividadesTableProps> = ({
     }
   };
 
+  const handleViewActividad = (actividad: Actividad) => {
+    setViewingActividad(actividad);
+    setShowViewModal(true);
+  };
+
+  const handleEditFromView = () => {
+    if (viewingActividad) {
+      setEditingActividad(viewingActividad);
+      setShowViewModal(false);
+      setShowActividadModal(true);
+    }
+  };
+
   const handleEditActividad = (actividad: Actividad) => {
     setEditingActividad(actividad);
     setShowActividadModal(true);
@@ -89,10 +105,18 @@ const ActividadesTable: React.FC<ActividadesTableProps> = ({
         return;
       }
 
+      setShowViewModal(false);
+      setViewingActividad(null);
       fetchActividades();
     } catch (error) {
       alert('Error al eliminar la actividad');
       console.error('Error:', error);
+    }
+  };
+
+  const handleUpdateEvidencias = (evidencias: any[]) => {
+    if (viewingActividad) {
+      setViewingActividad({ ...viewingActividad, evidencias });
     }
   };
 
@@ -184,7 +208,11 @@ const ActividadesTable: React.FC<ActividadesTableProps> = ({
             </thead>
             <tbody>
               {actividades.map(actividad => (
-                <tr key={actividad._id}>
+                <tr 
+                  key={actividad._id}
+                  onClick={() => handleViewActividad(actividad)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <td style={{ maxWidth: '300px' }}>
                     {actividad.descripcion}
                   </td>
@@ -196,8 +224,16 @@ const ActividadesTable: React.FC<ActividadesTableProps> = ({
                     </Badge>
                   </td>
                   <td>{getColaboradoresNames(actividad)}</td>
-                  <td>
+                  <td onClick={(e) => e.stopPropagation()}>
                     <div className="d-flex gap-1">
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => handleViewActividad(actividad)}
+                        title="Ver actividad"
+                      >
+                        <i className="fas fa-eye"></i>
+                      </Button>
                       <Button
                         variant="warning"
                         size="sm"
@@ -232,6 +268,19 @@ const ActividadesTable: React.FC<ActividadesTableProps> = ({
         onSave={handleSaveActividad}
         editingActividad={editingActividad}
         colaboradores={colaboradores}
+      />
+
+      <ActividadViewModal
+        show={showViewModal}
+        onHide={() => {
+          setShowViewModal(false);
+          setViewingActividad(null);
+        }}
+        actividad={viewingActividad}
+        colaboradores={colaboradores}
+        onEdit={handleEditFromView}
+        onDelete={() => viewingActividad?._id && handleDeleteActividad(viewingActividad._id)}
+        onUpdateEvidencias={handleUpdateEvidencias}
       />
     </>
   );
