@@ -5,6 +5,7 @@ import '@caldwell619/react-kanban/dist/styles.css';
 import { Actividad, Colaborador, Proyecto } from '../../types';
 import ActividadModal from './ActividadModal';
 import ActividadViewModal from './ActividadViewModal';
+import { exportGanttToPDF } from '../../utils/ganttExport';
 import './ActividadesKanban.css';
 
 interface ActividadesKanbanProps {
@@ -238,6 +239,15 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
     });
   };
 
+  const handleExportGantt = () => {
+    if (!proyecto) return;
+    // Obtener todas las actividades del board
+    const todasActividades = board.columns.flatMap(col => 
+      col.cards.map(card => card.actividadData)
+    );
+    exportGanttToPDF({ actividades: todasActividades, proyecto, colaboradores });
+  };
+
   const renderCard = (card: KanbanCard) => {
     const colaboradoresNames = getColaboradoresNames(card.colaboradores);
     
@@ -309,7 +319,15 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
   return (
     <>
       <div className="kanban-modal-body">
-        <div className="d-flex justify-content-end align-items-center mb-3 px-3">
+        <div className="d-flex justify-content-end align-items-center gap-2 mb-3 px-3">
+          <Button
+            variant="success"
+            onClick={handleExportGantt}
+            disabled={board.columns.every(col => col.cards.length === 0)}
+          >
+            <i className="fas fa-file-pdf me-2"></i>
+            Exportar Gantt
+          </Button>
           <Button
             variant="primary"
             onClick={() => {

@@ -3,6 +3,7 @@ import { Badge, Button, Table } from 'react-bootstrap';
 import { Actividad, Colaborador, Proyecto } from '../../types';
 import ActividadModal from './ActividadModal';
 import ActividadViewModal from './ActividadViewModal';
+import { exportGanttToPDF } from '../../utils/ganttExport';
 
 interface ActividadesTableProps {
   show: boolean;
@@ -173,9 +174,22 @@ const ActividadesTable: React.FC<ActividadesTableProps> = ({
     );
   };
 
+  const handleExportGantt = () => {
+    if (!proyecto) return;
+    exportGanttToPDF({ actividades, proyecto, colaboradores });
+  };
+
   return (
     <>
-      <div className="d-flex justify-content-end mb-3">
+      <div className="d-flex justify-content-end gap-2 mb-3">
+        <Button
+          variant="success"
+          onClick={handleExportGantt}
+          disabled={actividades.length === 0}
+        >
+          <i className="fas fa-file-pdf me-2"></i>
+          Exportar Gantt
+        </Button>
         <Button
           variant="primary"
           onClick={() => {

@@ -3,6 +3,7 @@ import { Badge, Button, Modal, Accordion } from 'react-bootstrap';
 import { Actividad, Colaborador, Proyecto } from '../../types';
 import ActividadModal from './ActividadModal';
 import ActividadViewModal from './ActividadViewModal';
+import { exportGanttToPDF } from '../../utils/ganttExport';
 import './ActividadesMobile.css';
 
 interface ActividadesMobileProps {
@@ -169,6 +170,11 @@ const ActividadesMobile: React.FC<ActividadesMobileProps> = ({
     return actividades.filter(a => a.estado === estado).length;
   };
 
+  const handleExportGantt = () => {
+    if (!proyecto) return;
+    exportGanttToPDF({ actividades, proyecto, colaboradores });
+  };
+
   return (
     <>
       <Modal show={show} onHide={onHide} fullscreen>
@@ -187,6 +193,15 @@ const ActividadesMobile: React.FC<ActividadesMobileProps> = ({
         <Modal.Body className="actividades-mobile-body">
           {/* Botón Nueva Actividad */}
           <div className="actividades-mobile-actions">
+            <Button 
+              variant="success" 
+              className="btn-exportar-gantt me-2"
+              onClick={handleExportGantt}
+              disabled={actividades.length === 0}
+            >
+              <i className="fas fa-file-pdf me-2"></i>
+              Exportar Gantt
+            </Button>
             <Button 
               variant="primary" 
               className="btn-nueva-actividad"
