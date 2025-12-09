@@ -1,0 +1,143 @@
+.vehiculo-card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  height: 100%;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.vehiculo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.vehiculo-card.estado-vencido {
+  border-left: 5px solid #dc3545;
+}
+
+.vehiculo-card.estado-hoy,
+.vehiculo-card.estado-proximo {
+  border-left: 5px solid #ffc107;
+}
+
+.vehiculo-card.estado-al-dia {
+  border-left: 5px solid #28a745;
+}
+
+.vehiculo-card.estado-sin-registro {
+  border-left: 5px solid #6c757d;
+}
+
+.vehiculo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.vehiculo-titulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 0.25rem;
+}
+
+.vehiculo-subtitulo {
+  font-size: 1rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+.estado-badge {
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.vehiculo-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.info-item:hover {
+  background-color: #e9ecef;
+}
+
+.info-item i {
+  color: #495057;
+  width: 20px;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #495057;
+  margin-right: 0.5rem;
+}
+
+.info-valor {
+  color: #2c3e50;
+  flex: 1;
+  text-align: right;
+  font-weight: 500;
+}
+
+.vehiculo-acciones {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid #e9ecef;
+}
+
+.vehiculo-acciones .btn {
+  font-weight: 600;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.vehiculo-acciones .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .vehiculo-titulo {
+    font-size: 1.25rem;
+  }
+
+  .vehiculo-subtitulo {
+    font-size: 0.9rem;
+  }
+
+  .estado-badge {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .info-item {
+    font-size: 0.9rem;
+  }
+
+  .vehiculo-acciones {
+    flex-wrap: wrap;
+  }
+
+  .vehiculo-acciones .flex-fill {
+    flex: 1 1 100%;
+  }
+}

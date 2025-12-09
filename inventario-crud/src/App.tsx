@@ -25,6 +25,7 @@ import SolicitudesHerramientas from "./pages/SolicitudesHerramientas";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import UsuarioConfig from "./pages/UsuarioConfig";
+import Vehiculos from "./pages/Vehiculos";
 import { jwtDecode } from 'jwt-decode';
 import SessionTimeout from './components/SessionTimeout';
 import axios from 'axios';
@@ -195,6 +196,7 @@ function App() {
           <Route path="razones-sociales" element={<RazonesSociales />} />
           <Route path="vendedores" element={<Vendedores />} />
           <Route path="mat-elec" element={<MaterialCanalizacion />} />
+          <Route path="vehiculos" element={<Vehiculos />} />
           <Route path="inventario" element={<Inventario />} />
           <Route path="inventarioExterior" element={<InventarioExterior />} />
           <Route path="guias" element={<Guias />} />

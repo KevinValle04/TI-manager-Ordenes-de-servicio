@@ -1,0 +1,37 @@
+.historial-servicios {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.historial-servicios::-webkit-scrollbar {
+  width: 8px;
+}
+
+.historial-servicios::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.historial-servicios::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.historial-servicios::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.historial-servicios table {
+  margin-bottom: 0;
+}
+
+.historial-servicios td,
+.historial-servicios th {
+  vertical-align: middle;
+  font-size: 0.9rem;
+}
+
+.historial-servicios .badge {
+  font-size: 0.85rem;
+  padding: 0.4rem 0.6rem;
+}

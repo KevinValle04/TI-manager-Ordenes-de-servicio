@@ -109,6 +109,7 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
         { path: "/razones-sociales", label: "Razones Sociales", icon: <FaBuilding size={14} /> },
         { path: "/vendedores", label: "Vendedores", icon: <FaUserTie size={14} /> },
         { path: "/mat-elec", label: "Material de Canalización", icon: <FaBolt size={14} /> },
+        { path: "/vehiculos", label: "Vehículos", icon: <FaTruck size={14} /> },
       ],
     },
   ];

@@ -276,3 +276,28 @@ export interface Actividad {
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }
+
+export interface HistorialServicio {
+  _id?: string;
+  fecha: Date | string;
+  descripcion?: string;
+  kilometraje?: number;
+  costo?: number;
+  realizadoPor?: string;
+}
+
+export interface Vehiculo {
+  _id?: string;
+  marca: string;
+  modelo: string;
+  año: number;
+  color: string;
+  placas?: string;
+  numeroSerie?: string;
+  ultimoServicio?: Date | string;
+  proximoServicio?: Date | string;
+  historialServicios: HistorialServicio[];
+  activo: boolean;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+}
