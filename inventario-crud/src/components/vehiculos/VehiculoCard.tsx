@@ -122,15 +122,17 @@ const VehiculoCard: React.FC<VehiculoCardProps> = ({
             variant="primary"
             size="sm"
             onClick={() => onEdit(vehiculo)}
+            title="Editar vehículo"
           >
-            <i className="fas fa-edit"></i>
+            ✏️
           </Button>
           <Button
             variant="danger"
             size="sm"
             onClick={() => onDelete(vehiculo._id!)}
+            title="Eliminar vehículo"
           >
-            <i className="fas fa-trash"></i>
+            🗑️
           </Button>
         </div>
       </Card.Body>
