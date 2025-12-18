@@ -1,13 +1,12 @@
 import jsPDF from 'jspdf';
-import { Actividad, Proyecto, Colaborador } from '../types';
+import { Actividad, Proyecto } from '../types';
 
 interface GanttExportOptions {
   actividades: Actividad[];
   proyecto: Proyecto;
-  colaboradores: Colaborador[];
 }
 
-export const exportGanttToPDF = ({ actividades, proyecto, colaboradores }: GanttExportOptions) => {
+export const exportGanttToPDF = ({ actividades, proyecto }: GanttExportOptions) => {
   const doc = new jsPDF({
     orientation: 'landscape',
     unit: 'mm',
@@ -62,7 +61,7 @@ export const exportGanttToPDF = ({ actividades, proyecto, colaboradores }: Gantt
   const chartStartY = 35;
   const chartWidth = 267; // Ancho disponible en landscape A4
   const rowHeight = 10;
-  const labelWidth = 80;
+  const labelWidth = 25; // Reducido: solo mostramos ACT00, ACT01, etc.
   const ganttWidth = chartWidth - labelWidth;
 
   // Dibujar encabezado de fechas
@@ -101,13 +100,11 @@ export const exportGanttToPDF = ({ actividades, proyecto, colaboradores }: Gantt
     doc.setLineWidth(0.1);
     doc.line(chartStartX, y + rowHeight, chartStartX + chartWidth, y + rowHeight);
 
-    // Etiqueta de la actividad (truncada si es muy larga)
+    // Mostrar solo el número de actividad en la etiqueta izquierda (ACT00, ACT01, etc.)
     doc.setFontSize(8);
     doc.setTextColor(...colors.text);
-    const descripcionTruncada = actividad.descripcion.length > 35 
-      ? actividad.descripcion.substring(0, 32) + '...' 
-      : actividad.descripcion;
-    doc.text(descripcionTruncada, chartStartX + 2, y + 6);
+    const numeroAct = actividad.numeroActividad || `ACT${index.toString().padStart(2, '0')}`;
+    doc.text(numeroAct, chartStartX + 2, y + 6);
 
     // Calcular posición y ancho de la barra
     const inicioActividad = new Date(actividad.fechaInicio);
@@ -121,78 +118,93 @@ export const exportGanttToPDF = ({ actividades, proyecto, colaboradores }: Gantt
     const barraY = y + 2;
     const barraHeight = rowHeight - 4;
 
-    // Color según estado
-    let barraColor: [number, number, number];
-    switch (actividad.estado) {
-      case 'Completada':
-        barraColor = colors.completada;
-        break;
-      case 'En progreso':
-        barraColor = colors.enProgreso;
-        break;
-      case 'Cancelada':
-        barraColor = colors.cancelada;
-        break;
-      default:
-        barraColor = colors.pendiente;
-    }
+    // Color azul para todas las barras
+    const barraColor = colors.enProgreso;
 
-    // Dibujar barra de la actividad
+    // Dibujar barra de la actividad (sin texto)
     doc.setFillColor(...barraColor);
     doc.roundedRect(barraX, barraY, barraWidth, barraHeight, 1, 1, 'F');
-
-    // Agregar información de colaboradores si hay espacio
-    if (actividad.colaboradores && actividad.colaboradores.length > 0) {
-      const colaboradorNombres = actividad.colaboradores
-        .map(c => {
-          if (typeof c === 'string') {
-            const colab = colaboradores.find(col => col._id === c);
-            return colab ? colab.nombre.split(' ')[0] : '';
-          }
-          return c.nombre.split(' ')[0];
-        })
-        .filter(n => n)
-        .slice(0, 2)
-        .join(', ');
-
-      if (colaboradorNombres && barraWidth > 20) {
-        doc.setFontSize(6);
-        doc.setTextColor(255, 255, 255);
-        doc.text(colaboradorNombres, barraX + barraWidth / 2, barraY + barraHeight / 2 + 1, { align: 'center' });
-      }
-    }
   });
 
-  // Leyenda
-  const legendY = chartStartY + (actividades.length + 1) * rowHeight + 10;
+  // Listado de actividades con descripción y tiempos
+  let listadoY = chartStartY + (actividades.length + 1) * rowHeight + 10;
   doc.setFontSize(9);
+  doc.setTextColor(...colors.header);
+  doc.text('Listado de Actividades:', chartStartX, listadoY);
+  listadoY += 5;
+
+  // Encabezados de la tabla
+  doc.setFontSize(7);
   doc.setTextColor(...colors.text);
-  doc.text('Leyenda:', chartStartX, legendY);
+  doc.setFont('helvetica', 'bold');
+  doc.text('No.', chartStartX, listadoY);
+  doc.text('Descripción', chartStartX + 15, listadoY);
+  doc.text('Inicio', chartStartX + 140, listadoY);
+  doc.text('Fin', chartStartX + 175, listadoY);
+  doc.text('Estado', chartStartX + 210, listadoY);
+  
+  doc.setDrawColor(...colors.gridLine);
+  doc.setLineWidth(0.2);
+  doc.line(chartStartX, listadoY + 1, chartStartX + 250, listadoY + 1);
+  listadoY += 5;
 
-  const estados: Array<{ nombre: string; color: [number, number, number] }> = [
-    { nombre: 'Pendiente', color: colors.pendiente },
-    { nombre: 'En progreso', color: colors.enProgreso },
-    { nombre: 'Completada', color: colors.completada },
-    { nombre: 'Cancelada', color: colors.cancelada }
-  ];
+  doc.setFont('helvetica', 'normal');
+  actividades.forEach((actividad, index) => {
+    // Verificar si necesitamos una nueva página
+    if (listadoY > 195) {
+      doc.addPage();
+      listadoY = 15;
+      // Re-imprimir encabezados en nueva página
+      doc.setFontSize(9);
+      doc.setTextColor(...colors.header);
+      doc.text('Listado de Actividades (continuación):', chartStartX, listadoY);
+      listadoY += 5;
+      doc.setFontSize(7);
+      doc.setTextColor(...colors.text);
+      doc.setFont('helvetica', 'bold');
+      doc.text('No.', chartStartX, listadoY);
+      doc.text('Descripción', chartStartX + 15, listadoY);
+      doc.text('Inicio', chartStartX + 140, listadoY);
+      doc.text('Fin', chartStartX + 175, listadoY);
+      doc.text('Estado', chartStartX + 210, listadoY);
+      doc.setDrawColor(...colors.gridLine);
+      doc.line(chartStartX, listadoY + 1, chartStartX + 250, listadoY + 1);
+      listadoY += 5;
+      doc.setFont('helvetica', 'normal');
+    }
 
-  estados.forEach((estado, index) => {
-    const legendX = chartStartX + 25 + (index * 50);
-    doc.setFillColor(...estado.color);
-    doc.roundedRect(legendX, legendY - 3, 8, 4, 0.5, 0.5, 'F');
-    doc.setFontSize(8);
-    doc.text(estado.nombre, legendX + 10, legendY);
+    const numeroAct = actividad.numeroActividad || `ACT${index.toString().padStart(2, '0')}`;
+    const descripcionTruncada = actividad.descripcion.length > 60 
+      ? actividad.descripcion.substring(0, 57) + '...' 
+      : actividad.descripcion;
+    const fechaInicioStr = new Date(actividad.fechaInicio).toLocaleDateString('es-MX', { 
+      day: '2-digit', month: 'short', year: 'numeric' 
+    });
+    const fechaFinStr = new Date(actividad.fechaFinal).toLocaleDateString('es-MX', { 
+      day: '2-digit', month: 'short', year: 'numeric' 
+    });
+
+    doc.setFontSize(7);
+    doc.setTextColor(...colors.text);
+    doc.text(numeroAct, chartStartX, listadoY);
+    doc.text(descripcionTruncada, chartStartX + 15, listadoY);
+    doc.text(fechaInicioStr, chartStartX + 140, listadoY);
+    doc.text(fechaFinStr, chartStartX + 175, listadoY);
+    doc.text(actividad.estado, chartStartX + 210, listadoY);
+    
+    listadoY += 4;
   });
 
-  // Información adicional
+  // Información adicional al final
+  listadoY += 5;
   doc.setFontSize(8);
   doc.setTextColor(...colors.gridLine);
   doc.text(
     `Generado el ${new Date().toLocaleDateString('es-MX')} a las ${new Date().toLocaleTimeString('es-MX')}`,
     chartStartX,
-    legendY + 8
+    listadoY
   );
-  doc.text(`Total de actividades: ${actividades.length}`, chartStartX + 120, legendY + 8);
+  doc.text(`Total de actividades: ${actividades.length}`, chartStartX + 120, listadoY);
 
   // Guardar el PDF
   const nombreArchivo = `gantt_${proyecto.nombre.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;

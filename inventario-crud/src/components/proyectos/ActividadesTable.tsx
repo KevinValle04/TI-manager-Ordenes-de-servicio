@@ -176,7 +176,7 @@ const ActividadesTable: React.FC<ActividadesTableProps> = ({
 
   const handleExportGantt = () => {
     if (!proyecto) return;
-    exportGanttToPDF({ actividades, proyecto, colaboradores });
+    exportGanttToPDF({ actividades, proyecto });
   };
 
   return (
@@ -288,6 +288,7 @@ const ActividadesTable: React.FC<ActividadesTableProps> = ({
         onSave={handleSaveActividad}
         editingActividad={editingActividad}
         colaboradores={colaboradores}
+        actividades={actividades}
       />
 
       <ActividadViewModal

@@ -19,6 +19,7 @@ export interface INotaActividad {
 
 export interface IActividad extends Document {
   proyecto: mongoose.Types.ObjectId; // Referencia al proyecto
+  numeroActividad: string; // Número de actividad: ACT00, ACT01, etc.
   descripcion: string;
   fechaInicio: Date;
   fechaFinal: Date;
@@ -37,6 +38,11 @@ const ActividadSchema: Schema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Proyecto',
       required: true
+    },
+    numeroActividad: {
+      type: String,
+      required: true,
+      trim: true
     },
     descripcion: {
       type: String,

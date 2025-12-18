@@ -8,6 +8,7 @@ interface ActividadModalProps {
   onSave: (data: Partial<Actividad>) => void;
   editingActividad: Actividad | null;
   colaboradores: Colaborador[];
+  actividades: Actividad[]; // Para validar números de actividad existentes
 }
 
 const ActividadModal: React.FC<ActividadModalProps> = ({
@@ -15,7 +16,8 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
   onHide,
   onSave,
   editingActividad,
-  colaboradores
+  colaboradores,
+  actividades
 }) => {
   // Colores predefinidos para las tarjetas
   const coloresPredefinidos = [
@@ -32,6 +34,7 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
   ];
 
   interface FormDataType {
+    numeroActividad: string;
     descripcion: string;
     fechaInicio: string;
     fechaFinal: string;
@@ -41,6 +44,7 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
   }
 
   const [formData, setFormData] = useState<FormDataType>({
+    numeroActividad: '',
     descripcion: '',
     fechaInicio: '',
     fechaFinal: '',
@@ -52,6 +56,7 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
   useEffect(() => {
     if (editingActividad) {
       setFormData({
+        numeroActividad: editingActividad.numeroActividad || '',
         descripcion: editingActividad.descripcion || '',
         fechaInicio: formatDateForInput(editingActividad.fechaInicio),
         fechaFinal: formatDateForInput(editingActividad.fechaFinal),
@@ -63,6 +68,7 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
       });
     } else {
       setFormData({
+        numeroActividad: '',
         descripcion: '',
         fechaInicio: '',
         fechaFinal: '',
@@ -102,6 +108,17 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
       return;
     }
 
+    // Validar que el número de actividad no esté duplicado
+    if (formData.numeroActividad) {
+      const numeroExistente = actividades.find(
+        a => a.numeroActividad === formData.numeroActividad && a._id !== editingActividad?._id
+      );
+      if (numeroExistente) {
+        alert(`El número de actividad "${formData.numeroActividad}" ya existe. Por favor, use otro número.`);
+        return;
+      }
+    }
+
     const fechaInicio = new Date(formData.fechaInicio);
     const fechaFinal = new Date(formData.fechaFinal);
 
@@ -128,6 +145,35 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
       </Modal.Header>
       <Form onSubmit={handleSubmit}>
         <Modal.Body>
+          {/* Número de Actividad - Solo visible al editar */}
+          {editingActividad && (
+            <Form.Group className="mb-3">
+              <Form.Label>
+                Número de Actividad
+              </Form.Label>
+              <div className="d-flex align-items-center" style={{ maxWidth: '150px' }}>
+                <span className="input-group-text" style={{ borderRadius: '0.375rem 0 0 0.375rem' }}>ACT</span>
+                <Form.Control
+                  type="number"
+                  min="0"
+                  max="99"
+                  name="numeroActividad"
+                  value={formData.numeroActividad.replace('ACT', '')}
+                  onChange={(e) => {
+                    const num = e.target.value.replace(/\D/g, '');
+                    const formatted = num ? `ACT${num.padStart(2, '0')}` : '';
+                    setFormData(prev => ({ ...prev, numeroActividad: formatted }));
+                  }}
+                  placeholder="00"
+                  style={{ borderRadius: '0 0.375rem 0.375rem 0' }}
+                />
+              </div>
+              <Form.Text className="text-muted">
+                Ingrese solo el número (ej: 1 → ACT01)
+              </Form.Text>
+            </Form.Group>
+          )}
+
           <Form.Group className="mb-3">
             <Form.Label>
               Descripción de la Actividad <span className="text-danger">*</span>

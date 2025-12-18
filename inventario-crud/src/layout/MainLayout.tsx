@@ -44,6 +44,8 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
 
     return () => clearTimeout(timer);
   }, [location.pathname]);
+  // ...existing code...
+
   const groupedNavItems = [
     // Dashboard sin agrupar
     {
@@ -100,6 +102,7 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
         ] : []),
       ],
     },
+    // Control de Vehículos como opción independiente
     {
       label: "Bases de Datos",
       icon: <FaUsers size={16} />,
@@ -109,10 +112,18 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
         { path: "/razones-sociales", label: "Razones Sociales", icon: <FaBuilding size={14} /> },
         { path: "/vendedores", label: "Vendedores", icon: <FaUserTie size={14} /> },
         { path: "/mat-elec", label: "Material de Canalización", icon: <FaBolt size={14} /> },
-        { path: "/vehiculos", label: "Vehículos", icon: <FaTruck size={14} /> },
+      ],
+    },
+        {
+      label: "Control de Vehículos",
+      icon: <FaTruck size={16} />,
+      items: [
+        { path: "/vehiculos", label: "Control de Vehículos", icon: <FaTruck size={14} /> },
       ],
     },
   ];
+
+//
 
   const handleLogout = () => {
     if (onLogout) onLogout();

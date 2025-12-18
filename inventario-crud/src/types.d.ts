@@ -265,6 +265,7 @@ export interface NotaActividad {
 export interface Actividad {
   _id?: string;
   proyecto: string | Proyecto; // Referencia al proyecto
+  numeroActividad?: string; // Número de actividad: ACT00, ACT01, etc.
   descripcion: string;
   fechaInicio: Date | string;
   fechaFinal: Date | string;

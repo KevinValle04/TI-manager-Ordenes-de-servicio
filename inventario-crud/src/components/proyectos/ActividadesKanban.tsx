@@ -245,7 +245,7 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
     const todasActividades = board.columns.flatMap(col => 
       col.cards.map(card => card.actividadData)
     );
-    exportGanttToPDF({ actividades: todasActividades, proyecto, colaboradores });
+    exportGanttToPDF({ actividades: todasActividades, proyecto });
   };
 
   const renderCard = (card: KanbanCard) => {
@@ -261,7 +261,12 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
         }}
       >
         <div className="kanban-card-header">
-          <h6 className="kanban-card-title">{card.title}</h6>
+          <div className="d-flex align-items-center gap-2">
+            <Badge bg="primary" className="kanban-act-badge">
+              {card.actividadData.numeroActividad || 'ACT--'}
+            </Badge>
+            <h6 className="kanban-card-title mb-0">{card.title}</h6>
+          </div>
           <div className="kanban-card-actions">
             <button
               className="btn btn-sm btn-link p-0 me-2"
@@ -373,6 +378,7 @@ const ActividadesKanban: React.FC<ActividadesKanbanProps> = ({
         onSave={handleSaveActividad}
         editingActividad={editingActividad}
         colaboradores={colaboradores}
+        actividades={board.columns.flatMap(col => col.cards.map(card => card.actividadData))}
       />
 
       <ActividadViewModal

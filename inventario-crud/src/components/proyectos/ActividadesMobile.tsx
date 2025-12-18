@@ -172,7 +172,7 @@ const ActividadesMobile: React.FC<ActividadesMobileProps> = ({
 
   const handleExportGantt = () => {
     if (!proyecto) return;
-    exportGanttToPDF({ actividades, proyecto, colaboradores });
+    exportGanttToPDF({ actividades, proyecto });
   };
 
   return (
@@ -340,6 +340,7 @@ const ActividadesMobile: React.FC<ActividadesMobileProps> = ({
         onSave={handleSaveActividad}
         editingActividad={editingActividad}
         colaboradores={colaboradores}
+        actividades={actividades}
       />
 
       {/* Modal de Visualización */}

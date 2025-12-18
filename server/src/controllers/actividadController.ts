@@ -84,8 +84,13 @@ export const crearActividad = async (req: Request, res: Response): Promise<void>
       }
     }
 
+    // Generar número de actividad automáticamente (ACT00, ACT01, etc.)
+    const actividadesProyecto = await Actividad.countDocuments({ proyecto: proyectoId });
+    const numeroActividad = `ACT${actividadesProyecto.toString().padStart(2, '0')}`;
+
     const nuevaActividad = new Actividad({
       proyecto: proyectoId,
+      numeroActividad,
       descripcion,
       fechaInicio,
       fechaFinal,
