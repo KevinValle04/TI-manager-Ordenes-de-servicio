@@ -80,10 +80,12 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
   }, [editingActividad, show]);
 
   const formatDateForInput = (date: Date | string): string => {
+    if (!date) return '';
+    // Usar UTC para evitar problemas de zona horaria
     const d = new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
+    const year = d.getUTCFullYear();
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
 
@@ -119,8 +121,10 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
       }
     }
 
-    const fechaInicio = new Date(formData.fechaInicio);
-    const fechaFinal = new Date(formData.fechaFinal);
+    // Crear fechas en UTC para evitar problemas de zona horaria
+    // Agregar 'T12:00:00' para que al convertir a UTC no cambie el día
+    const fechaInicio = new Date(formData.fechaInicio + 'T12:00:00');
+    const fechaFinal = new Date(formData.fechaFinal + 'T12:00:00');
 
     if (fechaFinal < fechaInicio) {
       alert('La fecha final debe ser posterior a la fecha de inicio');
@@ -129,6 +133,8 @@ const ActividadModal: React.FC<ActividadModalProps> = ({
 
     const dataToSave: Partial<Actividad> = {
       ...formData,
+      fechaInicio: fechaInicio,
+      fechaFinal: fechaFinal,
       ...(editingActividad?._id && { _id: editingActividad._id })
     };
 

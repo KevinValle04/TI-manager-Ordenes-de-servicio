@@ -42,7 +42,14 @@ export const exportGanttToPDF = ({ actividades, proyecto }: GanttExportOptions) 
     return;
   }
 
-  const fechas = actividades.map(a => ({
+  // Ordenar actividades por número de actividad de forma ascendente (ACT00, ACT01, ...)
+  const actividadesOrdenadas = [...actividades].sort((a, b) => {
+    const numA = a.numeroActividad || '';
+    const numB = b.numeroActividad || '';
+    return numA.localeCompare(numB, undefined, { numeric: true });
+  });
+
+  const fechas = actividadesOrdenadas.map(a => ({
     inicio: new Date(a.fechaInicio),
     fin: new Date(a.fechaFinal)
   }));
@@ -79,7 +86,7 @@ export const exportGanttToPDF = ({ actividades, proyecto }: GanttExportOptions) 
     // Línea vertical de la cuadrícula
     doc.setDrawColor(...colors.gridLine);
     doc.setLineWidth(0.1);
-    doc.line(x, chartStartY, x, chartStartY + (actividades.length + 1) * rowHeight);
+    doc.line(x, chartStartY, x, chartStartY + (actividadesOrdenadas.length + 1) * rowHeight);
     
     // Etiqueta de fecha
     const fechaStr = fecha.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' });
@@ -92,7 +99,7 @@ export const exportGanttToPDF = ({ actividades, proyecto }: GanttExportOptions) 
   doc.line(chartStartX, chartStartY, chartStartX + chartWidth, chartStartY);
 
   // Dibujar cada actividad
-  actividades.forEach((actividad, index) => {
+  actividadesOrdenadas.forEach((actividad, index) => {
     const y = chartStartY + (index + 1) * rowHeight;
 
     // Línea horizontal de separación
@@ -127,7 +134,7 @@ export const exportGanttToPDF = ({ actividades, proyecto }: GanttExportOptions) 
   });
 
   // Listado de actividades con descripción y tiempos
-  let listadoY = chartStartY + (actividades.length + 1) * rowHeight + 10;
+  let listadoY = chartStartY + (actividadesOrdenadas.length + 1) * rowHeight + 10;
   doc.setFontSize(9);
   doc.setTextColor(...colors.header);
   doc.text('Listado de Actividades:', chartStartX, listadoY);
@@ -141,7 +148,6 @@ export const exportGanttToPDF = ({ actividades, proyecto }: GanttExportOptions) 
   doc.text('Descripción', chartStartX + 15, listadoY);
   doc.text('Inicio', chartStartX + 140, listadoY);
   doc.text('Fin', chartStartX + 175, listadoY);
-  doc.text('Estado', chartStartX + 210, listadoY);
   
   doc.setDrawColor(...colors.gridLine);
   doc.setLineWidth(0.2);
@@ -149,9 +155,30 @@ export const exportGanttToPDF = ({ actividades, proyecto }: GanttExportOptions) 
   listadoY += 5;
 
   doc.setFont('helvetica', 'normal');
-  actividades.forEach((actividad, index) => {
+  actividadesOrdenadas.forEach((actividad, index) => {
+    // Calcular cuántas líneas necesita la descripción
+    const maxCharsPerLine = 70; // Caracteres máximos por línea
+    const descripcionCompleta = actividad.descripcion;
+    const lineasDescripcion: string[] = [];
+    
+    // Dividir la descripción en líneas
+    let textoRestante = descripcionCompleta;
+    while (textoRestante.length > 0) {
+      if (textoRestante.length <= maxCharsPerLine) {
+        lineasDescripcion.push(textoRestante);
+        break;
+      }
+      // Buscar el último espacio antes del límite para no cortar palabras
+      let corte = textoRestante.lastIndexOf(' ', maxCharsPerLine);
+      if (corte === -1) corte = maxCharsPerLine;
+      lineasDescripcion.push(textoRestante.substring(0, corte));
+      textoRestante = textoRestante.substring(corte).trim();
+    }
+    
+    const alturaActividad = lineasDescripcion.length * 3.5; // Altura por cada línea
+    
     // Verificar si necesitamos una nueva página
-    if (listadoY > 195) {
+    if (listadoY + alturaActividad > 195) {
       doc.addPage();
       listadoY = 15;
       // Re-imprimir encabezados en nueva página
@@ -166,7 +193,6 @@ export const exportGanttToPDF = ({ actividades, proyecto }: GanttExportOptions) 
       doc.text('Descripción', chartStartX + 15, listadoY);
       doc.text('Inicio', chartStartX + 140, listadoY);
       doc.text('Fin', chartStartX + 175, listadoY);
-      doc.text('Estado', chartStartX + 210, listadoY);
       doc.setDrawColor(...colors.gridLine);
       doc.line(chartStartX, listadoY + 1, chartStartX + 250, listadoY + 1);
       listadoY += 5;
@@ -174,9 +200,6 @@ export const exportGanttToPDF = ({ actividades, proyecto }: GanttExportOptions) 
     }
 
     const numeroAct = actividad.numeroActividad || `ACT${index.toString().padStart(2, '0')}`;
-    const descripcionTruncada = actividad.descripcion.length > 60 
-      ? actividad.descripcion.substring(0, 57) + '...' 
-      : actividad.descripcion;
     const fechaInicioStr = new Date(actividad.fechaInicio).toLocaleDateString('es-MX', { 
       day: '2-digit', month: 'short', year: 'numeric' 
     });
@@ -187,12 +210,19 @@ export const exportGanttToPDF = ({ actividades, proyecto }: GanttExportOptions) 
     doc.setFontSize(7);
     doc.setTextColor(...colors.text);
     doc.text(numeroAct, chartStartX, listadoY);
-    doc.text(descripcionTruncada, chartStartX + 15, listadoY);
+    
+    // Imprimir primera línea de descripción junto con fechas
+    doc.text(lineasDescripcion[0], chartStartX + 15, listadoY);
     doc.text(fechaInicioStr, chartStartX + 140, listadoY);
     doc.text(fechaFinStr, chartStartX + 175, listadoY);
-    doc.text(actividad.estado, chartStartX + 210, listadoY);
     
-    listadoY += 4;
+    // Imprimir líneas adicionales de descripción si las hay
+    for (let i = 1; i < lineasDescripcion.length; i++) {
+      listadoY += 3.5;
+      doc.text(lineasDescripcion[i], chartStartX + 15, listadoY);
+    }
+    
+    listadoY += 4.5; // Espacio entre actividades
   });
 
   // Información adicional al final
@@ -204,7 +234,7 @@ export const exportGanttToPDF = ({ actividades, proyecto }: GanttExportOptions) 
     chartStartX,
     listadoY
   );
-  doc.text(`Total de actividades: ${actividades.length}`, chartStartX + 120, listadoY);
+  doc.text(`Total de actividades: ${actividadesOrdenadas.length}`, chartStartX + 120, listadoY);
 
   // Guardar el PDF
   const nombreArchivo = `gantt_${proyecto.nombre.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;

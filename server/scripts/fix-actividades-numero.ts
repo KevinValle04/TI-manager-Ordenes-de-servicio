@@ -9,12 +9,12 @@ dotenv.config({ path: path.join(__dirname, '..', '.env') });
 import { Actividad } from '../src/models/Actividad';
 import { Proyecto } from '../src/models/Proyecto';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/inventario';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/timanager';
 
 async function fixActividadesNumero() {
   try {
     console.log('Conectando a MongoDB...');
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(MONGO_URI);
     console.log('Conectado exitosamente!\n');
 
     // Obtener todos los proyectos
