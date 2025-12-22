@@ -17,6 +17,13 @@ import {
   eliminarActividad
 } from '../controllers/actividadController';
 
+import {
+  obtenerDireccionesProyecto,
+  crearDireccionIP,
+  actualizarDireccionIP,
+  eliminarDireccionIP
+} from '../controllers/direccionIPController';
+
 const router = Router();
 
 // GET /api/proyectos - Obtener todos los proyectos
@@ -48,5 +55,11 @@ router.get('/:proyectoId/actividades', obtenerActividadesProyecto);
 
 // POST /api/proyectos/:proyectoId/actividades - Crear una nueva actividad
 router.post('/:proyectoId/actividades', crearActividad);
+
+// Rutas de direcciones IP
+router.get('/:proyectoId/direcciones', obtenerDireccionesProyecto);
+router.post('/:proyectoId/direcciones', crearDireccionIP);
+router.put('/direcciones/:id', actualizarDireccionIP);
+router.delete('/direcciones/:id', eliminarDireccionIP);
 
 export default router;

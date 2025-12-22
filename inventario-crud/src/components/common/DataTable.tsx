@@ -13,6 +13,7 @@ interface DataTableProps<T> {
   actions?: (item: T) => React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
+  onRowClick?: (item: T) => void; // Nueva prop
 }
 
 function DataTable<T extends { _id?: string }>({
@@ -21,6 +22,7 @@ function DataTable<T extends { _id?: string }>({
   actions,
   className,
   style,
+  onRowClick, // Nueva prop
 }: DataTableProps<T>) {
   return (
     <Table striped bordered hover className={className} style={style}>
@@ -34,7 +36,11 @@ function DataTable<T extends { _id?: string }>({
       </thead>
       <tbody>
         {data.map((item) => (
-          <tr key={item._id || JSON.stringify(item)}>
+          <tr 
+            key={item._id || JSON.stringify(item)}
+            onClick={() => onRowClick?.(item)}
+            style={onRowClick ? { cursor: 'pointer' } : undefined}
+          >
             {columns.map((col) => (
               <td key={col.key as string}>
                 {col.render ? col.render(item) : (item as any)[col.key]}

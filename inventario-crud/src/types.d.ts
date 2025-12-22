@@ -245,6 +245,19 @@ export interface Proyecto {
   updatedAt?: Date | string;
 }
 
+export interface DireccionIP {
+  _id?: string;
+  proyecto: string;
+  equipo: string;
+  usuario: string;
+  contrasena: string;
+  direccion: string;
+  esRango: boolean;
+  direccionFin?: string;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+}
+
 export interface EvidenciaActividad {
   _id?: string;
   nombre: string;

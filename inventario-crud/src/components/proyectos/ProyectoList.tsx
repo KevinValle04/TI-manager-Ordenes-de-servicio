@@ -9,7 +9,9 @@ import EntregaModal from '../entregas/EntregaModal';
 import OrdenCompraForm from '../ordenesCompra/OrdenCompraForm';
 import ActividadesList from './ActividadesList';
 import ProyectoModal from './ProyectoModal';
+import DireccionesModal from './DireccionesModal';
 import '../../styles/Proyectos.css';
+
 
 const ProyectoList: React.FC = () => {
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
@@ -19,12 +21,15 @@ const ProyectoList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [colaboradores, setColaboradores] = useState<Colaborador[]>([]);
+
+  
   
   // Estados para los modales de cotizaciones y órdenes de compra
   const [showCotizacionesModal, setShowCotizacionesModal] = useState(false);
   const [showEntregasModal, setShowEntregasModal] = useState(false);
   const [showOrdenesModal, setShowOrdenesModal] = useState(false);
   const [showActividadesModal, setShowActividadesModal] = useState(false);
+  const [showDireccionesModal, setShowDireccionesModal] = useState(false);
   const [selectedProyecto, setSelectedProyecto] = useState<Proyecto | null>(null);
   const [cotizacionesProyecto, setCotizacionesProyecto] = useState<Cotizacion[]>([]);
   const [entregasProyecto, setEntregasProyecto] = useState<Entrega[]>([]);
@@ -50,6 +55,8 @@ const ProyectoList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [searchTerm, setSearchTerm] = useState('');
+  const [expandedProyectoId, setExpandedProyectoId] = useState<string | null>(null);
+  
 
   useEffect(() => {
     fetchProyectos();
@@ -274,6 +281,15 @@ const ProyectoList: React.FC = () => {
     setShowActividadesModal(true);
   };
 
+  const handleViewDirecciones = (proyecto: Proyecto) => {
+  setSelectedProyecto(proyecto);
+  setShowDireccionesModal(true);
+};
+
+  const toggleExpandProyecto = (proyectoId: string) => {
+    setExpandedProyectoId(expandedProyectoId === proyectoId ? null : proyectoId);
+  };
+
   const handleEditCotizacion = (cotizacion: Cotizacion) => {
     setEditingCotizacion(cotizacion);
     setShowEditCotizacionModal(true);
@@ -466,83 +482,135 @@ const ProyectoList: React.FC = () => {
       )
     },
     {
-      key: 'acciones',
-      label: 'Acciones',
-      render: (proyecto: Proyecto) => (
-        <div className="d-flex flex-column gap-1" style={{ minWidth: '150px' }}>
-          <div className="d-flex gap-1">
-            <Button
-              variant="success"
-              size="sm"
-              onClick={() => handleViewActividades(proyecto)}
-              title="Ver actividades del proyecto"
-              className="flex-fill"
-            >
-              <i className="fas fa-tasks me-1"></i>
-              Actividades
-            </Button>
+  key: 'acciones',
+  label: 'Acciones',
+  render: (proyecto: Proyecto) => {
+    const isExpanded = expandedProyectoId === proyecto._id;
+    return (
+      <div>
+        {!isExpanded ? (
+          <Button
+            variant="outline-primary"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleExpandProyecto(proyecto._id!);
+            }}
+          >
+            <i className="fas fa-chevron-down me-1"></i>
+            Ver acciones
+          </Button>
+        ) : (
+          <div className="d-flex flex-column gap-1" style={{ minWidth: '150px' }}>
+            <div className="d-flex gap-1">
+              <Button
+                variant="success"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleViewActividades(proyecto);
+                }}
+                title="Ver actividades del proyecto"
+                className="flex-fill"
+              >
+                <i className="fas fa-tasks me-1"></i>
+                Actividades
+              </Button>
+            </div>
+            <div className="d-flex gap-1">
+              <Button
+                variant="info"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleViewCotizaciones(proyecto);
+                }}
+                title="Ver cotizaciones del proyecto"
+                className="flex-fill"
+              >
+                <i className="fas fa-file-invoice me-1"></i>
+                Cotizaciones
+              </Button>
+            </div>
+            <div className="d-flex gap-1">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleViewEntregas(proyecto);
+                }}
+                title="Ver entregas del proyecto"
+                className="flex-fill"
+              >
+                <i className="fas fa-truck me-1"></i>
+                Entregas
+              </Button>
+            </div>
+            <div className="d-flex gap-1">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleViewOrdenes(proyecto);
+                }}
+                title="Ver órdenes de compra del proyecto"
+                className="flex-fill"
+              >
+                <i className="fas fa-shopping-cart me-1"></i>
+                Órdenes
+              </Button>
+            </div>
+            <div className="d-flex gap-1">
+              <Button
+                variant="dark"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleViewDirecciones(proyecto);
+                }}
+                title="Gestionar direcciones IP del proyecto"
+                className="flex-fill"
+              >
+                <i className="fas fa-network-wired me-1"></i>
+                Direcciones
+              </Button>
+            </div>
+            <div className="d-flex gap-1">
+              <Button
+                variant="warning"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEdit(proyecto);
+                }}
+                title="Editar proyecto"
+                className="flex-fill"
+              >
+                <i className="fas fa-edit me-1"></i>
+                Editar
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(proyecto._id!);
+                }}
+                title="Eliminar proyecto"
+                className="flex-fill"
+              >
+                <i className="fas fa-trash me-1"></i>
+                Eliminar
+              </Button>
+            </div>
           </div>
-          <div className="d-flex gap-1">
-            <Button
-              variant="info"
-              size="sm"
-              onClick={() => handleViewCotizaciones(proyecto)}
-              title="Ver cotizaciones del proyecto"
-              className="flex-fill"
-            >
-              <i className="fas fa-file-invoice me-1"></i>
-              Cotizaciones
-            </Button>
-          </div>
-          <div className="d-flex gap-1">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => handleViewEntregas(proyecto)}
-              title="Ver entregas del proyecto"
-              className="flex-fill"
-            >
-              <i className="fas fa-truck me-1"></i>
-              Entregas
-            </Button>
-          </div>
-          <div className="d-flex gap-1">
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => handleViewOrdenes(proyecto)}
-              title="Ver órdenes de compra del proyecto"
-              className="flex-fill"
-            >
-              <i className="fas fa-shopping-cart me-1"></i>
-              Órdenes
-            </Button>
-          </div>
-          <div className="d-flex gap-1">
-            <Button
-              variant="warning"
-              size="sm"
-              onClick={() => handleEdit(proyecto)}
-              title="Editar proyecto"
-              className="flex-fill"
-            >
-              <i className="fas fa-edit me-1"></i>
-              Editar
-            </Button>
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={() => handleDelete(proyecto._id!)}
-              title="Eliminar proyecto"
-              className="flex-fill"
-            >
-              <i className="fas fa-trash me-1"></i>
-              Eliminar
-            </Button>
-          </div>
-        </div>
-      )
-    }
+        )}
+      </div>
+    );
+  }
+}
   ];
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -647,6 +715,16 @@ const ProyectoList: React.FC = () => {
             <i className="fas fa-shopping-cart me-1"></i>
             Órdenes
           </Button>
+
+          <Button
+            variant="dark"
+            size="sm"
+            onClick={() => handleViewDirecciones(proyecto)}
+            title="Gestionar direcciones IP"
+          >
+            <i className="fas fa-network-wired me-1"></i>
+            Direcciones
+          </Button>
         </div>
         
         <div className="proyecto-card-mobile-actions-full">
@@ -722,9 +800,10 @@ const ProyectoList: React.FC = () => {
           <div className="proyectos-table-desktop">
             <div className="table-responsive">
               <DataTable
-                columns={columns}
-                data={currentItems}
-              />
+  columns={columns}
+  data={currentItems}
+  onRowClick={(proyecto) => toggleExpandProyecto(proyecto._id!)}
+/>
             </div>
           </div>
           
@@ -1060,6 +1139,12 @@ const ProyectoList: React.FC = () => {
           proyectos={proyectos}
         />
       )}
+      {/* Modal de Direcciones IP */}
+        <DireccionesModal
+          show={showDireccionesModal}
+          onHide={() => setShowDireccionesModal(false)}
+          proyecto={selectedProyecto}
+        />
     </div>
   );
 };
