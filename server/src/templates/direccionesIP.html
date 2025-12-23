@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Direcciones IP - {{nombreProyecto}}</title>
+</head>
+<body>
+  <!-- Encabezado con logo (opcional) -->
+  <div class="header">
+    <img src="img/top.png" alt="Logo" class="logo">
+  </div>
+
+  <!-- Título principal -->
+  <div class="title-section">
+    <h1>Listado de Direcciones IP</h1>
+    <h2>Proyecto: {{nombreProyecto}}</h2>
+  </div>
+
+  <!-- Información del documento -->
+  <div class="info-section">
+    <p><strong>Fecha de generación:</strong> {{fechaGeneracion}}</p>
+    <p><strong>Total de direcciones:</strong> {{totalDirecciones}}</p>
+  </div>
+
+  <!-- Tabla de direcciones -->
+  <table class="direcciones-table">
+    <thead>
+      <tr>
+        <th class="col-num">#</th>
+        <th class="col-equipo">Equipo</th>
+        <th class="col-usuario">Usuario</th>
+        <th class="col-password">Contraseña</th>
+        <th class="col-ip">Dirección IP</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{filasDirecciones}}
+    </tbody>
+  </table>
+
+  <!-- Pie de página -->
+  <div class="footer">
+    <p>Documento generado automáticamente - Confidencial</p>
+  </div>
+</body>
+</html>

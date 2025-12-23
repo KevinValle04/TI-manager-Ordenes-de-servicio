@@ -21,7 +21,8 @@ import {
   obtenerDireccionesProyecto,
   crearDireccionIP,
   actualizarDireccionIP,
-  eliminarDireccionIP
+  eliminarDireccionIP,
+  generarPDFDirecciones
 } from '../controllers/direccionIPController';
 
 const router = Router();
@@ -57,6 +58,7 @@ router.get('/:proyectoId/actividades', obtenerActividadesProyecto);
 router.post('/:proyectoId/actividades', crearActividad);
 
 // Rutas de direcciones IP
+router.get('/:proyectoId/direcciones/pdf', generarPDFDirecciones);
 router.get('/:proyectoId/direcciones', obtenerDireccionesProyecto);
 router.post('/:proyectoId/direcciones', crearDireccionIP);
 router.put('/direcciones/:id', actualizarDireccionIP);

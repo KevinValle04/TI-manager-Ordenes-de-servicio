@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { DireccionIP, IDireccionIP } from '../models/DireccionIP';
 import { Proyecto } from '../models/Proyecto';
+import { DireccionIPPdfService } from '../services/direccionIPPdfService';
 
 export const obtenerDireccionesProyecto = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -111,5 +112,44 @@ export const eliminarDireccionIP = async (req: Request, res: Response): Promise<
   } catch (error) {
     console.error('Error al eliminar dirección IP:', error);
     res.status(500).json({ message: 'Error al eliminar dirección IP', error });
+  }
+};
+
+// Generar PDF de direcciones de un proyecto
+export const generarPDFDirecciones = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { proyectoId } = req.params;
+    
+    const proyecto = await Proyecto.findById(proyectoId);
+    if (!proyecto) {
+      res.status(404).json({ message: 'Proyecto no encontrado' });
+      return;
+    }
+
+    const direcciones = await DireccionIP.find({ proyecto: proyectoId })
+      .sort({ createdAt: -1 });
+
+    // Crear instancia del servicio y generar PDF
+    const pdfService = new DireccionIPPdfService();
+    const pdfBuffer = await pdfService.generarPdfDirecciones(
+      direcciones as any[],
+      {
+        nombre: proyecto.nombre,
+        descripcion: proyecto.descripcion
+      }
+    );
+
+    // Configurar headers para descarga
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=Direcciones_IP_${proyecto.nombre.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`
+    );
+    res.setHeader('Content-Length', pdfBuffer.length);
+
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error('Error al generar PDF de direcciones:', error);
+    res.status(500).json({ message: 'Error al generar PDF de direcciones', error });
   }
 };

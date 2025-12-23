@@ -1,0 +1,180 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  font-size: 11pt;
+  color: #333;
+  line-height: 1.4;
+  padding: 20px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.header .logo {
+  max-height: 80px;
+  width: auto;
+  object-fit: contain;
+}
+
+.title-section {
+  text-align: center;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #2c3e50;
+  padding-bottom: 15px;
+}
+
+.title-section h1 {
+  font-size: 24pt;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.title-section h2 {
+  font-size: 16pt;
+  color: #34495e;
+  margin-bottom: 5px;
+  font-weight: normal;
+}
+
+.title-section .cliente {
+  font-size: 12pt;
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+.info-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #ecf0f1;
+  border-radius: 5px;
+}
+
+.info-section p {
+  margin: 0;
+  font-size: 10pt;
+}
+
+.direcciones-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+}
+
+.direcciones-table thead {
+  background-color: #2c3e50;
+  color: white;
+}
+
+.direcciones-table thead th {
+  padding: 12px 8px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 11pt;
+  border: 1px solid #34495e;
+}
+
+.direcciones-table tbody tr {
+  border-bottom: 1px solid #ddd;
+}
+
+.direcciones-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.direcciones-table tbody tr:hover {
+  background-color: #ecf0f1;
+}
+
+.direcciones-table tbody td {
+  padding: 10px 8px;
+  font-size: 10pt;
+  border: 1px solid #ddd;
+  vertical-align: middle;
+}
+
+/* Anchos de columnas */
+.col-num {
+  width: 5%;
+  text-align: center;
+}
+
+.col-equipo {
+  width: 25%;
+}
+
+.col-usuario {
+  width: 20%;
+}
+
+.col-password {
+  width: 20%;
+  font-family: 'Courier New', monospace;
+}
+
+.col-ip {
+  width: 30%;
+}
+
+/* Badge para rangos */
+.badge-rango {
+  display: inline-block;
+  background-color: #3498db;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 8pt;
+  font-weight: bold;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* Clase para centrar texto */
+.text-center {
+  text-align: center;
+  font-style: italic;
+  color: #7f8c8d;
+}
+
+.footer {
+  margin-top: 40px;
+  padding-top: 15px;
+  border-top: 1px solid #bdc3c7;
+  text-align: center;
+  font-size: 9pt;
+  color: #7f8c8d;
+}
+
+/* Estilos para impresión */
+@media print {
+  body {
+    padding: 0;
+  }
+  
+  .direcciones-table {
+    page-break-inside: auto;
+  }
+  
+  .direcciones-table tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+  
+  .direcciones-table thead {
+    display: table-header-group;
+  }
+  
+  .direcciones-table tfoot {
+    display: table-footer-group;
+  }
+}

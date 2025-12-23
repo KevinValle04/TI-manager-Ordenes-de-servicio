@@ -175,14 +175,25 @@ const DireccionesModal: React.FC<DireccionesModalProps> = ({ show, onHide, proye
           <>
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h5>Listado de Direcciones</h5>
-              <Button 
-                variant="primary" 
-                size="sm"
-                onClick={() => setShowForm(true)}
-              >
-                <FaPlus className="me-2" />
-                Nueva Dirección
-              </Button>
+              <div className="d-flex gap-2">
+                <Button 
+                  variant="success" 
+                  size="sm"
+                  onClick={() => window.open(`/api/proyectos/${proyecto?._id}/direcciones/pdf`, '_blank')}                  disabled={direcciones.length === 0}
+                  title="Descargar listado en PDF"
+                >
+                  <i className="fas fa-file-pdf me-2"></i>
+                  Descargar PDF
+                </Button>
+                <Button 
+                  variant="primary" 
+                  size="sm"
+                  onClick={() => setShowForm(true)}
+                >
+                  <FaPlus className="me-2" />
+                  Nueva Dirección
+                </Button>
+              </div>
             </div>
 
             {loading ? (
