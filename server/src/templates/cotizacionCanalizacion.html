@@ -230,41 +230,7 @@
       </div>
     </div>
 
-    <!-- Segunda fila: Información del Cliente -->
-    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
-      <div class="info-section" style="flex: 1; margin-bottom: 0; position: relative;">
-        <h3>Información del Cliente</h3>
-        <div class="info-grid single-column">
-          <div class="info-item">
-            <span class="info-label">Empresa:</span>
-            <span>{{cliente.nombreEmpresa}}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Dirección:</span>
-            <span>{{cliente.direccion}}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Teléfono:</span>
-            <span>{{cliente.telefono}}</span>
-          </div>
-          {{#if cliente.contacto}}
-          <div class="info-item">
-            <span class="info-label">Contacto:</span>
-            <span>{{cliente.contacto.nombre}}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Puesto:</span>
-            <span>{{cliente.contacto.puesto}}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Tel. Contacto:</span>
-            <span>{{cliente.contacto.telefono}}</span>
-          </div>
-          {{/if}}
-        </div>
-      </div>
-    </div>
-
+   
     <!-- Tercera fila: Tipo de Listado y Concepto -->
     <div style="display: flex; gap: 6px; margin-bottom: 6px;">
       <div class="info-section" style="flex: 1; margin-bottom: 0; position: relative;">
