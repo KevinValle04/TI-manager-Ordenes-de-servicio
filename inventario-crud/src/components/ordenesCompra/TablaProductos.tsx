@@ -181,8 +181,15 @@ const FilaProducto: React.FC<FilaProductoProps> = React.memo(({
           type="number"
           size="sm"
           value={producto.cantidad || ''}
-          onChange={(e) => handleInputChange('cantidad', parseFloat(e.target.value) || 0)}
-          placeholder="0"
+          onChange={(e) => {
+            const val = e.target.value;
+            handleInputChange('cantidad', val === '' ? '' : parseFloat(val) || 0);
+          }}
+          onBlur={(e) => {
+            if (e.target.value === '' || parseFloat(e.target.value) === 0) {
+              handleInputChange('cantidad', 1);
+            }
+          }}          placeholder="0"
           min="0"
           step="0.01"
         />
@@ -201,8 +208,15 @@ const FilaProducto: React.FC<FilaProductoProps> = React.memo(({
           type="number"
           size="sm"
           value={producto.precioUnitario || ''}
-          onChange={(e) => handleInputChange('precioUnitario', parseFloat(e.target.value) || 0)}
-          placeholder="0.00"
+          onChange={(e) => {
+            const val = e.target.value;
+            handleInputChange('precioUnitario', val === '' ? '' : parseFloat(val) || 0);
+          }}
+          onBlur={(e) => {
+            if (e.target.value === '') {
+              handleInputChange('precioUnitario', 0);
+            }
+          }}          placeholder="0.00"
           min="0"
           step="0.01"
         />

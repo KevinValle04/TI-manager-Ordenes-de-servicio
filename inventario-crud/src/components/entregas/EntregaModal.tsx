@@ -900,8 +900,15 @@ const EntregaModal = ({
                           <Form.Control
                             type="number"
                             value={item.cantidad}
-                            onChange={(e) => handleItemChange(index, 'cantidad', parseFloat(e.target.value) || 1)}
-                            min="1"
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              handleItemChange(index, 'cantidad', val === '' ? '' : parseFloat(val) || 0);
+                            }}
+                            onBlur={(e) => {
+                              if (e.target.value === '' || parseFloat(e.target.value) === 0) {
+                                handleItemChange(index, 'cantidad', 1);
+                              }
+                            }}                            min="1"
                             step="1"
                             style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
                           />

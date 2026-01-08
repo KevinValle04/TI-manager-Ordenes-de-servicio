@@ -217,12 +217,12 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
     
     // Recalcular subtotal
     if (field === 'cantidad' || field === 'precioUnitario') {
-      items[index].subtotal = (items[index].cantidad || 1) * (items[index].precioUnitario || 0);
+      items[index].subtotal = (items[index].cantidad || 0) * (items[index].precioUnitario || 0);
     }
     
     // Si estamos editando la descripción y hay valor, calcular subtotal
     if (field === 'descripcion' && items[index].precioUnitario) {
-      items[index].subtotal = (items[index].cantidad || 1) * items[index].precioUnitario;
+      items[index].subtotal = (items[index].cantidad || 0) * items[index].precioUnitario;
     }
     
     // Asegurar fila vacía al final
@@ -751,8 +751,15 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
                         <Form.Control
                           type="number"
                           value={item.cantidad}
-                          onChange={(e) => handleItemChange(index, 'cantidad', parseFloat(e.target.value) || 1)}
-                          min="1"
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            handleItemChange(index, 'cantidad', val === '' ? '' : parseFloat(val) || 0);
+                          }}
+                          onBlur={(e) => {
+                            if (e.target.value === '' || parseFloat(e.target.value) === 0) {
+                              handleItemChange(index, 'cantidad', 1);
+                            }
+                          }}                          min="1"
                           step="1"
                           style={{ 
                             minWidth: '80px', 
@@ -766,8 +773,15 @@ const CotizacionCanalizacionModal: React.FC<CotizacionCanalizacionModalProps> = 
                         <Form.Control
                           type="number"
                           value={item.precioUnitario}
-                          onChange={(e) => handleItemChange(index, 'precioUnitario', parseFloat(e.target.value) || 0)}
-                          min="0"
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            handleItemChange(index, 'precioUnitario', val === '' ? '' : parseFloat(val) || 0);
+                          }}
+                          onBlur={(e) => {
+                            if (e.target.value === '') {
+                              handleItemChange(index, 'precioUnitario', 0);
+                            }
+                          }}                          min="0"
                           step="0.01"
                           style={{ 
                             minWidth: '100px', 

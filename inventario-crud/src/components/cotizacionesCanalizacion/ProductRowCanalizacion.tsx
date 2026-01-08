@@ -296,8 +296,15 @@ const ProductRowCanalizacion: React.FC<ProductRowCanalizacionProps> = ({
             type="number"
             size="sm"
             value={item.cantidad || 1}
-            onChange={(e) => onUpdate(index, 'cantidad', parseFloat(e.target.value) || 1)}
-            min="1"
+            onChange={(e) => {
+              const val = e.target.value;
+              onUpdate(index, 'cantidad', val === '' ? '' : parseFloat(val) || 0);
+            }}
+            onBlur={(e) => {
+              if (e.target.value === '' || parseFloat(e.target.value) === 0) {
+                onUpdate(index, 'cantidad', 1);
+              }
+            }}            min="1"
             step="0.01"
             placeholder="0"
           />
@@ -307,8 +314,15 @@ const ProductRowCanalizacion: React.FC<ProductRowCanalizacionProps> = ({
             type="number"
             size="sm"
             value={item.precioUnitario || 0}
-            onChange={(e) => onUpdate(index, 'precioUnitario', parseFloat(e.target.value) || 0)}
-            min="0"
+            onChange={(e) => {
+              const val = e.target.value;
+              onUpdate(index, 'precioUnitario', val === '' ? '' : parseFloat(val) || 0);
+            }}
+            onBlur={(e) => {
+              if (e.target.value === '') {
+                onUpdate(index, 'precioUnitario', 0);
+              }
+            }}            min="0"
             step="0.01"
             placeholder="0.00"
           />

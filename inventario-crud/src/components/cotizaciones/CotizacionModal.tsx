@@ -1224,8 +1224,15 @@ const CotizacionModal = ({
                           <Form.Control
                             type="number"
                             value={item.cantidad}
-                            onChange={(e) => handleItemChange(index, 'cantidad', parseFloat(e.target.value) || 1)}
-                            min="1"
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              handleItemChange(index, 'cantidad', val === '' ? '' : parseFloat(val) || 0);
+                            }}
+                            onBlur={(e) => {
+                              if (e.target.value === '' || parseFloat(e.target.value) === 0) {
+                                handleItemChange(index, 'cantidad', 1);
+                              }
+                            }}                            min="1"
                             step="1"
                             style={{ fontSize: '14px', padding: '8px 12px', minWidth: '80px' }}
                           />
@@ -1234,8 +1241,15 @@ const CotizacionModal = ({
                           <Form.Control
                             type="number"
                             value={item.precioUnitario}
-                            onChange={(e) => handleItemChange(index, 'precioUnitario', parseFloat(e.target.value) || 0)}
-                            min="0"
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              handleItemChange(index, 'precioUnitario', val === '' ? '' : parseFloat(val) || 0);
+                            }}
+                            onBlur={(e) => {
+                              if (e.target.value === '') {
+                                handleItemChange(index, 'precioUnitario', 0);
+                              }
+                            }}                            min="0"
                             step="0.01"
                             style={{ fontSize: '14px', padding: '8px 12px', minWidth: '120px' }}
                           />

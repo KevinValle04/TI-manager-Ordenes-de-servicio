@@ -136,8 +136,15 @@ const FilaProducto = React.memo(({
           type="number"
           size="sm"
           value={producto.precioUnitario || ''}
-          onChange={(e) => onActualizar(index, 'precioUnitario', parseFloat(e.target.value) || 0)}
-          placeholder="0.00"
+          onChange={(e) => {
+            const val = e.target.value;
+            onActualizar(index, 'precioUnitario', val === '' ? '' : parseFloat(val) || 0);
+          }}
+          onBlur={(e) => {
+            if (e.target.value === '') {
+              onActualizar(index, 'precioUnitario', 0);
+            }
+          }}          placeholder="0.00"
           min="0"
           step="0.01"
         />
