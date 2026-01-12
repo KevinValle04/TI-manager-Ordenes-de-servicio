@@ -34,6 +34,22 @@ const prepararDatosPdf = (cotizacion: ICotizacion): CotizacionPdfData => ({
   estado: cotizacion.estado,
   moneda: cotizacion.moneda || 'MXN',
   items: cotizacion.items.map(item => {
+    // Si es un separador, solo pasar el concepto
+    if (item.esSeparador) {
+      return {
+        descripcion: item.concepto || '',
+        marca: '',
+        modelo: '',
+        concepto: item.concepto || '',
+        unidad: '',
+        cantidad: 0,
+        precioUnitario: 0,
+        subtotal: 0,
+        aplicarIva: false,
+        iva: 0,
+        esSeparador: true
+      };
+    }
     // Calcular precio de venta (costo + ganancia) para mostrar en el PDF
     const ganancia = item.ganancia || 0;
     const precioVenta = item.precioUnitario + ganancia;
@@ -47,7 +63,8 @@ const prepararDatosPdf = (cotizacion: ICotizacion): CotizacionPdfData => ({
       precioUnitario: precioVenta, // Mostrar precio de venta (ya incluye ganancia)
       subtotal: item.importe, // El importe ya incluye la ganancia calculada
       aplicarIva: item.aplicarIva || false,
-      iva: item.aplicarIva ? item.importe * (cotizacion.iva/100) : 0
+      iva: item.aplicarIva ? item.importe * (cotizacion.iva/100) : 0,
+      esSeparador: false
     };
   }),
   comentarios: cotizacion.comentarios,

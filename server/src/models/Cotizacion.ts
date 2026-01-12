@@ -36,6 +36,7 @@ export interface IItemCotizacion {
   esCanalizacion?: boolean; // Para identificar si es una canalización
   canalizacionId?: string; // ID de la canalización si aplica
   aplicarIva: boolean; // Indica si se debe aplicar IVA a este item
+  esSeparador?: boolean; // Para identificar si es un separador visual
 }
 
 const ItemCotizacionSchema = new Schema<IItemCotizacion>({
@@ -99,6 +100,10 @@ const ItemCotizacionSchema = new Schema<IItemCotizacion>({
   aplicarIva: {
     type: Boolean,
     required: true,
+    default: false
+  },
+  esSeparador: {
+    type: Boolean,
     default: false
   }
 });

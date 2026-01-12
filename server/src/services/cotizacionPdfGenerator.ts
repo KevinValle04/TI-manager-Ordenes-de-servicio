@@ -32,6 +32,7 @@ export interface CotizacionPdfData {
     subtotal: number;
     aplicarIva: boolean;
     iva?: number;
+    esSeparador?: boolean;
   }>;
   comentarios?: string;
   razonSocial?: {

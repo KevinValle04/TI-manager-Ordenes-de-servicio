@@ -304,6 +304,11 @@
       </thead>
       <tbody>
         {{#each items}}
+        {{#if esSeparador}}
+        <tr style="background-color: #0F2A52;">
+          <td colspan="8" style="background-color: #0F2A52; color: white; font-weight: bold; text-align: left; padding: 6px 10px;">{{concepto}}</td>
+        </tr>
+        {{else}}
         <tr>
           <td class="text-center">{{increment @index}}</td>
           <td>{{marca}}</td>
@@ -314,6 +319,7 @@
           <td class="text-right">{{precioUnitario}}</td>
           <td class="text-right">{{subtotal}}</td>
         </tr>
+        {{/if}}
         {{/each}}
       </tbody>
     </table>

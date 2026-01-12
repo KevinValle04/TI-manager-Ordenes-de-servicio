@@ -202,6 +202,42 @@ const CotizacionModal = ({
     calculateTotals();
   };
 
+  // Función para añadir un separador visual
+  const addSeparador = () => {
+    const newItem: ItemCotizacion = {
+      clave: formData.items.length + 1,
+      marca: '',
+      modelo: '',
+      concepto: 'Nuevo Separador',
+      cantidad: 0,
+      unidad: 'PZA' as const,
+      precioUnitario: 0,
+      porcentajeGanancia: 0,
+      ganancia: 0,
+      importe: 0,
+      aplicarIva: false,
+      esSeparador: true
+    };
+
+    setFormData(prev => ({
+      ...prev,
+      items: [...prev.items.filter(item => item.concepto.trim() !== '' || item.esSeparador), newItem, {
+        clave: prev.items.length + 2,
+        marca: '',
+        modelo: '',
+        concepto: '',
+        cantidad: 1,
+        unidad: 'PZA' as const,
+        precioUnitario: 0,
+        porcentajeGanancia: 0,
+        ganancia: 0,
+        importe: 0,
+        aplicarIva: true,
+        esSeparador: false
+      }]
+    }));
+  };
+
   // Efecto para cargar datos de edición
   useEffect(() => {
     if (editingCotizacion) {
@@ -402,14 +438,18 @@ const CotizacionModal = ({
     const filteredData = {
       ...formData,
       moneda: moneda, // Agregar la moneda seleccionada
-      items: formData.items.filter(item => item.concepto.trim() !== '')
+      items: formData.items.filter(item => item.concepto.trim() !== '' || item.esSeparador)
     };
     onSave(filteredData);
   };
 
   // Asegurar que siempre haya una fila vacía al final
   const ensureEmptyRow = (items: ItemCotizacion[]): ItemCotizacion[] => {
-    if (items.length === 0 || items[items.length - 1].concepto !== '') {
+    // Verificar si el último item es una fila vacía (no separador y sin concepto)
+    const lastItem = items[items.length - 1];
+    const lastIsEmpty = lastItem && !lastItem.esSeparador && lastItem.concepto === '';
+    
+    if (items.length === 0 || !lastIsEmpty) {
       const newIndex = items.length + 1;
       return [...items, { 
         clave: newIndex,
@@ -976,13 +1016,22 @@ const CotizacionModal = ({
                   <i className="fas fa-shopping-cart me-2"></i>
                   Productos en la Cotización
                 </h5>
+                <div className="d-flex gap-2">
                   <Button 
-                  variant="outline-primary"
-                  onClick={() => setShowCanalizacionModal(true)}
-                >
-                  <i className="fas fa-plus me-2"></i>
-                  Añadir Canalización
-                </Button>
+                    variant="outline-secondary"
+                    onClick={addSeparador}
+                  >
+                    <i className="fas fa-minus me-2"></i>
+                    Crear Separador
+                  </Button>
+                  <Button 
+                    variant="outline-primary"
+                    onClick={() => setShowCanalizacionModal(true)}
+                  >
+                    <i className="fas fa-plus me-2"></i>
+                    Añadir Canalización
+                  </Button>
+                </div>
               </div>
 
               {/* Modal de búsqueda de canalizaciones */}
@@ -1088,18 +1137,70 @@ const CotizacionModal = ({
                   </thead>
                   <tbody>
                     {formData.items && formData.items.map((item, index) => (
-                      <tr 
-                        key={index}
-                        draggable={item.concepto !== ''}
-                        onDragStart={(e) => handleDragStart(e, index)}
-                        onDragEnd={handleDragEnd}
-                        onDragOver={handleDragOver}
-                        onDrop={(e) => handleDrop(e, index)}
-                        style={{
-                          cursor: item.concepto !== '' ? 'move' : 'default',
-                          backgroundColor: draggedItem === index ? '#f8f9fa' : 'transparent'
-                        }}
-                      >
+                      item.esSeparador ? (
+                        // Fila de separador
+                        <tr 
+                          key={index}
+                          draggable={true}
+                          onDragStart={(e) => handleDragStart(e, index)}
+                          onDragEnd={handleDragEnd}
+                          onDragOver={handleDragOver}
+                          onDrop={(e) => handleDrop(e, index)}
+                          style={{
+                            cursor: 'move',
+                            backgroundColor: draggedItem === index ? '#1a4a8a' : '#0F2A52'
+                          }}
+                        >
+                          <td className="text-center" style={{ cursor: 'grab', backgroundColor: '#0F2A52' }}>
+                            <FontAwesomeIcon 
+                              icon={faGripVertical} 
+                              className="text-white"
+                              title="Arrastrar para reordenar"
+                            />
+                          </td>
+                          <td colSpan={11} style={{ backgroundColor: '#0F2A52', padding: '8px 12px' }}>
+                            <div className="d-flex align-items-center justify-content-between">
+                              <Form.Control
+                                type="text"
+                                value={item.concepto || ''}
+                                onChange={(e) => handleItemChange(index, 'concepto', e.target.value)}
+                                placeholder="Nombre del separador..."
+                                style={{ 
+                                  fontSize: '14px', 
+                                  fontWeight: 'bold',
+                                  padding: '6px 12px', 
+                                  backgroundColor: 'transparent',
+                                  border: '1px solid rgba(255,255,255,0.3)',
+                                  color: 'white',
+                                  maxWidth: '400px'
+                                }}
+                                className="separator-input"
+                              />
+                              <Button
+                                variant="outline-light"
+                                size="sm"
+                                onClick={() => handleRemoveItem(index)}
+                                title="Eliminar separador"
+                              >
+                                <FontAwesomeIcon icon={faTrash} />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ) : (
+                        // Fila normal de producto
+                        <tr 
+                          key={index}
+                          draggable={item.concepto !== ''}
+                          onDragStart={(e) => handleDragStart(e, index)}
+                          onDragEnd={handleDragEnd}
+                          onDragOver={handleDragOver}
+                          onDrop={(e) => handleDrop(e, index)}
+                          style={{
+                            cursor: item.concepto !== '' ? 'move' : 'default',
+                            backgroundColor: draggedItem === index ? '#f8f9fa' : 'transparent'
+                          }}
+                        >
                         <td className="text-center" style={{ cursor: item.concepto !== '' ? 'grab' : 'default' }}>
                           {item.concepto !== '' && (
                             <FontAwesomeIcon 
@@ -1412,6 +1513,7 @@ const CotizacionModal = ({
                           </Button>
                         </td>
                       </tr>
+                      )
                     ))}
                   </tbody>
                 </table>

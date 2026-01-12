@@ -224,6 +224,7 @@ export interface ItemCotizacion {
   material?: string | IInventoryItem; // Referencia al material (opcional)
   canalizacionId?: string; // ID de la canalización si aplica
   esCanalizacion?: boolean;
+  esSeparador?: boolean; // Para identificar si es un separador visual
 }
 
 export interface ItemEntrega {
