@@ -1,6 +1,6 @@
 import { faGripVertical, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { createPortal } from 'react-dom';
 import { Cliente, Cotizacion, IInventoryItem, ItemCotizacion, Proyecto, RazonSocial, Vendedor } from '../../types';
@@ -92,6 +92,9 @@ const CotizacionModal = ({
   const [showCanalizacionModal, setShowCanalizacionModal] = useState(false);
   const [canalizaciones, setCanalizaciones] = useState<any[]>([]);
   const [canalizacionSearchTerm, setCanalizacionSearchTerm] = useState('');
+
+  // Snapshot para detectar cambios (dirty)
+  const initialSnapshotRef = useRef<string>('');
 
   // Función para generar número automáticamente
   const generarNumeroAutomatico = async (razonSocialId?: string, nombreEmpresa?: string) => {
@@ -240,7 +243,7 @@ const CotizacionModal = ({
       }
       
       const editingVendedor = (editingCotizacion as any)?.vendedor;
-      setFormData({
+      const initialData = {
         ...editingCotizacion,
         fecha: editingCotizacion.fecha ? new Date(editingCotizacion.fecha).toISOString().split('T')[0] : '',
         vigencia: editingCotizacion.vigencia ? new Date(editingCotizacion.vigencia).toISOString().split('T')[0] : '',
@@ -252,13 +255,19 @@ const CotizacionModal = ({
           : editingCotizacion.razonSocial?._id || '',
         vendedor: typeof editingVendedor === 'string' ? editingVendedor : editingVendedor?._id || '',
         items: itemsToSet
-      } as CotizacionFormData);
+      } as CotizacionFormData;
+
+  setFormData(initialData as CotizacionFormData);
+
+      // Guardar snapshot inicial para detectar si hay cambios
+      const comparable = getComparableData(initialData);
+      initialSnapshotRef.current = JSON.stringify(comparable);
     } else {
       // Resetear completamente el formulario para nueva cotización
       const today = new Date().toISOString().split('T')[0];
       const vigencia = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
       
-      setFormData({
+      const initialData = {
         cliente: '',
         razonSocial: '',
         vendedor: '',
@@ -283,7 +292,13 @@ const CotizacionModal = ({
         total: 0,
         estado: 'Borrador',
         comentarios: ''
-      });
+      };
+
+  setFormData(initialData as CotizacionFormData);
+
+      // Guardar snapshot inicial para detectar si hay cambios
+      const comparable = getComparableData(initialData as CotizacionFormData);
+      initialSnapshotRef.current = JSON.stringify(comparable);
       
       // Limpiar también el estado de razón social
       setRazonSocialDisplayText('');
@@ -300,6 +315,55 @@ const CotizacionModal = ({
       setActiveRow(null);
     }
   }, [editingCotizacion, generatePresupuestoNumber, show]);
+
+  // Genera un objeto comparable (sin campos volátiles) para detectar cambios
+  const getComparableData = (data: CotizacionFormData) => {
+    return {
+      cliente: data.cliente || '',
+      razonSocial: data.razonSocial || '',
+      vendedor: data.vendedor || '',
+      numeroPresupuesto: data.numeroPresupuesto || '',
+      fecha: data.fecha || '',
+      vigencia: data.vigencia || '',
+      items: (data.items || []).filter(i => i.concepto && i.concepto.trim() !== '').map(i => ({
+        marca: i.marca || '',
+        modelo: i.modelo || '',
+        concepto: i.concepto || '',
+        cantidad: i.cantidad || 0,
+        unidad: i.unidad || 'PZA',
+        precioUnitario: i.precioUnitario || 0,
+        importe: i.importe || 0,
+        aplicarIva: !!i.aplicarIva
+      })),
+      subtotal: data.subtotal || 0,
+      iva: data.iva || 0,
+      total: data.total || 0,
+      estado: data.estado || '',
+      comentarios: data.comentarios || ''
+    };
+  };
+
+  // Determina si el formulario tiene cambios respecto al snapshot inicial
+  const isFormDirty = () => {
+    try {
+      const current = getComparableData(formData);
+      return initialSnapshotRef.current !== JSON.stringify(current);
+    } catch (e) {
+      return false;
+    }
+  };
+
+  // Intercepta intentos de cerrar el modal y pregunta confirmación si hay cambios
+  const handleRequestClose = () => {
+    if (isFormDirty()) {
+      const confirmExit = window.confirm('Hay cambios sin guardar en la cotización. ¿Seguro que desea salir y perder los cambios?');
+      if (confirmExit) {
+        onHide();
+      }
+    } else {
+      onHide();
+    }
+  };
 
   // Debug: Ver items de inventario cargados
   useEffect(() => {
@@ -672,24 +736,27 @@ const CotizacionModal = ({
 
   return createPortal(
     <>
-      <Modal 
-        show={show} 
-        onHide={onHide} 
-        size="xl" 
-        centered={false}
-        style={{ 
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw', 
-          height: '100vh', 
-          maxWidth: '100vw', 
-          maxHeight: '100vh', 
-          margin: 0,
-          zIndex: 9999
-        }}
-        dialogClassName="w-100 h-100 m-0 mw-100"
-      >
+    <Modal
+  show={show}
+  onHide={handleRequestClose}
+  size="xl"
+  centered={false}
+  backdrop="static"
+  keyboard={false}
+  style={{
+    position: 'fixed',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '90vw',
+    height: '90vh',
+    maxWidth: '90vw',
+    maxHeight: '90vh',
+    margin: 0,
+    zIndex: 9999
+  }}
+  dialogClassName="w-100 h-100 m-0 mw-100"
+>
         <Modal.Header closeButton className="bg-light border-bottom">
           <Modal.Title>
             {editingCotizacion ? 'Editar' : 'Nueva'} Cotización
@@ -1355,15 +1422,17 @@ const CotizacionModal = ({
               </div>
             </div>
           </Form>
+
+          <div className="d-flex justify-content-end gap-2 mt-3">
+            <Button variant="secondary" onClick={handleRequestClose}>
+              Cancelar
+            </Button>
+            <Button variant="primary" onClick={handleSubmit}>
+              {editingCotizacion ? 'Actualizar' : 'Guardar'} Cotización
+            </Button>
+          </div>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={onHide}>
-            Cancelar
-          </Button>
-          <Button variant="primary" onClick={handleSubmit}>
-            {editingCotizacion ? 'Actualizar' : 'Guardar'} Cotización
-          </Button>
-        </Modal.Footer>
+
       </Modal>
     </>,
     document.body

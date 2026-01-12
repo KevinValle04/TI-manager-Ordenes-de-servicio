@@ -208,6 +208,54 @@ const CotizacionList: React.FC = () => {
     }
   };
 
+  // Duplicar cotización: crea una nueva cotización idéntica y agrega " - DUPLICADO" al número
+  const handleDuplicate = async (cotizacion: Cotizacion) => {
+    try {
+      const baseNumero = cotizacion.numeroPresupuesto || generatePresupuestoNumber();
+      const nuevoNumero = `${baseNumero} - DUPLICADO`;
+
+      // Preparamos el payload para crear (sin _id para forzar POST)
+      const payload: any = { ...cotizacion, numeroPresupuesto: nuevoNumero };
+      delete payload._id;
+
+      // Asegurar que campos que el servidor espera como string sean strings
+      if (payload.cliente && typeof payload.cliente === 'object') {
+        payload.cliente = payload.cliente._id || payload.cliente.nombreEmpresa || String(payload.cliente);
+      }
+      if (payload.razonSocial && typeof payload.razonSocial === 'object') {
+        payload.razonSocial = payload.razonSocial._id || payload.razonSocial.nombre || String(payload.razonSocial);
+      }
+      if (payload.vendedor && typeof payload.vendedor === 'object') {
+        payload.vendedor = payload.vendedor._id || payload.vendedor.nombre || String(payload.vendedor);
+      }
+      if (payload.proyecto && typeof payload.proyecto === 'object') {
+        payload.proyecto = payload.proyecto._id || payload.proyecto.nombre || String(payload.proyecto);
+      }
+
+      const response = await fetch('/api/cotizaciones', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const err = await response.text().catch(() => '');
+        alert('Error al duplicar la cotización: ' + (err || response.status));
+        return;
+      }
+
+  await response.json().catch(() => null);
+  // Refrescar la lista y restablecer la vista como al entrar al módulo
+  setSearchTerm('');
+  setCurrentPage(1);
+  fetchCotizaciones();
+  alert('Cotización duplicada');
+    } catch (error) {
+      console.error('Error duplicando cotización:', error);
+      alert('Error al duplicar la cotización');
+    }
+  };
+
   // Definición de columnas
   const columns = [
     { key: 'numeroPresupuesto', label: 'No. Presupuesto' },
@@ -221,20 +269,15 @@ const CotizacionList: React.FC = () => {
           : cotizacion.cliente.nombreEmpresa;
       }
     },
+        { 
+      key: 'comentarios', 
+      label: 'Comentarios',
+      render: (cotizacion: Cotizacion) => cotizacion.comentarios || 'Sin comentarios'
+    },
     { 
       key: 'fecha', 
       label: 'Fecha',
       render: (cotizacion: Cotizacion) => new Date(cotizacion.fecha).toLocaleDateString()
-    },
-    { 
-      key: 'vigencia', 
-      label: 'Vigencia',
-      render: (cotizacion: Cotizacion) => new Date(cotizacion.vigencia).toLocaleDateString()
-    },
-    { 
-      key: 'subtotal', 
-      label: 'Subtotal',
-      render: (cotizacion: Cotizacion) => `$${cotizacion.subtotal.toFixed(2)}`
     },
     { 
       key: 'total', 
@@ -298,6 +341,15 @@ const CotizacionList: React.FC = () => {
             onClick={() => handleEdit(cotizacion)}
           >
             <i className="fas fa-edit me-1"></i>Editar
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            className="me-1 mb-1"
+            onClick={() => handleDuplicate(cotizacion)}
+            title="Crear copia de la cotización"
+          >
+            <i className="fas fa-clone me-1"></i>Duplicar
           </Button>
           <Button
             variant="danger"
