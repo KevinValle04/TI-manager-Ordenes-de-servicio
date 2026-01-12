@@ -15,6 +15,7 @@ import Vendedores from "./pages/Vendedores";
 import MaterialCanalizacion from "./pages/Mat-elec";
 import Inventario from "./pages/Inventario";
 import InventarioExterior from "./pages/InventarioExterior";
+import MovimientosInventario from "./pages/MovimientosInventario";
 import Guias from "./pages/Guias";
 import Colaboradores from "./pages/Colaboradores";
 import Papeleria from "./pages/Papeleria";
@@ -199,6 +200,7 @@ function App() {
           <Route path="vehiculos" element={<Vehiculos />} />
           <Route path="inventario" element={<Inventario />} />
           <Route path="inventarioExterior" element={<InventarioExterior />} />
+          <Route path="movimientos-inventario" element={<MovimientosInventario />} />
           <Route path="guias" element={<Guias />} />
           <Route path="colaboradores" element={<Colaboradores />} />
           <Route path="papeleria" element={<Papeleria />} />

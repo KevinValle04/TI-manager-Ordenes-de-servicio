@@ -20,6 +20,7 @@ export interface IItemEntrega {
   concepto: string; // Descripción o concepto del item
   cantidad: number;
   unidad: 'PZA' | 'MTS' | 'SERV' | 'LOTE';
+  inventarioItemId?: mongoose.Types.ObjectId; // Referencia opcional al item de inventario
 }
 
 const ItemEntregaSchema = new Schema<IItemEntrega>({
@@ -49,6 +50,11 @@ const ItemEntregaSchema = new Schema<IItemEntrega>({
     type: String, 
     required: true,
     enum: ['PZA', 'MTS', 'SERV', 'LOTE']
+  },
+  inventarioItemId: {
+    type: Schema.Types.ObjectId,
+    ref: 'InventoryItem',
+    required: false
   }
 });
 

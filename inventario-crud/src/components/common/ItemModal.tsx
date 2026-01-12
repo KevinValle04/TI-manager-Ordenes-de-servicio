@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Button, Row, Col, Form } from "react-bootstrap";
-import { IInventoryItem } from "../../types";
+import { IInventoryItem, RazonSocial } from "../../types";
+import axios from "../../utils/axios-config";
 
 interface ItemModalProps {
   show: boolean;
@@ -23,6 +24,26 @@ const categorias = [
 ];
 
 const ItemModal: React.FC<ItemModalProps> = ({ show, onHide, onSave, item, setItem, isEdit, isSaving, errorMessage }) => {
+  const [razonesSociales, setRazonesSociales] = useState<RazonSocial[]>([]);
+
+  // Cargar razones sociales cuando se abre el modal
+  useEffect(() => {
+    if (show) {
+      fetchRazonesSociales();
+    }
+  }, [show]);
+
+  const fetchRazonesSociales = async () => {
+    try {
+      const urlServer = import.meta.env.VITE_API_URL + "razones-sociales/";
+      const response = await axios.get<RazonSocial[]>(urlServer);
+      setRazonesSociales(response.data);
+    } catch (error) {
+      console.error('Error al cargar razones sociales:', error);
+      setRazonesSociales([]);
+    }
+  };
+
   const handleSerieChange = (index: number, value: string) => {
     const nuevos = [...item.numerosSerie];
     nuevos[index] = value;
@@ -101,6 +122,22 @@ const ItemModal: React.FC<ItemModalProps> = ({ show, onHide, onSave, item, setIt
               value={item.cantidad}
               onChange={(e) => setItem({ ...item, cantidad: Number(e.target.value) })}
             />
+          </Col>
+
+          <Col md={12} className="mb-3">
+            <Form.Label htmlFor="item-razonSocial">Razón Social (Opcional)</Form.Label>
+            <Form.Select
+              id="item-razonSocial"
+              value={typeof item.razonSocial === 'string' ? item.razonSocial : item.razonSocial?._id || ''}
+              onChange={(e) => setItem({ ...item, razonSocial: e.target.value || undefined })}
+            >
+              <option value="">Sin razón social asignada</option>
+              {razonesSociales.map((razon) => (
+                <option key={razon._id} value={razon._id}>
+                  {razon.nombre} - {razon.rfc}
+                </option>
+              ))}
+            </Form.Select>
           </Col>
 
           <Col md={12} className="mb-3">

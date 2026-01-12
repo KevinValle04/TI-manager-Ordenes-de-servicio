@@ -26,6 +26,7 @@ export interface IInventoryItem {
   cantidad: number;
   numerosSerie: string[];
   categorias: string[];
+  razonSocial?: string | RazonSocial; // Referencia opcional a RazonSocial (puede ser ID o objeto poblado)
 }
 
 export interface IInventoryMovement {
@@ -231,6 +232,7 @@ export interface ItemEntrega {
   concepto: string;
   cantidad: number;
   unidad: "PZA" | "MTS" | "SERV" | "LOTE";
+  inventarioItemId?: string; // Referencia opcional al item de inventario
 }
 
 export interface Proyecto {

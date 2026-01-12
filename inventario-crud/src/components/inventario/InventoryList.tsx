@@ -323,7 +323,15 @@ const Inventario: React.FC = () => {
     { key: "unidad", label: "Unidad" },
     { key: "precioUnitario", label: "Precio Unitario" },
     { key: "cantidad", label: "Cantidad" },
-    { key: "numerosSerie", label: "Números de Serie", render: (item) => item.numerosSerie.join(", ") },
+    { 
+      key: "razonSocial", 
+      label: "Razón Social", 
+      render: (item) => {
+        if (!item.razonSocial) return "Sin asignar";
+        if (typeof item.razonSocial === 'string') return item.razonSocial;
+        return item.razonSocial.nombre || "Sin asignar";
+      }
+    },
   ];
 
   // Cálculo de la paginación

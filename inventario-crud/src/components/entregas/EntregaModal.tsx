@@ -462,6 +462,7 @@ const EntregaModal = ({
         modelo: suggestion.modelo,
         concepto: suggestion.descripcion,
         unidad: (suggestion.unidad === 'PZA' || suggestion.unidad === 'MTS') ? suggestion.unidad as 'PZA' | 'MTS' : 'PZA',
+        inventarioItemId: suggestion._id, // Guardar referencia al item de inventario
         precioUnitario: suggestion.precioUnitario,
         material: suggestion._id,
         importe: (newItems[index].cantidad || 1) * suggestion.precioUnitario,

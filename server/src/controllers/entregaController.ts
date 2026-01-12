@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import Entrega, { IEntrega, IItemEntrega } from '../models/Entrega';
 import { EntregaPdfGenerator, EntregaPdfData } from '../services/entregaPdfGenerator';
+import { InventoryItem } from '../models/InventoryItem';
+import { InventoryMovement } from '../models/InventoryMovement';
 
 const prepararDatosPdf = (entrega: IEntrega, clienteInfo?: any): EntregaPdfData => {
   return {
@@ -70,6 +72,33 @@ export const createEntrega = async (req: Request, res: Response) => {
     
     const entrega = new Entrega(entregaData);
     await entrega.save();
+    
+    // Procesar items para disminuir inventario y registrar movimientos
+    if (entrega.items && entrega.items.length > 0) {
+      for (const item of entrega.items) {
+        if (item.inventarioItemId) {
+          // Disminuir cantidad en inventario
+          const inventarioItem = await InventoryItem.findById(item.inventarioItemId);
+          if (inventarioItem) {
+            inventarioItem.cantidad = Math.max(0, inventarioItem.cantidad - item.cantidad);
+            await inventarioItem.save();
+            
+            // Registrar movimiento de salida
+            const movimiento = new InventoryMovement({
+              itemId: item.inventarioItemId,
+              tipo: 'salida',
+              cantidad: item.cantidad,
+              fecha: new Date(),
+              comentario: `Entrega: ${entrega.numeroEntrega} - ${entrega.cliente}`,
+              usuario: (req as any).user?.nombre || 'Sistema'
+            });
+            await movimiento.save();
+            
+            console.log(`Inventario actualizado para item ${item.inventarioItemId}: ${inventarioItem.cantidad}`);
+          }
+        }
+      }
+    }
     
     console.log('Entrega guardada exitosamente:', entrega._id);
     console.log('=========================');

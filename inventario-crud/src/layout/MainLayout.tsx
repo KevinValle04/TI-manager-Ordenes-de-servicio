@@ -87,7 +87,6 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
         { path: "/proyectos", label: "Control de Proyectos", icon: <FaProjectDiagram size={14} /> },
         { path: "/ordenes-compra", label: "Órdenes de Compra", icon: <FaShoppingCart size={14} /> },
         { path: "/cotizaciones", label: "Cotizaciones", icon: <FaFileInvoiceDollar size={14} /> },
-        { path: "/entregas", label: "Entregas", icon: <FaTruck size={14} /> },
         { path: "/cotizaciones-canalizacion", label: "Presupuesto de Canalización", icon: <FaFileInvoiceDollar size={14} /> },
       ],
     },
@@ -97,6 +96,8 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
       items: [
         { path: "/inventario", label: "Almacén Interno", icon: <FaWarehouse size={14} /> },
         { path: "/inventarioExterior", label: "Almacén Externo", icon: <FaWarehouse size={14} /> },
+        { path: "/entregas", label: "Entregas", icon: <FaTruck size={14} /> },
+        { path: "/movimientos-inventario", label: "Movimientos", icon: <FaFileAlt size={14} /> },
         ...((token && !(jwtDecode(token) as any).isAdmin) ? [
           { path: "/solicitudes-inventario", label: "Solicitudes", icon: <FaFileAlt size={14} /> }
         ] : []),

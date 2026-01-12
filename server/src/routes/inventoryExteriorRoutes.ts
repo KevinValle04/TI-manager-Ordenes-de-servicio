@@ -5,7 +5,7 @@ const router: Router = Router();
 
 // Obtener todos los artículos del inventario exterior
 router.get("/", async (_req: Request, res: Response) => {
-  const items = await InventoryExteriorItem.find();
+  const items = await InventoryExteriorItem.find().populate('razonSocial', 'nombre rfc');
   res.json(items);
 });
 
@@ -13,12 +13,13 @@ router.get("/", async (_req: Request, res: Response) => {
 router.post("/", async (req: Request, res: Response) => {
   const nuevoItem: IInventoryExteriorItem = new InventoryExteriorItem(req.body);
   await nuevoItem.save();
+  await nuevoItem.populate('razonSocial', 'nombre rfc');
   res.json(nuevoItem);
 });
 
 // Actualizar un artículo existente
 router.put("/:id", async (req: Request, res: Response) => {
-  const itemActualizado = await InventoryExteriorItem.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  const itemActualizado = await InventoryExteriorItem.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate('razonSocial', 'nombre rfc');
   res.json(itemActualizado);
 });
 

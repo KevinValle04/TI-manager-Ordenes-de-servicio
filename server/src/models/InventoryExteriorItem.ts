@@ -10,6 +10,7 @@ export interface IInventoryExteriorItem extends Document {
   cantidad: number;
   numerosSerie: string[];
   categorias: string[];
+  razonSocial?: Types.ObjectId; // Referencia opcional a RazonSocial
 }
 
 const InventoryExteriorItemSchema = new Schema<IInventoryExteriorItem>({
@@ -22,6 +23,7 @@ const InventoryExteriorItemSchema = new Schema<IInventoryExteriorItem>({
   cantidad: { type: Number },
   numerosSerie: { type: [String], default: [] },
   categorias: { type: [String], default: [] },
+  razonSocial: { type: Schema.Types.ObjectId, ref: 'RazonSocial', required: false },
 });
 
 export const InventoryExteriorItem = mongoose.model<IInventoryExteriorItem>(
