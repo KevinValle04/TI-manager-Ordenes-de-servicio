@@ -54,6 +54,8 @@ const CotizacionModal = ({
       cantidad: 1,
       unidad: 'PZA' as const,
       precioUnitario: 0,
+      porcentajeGanancia: 0,
+      ganancia: 0,
       importe: 0,
       material: '',
       aplicarIva: true
@@ -168,6 +170,8 @@ const CotizacionModal = ({
       cantidad: 1,
       unidad: 'PZA' as const,
       precioUnitario: canalizacion.total,
+      porcentajeGanancia: 0,
+      ganancia: 0,
       importe: canalizacion.total,
       material: '',
       canalizacionId: canalizacion._id, // Referencia a la canalización original
@@ -185,6 +189,8 @@ const CotizacionModal = ({
         cantidad: 1,
         unidad: 'PZA',
         precioUnitario: 0,
+        porcentajeGanancia: 0,
+        ganancia: 0,
         importe: 0,
         material: '',
         esCanalizacion: false,
@@ -228,6 +234,8 @@ const CotizacionModal = ({
           cantidad: 1,
           unidad: 'PZA' as const,
           precioUnitario: 0,
+          porcentajeGanancia: 0,
+          ganancia: 0,
           importe: 0,
           material: '',
           aplicarIva: true
@@ -282,6 +290,8 @@ const CotizacionModal = ({
           cantidad: 1,
           unidad: 'PZA' as const,
           precioUnitario: 0,
+          porcentajeGanancia: 0,
+          ganancia: 0,
           importe: 0,
           material: '',
           aplicarIva: true
@@ -332,6 +342,8 @@ const CotizacionModal = ({
         cantidad: i.cantidad || 0,
         unidad: i.unidad || 'PZA',
         precioUnitario: i.precioUnitario || 0,
+        porcentajeGanancia: i.porcentajeGanancia || 0,
+        ganancia: i.ganancia || 0,
         importe: i.importe || 0,
         aplicarIva: !!i.aplicarIva
       })),
@@ -407,6 +419,8 @@ const CotizacionModal = ({
         cantidad: 1,
         unidad: 'PZA' as const,
         precioUnitario: 0,
+        porcentajeGanancia: 0,
+        ganancia: 0,
         importe: 0,
         material: '',
         aplicarIva: true
@@ -618,6 +632,8 @@ const CotizacionModal = ({
           const newItems = [...prev.items];
           const unidad = (selectedItem.unidad === 'PZA' || selectedItem.unidad === 'MTS') ? selectedItem.unidad : 'PZA' as const;
           const cantidad = newItems[index]?.cantidad || 1;
+          const porcentajeGanancia = newItems[index]?.porcentajeGanancia || 0;
+          const ganancia = selectedItem.precioUnitario * (porcentajeGanancia / 100);
           const concepto = [
             selectedItem.descripcion,
             selectedItem.marca,
@@ -632,9 +648,11 @@ const CotizacionModal = ({
             concepto: concepto,
             unidad,
             precioUnitario: selectedItem.precioUnitario,
+            porcentajeGanancia: porcentajeGanancia,
+            ganancia: ganancia,
             material: value,
             cantidad,
-            importe: cantidad * selectedItem.precioUnitario,
+            importe: cantidad * (selectedItem.precioUnitario + ganancia),
             aplicarIva: true
           };
           
@@ -676,11 +694,26 @@ const CotizacionModal = ({
           unidad: currentItem.unidad || 'PZA' as const,
           clave: currentItem.clave || index + 1
         };
+        
+        // Mantener valores previos si no se están actualizando
+        if (name !== 'porcentajeGanancia') {
+          updatedItem.porcentajeGanancia = currentItem.porcentajeGanancia ?? 0;
+        }
+        if (name !== 'ganancia') {
+          updatedItem.ganancia = currentItem.ganancia ?? 0;
+        }
 
-        // Recalcular importe si cambia cantidad o precio
-        if (['cantidad', 'precioUnitario'].includes(name)) {
-          updatedItem.importe = 
-            Number(updatedItem.cantidad || 0) * Number(updatedItem.precioUnitario || 0);
+        // Recalcular ganancia e importe si cambia cantidad, precio o porcentaje de ganancia
+        if (['cantidad', 'precioUnitario', 'porcentajeGanancia'].includes(name)) {
+          const precioUnitario = Number(updatedItem.precioUnitario || 0);
+          const porcentajeGanancia = Number(updatedItem.porcentajeGanancia || 0);
+          const cantidad = Number(updatedItem.cantidad || 0);
+          
+          // Calcular ganancia por unidad
+          updatedItem.ganancia = precioUnitario * (porcentajeGanancia / 100);
+          
+          // Calcular importe final: cantidad * (precio costo + ganancia)
+          updatedItem.importe = cantidad * (precioUnitario + updatedItem.ganancia);
         }
 
         newItems[index] = updatedItem;
@@ -1035,20 +1068,22 @@ const CotizacionModal = ({
                 border: '1px solid #dee2e6',
                 borderRadius: '0.25rem'
               }}>
-                <table className="table table-striped table-hover mb-0" style={{ minWidth: '1400px', fontSize: '14px' }}>
+                <table className="table table-striped table-hover mb-0" style={{ minWidth: '1600px', fontSize: '13px' }}>
                   <thead className="table-dark" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                     <tr>
-                      <th style={{ width: '40px' }}>⋮⋮</th>
-                      <th style={{ width: '80px' }}>CLAVE</th>
-                      <th style={{ width: '200px', minWidth: '180px' }}>MARCA</th>
-                      <th style={{ width: '250px', minWidth: '220px' }}>MODELO</th>
-                      <th style={{ width: '400px', minWidth: '350px' }}>CONCEPTO</th>
-                      <th style={{ width: '90px', minWidth: '80px' }}>U</th>
-                      <th style={{ width: '100px', minWidth: '90px' }}>CANT</th>
-                      <th style={{ width: '150px', minWidth: '130px' }}>P.U</th>
-                      <th style={{ width: '150px', minWidth: '130px' }}>IMPORTE</th>
-                      <th style={{ width: '60px' }}>IVA</th>
-                      <th style={{ width: '80px' }}>Acciones</th>
+                      <th style={{ width: '30px' }}>⋮⋮</th>
+                      <th style={{ width: '50px' }}>CLAVE</th>
+                      <th style={{ width: '100px', minWidth: '90px' }}>MARCA</th>
+                      <th style={{ width: '120px', minWidth: '100px' }}>MODELO</th>
+                      <th style={{ width: '200px', minWidth: '180px' }}>CONCEPTO</th>
+                      <th style={{ width: '60px', minWidth: '50px' }}>U</th>
+                      <th style={{ width: '70px', minWidth: '60px' }}>CANT</th>
+                      <th style={{ width: '110px', minWidth: '100px' }}>P.U (Costo)</th>
+                      <th style={{ width: '70px', minWidth: '60px' }}>% GAN</th>
+                      <th style={{ width: '100px', minWidth: '90px' }}>GANANCIA</th>
+                      <th style={{ width: '120px', minWidth: '110px' }}>IMPORTE</th>
+                      <th style={{ width: '40px' }}>IVA</th>
+                      <th style={{ width: '60px' }}>Acc.</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1084,7 +1119,7 @@ const CotizacionModal = ({
                               onFocus={() => handleProductFocus(index)}
                               placeholder="Marca..."
                               autoComplete="off"
-                              style={{ fontSize: '14px', padding: '8px 12px', minWidth: '150px' }}
+                              style={{ fontSize: '12px', padding: '4px 6px', minWidth: '80px' }}
                             />
                             {showProductSuggestions[index] && productSuggestions[index]?.length > 0 && (
                               <div className="position-absolute w-100 bg-white border rounded shadow-sm" 
@@ -1149,7 +1184,7 @@ const CotizacionModal = ({
                               onFocus={() => handleProductFocus(index)}
                               placeholder="Modelo..."
                               autoComplete="off"
-                              style={{ fontSize: '14px', padding: '8px 12px', minWidth: '200px' }}
+                              style={{ fontSize: '12px', padding: '4px 6px', minWidth: '90px' }}
                             />
                             {showProductSuggestions[index] && productSuggestions[index]?.length > 0 && (
                               <div className="position-absolute w-100 bg-white border rounded shadow-sm" 
@@ -1160,6 +1195,8 @@ const CotizacionModal = ({
                                     className="p-2 border-bottom cursor-pointer hover-bg-light"
                                     onClick={(e) => {
                                       e.stopPropagation();
+                                      const porcentajeGanancia = formData.items[index].porcentajeGanancia || 0;
+                                      const ganancia = suggestion.precioUnitario * (porcentajeGanancia / 100);
                                       const updatedItem: ItemCotizacion = {
                                         ...formData.items[index],
                                         marca: suggestion.marca,
@@ -1167,8 +1204,10 @@ const CotizacionModal = ({
                                         concepto: suggestion.descripcion,
                                         unidad: (suggestion.unidad === 'PZA' || suggestion.unidad === 'MTS') ? suggestion.unidad as 'PZA' | 'MTS' : 'PZA',
                                         precioUnitario: suggestion.precioUnitario,
+                                        porcentajeGanancia: porcentajeGanancia,
+                                        ganancia: ganancia,
                                         material: suggestion._id,
-                                        importe: (formData.items[index].cantidad || 1) * suggestion.precioUnitario,
+                                        importe: (formData.items[index].cantidad || 1) * (suggestion.precioUnitario + ganancia),
                                         aplicarIva: true
                                       };
                                       setFormData(prev => {
@@ -1214,7 +1253,7 @@ const CotizacionModal = ({
                               onFocus={() => handleProductFocus(index)}
                               placeholder="Concepto..."
                               autoComplete="off"
-                              style={{ fontSize: '14px', padding: '8px 12px', minWidth: '320px' }}
+                              style={{ fontSize: '12px', padding: '4px 6px', minWidth: '160px' }}
                             />
                             {showProductSuggestions[index] && productSuggestions[index]?.length > 0 && (
                               <div className="position-absolute w-100 bg-white border rounded shadow-sm" 
@@ -1225,6 +1264,8 @@ const CotizacionModal = ({
                                     className="p-2 border-bottom cursor-pointer hover-bg-light"
                                     onClick={() => {
                                       // Actualizar todos los campos del item con la información del producto seleccionado
+                                      const porcentajeGanancia = formData.items[index].porcentajeGanancia || 0;
+                                      const ganancia = suggestion.precioUnitario * (porcentajeGanancia / 100);
                                       const updatedItem: ItemCotizacion = {
                                         ...formData.items[index],
                                         marca: suggestion.marca,
@@ -1232,8 +1273,10 @@ const CotizacionModal = ({
                                         concepto: suggestion.descripcion,
                                         unidad: suggestion.unidad as 'PZA' | 'MTS',
                                         precioUnitario: suggestion.precioUnitario,
+                                        porcentajeGanancia: porcentajeGanancia,
+                                        ganancia: ganancia,
                                         material: suggestion._id,
-                                        importe: (formData.items[index].cantidad || 1) * suggestion.precioUnitario,
+                                        importe: (formData.items[index].cantidad || 1) * (suggestion.precioUnitario + ganancia),
                                         aplicarIva: true
                                       };
                                       
@@ -1279,7 +1322,7 @@ const CotizacionModal = ({
                           <Form.Select
                             value={item.unidad}
                             onChange={(e) => handleItemChange(index, 'unidad', e.target.value)}
-                            style={{ fontSize: '14px', padding: '8px 12px', minWidth: '70px' }}
+                            style={{ fontSize: '12px', padding: '4px 6px', minWidth: '50px' }}
                           >
                             <option value="PZA">PZA</option>
                             <option value="MTS">MTS</option>
@@ -1301,7 +1344,7 @@ const CotizacionModal = ({
                               }
                             }}                            min="1"
                             step="1"
-                            style={{ fontSize: '14px', padding: '8px 12px', minWidth: '80px' }}
+                            style={{ fontSize: '12px', padding: '4px 6px', minWidth: '60px' }}
                           />
                         </td>
                         <td>
@@ -1318,11 +1361,35 @@ const CotizacionModal = ({
                               }
                             }}                            min="0"
                             step="0.01"
-                            style={{ fontSize: '14px', padding: '8px 12px', minWidth: '120px' }}
+                            style={{ fontSize: '12px', padding: '4px 6px', minWidth: '90px' }}
                           />
                         </td>
                         <td>
-                          <span className="fw-bold" style={{ fontSize: '14px', padding: '8px 12px', display: 'block', minWidth: '120px', textAlign: 'right' }}>${(item.importe || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          <Form.Control
+                            type="text"
+                            inputMode="numeric"
+                            value={item.porcentajeGanancia ?? ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              // Solo permitir números y punto decimal
+                              if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                                handleItemChange(index, 'porcentajeGanancia', val === '' ? '' : parseFloat(val) || 0);
+                              }
+                            }}
+                            onBlur={(e) => {
+                              if (e.target.value === '') {
+                                handleItemChange(index, 'porcentajeGanancia', 0);
+                              }
+                            }}
+                            style={{ fontSize: '12px', padding: '4px 6px', minWidth: '50px', textAlign: 'right' }}
+                            title="Porcentaje de ganancia"
+                          />
+                        </td>
+                        <td>
+                          <span className="text-success" style={{ fontSize: '12px', padding: '4px 6px', display: 'block', minWidth: '80px', textAlign: 'right' }}>${(item.ganancia || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </td>
+                        <td>
+                          <span className="fw-bold" style={{ fontSize: '12px', padding: '4px 6px', display: 'block', minWidth: '100px', textAlign: 'right' }}>${(item.importe || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </td>
                         <td>
                           <Form.Check

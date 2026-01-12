@@ -33,18 +33,23 @@ const prepararDatosPdf = (cotizacion: ICotizacion): CotizacionPdfData => ({
   total: cotizacion.total,
   estado: cotizacion.estado,
   moneda: cotizacion.moneda || 'MXN',
-  items: cotizacion.items.map(item => ({
-    descripcion: item.concepto || '',
-    marca: item.marca || '',
-    modelo: item.modelo || '',
-    concepto: item.concepto || '',
-    unidad: item.unidad,
-    cantidad: item.cantidad,
-    precioUnitario: item.precioUnitario,
-    subtotal: item.importe,
-    aplicarIva: item.aplicarIva || false,
-    iva: item.aplicarIva ? item.importe * (cotizacion.iva/100) : 0
-  })),
+  items: cotizacion.items.map(item => {
+    // Calcular precio de venta (costo + ganancia) para mostrar en el PDF
+    const ganancia = item.ganancia || 0;
+    const precioVenta = item.precioUnitario + ganancia;
+    return {
+      descripcion: item.concepto || '',
+      marca: item.marca || '',
+      modelo: item.modelo || '',
+      concepto: item.concepto || '',
+      unidad: item.unidad,
+      cantidad: item.cantidad,
+      precioUnitario: precioVenta, // Mostrar precio de venta (ya incluye ganancia)
+      subtotal: item.importe, // El importe ya incluye la ganancia calculada
+      aplicarIva: item.aplicarIva || false,
+      iva: item.aplicarIva ? item.importe * (cotizacion.iva/100) : 0
+    };
+  }),
   comentarios: cotizacion.comentarios,
   razonSocial: (() => {
     const rs: any = cotizacion.razonSocial;

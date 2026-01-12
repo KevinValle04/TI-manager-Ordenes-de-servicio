@@ -29,8 +29,10 @@ export interface IItemCotizacion {
   concepto: string; // Descripción o concepto del item
   cantidad: number;
   unidad: 'PZA' | 'MTS' | 'SERV' | 'LOTE';
-  precioUnitario: number;
-  importe: number;
+  precioUnitario: number; // Precio costo unitario (lo que nos cuesta)
+  porcentajeGanancia: number; // Porcentaje de ganancia a aplicar
+  ganancia: number; // Ganancia por unidad en valor monetario
+  importe: number; // Importe final (cantidad * (precioUnitario + ganancia))
   esCanalizacion?: boolean; // Para identificar si es una canalización
   canalizacionId?: string; // ID de la canalización si aplica
   aplicarIva: boolean; // Indica si se debe aplicar IVA a este item
@@ -68,6 +70,18 @@ const ItemCotizacionSchema = new Schema<IItemCotizacion>({
     type: Number, 
     required: true,
     min: 0 
+  },
+  porcentajeGanancia: {
+    type: Number,
+    required: false,
+    default: 0,
+    min: 0
+  },
+  ganancia: {
+    type: Number,
+    required: false,
+    default: 0,
+    min: 0
   },
   importe: { 
     type: Number, 

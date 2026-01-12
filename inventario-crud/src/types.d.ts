@@ -216,8 +216,10 @@ export interface ItemCotizacion {
   concepto: string;
   cantidad: number;
   unidad: "PZA" | "MTS" | "SERV" | "LOTE";
-  precioUnitario: number;
-  importe: number;
+  precioUnitario: number; // Precio costo unitario (lo que nos cuesta)
+  porcentajeGanancia: number; // Porcentaje de ganancia a aplicar
+  ganancia: number; // Ganancia por unidad en valor monetario
+  importe: number; // Importe final (cantidad * (precioUnitario + ganancia))
   aplicarIva: boolean;
   material?: string | IInventoryItem; // Referencia al material (opcional)
   canalizacionId?: string; // ID de la canalización si aplica
