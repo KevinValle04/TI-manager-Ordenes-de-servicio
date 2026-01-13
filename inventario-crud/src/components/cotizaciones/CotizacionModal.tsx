@@ -1585,6 +1585,20 @@ const CotizacionModal = ({
                         <span className="fw-bold text-primary">Total:</span>
                         <span className="fw-bold text-primary fs-5">{formatearMoneda(formData.total || 0)}</span>
                       </div>
+                      {/* Ganancia total - Solo visible en el modal, no en PDF */}
+                      <div className="d-flex justify-content-between py-2 mt-2 border-top" style={{ backgroundColor: '#e8f5e9' }}>
+                        <span className="text-success">
+                          <i className="fas fa-chart-line me-2"></i>
+                          Ganancia Total:
+                        </span>
+                        <span className="fw-bold text-success">
+                          {formatearMoneda(
+                            formData.items
+                              ?.filter(item => !item.esSeparador)
+                              .reduce((sum, item) => sum + ((item.ganancia || 0) * (item.cantidad || 0)), 0) || 0
+                          )}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
