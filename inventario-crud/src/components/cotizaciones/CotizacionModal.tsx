@@ -1490,7 +1490,88 @@ const CotizacionModal = ({
                           <span className="text-success" style={{ fontSize: '12px', padding: '4px 6px', display: 'block', minWidth: '80px', textAlign: 'right' }}>${(item.ganancia || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </td>
                         <td>
-                          <span className="fw-bold" style={{ fontSize: '12px', padding: '4px 6px', display: 'block', minWidth: '100px', textAlign: 'right' }}>${(item.importe || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          <Form.Control
+                            type="text"
+                            inputMode="decimal"
+                            value={item.importe ?? ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              // Permitir borrar completamente y solo números/decimales (incluyendo valores parciales como "123.")
+                              if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                                // Si es vacío o termina en punto, solo guardar el valor sin calcular
+                                if (val === '' || val.endsWith('.')) {
+                                  setFormData(prev => {
+                                    const newItems = [...prev.items];
+                                    newItems[index] = {
+                                      ...newItems[index],
+                                      importe: val as any // Guardar como string temporalmente
+                                    };
+                                    return { ...prev, items: newItems };
+                                  });
+                                  return;
+                                }
+                                
+                                const nuevoImporte = parseFloat(val) || 0;
+                                const cantidad = Number(item.cantidad || 1);
+                                const precioUnitario = Number(item.precioUnitario || 0);
+                                
+                                // Calcular ganancia por unidad inversa (puede ser negativa temporalmente)
+                                const precioVentaUnitario = nuevoImporte / cantidad;
+                                const nuevaGanancia = precioVentaUnitario - precioUnitario;
+                                
+                                // Calcular porcentaje de ganancia
+                                const nuevoPorcentaje = precioUnitario > 0 
+                                  ? (nuevaGanancia / precioUnitario) * 100 
+                                  : 0;
+                                
+                                // Actualizar todos los campos relacionados
+                                setFormData(prev => {
+                                  const newItems = [...prev.items];
+                                  newItems[index] = {
+                                    ...newItems[index],
+                                    importe: nuevoImporte,
+                                    ganancia: nuevaGanancia,
+                                    porcentajeGanancia: Math.round(nuevoPorcentaje * 100) / 100
+                                  };
+                                  return { ...prev, items: newItems };
+                                });
+                                setTimeout(() => calculateTotals(), 50);
+                              }
+                            }}
+                            onBlur={(e) => {
+                              const val = parseFloat(e.target.value) || 0;
+                              const cantidad = Number(item.cantidad || 1);
+                              const precioUnitario = Number(item.precioUnitario || 0);
+                              const importeMinimo = precioUnitario * cantidad;
+                              
+                              // Si el importe es menor al mínimo, restaurar al mínimo y recalcular
+                              if (val < importeMinimo) {
+                                setFormData(prev => {
+                                  const newItems = [...prev.items];
+                                  newItems[index] = {
+                                    ...newItems[index],
+                                    importe: importeMinimo,
+                                    ganancia: 0,
+                                    porcentajeGanancia: 0
+                                  };
+                                  return { ...prev, items: newItems };
+                                });
+                                setTimeout(() => calculateTotals(), 50);
+                              } else {
+                                // Asegurar que el valor sea número al salir del campo
+                                setFormData(prev => {
+                                  const newItems = [...prev.items];
+                                  newItems[index] = {
+                                    ...newItems[index],
+                                    importe: val
+                                  };
+                                  return { ...prev, items: newItems };
+                                });
+                              }
+                            }}
+                            style={{ fontSize: '12px', padding: '4px 6px', minWidth: '100px', textAlign: 'right', fontWeight: 'bold' }}
+                            title={`Mínimo: $${(Number(item.precioUnitario || 0) * Number(item.cantidad || 1)).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`}
+                          />
                         </td>
                         <td>
                           <Form.Check
