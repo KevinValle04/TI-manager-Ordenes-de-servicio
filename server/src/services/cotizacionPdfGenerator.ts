@@ -35,6 +35,7 @@ export interface CotizacionPdfData {
     esSeparador?: boolean;
   }>;
   comentarios?: string;
+  comentariosPdf?: string;
   razonSocial?: {
     nombre: string;
     rfc: string;

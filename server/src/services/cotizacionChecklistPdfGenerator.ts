@@ -24,6 +24,7 @@ export interface CotizacionChecklistPdfData {
     unidad: string;
   }>;
   comentarios?: string;
+  comentariosPdf?: string;
   razonSocial?: {
     nombre: string;
     rfc: string;

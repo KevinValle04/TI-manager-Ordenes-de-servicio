@@ -224,7 +224,7 @@ export const exportarCotizacionPDF = (cotizacion: CotizacionCanalizacion) => {
   // ===== SECCIÓN DE COMENTARIOS (si existen) =====
   const finalYTotal = finalY + 55;
   
-  if (cotizacion.comentarios && cotizacion.comentarios.trim() !== '') {
+  if (cotizacion.comentariosPdf && cotizacion.comentariosPdf.trim() !== '') {
     // Fondo amarillo claro para observaciones (similar al CSS)
     doc.setFillColor(254, 243, 199);
     doc.setDrawColor(245, 158, 11);
@@ -244,12 +244,12 @@ export const exportarCotizacionPDF = (cotizacion: CotizacionCanalizacion) => {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(11);
     doc.setTextColor(146, 64, 14); // Color café oscuro
-    const comentarios = doc.splitTextToSize(cotizacion.comentarios, 160);
+    const comentarios = doc.splitTextToSize(cotizacion.comentariosPdf, 160);
     doc.text(comentarios, 25, finalYTotal + 15);
   }
   
   // ===== PIE DE PÁGINA (estilo orden de compra) =====
-  const footerY = finalYTotal + (cotizacion.comentarios ? 35 : 20);
+  const footerY = finalYTotal + (cotizacion.comentariosPdf ? 35 : 20);
   
   // Línea decorativa superior
   doc.setDrawColor(226, 232, 240);
