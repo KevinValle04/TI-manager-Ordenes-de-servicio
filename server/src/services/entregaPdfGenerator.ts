@@ -152,7 +152,10 @@ export class EntregaPdfGenerator {
       // Obtener y compilar plantilla
       const plantillaHtml = await this.obtenerPlantillaHtml();
       const template = handlebars.compile(plantillaHtml);
-      const html = template(datosFormateados);
+      const html = template(datosFormateados, {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true
+      });
 
       // Generar PDF con Puppeteer
       const browser = await puppeteer.launch({

@@ -10,7 +10,10 @@ export const generatePDF = async (templatePath: string, data: any): Promise<Buff
     
     // Compilar el template con Handlebars
     const compiledTemplate = Handlebars.compile(template);
-    const html = compiledTemplate(data);
+    const html = compiledTemplate(data, {
+      allowProtoPropertiesByDefault: true,
+      allowProtoMethodsByDefault: true
+    });
 
     // Iniciar Puppeteer
     const browser = await puppeteer.launch({

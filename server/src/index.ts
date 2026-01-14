@@ -39,7 +39,10 @@ import vehiculosRoutes from './routes/vehiculos';
 
 dotenv.config();
 const app: Application = express();
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:80', 'http://192.168.100.150:80', 'http://www.timanager.com'],
+  credentials: true
+}));
 app.use(express.json());
 
 // Servir archivos estáticos
