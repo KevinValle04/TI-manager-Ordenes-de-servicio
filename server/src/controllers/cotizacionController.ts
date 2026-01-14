@@ -67,7 +67,7 @@ const prepararDatosPdf = (cotizacion: ICotizacion): CotizacionPdfData => ({
       esSeparador: false
     };
   }),
-  comentarios: cotizacion.comentarios,
+  comentariosPdf: cotizacion.comentariosPdf,
   razonSocial: (() => {
     const rs: any = cotizacion.razonSocial;
     if (!rs) return undefined;
@@ -536,7 +536,7 @@ const prepararDatosChecklistPdf = (cotizacion: ICotizacion): CotizacionChecklist
     cantidad: item.cantidad,
     unidad: item.unidad
   })),
-  comentarios: cotizacion.comentarios,
+  comentariosPdf: cotizacion.comentariosPdf,
   razonSocial: cotizacion.razonSocial as any,
   vendedor: (() => {
     const v: any = (cotizacion as any).vendedor;

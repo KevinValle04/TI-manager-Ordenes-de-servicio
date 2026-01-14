@@ -190,7 +190,8 @@ export interface Cotizacion {
   estado: "Borrador" | "Enviada" | "Aceptada" | "Rechazada" | "Vencida";
   moneda?: string; // Moneda de la cotización (MXN o USD)
   items: ItemCotizacion[];
-  comentarios?: string;
+  comentariosInternos?: string; // Comentarios visibles solo en la lista de cotizaciones
+  comentariosPdf?: string; // Comentarios que aparecen en el PDF
   fechaCreacion: Date | string;
   fechaActualizacion: Date | string;
 }

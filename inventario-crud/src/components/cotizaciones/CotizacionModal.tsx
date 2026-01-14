@@ -65,7 +65,8 @@ const CotizacionModal = ({
     ivaImporte: 0,
     total: 0,
     estado: 'Borrador',
-    comentarios: ''
+    comentariosInternos: '',
+    comentariosPdf: ''
   };
 
   // Estados del formulario
@@ -387,7 +388,8 @@ const CotizacionModal = ({
       iva: data.iva || 0,
       total: data.total || 0,
       estado: data.estado || '',
-      comentarios: data.comentarios || ''
+      comentariosInternos: data.comentariosInternos || '',
+      comentariosPdf: data.comentariosPdf || ''
     };
   };
 
@@ -837,12 +839,14 @@ const CotizacionModal = ({
         </Modal.Header>
         <Modal.Body className="px-4 py-3" style={{ height: 'calc(100vh - 120px)', overflowY: 'auto', overflowX: 'hidden' }}>
           <Form>
-            <div className="row">
+            {/* Fila 1: Cliente, Razón Social, No. Cotización */}
+            <div className="row mb-2">
               <div className="col-md-4">
-                <Form.Group className="mb-2">
-                  <Form.Label>Cliente</Form.Label>
+                <Form.Group>
+                  <Form.Label className="mb-1" style={{ fontSize: '0.85rem' }}>Cliente</Form.Label>
                   <div className="position-relative">
                     <Form.Control
+                      size="sm"
                       type="text"
                       value={clienteDisplayText}
                       onChange={(e) => handleClienteSearch(e.target.value)}
@@ -869,11 +873,12 @@ const CotizacionModal = ({
                   </div>
                 </Form.Group>
               </div>
-              <div className="col-md-4">
-                <Form.Group className="mb-2">
-                  <Form.Label>Razón Social</Form.Label>
+              <div className="col-md-5">
+                <Form.Group>
+                  <Form.Label className="mb-1" style={{ fontSize: '0.85rem' }}>Razón Social</Form.Label>
                   <div className="position-relative">
                     <Form.Control
+                      size="sm"
                       type="text"
                       value={razonSocialDisplayText}
                       onChange={(e) => handleRazonSocialSearch(e.target.value)}
@@ -900,36 +905,40 @@ const CotizacionModal = ({
                   </div>
                 </Form.Group>
               </div>
-              <div className="col-md-4">
-                <Form.Group className="mb-2">
-                  <Form.Label>No. Cotización</Form.Label>
+              <div className="col-md-3">
+                <Form.Group>
+                  <Form.Label className="mb-1" style={{ fontSize: '0.85rem' }}>No. Cotización</Form.Label>
                   <Form.Control
+                    size="sm"
                     type="text"
                     value={formData.numeroPresupuesto}
                     onChange={(e) => setFormData(prev => ({ ...prev, numeroPresupuesto: e.target.value }))}
-                    placeholder="Selecciona un cliente para generar"
-                  />
-                </Form.Group>
-              </div>
-              <div className="col-md-6">
-                <Form.Group>
-                  <Form.Label>Fecha</Form.Label>
-                  <Form.Control
-                    type="date"
-                    name="fecha"
-                    value={typeof formData.fecha === 'string' ? formData.fecha : ''}
-                    onChange={handleChange}
-                    required
+                    placeholder="Automático"
                   />
                 </Form.Group>
               </div>
             </div>
 
+            {/* Fila 2: Vigencia, Vendedor, Estado, Proyecto */}
             <div className="row mb-2">
+              <div className="col-md-2">
+                <Form.Group>
+                  <Form.Label className="mb-1" style={{ fontSize: '0.85rem' }}>Vigencia</Form.Label>
+                  <Form.Control
+                    size="sm"
+                    type="date"
+                    name="vigencia"
+                    value={typeof formData.vigencia === 'string' ? formData.vigencia : ''}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+              </div>
               <div className="col-md-4">
-                <Form.Group className="mb-2">
-                  <Form.Label>Vendedor</Form.Label>
+                <Form.Group>
+                  <Form.Label className="mb-1" style={{ fontSize: '0.85rem' }}>Vendedor</Form.Label>
                   <Form.Select
+                    size="sm"
                     name="vendedor"
                     value={typeof formData.vendedor === 'string' ? formData.vendedor : ''}
                     onChange={handleChange}
@@ -941,25 +950,11 @@ const CotizacionModal = ({
                   </Form.Select>
                 </Form.Group>
               </div>
-            </div>
-
-            <div className="row mb-3">
-              <div className="col-md-6">
+              <div className="col-md-3">
                 <Form.Group>
-                  <Form.Label>Vigencia</Form.Label>
-                  <Form.Control
-                    type="date"
-                    name="vigencia"
-                    value={typeof formData.vigencia === 'string' ? formData.vigencia : ''}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-              </div>
-              <div className="col-md-6">
-                <Form.Group>
-                  <Form.Label>Estado</Form.Label>
+                  <Form.Label className="mb-1" style={{ fontSize: '0.85rem' }}>Estado</Form.Label>
                   <Form.Select
+                    size="sm"
                     name="estado"
                     value={formData.estado || 'Borrador'}
                     onChange={handleChange}
@@ -973,17 +968,16 @@ const CotizacionModal = ({
                   </Form.Select>
                 </Form.Group>
               </div>
-              <div className="col-md-6">
+              <div className="col-md-3">
                 <Form.Group>
-                  <Form.Label>
-                    Proyecto <small className="text-muted">(Opcional)</small>
-                  </Form.Label>
+                  <Form.Label className="mb-1" style={{ fontSize: '0.85rem' }}>Proyecto <small className="text-muted">(Opc.)</small></Form.Label>
                   <Form.Select
+                    size="sm"
                     name="proyecto"
                     value={typeof formData.proyecto === 'string' ? formData.proyecto : formData.proyecto?._id || ''}
                     onChange={handleChange}
                   >
-                    <option value="">Sin proyecto asignado</option>
+                    <option value="">Sin proyecto</option>
                     {proyectos.map(proyecto => (
                       <option key={proyecto._id} value={proyecto._id}>
                         {proyecto.nombre}
@@ -994,16 +988,33 @@ const CotizacionModal = ({
               </div>
             </div>
 
-            <div className="row mb-3">
-              <div className="col-md-12">
+            {/* Fila 3: Comentarios Internos y Comentarios PDF */}
+            <div className="row mb-2">
+              <div className="col-md-6">
                 <Form.Group>
-                  <Form.Label>Comentarios</Form.Label>
+                  <Form.Label className="mb-1" style={{ fontSize: '0.85rem' }}>Comentarios <span className="badge bg-secondary" style={{ fontSize: '0.7rem' }}>Internos</span></Form.Label>
                   <Form.Control
+                    size="sm"
                     as="textarea"
-                    rows={3}
-                    name="comentarios"
-                    value={formData.comentarios || ''}
+                    rows={2}
+                    name="comentariosInternos"
+                    value={formData.comentariosInternos || ''}
                     onChange={handleChange}
+                    placeholder="Notas internas (solo visible en la lista)..."
+                  />
+                </Form.Group>
+              </div>
+              <div className="col-md-6">
+                <Form.Group>
+                  <Form.Label className="mb-1" style={{ fontSize: '0.85rem' }}>Comentarios <span className="badge bg-primary" style={{ fontSize: '0.7rem' }}>PDF</span></Form.Label>
+                  <Form.Control
+                    size="sm"
+                    as="textarea"
+                    rows={2}
+                    name="comentariosPdf"
+                    value={formData.comentariosPdf || ''}
+                    onChange={handleChange}
+                    placeholder="Comentarios que aparecerán en el PDF..."
                   />
                 </Form.Group>
               </div>

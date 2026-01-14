@@ -270,9 +270,9 @@ const CotizacionList: React.FC = () => {
       }
     },
         { 
-      key: 'comentarios', 
+      key: 'comentariosInternos', 
       label: 'Comentarios',
-      render: (cotizacion: Cotizacion) => cotizacion.comentarios || 'Sin comentarios'
+      render: (cotizacion: Cotizacion) => cotizacion.comentariosInternos || 'Sin comentarios'
     },
     { 
       key: 'fecha', 

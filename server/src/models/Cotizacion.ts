@@ -15,7 +15,8 @@ export interface ICotizacion extends Document {
   estado: 'Borrador' | 'Enviada' | 'Aceptada' | 'Rechazada' | 'Vencida';
   moneda?: string; // Moneda de la cotización (MXN o USD)
   items: IItemCotizacion[];
-  comentarios?: string;
+  comentariosInternos?: string; // Comentarios visibles solo en la lista
+  comentariosPdf?: string; // Comentarios que aparecen en el PDF
   fechaCreacion: Date;
   fechaActualizacion: Date;
   calcularTotales(): void;
@@ -179,7 +180,11 @@ const CotizacionSchema = new Schema<ICotizacion>({
     default: 'MXN'
   },
   items: [ItemCotizacionSchema],
-  comentarios: { 
+  comentariosInternos: { 
+    type: String,
+    required: false
+  },
+  comentariosPdf: { 
     type: String,
     required: false
   },
