@@ -33,6 +33,8 @@ export interface CotizacionPdfData {
     aplicarIva: boolean;
     iva?: number;
     esSeparador?: boolean;
+    esConceptoAgrupado?: boolean;
+    nombreConceptoAgrupado?: string;
   }>;
   comentarios?: string;
   comentariosPdf?: string;

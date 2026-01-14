@@ -38,6 +38,10 @@ export interface IItemCotizacion {
   canalizacionId?: string; // ID de la canalización si aplica
   aplicarIva: boolean; // Indica si se debe aplicar IVA a este item
   esSeparador?: boolean; // Para identificar si es un separador visual
+  // Campos para conceptos agrupados
+  esConceptoAgrupado?: boolean; // Indica si es un concepto que agrupa otros items
+  nombreConceptoAgrupado?: string; // Nombre del concepto agrupado
+  itemsAgrupados?: IItemCotizacion[]; // Items que contiene el concepto
 }
 
 const ItemCotizacionSchema = new Schema<IItemCotizacion>({
@@ -106,6 +110,20 @@ const ItemCotizacionSchema = new Schema<IItemCotizacion>({
   esSeparador: {
     type: Boolean,
     default: false
+  },
+  // Campos para conceptos agrupados
+  esConceptoAgrupado: {
+    type: Boolean,
+    default: false
+  },
+  nombreConceptoAgrupado: {
+    type: String,
+    required: false
+  },
+  itemsAgrupados: {
+    type: [Schema.Types.Mixed], // Array de items agrupados (se guarda como objeto)
+    required: false,
+    default: undefined
   }
 });
 

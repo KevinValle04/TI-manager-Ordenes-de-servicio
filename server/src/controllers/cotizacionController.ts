@@ -47,7 +47,26 @@ const prepararDatosPdf = (cotizacion: ICotizacion): CotizacionPdfData => ({
         subtotal: 0,
         aplicarIva: false,
         iva: 0,
-        esSeparador: true
+        esSeparador: true,
+        esConceptoAgrupado: false
+      };
+    }
+    // Si es un concepto agrupado, mostrar solo el nombre y el importe
+    if (item.esConceptoAgrupado) {
+      return {
+        descripcion: item.nombreConceptoAgrupado || item.concepto || '',
+        marca: '',
+        modelo: '',
+        concepto: item.nombreConceptoAgrupado || item.concepto || '',
+        unidad: 'LOTE',
+        cantidad: 1,
+        precioUnitario: item.importe,
+        subtotal: item.importe,
+        aplicarIva: item.aplicarIva || false,
+        iva: item.aplicarIva ? item.importe * (cotizacion.iva/100) : 0,
+        esSeparador: false,
+        esConceptoAgrupado: true,
+        nombreConceptoAgrupado: item.nombreConceptoAgrupado || ''
       };
     }
     // Calcular precio de venta (costo + ganancia) para mostrar en el PDF
@@ -64,7 +83,8 @@ const prepararDatosPdf = (cotizacion: ICotizacion): CotizacionPdfData => ({
       subtotal: item.importe, // El importe ya incluye la ganancia calculada
       aplicarIva: item.aplicarIva || false,
       iva: item.aplicarIva ? item.importe * (cotizacion.iva/100) : 0,
-      esSeparador: false
+      esSeparador: false,
+      esConceptoAgrupado: false
     };
   }),
   comentariosPdf: cotizacion.comentariosPdf,

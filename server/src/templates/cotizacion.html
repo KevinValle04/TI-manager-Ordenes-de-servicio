@@ -308,6 +308,12 @@
         <tr style="background-color: #0F2A52;">
           <td colspan="8" style="background-color: #0F2A52; color: white; font-weight: bold; text-align: left; padding: 6px 10px;">{{concepto}}</td>
         </tr>
+        {{else if esConceptoAgrupado}}
+        <tr>
+          <td colspan="6" style="text-align: left; font-weight: bold; padding: 6px 10px; border-right: none;">{{nombreConceptoAgrupado}}</td>
+          <td style="border-left: none; border-right: none;"></td>
+          <td class="text-right" style="font-weight: bold;">{{subtotal}}</td>
+        </tr>
         {{else}}
         <tr>
           <td class="text-center">{{increment @index}}</td>

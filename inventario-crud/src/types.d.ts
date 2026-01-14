@@ -226,6 +226,11 @@ export interface ItemCotizacion {
   canalizacionId?: string; // ID de la canalización si aplica
   esCanalizacion?: boolean;
   esSeparador?: boolean; // Para identificar si es un separador visual
+  // Campos para conceptos agrupados
+  esConceptoAgrupado?: boolean; // Indica si es un concepto que agrupa otros items
+  nombreConceptoAgrupado?: string; // Nombre del concepto agrupado
+  itemsAgrupados?: ItemCotizacion[]; // Items que contiene el concepto
+  conceptoPadreId?: string; // ID del concepto padre (para items hijos)
 }
 
 export interface ItemEntrega {

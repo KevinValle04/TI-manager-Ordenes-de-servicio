@@ -1,4 +1,4 @@
-import { faGripVertical, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronRight, faGripVertical, faLayerGroup, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState, useRef } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
@@ -95,6 +95,13 @@ const CotizacionModal = ({
   const [showCanalizacionModal, setShowCanalizacionModal] = useState(false);
   const [canalizaciones, setCanalizaciones] = useState<any[]>([]);
   const [canalizacionSearchTerm, setCanalizacionSearchTerm] = useState('');
+
+  // Estados para la funcionalidad de Crear Concepto
+  const [modoCrearConcepto, setModoCrearConcepto] = useState(false);
+  const [itemsSeleccionadosConcepto, setItemsSeleccionadosConcepto] = useState<Set<number>>(new Set());
+  const [showNombreConceptoModal, setShowNombreConceptoModal] = useState(false);
+  const [nombreConceptoNuevo, setNombreConceptoNuevo] = useState('');
+  const [conceptosExpandidos, setConceptosExpandidos] = useState<Set<number>>(new Set());
 
   // Snapshot para detectar cambios (dirty)
   const initialSnapshotRef = useRef<string>('');
@@ -239,6 +246,158 @@ const CotizacionModal = ({
     }));
   };
 
+  // Función para iniciar el modo de crear concepto
+  const iniciarModoCrearConcepto = () => {
+    setModoCrearConcepto(true);
+    setItemsSeleccionadosConcepto(new Set());
+  };
+
+  // Función para cancelar el modo de crear concepto
+  const cancelarModoCrearConcepto = () => {
+    setModoCrearConcepto(false);
+    setItemsSeleccionadosConcepto(new Set());
+    setNombreConceptoNuevo('');
+  };
+
+  // Función para seleccionar/deseleccionar un item para el concepto
+  const toggleSeleccionItem = (index: number) => {
+    setItemsSeleccionadosConcepto(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
+  };
+
+  // Función para confirmar la selección y pedir el nombre del concepto
+  const confirmarSeleccionConcepto = () => {
+    if (itemsSeleccionadosConcepto.size === 0) {
+      alert('Selecciona al menos un artículo para crear el concepto.');
+      return;
+    }
+    setShowNombreConceptoModal(true);
+  };
+
+  // Función para crear el concepto agrupado
+  const crearConceptoAgrupado = () => {
+    if (!nombreConceptoNuevo.trim()) {
+      alert('Ingresa un nombre para el concepto.');
+      return;
+    }
+
+    const indicesSeleccionados = Array.from(itemsSeleccionadosConcepto).sort((a, b) => a - b);
+    const itemsParaAgrupar = indicesSeleccionados.map(i => formData.items[i]).filter(item => item && !item.esSeparador && !item.esConceptoAgrupado);
+    
+    if (itemsParaAgrupar.length === 0) {
+      alert('No hay artículos válidos seleccionados.');
+      return;
+    }
+
+    // Calcular el importe total de los items agrupados
+    const importeTotal = itemsParaAgrupar.reduce((sum, item) => sum + (item.importe || 0), 0);
+    // Calcular si alguno aplica IVA
+    const aplicaIva = itemsParaAgrupar.some(item => item.aplicarIva);
+
+    // Crear el nuevo item de concepto agrupado
+    const conceptoAgrupado: ItemCotizacion = {
+      clave: formData.items.length + 1,
+      marca: '',
+      modelo: '',
+      concepto: nombreConceptoNuevo.trim(),
+      cantidad: 1,
+      unidad: 'LOTE' as const,
+      precioUnitario: importeTotal,
+      porcentajeGanancia: 0,
+      ganancia: 0,
+      importe: importeTotal,
+      aplicarIva: aplicaIva,
+      esConceptoAgrupado: true,
+      nombreConceptoAgrupado: nombreConceptoNuevo.trim(),
+      itemsAgrupados: itemsParaAgrupar.map(item => ({ ...item }))
+    };
+
+    // Filtrar los items que no fueron seleccionados (mantenerlos) y la fila vacía
+    const itemsNoSeleccionados = formData.items.filter((item, index) => {
+      // No incluir items seleccionados
+      if (itemsSeleccionadosConcepto.has(index)) return false;
+      // No incluir filas vacías (se agregarán después)
+      if (!item.concepto || item.concepto.trim() === '') return false;
+      return true;
+    });
+
+    // Agregar el concepto agrupado y una fila vacía al final
+    const nuevosItems = [...itemsNoSeleccionados, conceptoAgrupado];
+    const itemsConFilaVacia = ensureEmptyRow(nuevosItems).map((item, idx) => ({
+      ...item,
+      clave: idx + 1
+    }));
+
+    setFormData(prev => ({
+      ...prev,
+      items: itemsConFilaVacia
+    }));
+
+    // Expandir automáticamente el nuevo concepto
+    setConceptosExpandidos(prev => {
+      const newSet = new Set(prev);
+      newSet.add(itemsConFilaVacia.findIndex(item => item.esConceptoAgrupado && item.nombreConceptoAgrupado === nombreConceptoNuevo.trim()));
+      return newSet;
+    });
+
+    // Limpiar estados
+    setModoCrearConcepto(false);
+    setItemsSeleccionadosConcepto(new Set());
+    setNombreConceptoNuevo('');
+    setShowNombreConceptoModal(false);
+
+    // Recalcular totales
+    setTimeout(() => calculateTotals(), 50);
+  };
+
+  // Función para expandir/colapsar un concepto agrupado
+  const toggleConceptoExpandido = (index: number) => {
+    setConceptosExpandidos(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
+  };
+
+  // Función para desagrupar un concepto (volver a mostrar los items individuales)
+  const desagruparConcepto = (index: number) => {
+    const conceptoAgrupado = formData.items[index];
+    if (!conceptoAgrupado.esConceptoAgrupado || !conceptoAgrupado.itemsAgrupados) return;
+
+    const itemsAnteriores = formData.items.slice(0, index);
+    const itemsPosteriores = formData.items.slice(index + 1).filter(item => item.concepto && item.concepto.trim() !== '');
+    const itemsDesagrupados = conceptoAgrupado.itemsAgrupados.map(item => ({
+      ...item,
+      esConceptoAgrupado: false,
+      itemsAgrupados: undefined,
+      nombreConceptoAgrupado: undefined
+    }));
+
+    const nuevosItems = [...itemsAnteriores, ...itemsDesagrupados, ...itemsPosteriores];
+    const itemsConFilaVacia = ensureEmptyRow(nuevosItems).map((item, idx) => ({
+      ...item,
+      clave: idx + 1
+    }));
+
+    setFormData(prev => ({
+      ...prev,
+      items: itemsConFilaVacia
+    }));
+
+    setTimeout(() => calculateTotals(), 50);
+  };
+
   // Efecto para cargar datos de edición
   useEffect(() => {
     if (editingCotizacion) {
@@ -278,14 +437,27 @@ const CotizacionModal = ({
           aplicarIva: true
         }];
       } else {
-        // Asegurar que todos los items tengan clave correcta
+        // Asegurar que todos los items tengan clave correcta y preservar campos de concepto agrupado
         itemsToSet = itemsToSet.map((item, index) => ({
           ...item,
-          clave: item.clave || index + 1
+          clave: item.clave || index + 1,
+          // Preservar campos de concepto agrupado
+          esConceptoAgrupado: item.esConceptoAgrupado || false,
+          nombreConceptoAgrupado: item.nombreConceptoAgrupado || '',
+          itemsAgrupados: item.itemsAgrupados || undefined
         }));
         // Asegurar fila vacía al final
         itemsToSet = ensureEmptyRow(itemsToSet);
       }
+
+      // Expandir automáticamente los conceptos agrupados existentes
+      const indicesConceptosAgrupados = new Set<number>();
+      itemsToSet.forEach((item, index) => {
+        if (item.esConceptoAgrupado) {
+          indicesConceptosAgrupados.add(index);
+        }
+      });
+      setConceptosExpandidos(indicesConceptosAgrupados);
       
       const editingVendedor = (editingCotizacion as any)?.vendedor;
       const initialData = {
@@ -360,6 +532,13 @@ const CotizacionModal = ({
       setProductSuggestions({});
       setShowProductSuggestions({});
       setActiveRow(null);
+      
+      // Limpiar estados de crear concepto
+      setModoCrearConcepto(false);
+      setItemsSeleccionadosConcepto(new Set());
+      setNombreConceptoNuevo('');
+      setShowNombreConceptoModal(false);
+      setConceptosExpandidos(new Set());
     }
   }, [editingCotizacion, generatePresupuestoNumber, show]);
 
@@ -440,7 +619,7 @@ const CotizacionModal = ({
     const filteredData = {
       ...formData,
       moneda: moneda, // Agregar la moneda seleccionada
-      items: formData.items.filter(item => item.concepto.trim() !== '' || item.esSeparador)
+      items: formData.items.filter(item => item.concepto.trim() !== '' || item.esSeparador || item.esConceptoAgrupado)
     };
     onSave(filteredData);
   };
@@ -1031,19 +1210,124 @@ const CotizacionModal = ({
                   <Button 
                     variant="outline-secondary"
                     onClick={addSeparador}
+                    disabled={modoCrearConcepto}
                   >
                     <i className="fas fa-minus me-2"></i>
                     Crear Separador
                   </Button>
+                  {!modoCrearConcepto ? (
+                    <Button 
+                      variant="outline-success"
+                      onClick={iniciarModoCrearConcepto}
+                    >
+                      <FontAwesomeIcon icon={faLayerGroup} className="me-2" />
+                      Crear Concepto
+                    </Button>
+                  ) : (
+                    <>
+                      <Button 
+                        variant="success"
+                        onClick={confirmarSeleccionConcepto}
+                        disabled={itemsSeleccionadosConcepto.size === 0}
+                      >
+                        <i className="fas fa-check me-2"></i>
+                        Confirmar Concepto ({itemsSeleccionadosConcepto.size})
+                      </Button>
+                      <Button 
+                        variant="outline-danger"
+                        onClick={cancelarModoCrearConcepto}
+                      >
+                        <i className="fas fa-times me-2"></i>
+                        Cancelar
+                      </Button>
+                    </>
+                  )}
                   <Button 
                     variant="outline-primary"
                     onClick={() => setShowCanalizacionModal(true)}
+                    disabled={modoCrearConcepto}
                   >
                     <i className="fas fa-plus me-2"></i>
                     Añadir Canalización
                   </Button>
                 </div>
               </div>
+
+              {/* Mensaje informativo cuando está en modo crear concepto */}
+              {modoCrearConcepto && (
+                <div className="alert alert-info mb-3">
+                  <i className="fas fa-info-circle me-2"></i>
+                  <strong>Modo Crear Concepto:</strong> Selecciona los artículos que deseas agrupar marcando las casillas de la columna "SEL". 
+                  Luego presiona "Confirmar Concepto" para asignarles un nombre.
+                </div>
+              )}
+
+              {/* Modal para ingresar el nombre del concepto */}
+              <Modal 
+                show={showNombreConceptoModal}
+                onHide={() => setShowNombreConceptoModal(false)}
+                size="lg"
+                centered
+                style={{ zIndex: 10000 }}
+                backdrop="static"
+              >
+                <Modal.Header closeButton>
+                  <Modal.Title>
+                    <FontAwesomeIcon icon={faLayerGroup} className="me-2 text-success" />
+                    Nombre del Concepto
+                  </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <Form.Group>
+                    <Form.Label>Ingresa el nombre para este concepto agrupado:</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={nombreConceptoNuevo}
+                      onChange={(e) => setNombreConceptoNuevo(e.target.value)}
+                      placeholder="Ej: Suministros de oficina, Kit de herramientas..."
+                      autoFocus
+                    />
+                    <Form.Text className="text-muted">
+                      Este nombre aparecerá en el PDF englobando los {itemsSeleccionadosConcepto.size} artículos seleccionados.
+                    </Form.Text>
+                  </Form.Group>
+                  <div className="mt-3">
+                    <strong>Artículos a agrupar:</strong>
+                    <ul className="mt-2" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                      {Array.from(itemsSeleccionadosConcepto).sort((a, b) => a - b).map(idx => {
+                        const item = formData.items[idx];
+                        return item ? (
+                          <li key={idx}>
+                            {item.concepto} - ${(item.importe || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                          </li>
+                        ) : null;
+                      })}
+                    </ul>
+                    <div className="border-top pt-2 mt-2">
+                      <strong>Importe total del concepto: </strong>
+                      <span className="text-success fw-bold">
+                        ${Array.from(itemsSeleccionadosConcepto).reduce((sum, idx) => {
+                          const item = formData.items[idx];
+                          return sum + (item?.importe || 0);
+                        }, 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                  </div>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onClick={() => setShowNombreConceptoModal(false)}>
+                    Cancelar
+                  </Button>
+                  <Button 
+                    variant="success" 
+                    onClick={crearConceptoAgrupado}
+                    disabled={!nombreConceptoNuevo.trim()}
+                  >
+                    <FontAwesomeIcon icon={faLayerGroup} className="me-2" />
+                    Crear Concepto
+                  </Button>
+                </Modal.Footer>
+              </Modal>
 
               {/* Modal de búsqueda de canalizaciones */}
               {/* {console.log('Renderizando modal con showCanalizacionModal:', showCanalizacionModal)} */}
@@ -1128,9 +1412,12 @@ const CotizacionModal = ({
                 border: '1px solid #dee2e6',
                 borderRadius: '0.25rem'
               }}>
-                <table className="table table-striped table-hover mb-0" style={{ minWidth: '1600px', fontSize: '13px' }}>
+                <table className="table table-striped table-hover mb-0" style={{ minWidth: modoCrearConcepto ? '1650px' : '1600px', fontSize: '13px' }}>
                   <thead className="table-dark" style={{ position: 'sticky', top: 0, zIndex: 10 }}>
                     <tr>
+                      {modoCrearConcepto && (
+                        <th style={{ width: '40px', backgroundColor: '#28a745' }}>SEL</th>
+                      )}
                       <th style={{ width: '30px' }}>⋮⋮</th>
                       <th style={{ width: '50px' }}>CLAVE</th>
                       <th style={{ width: '100px', minWidth: '90px' }}>MARCA</th>
@@ -1152,24 +1439,31 @@ const CotizacionModal = ({
                         // Fila de separador
                         <tr 
                           key={index}
-                          draggable={true}
+                          draggable={!modoCrearConcepto}
                           onDragStart={(e) => handleDragStart(e, index)}
                           onDragEnd={handleDragEnd}
                           onDragOver={handleDragOver}
                           onDrop={(e) => handleDrop(e, index)}
                           style={{
-                            cursor: 'move',
+                            cursor: modoCrearConcepto ? 'default' : 'move',
                             backgroundColor: draggedItem === index ? '#1a4a8a' : '#0F2A52'
                           }}
                         >
-                          <td className="text-center" style={{ cursor: 'grab', backgroundColor: '#0F2A52' }}>
-                            <FontAwesomeIcon 
-                              icon={faGripVertical} 
-                              className="text-white"
-                              title="Arrastrar para reordenar"
-                            />
+                          {modoCrearConcepto && (
+                            <td style={{ backgroundColor: '#0F2A52' }}>
+                              {/* Los separadores no se pueden seleccionar */}
+                            </td>
+                          )}
+                          <td className="text-center" style={{ cursor: modoCrearConcepto ? 'default' : 'grab', backgroundColor: '#0F2A52' }}>
+                            {!modoCrearConcepto && (
+                              <FontAwesomeIcon 
+                                icon={faGripVertical} 
+                                className="text-white"
+                                title="Arrastrar para reordenar"
+                              />
+                            )}
                           </td>
-                          <td colSpan={11} style={{ backgroundColor: '#0F2A52', padding: '8px 12px' }}>
+                          <td colSpan={modoCrearConcepto ? 11 : 11} style={{ backgroundColor: '#0F2A52', padding: '8px 12px' }}>
                             <div className="d-flex align-items-center justify-content-between">
                               <Form.Control
                                 type="text"
@@ -1198,22 +1492,159 @@ const CotizacionModal = ({
                             </div>
                           </td>
                         </tr>
+                      ) : item.esConceptoAgrupado ? (
+                        // Fila de concepto agrupado (expandible)
+                        <React.Fragment key={`concepto-${index}`}>
+                          <tr 
+                            style={{
+                              backgroundColor: '#d4edda',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {modoCrearConcepto && (
+                              <td style={{ backgroundColor: '#d4edda' }}>
+                                {/* Los conceptos agrupados no se pueden seleccionar */}
+                              </td>
+                            )}
+                            <td 
+                              className="text-center" 
+                              style={{ backgroundColor: '#d4edda', cursor: 'pointer' }}
+                              onClick={() => toggleConceptoExpandido(index)}
+                            >
+                              <FontAwesomeIcon 
+                                icon={conceptosExpandidos.has(index) ? faChevronDown : faChevronRight} 
+                                className="text-success"
+                                title={conceptosExpandidos.has(index) ? 'Contraer' : 'Expandir'}
+                              />
+                            </td>
+                            <td style={{ backgroundColor: '#d4edda' }}>{item.clave || index + 1}</td>
+                            <td colSpan={2} style={{ backgroundColor: '#d4edda' }}>
+                              <span className="badge bg-success me-2">
+                                <FontAwesomeIcon icon={faLayerGroup} className="me-1" />
+                                CONCEPTO
+                              </span>
+                              <span className="text-muted small">({item.itemsAgrupados?.length || 0} artículos)</span>
+                            </td>
+                            <td style={{ backgroundColor: '#d4edda' }}>
+                              <Form.Control
+                                type="text"
+                                value={item.nombreConceptoAgrupado || item.concepto || ''}
+                                onChange={(e) => {
+                                  const nuevoNombre = e.target.value;
+                                  setFormData(prev => {
+                                    const newItems = [...prev.items];
+                                    newItems[index] = {
+                                      ...newItems[index],
+                                      nombreConceptoAgrupado: nuevoNombre,
+                                      concepto: nuevoNombre
+                                    };
+                                    return { ...prev, items: newItems };
+                                  });
+                                }}
+                                style={{ fontSize: '12px', padding: '4px 6px', fontWeight: 'bold', backgroundColor: '#fff' }}
+                              />
+                            </td>
+                            <td style={{ backgroundColor: '#d4edda' }}>LOTE</td>
+                            <td style={{ backgroundColor: '#d4edda' }}>1</td>
+                            <td style={{ backgroundColor: '#d4edda' }}>-</td>
+                            <td style={{ backgroundColor: '#d4edda' }}>-</td>
+                            <td style={{ backgroundColor: '#d4edda' }}>-</td>
+                            <td style={{ backgroundColor: '#d4edda' }}>
+                              <span className="fw-bold text-success" style={{ fontSize: '13px' }}>
+                                ${(item.importe || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                              </span>
+                            </td>
+                            <td style={{ backgroundColor: '#d4edda' }}>
+                              <Form.Check
+                                type="checkbox"
+                                checked={item.aplicarIva}
+                                onChange={(e) => handleItemChange(index, 'aplicarIva', e.target.checked)}
+                              />
+                            </td>
+                            <td style={{ backgroundColor: '#d4edda' }}>
+                              <div className="d-flex gap-1">
+                                <Button
+                                  variant="outline-warning"
+                                  size="sm"
+                                  onClick={() => desagruparConcepto(index)}
+                                  title="Desagrupar concepto"
+                                >
+                                  <i className="fas fa-object-ungroup"></i>
+                                </Button>
+                                <Button
+                                  variant="outline-danger"
+                                  size="sm"
+                                  onClick={() => handleRemoveItem(index)}
+                                  title="Eliminar concepto"
+                                >
+                                  <FontAwesomeIcon icon={faTrash} />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                          {/* Filas de items agrupados (solo visibles cuando está expandido) */}
+                          {conceptosExpandidos.has(index) && item.itemsAgrupados?.map((subItem, subIndex) => (
+                            <tr 
+                              key={`${index}-sub-${subIndex}`}
+                              style={{ backgroundColor: '#f0f9f0' }}
+                            >
+                              {modoCrearConcepto && <td style={{ backgroundColor: '#f0f9f0' }}></td>}
+                              <td style={{ backgroundColor: '#f0f9f0', paddingLeft: '30px' }}>
+                                <span className="text-muted">└</span>
+                              </td>
+                              <td style={{ backgroundColor: '#f0f9f0' }} className="text-muted small">{subIndex + 1}</td>
+                              <td style={{ backgroundColor: '#f0f9f0' }} className="text-muted small">{subItem.marca || '-'}</td>
+                              <td style={{ backgroundColor: '#f0f9f0' }} className="text-muted small">{subItem.modelo || '-'}</td>
+                              <td style={{ backgroundColor: '#f0f9f0' }} className="text-muted small">{subItem.concepto}</td>
+                              <td style={{ backgroundColor: '#f0f9f0' }} className="text-muted small">{subItem.unidad}</td>
+                              <td style={{ backgroundColor: '#f0f9f0' }} className="text-muted small">{subItem.cantidad}</td>
+                              <td style={{ backgroundColor: '#f0f9f0' }} className="text-muted small">
+                                ${(subItem.precioUnitario || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                              </td>
+                              <td style={{ backgroundColor: '#f0f9f0' }} className="text-muted small">{subItem.porcentajeGanancia}%</td>
+                              <td style={{ backgroundColor: '#f0f9f0' }} className="text-muted small">
+                                ${(subItem.ganancia || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                              </td>
+                              <td style={{ backgroundColor: '#f0f9f0' }} className="text-muted small">
+                                ${(subItem.importe || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                              </td>
+                              <td style={{ backgroundColor: '#f0f9f0' }}>
+                                {subItem.aplicarIva ? '✓' : '-'}
+                              </td>
+                              <td style={{ backgroundColor: '#f0f9f0' }}></td>
+                            </tr>
+                          ))}
+                        </React.Fragment>
                       ) : (
                         // Fila normal de producto
                         <tr 
                           key={index}
-                          draggable={item.concepto !== ''}
+                          draggable={item.concepto !== '' && !modoCrearConcepto}
                           onDragStart={(e) => handleDragStart(e, index)}
                           onDragEnd={handleDragEnd}
                           onDragOver={handleDragOver}
                           onDrop={(e) => handleDrop(e, index)}
                           style={{
-                            cursor: item.concepto !== '' ? 'move' : 'default',
-                            backgroundColor: draggedItem === index ? '#f8f9fa' : 'transparent'
+                            cursor: item.concepto !== '' && !modoCrearConcepto ? 'move' : 'default',
+                            backgroundColor: draggedItem === index ? '#f8f9fa' : 
+                              (itemsSeleccionadosConcepto.has(index) ? '#d4edda' : 'transparent')
                           }}
                         >
-                        <td className="text-center" style={{ cursor: item.concepto !== '' ? 'grab' : 'default' }}>
-                          {item.concepto !== '' && (
+                        {/* Columna de selección para crear concepto */}
+                        {modoCrearConcepto && (
+                          <td className="text-center" style={{ backgroundColor: itemsSeleccionadosConcepto.has(index) ? '#d4edda' : 'transparent' }}>
+                            {item.concepto && item.concepto.trim() !== '' && !item.esSeparador && !item.esConceptoAgrupado && (
+                              <Form.Check
+                                type="checkbox"
+                                checked={itemsSeleccionadosConcepto.has(index)}
+                                onChange={() => toggleSeleccionItem(index)}
+                                style={{ cursor: 'pointer' }}
+                              />
+                            )}
+                          </td>
+                        )}
+                        <td className="text-center" style={{ cursor: item.concepto !== '' && !modoCrearConcepto ? 'grab' : 'default' }}>
+                          {item.concepto !== '' && !modoCrearConcepto && (
                             <FontAwesomeIcon 
                               icon={faGripVertical} 
                               className="text-muted"
