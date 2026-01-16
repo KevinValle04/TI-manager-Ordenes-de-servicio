@@ -319,6 +319,9 @@ const CotizacionModal = ({
       itemsAgrupados: itemsParaAgrupar.map(item => ({ ...item }))
     };
 
+    // Encontrar la posición del primer item seleccionado
+    const primerIndiceSeleccionado = Math.min(...Array.from(itemsSeleccionadosConcepto));
+    
     // Filtrar los items que no fueron seleccionados (mantenerlos) y la fila vacía
     const itemsNoSeleccionados = formData.items.filter((item, index) => {
       // No incluir items seleccionados
@@ -328,8 +331,30 @@ const CotizacionModal = ({
       return true;
     });
 
-    // Agregar el concepto agrupado y una fila vacía al final
-    const nuevosItems = [...itemsNoSeleccionados, conceptoAgrupado];
+    // Crear el array final insertando el concepto en la posición del primer item seleccionado
+    const nuevosItems: ItemCotizacion[] = [];
+    let contadorNoSeleccionados = 0;
+    
+    for (let i = 0; i < formData.items.length; i++) {
+      if (i === primerIndiceSeleccionado) {
+        // Insertar el concepto agrupado en esta posición
+        nuevosItems.push(conceptoAgrupado);
+      }
+      
+      // Si el item actual no fue seleccionado y no es una fila vacía, agregarlo
+      if (!itemsSeleccionadosConcepto.has(i) && 
+          formData.items[i].concepto && 
+          formData.items[i].concepto.trim() !== '') {
+        nuevosItems.push(itemsNoSeleccionados[contadorNoSeleccionados]);
+        contadorNoSeleccionados++;
+      }
+    }
+    
+    // Si el concepto aún no se ha insertado (por si acaso), agregarlo al final
+    if (!nuevosItems.includes(conceptoAgrupado)) {
+      nuevosItems.push(conceptoAgrupado);
+    }
+    
     const itemsConFilaVacia = ensureEmptyRow(nuevosItems).map((item, idx) => ({
       ...item,
       clave: idx + 1
@@ -1496,9 +1521,14 @@ const CotizacionModal = ({
                         // Fila de concepto agrupado (expandible)
                         <React.Fragment key={`concepto-${index}`}>
                           <tr 
+                            draggable={!modoCrearConcepto}
+                            onDragStart={(e) => handleDragStart(e, index)}
+                            onDragEnd={handleDragEnd}
+                            onDragOver={handleDragOver}
+                            onDrop={(e) => handleDrop(e, index)}
                             style={{
-                              backgroundColor: '#d4edda',
-                              cursor: 'pointer'
+                              backgroundColor: draggedItem === index ? '#c3e6cb' : '#d4edda',
+                              cursor: modoCrearConcepto ? 'default' : 'move'
                             }}
                           >
                             {modoCrearConcepto && (
@@ -1508,7 +1538,18 @@ const CotizacionModal = ({
                             )}
                             <td 
                               className="text-center" 
-                              style={{ backgroundColor: '#d4edda', cursor: 'pointer' }}
+                              style={{ backgroundColor: '#d4edda', cursor: modoCrearConcepto ? 'default' : 'grab' }}
+                            >
+                              {!modoCrearConcepto && (
+                                <FontAwesomeIcon 
+                                  icon={faGripVertical} 
+                                  className="text-success"
+                                  title="Arrastrar para reordenar"
+                                />
+                              )}
+                            </td>
+                            <td 
+                              style={{ backgroundColor: '#d4edda', cursor: 'pointer', width: '40px' }}
                               onClick={() => toggleConceptoExpandido(index)}
                             >
                               <FontAwesomeIcon 
@@ -1517,7 +1558,6 @@ const CotizacionModal = ({
                                 title={conceptosExpandidos.has(index) ? 'Contraer' : 'Expandir'}
                               />
                             </td>
-                            <td style={{ backgroundColor: '#d4edda' }}>{item.clave || index + 1}</td>
                             <td colSpan={2} style={{ backgroundColor: '#d4edda' }}>
                               <span className="badge bg-success me-2">
                                 <FontAwesomeIcon icon={faLayerGroup} className="me-1" />
