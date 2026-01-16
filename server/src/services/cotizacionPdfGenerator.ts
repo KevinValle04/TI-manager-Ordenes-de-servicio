@@ -35,9 +35,17 @@ export interface CotizacionPdfData {
     esSeparador?: boolean;
     esConceptoAgrupado?: boolean;
     nombreConceptoAgrupado?: string;
+    itemsAgrupados?: Array<{
+      marca?: string;
+      modelo?: string;
+      concepto?: string;
+      cantidad: number;
+      unidad: string;
+    }>;
   }>;
   comentarios?: string;
   comentariosPdf?: string;
+  mostrarContenidoConceptos?: boolean;
   razonSocial?: {
     nombre: string;
     rfc: string;
@@ -186,6 +194,7 @@ export class CotizacionPdfGenerator {
         total: this.formatoMoneda(datos.total, moneda),
         nombreMoneda: nombreMoneda,
         razonSocial: datos.razonSocial, // Pasar datos de razón social
+        mostrarContenidoConceptos: datos.mostrarContenidoConceptos || false, // Pasar flag de mostrar contenido
         items: datos.items.map(item => ({
           ...item,
           precioUnitario: this.formatoMoneda(item.precioUnitario, moneda),

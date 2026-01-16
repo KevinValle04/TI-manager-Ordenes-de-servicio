@@ -314,6 +314,20 @@
           <td style="border-left: none; border-right: none;"></td>
           <td class="text-right" style="font-weight: bold;">{{subtotal}}</td>
         </tr>
+        {{#if ../mostrarContenidoConceptos}}
+          {{#each itemsAgrupados}}
+          <tr style="background-color: #f8f9fa;">
+            <td class="text-center" style="padding-left: 20px; font-size: 0.9em; color: #6c757d;">└</td>
+            <td style="font-size: 0.9em; color: #6c757d;">{{marca}}</td>
+            <td style="font-size: 0.9em; color: #6c757d;">{{modelo}}</td>
+            <td style="font-size: 0.9em; color: #6c757d;">{{concepto}}</td>
+            <td class="text-center" style="font-size: 0.9em; color: #6c757d;">{{unidad}}</td>
+            <td class="text-center" style="font-size: 0.9em; color: #6c757d;">{{cantidad}}</td>
+            <td style="font-size: 0.9em; color: #6c757d;">-</td>
+            <td style="font-size: 0.9em; color: #6c757d;">-</td>
+          </tr>
+          {{/each}}
+        {{/if}}
         {{else}}
         <tr>
           <td class="text-center">{{increment @index}}</td>

@@ -66,7 +66,8 @@ const CotizacionModal = ({
     total: 0,
     estado: 'Borrador',
     comentariosInternos: '',
-    comentariosPdf: ''
+    comentariosPdf: '',
+    mostrarContenidoConceptos: false
   };
 
   // Estados del formulario
@@ -74,6 +75,9 @@ const CotizacionModal = ({
   
   // Estado para la moneda
   const [moneda, setMoneda] = useState<'MXN' | 'USD'>('MXN');
+  
+  // Estado para mostrar contenido de conceptos en PDF
+  const [mostrarContenidoConceptos, setMostrarContenidoConceptos] = useState(false);
 
   // Estados para autocompletado
   const [clienteSuggestions, setClienteSuggestions] = useState<Cliente[]>([]);
@@ -491,6 +495,11 @@ const CotizacionModal = ({
         setMoneda(editingCotizacion.moneda as 'MXN' | 'USD');
       }
       
+      // Cargar mostrarContenidoConceptos si existe
+      if (editingCotizacion.mostrarContenidoConceptos !== undefined) {
+        setMostrarContenidoConceptos(editingCotizacion.mostrarContenidoConceptos);
+      }
+      
       // Cargar display text del cliente
       const clienteObj = typeof editingCotizacion.cliente === 'object' ? editingCotizacion.cliente : null;
       if (clienteObj) {
@@ -605,6 +614,7 @@ const CotizacionModal = ({
       setRazonSocialDisplayText('');
       setClienteDisplayText('');
       setMoneda('MXN'); // Resetear moneda a MXN por defecto
+      setMostrarContenidoConceptos(false); // Resetear checkbox
       
       // Limpiar estados de autocompletado
       setClienteSuggestions([]);
@@ -701,6 +711,7 @@ const CotizacionModal = ({
     const filteredData = {
       ...formData,
       moneda: moneda, // Agregar la moneda seleccionada
+      mostrarContenidoConceptos: mostrarContenidoConceptos, // Agregar flag de mostrar contenido
       items: formData.items.filter(item => item.concepto.trim() !== '' || item.esSeparador || item.esConceptoAgrupado)
     };
     onSave(filteredData);
@@ -1100,6 +1111,20 @@ const CotizacionModal = ({
         </Modal.Header>
         <Modal.Body className="px-4 py-3" style={{ height: 'calc(100vh - 120px)', overflowY: 'auto', overflowX: 'hidden' }}>
           <Form>
+            {/* Checkbox para mostrar contenido de conceptos en PDF */}
+            <div className="row mb-2">
+              <div className="col-12">
+                <Form.Check
+                  type="checkbox"
+                  id="mostrarContenidoConceptos"
+                  label="Mostrar contenido de Conceptos en PDF"
+                  checked={mostrarContenidoConceptos}
+                  onChange={(e) => setMostrarContenidoConceptos(e.target.checked)}
+                  title="Si está marcado, los artículos dentro de cada concepto se listarán en el PDF (sin mostrar precio unitario ni importe individual)"
+                />
+              </div>
+            </div>
+
             {/* Fila 1: Cliente, Razón Social, No. Cotización */}
             <div className="row mb-2">
               <div className="col-md-4">

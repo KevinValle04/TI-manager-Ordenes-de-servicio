@@ -192,6 +192,7 @@ export interface Cotizacion {
   items: ItemCotizacion[];
   comentariosInternos?: string; // Comentarios visibles solo en la lista de cotizaciones
   comentariosPdf?: string; // Comentarios que aparecen en el PDF
+  mostrarContenidoConceptos?: boolean; // Si se debe mostrar el contenido de los conceptos agrupados en el PDF
   fechaCreacion: Date | string;
   fechaActualizacion: Date | string;
 }

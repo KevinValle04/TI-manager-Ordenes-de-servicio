@@ -17,6 +17,7 @@ export interface ICotizacion extends Document {
   items: IItemCotizacion[];
   comentariosInternos?: string; // Comentarios visibles solo en la lista
   comentariosPdf?: string; // Comentarios que aparecen en el PDF
+  mostrarContenidoConceptos?: boolean; // Si se debe mostrar el contenido de los conceptos agrupados en el PDF
   fechaCreacion: Date;
   fechaActualizacion: Date;
   calcularTotales(): void;
@@ -205,6 +206,11 @@ const CotizacionSchema = new Schema<ICotizacion>({
   comentariosPdf: { 
     type: String,
     required: false
+  },
+  mostrarContenidoConceptos: {
+    type: Boolean,
+    required: false,
+    default: false
   },
   fechaCreacion: { 
     type: Date, 

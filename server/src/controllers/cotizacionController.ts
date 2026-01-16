@@ -66,7 +66,14 @@ const prepararDatosPdf = (cotizacion: ICotizacion): CotizacionPdfData => ({
         iva: item.aplicarIva ? item.importe * (cotizacion.iva/100) : 0,
         esSeparador: false,
         esConceptoAgrupado: true,
-        nombreConceptoAgrupado: item.nombreConceptoAgrupado || ''
+        nombreConceptoAgrupado: item.nombreConceptoAgrupado || '',
+        itemsAgrupados: item.itemsAgrupados?.map(subItem => ({
+          marca: subItem.marca || '',
+          modelo: subItem.modelo || '',
+          concepto: subItem.concepto || '',
+          cantidad: subItem.cantidad,
+          unidad: subItem.unidad
+        }))
       };
     }
     // Calcular precio de venta (costo + ganancia) para mostrar en el PDF
@@ -88,6 +95,7 @@ const prepararDatosPdf = (cotizacion: ICotizacion): CotizacionPdfData => ({
     };
   }),
   comentariosPdf: cotizacion.comentariosPdf,
+  mostrarContenidoConceptos: cotizacion.mostrarContenidoConceptos || false,
   razonSocial: (() => {
     const rs: any = cotizacion.razonSocial;
     if (!rs) return undefined;
