@@ -231,6 +231,7 @@ export interface ItemCotizacion {
   nombreConceptoAgrupado?: string; // Nombre del concepto agrupado
   itemsAgrupados?: ItemCotizacion[]; // Items que contiene el concepto
   conceptoPadreId?: string; // ID del concepto padre (para items hijos)
+  indiceOriginalAntesDeConcept?: number; // Índice original del item antes de ser agrupado en un concepto
 }
 
 export interface ItemEntrega {

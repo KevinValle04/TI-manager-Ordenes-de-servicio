@@ -289,7 +289,11 @@ const CotizacionModal = ({
     }
 
     const indicesSeleccionados = Array.from(itemsSeleccionadosConcepto).sort((a, b) => a - b);
-    const itemsParaAgrupar = indicesSeleccionados.map(i => formData.items[i]).filter(item => item && !item.esSeparador && !item.esConceptoAgrupado);
+    // Guardar tanto el item como su índice original
+    const itemsConIndices = indicesSeleccionados
+      .map(i => ({ item: formData.items[i], indiceOriginal: i }))
+      .filter(({ item }) => item && !item.esSeparador && !item.esConceptoAgrupado);
+    const itemsParaAgrupar = itemsConIndices.map(({ item }) => item);
     
     if (itemsParaAgrupar.length === 0) {
       alert('No hay artículos válidos seleccionados.');
@@ -316,7 +320,10 @@ const CotizacionModal = ({
       aplicarIva: aplicaIva,
       esConceptoAgrupado: true,
       nombreConceptoAgrupado: nombreConceptoNuevo.trim(),
-      itemsAgrupados: itemsParaAgrupar.map(item => ({ ...item }))
+      itemsAgrupados: itemsConIndices.map(({ item, indiceOriginal }) => ({
+        ...item,
+        indiceOriginalAntesDeConcept: indiceOriginal
+      }))
     };
 
     // Encontrar la posición del primer item seleccionado
@@ -400,16 +407,66 @@ const CotizacionModal = ({
     const conceptoAgrupado = formData.items[index];
     if (!conceptoAgrupado.esConceptoAgrupado || !conceptoAgrupado.itemsAgrupados) return;
 
-    const itemsAnteriores = formData.items.slice(0, index);
-    const itemsPosteriores = formData.items.slice(index + 1).filter(item => item.concepto && item.concepto.trim() !== '');
     const itemsDesagrupados = conceptoAgrupado.itemsAgrupados.map(item => ({
       ...item,
       esConceptoAgrupado: false,
       itemsAgrupados: undefined,
-      nombreConceptoAgrupado: undefined
+      nombreConceptoAgrupado: undefined,
+      indiceOriginalAntesDeConcept: undefined
     }));
 
-    const nuevosItems = [...itemsAnteriores, ...itemsDesagrupados, ...itemsPosteriores];
+    // Verificar si los items tienen índice original guardado
+    const tienenIndiceOriginal = conceptoAgrupado.itemsAgrupados.some(
+      item => item.indiceOriginalAntesDeConcept !== undefined
+    );
+
+    let nuevosItems: ItemCotizacion[];
+
+    if (tienenIndiceOriginal) {
+      // Restaurar items en sus posiciones originales
+      // Primero, obtener todos los items actuales excepto el concepto y filas vacías
+      const itemsActuales = formData.items
+        .filter((item, i) => i !== index && item.concepto && item.concepto.trim() !== '');
+      
+      // Crear un mapa de índices originales a items desagrupados
+      const itemsPorIndice = new Map<number, ItemCotizacion>();
+      conceptoAgrupado.itemsAgrupados.forEach((item, i) => {
+        const indiceOriginal = item.indiceOriginalAntesDeConcept ?? 0;
+        itemsPorIndice.set(indiceOriginal, itemsDesagrupados[i]);
+      });
+      
+      // Reconstruir el array insertando items en sus posiciones originales
+      const maxIndice = Math.max(
+        ...itemsActuales.map((_, i) => i),
+        ...Array.from(itemsPorIndice.keys())
+      );
+      
+      nuevosItems = [];
+      let contadorItemsActuales = 0;
+      
+      for (let i = 0; i <= maxIndice + itemsDesagrupados.length; i++) {
+        if (itemsPorIndice.has(i)) {
+          // Insertar item desagrupado en su posición original
+          nuevosItems.push(itemsPorIndice.get(i)!);
+        } else if (contadorItemsActuales < itemsActuales.length) {
+          // Insertar item actual
+          nuevosItems.push(itemsActuales[contadorItemsActuales]);
+          contadorItemsActuales++;
+        }
+      }
+      
+      // Agregar items actuales restantes
+      while (contadorItemsActuales < itemsActuales.length) {
+        nuevosItems.push(itemsActuales[contadorItemsActuales]);
+        contadorItemsActuales++;
+      }
+    } else {
+      // Comportamiento anterior: insertar en la posición del concepto
+      const itemsAnteriores = formData.items.slice(0, index);
+      const itemsPosteriores = formData.items.slice(index + 1).filter(item => item.concepto && item.concepto.trim() !== '');
+      nuevosItems = [...itemsAnteriores, ...itemsDesagrupados, ...itemsPosteriores];
+    }
+
     const itemsConFilaVacia = ensureEmptyRow(nuevosItems).map((item, idx) => ({
       ...item,
       clave: idx + 1
