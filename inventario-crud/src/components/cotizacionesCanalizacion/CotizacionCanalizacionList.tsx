@@ -359,40 +359,38 @@ const CotizacionCanalizacionList: React.FC = () => {
               data={currentItems}
               columns={columns}
               actions={(cotizacion) => (
-                <div className="d-flex flex-column flex-sm-row align-items-stretch gap-1">
+                <div className="d-flex gap-1 align-items-center" style={{ flexWrap: 'nowrap' }}>
                   <Button
-                    variant="warning"
+                    variant="outline-primary"
                     size="sm"
-                    className="w-100 w-sm-auto"
-                    onClick={() => handleEdit(cotizacion)}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    variant="info"
-                    size="sm"
-                    className="w-100 w-sm-auto"
                     onClick={() => handleVerPdf(cotizacion)}
                     title="Ver PDF"
                   >
-                    Ver
+                    <i className="fas fa-eye"></i>
                   </Button>
                   <Button
-                    variant="secondary"
+                    variant="outline-success"
                     size="sm"
-                    className="w-100 w-sm-auto"
                     onClick={() => handleDescargarPdf(cotizacion)}
                     title="Descargar PDF"
                   >
-                    📄
+                    <i className="fas fa-download"></i>
                   </Button>
                   <Button
-                    variant="danger"
+                    variant="outline-warning"
                     size="sm"
-                    className="w-100 w-sm-auto"
-                    onClick={() => handleDelete(cotizacion._id!)}
+                    onClick={() => handleEdit(cotizacion)}
+                    title="Editar"
                   >
-                    Eliminar
+                    <i className="fas fa-pencil-alt"></i>
+                  </Button>
+                  <Button
+                    variant="outline-danger"
+                    size="sm"
+                    onClick={() => handleDelete(cotizacion._id!)}
+                    title="Eliminar"
+                  >
+                    <i className="fas fa-trash"></i>
                   </Button>
                 </div>
               )}

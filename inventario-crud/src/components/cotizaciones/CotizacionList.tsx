@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Dropdown } from 'react-bootstrap';
 import { Cliente, Cotizacion, IInventoryItem, Proyecto, RazonSocial, Vendedor } from '../../types';
 import DataTable from '../common/DataTable';
 import PaginationCompact from '../common/PaginationCompact';
@@ -272,7 +272,13 @@ const CotizacionList: React.FC = () => {
         { 
       key: 'comentariosInternos', 
       label: 'Comentarios',
-      render: (cotizacion: Cotizacion) => cotizacion.comentariosInternos || 'Sin comentarios'
+      render: (cotizacion: Cotizacion) => cotizacion.comentariosInternos || 'Sin comentarios',
+      style: { 
+        maxWidth: '250px', 
+        wordWrap: 'break-word', 
+        whiteSpace: 'normal',
+        overflow: 'hidden'
+      } as React.CSSProperties
     },
     { 
       key: 'fecha', 
@@ -296,70 +302,71 @@ const CotizacionList: React.FC = () => {
     {
       key: 'acciones',
       label: 'Acciones',
+      style: { minWidth: '200px' } as React.CSSProperties,
       render: (cotizacion: Cotizacion) => (
-        <>
+        <div className="d-flex gap-1 align-items-center" style={{ flexWrap: 'nowrap' }}>
           <Button
-            variant="primary"
+            variant="outline-primary"
             size="sm"
-            className="me-1 mb-1"
             onClick={() => handleVerPdf(cotizacion)}
-            title="Ver PDF con precios"
+            title="Ver PDF"
           >
-            <i className="fas fa-file-pdf me-1"></i>Ver PDF Precios
+            <i className="fas fa-eye"></i>
           </Button>
           <Button
-            variant="success"
+            variant="outline-success"
             size="sm"
-            className="me-1 mb-1"
             onClick={() => handleDescargarPdf(cotizacion)}
-            title="Descargar PDF con precios"
+            title="Descargar PDF"
           >
-            <i className="fas fa-download me-1"></i>Descargar PDF
+            <i className="fas fa-download"></i>
           </Button>
           <Button
-            variant="info"
+            variant="outline-warning"
             size="sm"
-            className="me-1 mb-1"
-            onClick={() => handleVerPdfChecklist(cotizacion)}
-            title="Ver checklist sin precios"
-          >
-            <i className="fas fa-list-check me-1"></i>Ver Checklist
-          </Button>
-          <Button
-            variant="outline-info"
-            size="sm"
-            className="me-1 mb-1"
-            onClick={() => handleDescargarPdfChecklist(cotizacion)}
-            title="Descargar checklist sin precios"
-          >
-            <i className="fas fa-download me-1"></i>Descargar Checklist
-          </Button>
-          <Button
-            variant="warning"
-            size="sm"
-            className="me-1 mb-1"
             onClick={() => handleEdit(cotizacion)}
+            title="Editar"
           >
-            <i className="fas fa-edit me-1"></i>Editar
+            <i className="fas fa-pencil-alt"></i>
           </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            className="me-1 mb-1"
-            onClick={() => handleDuplicate(cotizacion)}
-            title="Crear copia de la cotización"
-          >
-            <i className="fas fa-clone me-1"></i>Duplicar
-          </Button>
-          <Button
-            variant="danger"
-            size="sm"
-            className="mb-1"
-            onClick={() => handleDelete(cotizacion._id!)}
-          >
-            <i className="fas fa-trash me-1"></i>Eliminar
-          </Button>
-        </>
+          <Dropdown drop="down">
+            <Dropdown.Toggle variant="outline-secondary" size="sm" id={`dropdown-${cotizacion._id}`}>
+              <i className="fas fa-ellipsis-v"></i>
+            </Dropdown.Toggle>
+            <Dropdown.Menu align="end" className="bg-white shadow border">
+              <Dropdown.Item 
+                onClick={() => handleVerPdfChecklist(cotizacion)} 
+                className="text-dark"
+                style={{ backgroundColor: 'white', color: '#212529 !important' }}
+              >
+                <i className="fas fa-list-check me-2 text-info"></i>Ver Checklist
+              </Dropdown.Item>
+              <Dropdown.Item 
+                onClick={() => handleDescargarPdfChecklist(cotizacion)}
+                className="text-dark"
+                style={{ backgroundColor: 'white', color: '#212529 !important' }}
+              >
+                <i className="fas fa-download me-2 text-success"></i>Descargar Checklist
+              </Dropdown.Item>
+              <Dropdown.Divider />
+              <Dropdown.Item 
+                onClick={() => handleDuplicate(cotizacion)}
+                className="text-dark"
+                style={{ backgroundColor: 'white', color: '#212529 !important' }}
+              >
+                <i className="fas fa-clone me-2 text-secondary"></i>Duplicar
+              </Dropdown.Item>
+              <Dropdown.Divider />
+              <Dropdown.Item 
+                onClick={() => handleDelete(cotizacion._id!)} 
+                className="text-danger"
+                style={{ backgroundColor: 'white' }}
+              >
+                <i className="fas fa-trash me-2"></i>Eliminar
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
       )
     }
   ];

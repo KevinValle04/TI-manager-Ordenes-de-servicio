@@ -548,53 +548,51 @@ const ColaboradorList: React.FC = () => {
           columns={columns}
           data={paginated}
           actions={(colaborador) => (
-            <div className="d-flex flex-column flex-sm-row align-items-stretch gap-1">
+            <div className="d-flex gap-1 align-items-center" style={{ flexWrap: 'nowrap' }}>
               {isAdmin && (
                 <>
-                  <Button variant="warning" size="sm" className="w-100 w-sm-auto" onClick={() => handleEdit(colaborador)}>
-                    Editar
-                  </Button>
-                  <Button variant="danger" size="sm" className="w-100 w-sm-auto" onClick={() => handleDelete(colaborador._id!)}>
-                    Eliminar
+                  <Button 
+                    variant="outline-warning" 
+                    size="sm" 
+                    onClick={() => handleEdit(colaborador)}
+                    title="Editar"
+                  >
+                    <i className="fas fa-pencil-alt"></i>
                   </Button>
                 </>
               )}
               <Button 
-                variant="warning" 
+                variant="outline-info" 
                 size="sm" 
-                style={{ 
-                  width: '40px', 
-                  height: '40px', 
-                  padding: '8px', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center' 
-                }}
                 onClick={(e) => {
                   e.preventDefault();
                   handleShowHerramientas(colaborador);
                 }}
+                title="Herramientas"
               >
                 <FaTools size={16} />
               </Button>
               <Button 
-                variant="info" 
+                variant="outline-secondary" 
                 size="sm" 
-                style={{ 
-                  width: '40px', 
-                  height: '40px', 
-                  padding: '8px', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center' 
-                }}
                 onClick={(e) => {
                   e.preventDefault();
                   handleShowDocumentos(colaborador);
                 }}
+                title="Documentos"
               >
                 <FaFileAlt size={16} />
               </Button>
+              {isAdmin && (
+                <Button 
+                  variant="outline-danger" 
+                  size="sm" 
+                  onClick={() => handleDelete(colaborador._id!)}
+                  title="Eliminar"
+                >
+                  <i className="fas fa-trash"></i>
+                </Button>
+              )}
             </div>
           )}
           className="small"

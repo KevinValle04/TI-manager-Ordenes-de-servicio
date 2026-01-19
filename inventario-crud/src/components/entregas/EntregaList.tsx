@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Dropdown } from 'react-bootstrap';
 import { Cliente, Entrega, IInventoryItem, RazonSocial, Proyecto } from '../../types';
 import DataTable from '../common/DataTable';
 import PaginationCompact from '../common/PaginationCompact';
@@ -195,40 +195,48 @@ const EntregaList: React.FC = () => {
     {
       key: 'acciones',
       label: 'Acciones',
+      style: { minWidth: '200px' } as React.CSSProperties,
       render: (Entrega: Entrega) => (
-        <>
+        <div className="d-flex gap-1 align-items-center" style={{ flexWrap: 'nowrap' }}>
           <Button
-            variant="primary"
+            variant="outline-primary"
             size="sm"
-            className="me-2"
             onClick={() => handleVerPdf(Entrega)}
+            title="Ver PDF"
           >
-            Ver PDF
+            <i className="fas fa-eye"></i>
           </Button>
           <Button
-            variant="success"
+            variant="outline-success"
             size="sm"
-            className="me-2"
             onClick={() => handleDescargarPdf(Entrega)}
+            title="Descargar PDF"
           >
-            Descargar
+            <i className="fas fa-download"></i>
           </Button>
           <Button
-            variant="warning"
+            variant="outline-warning"
             size="sm"
-            className="me-2"
             onClick={() => handleEdit(Entrega)}
+            title="Editar"
           >
-            Editar
+            <i className="fas fa-pencil-alt"></i>
           </Button>
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={() => handleDelete(Entrega._id!)}
-          >
-            Eliminar
-          </Button>
-        </>
+          <Dropdown drop="down">
+            <Dropdown.Toggle variant="outline-secondary" size="sm" id={`dropdown-${Entrega._id}`}>
+              <i className="fas fa-ellipsis-v"></i>
+            </Dropdown.Toggle>
+            <Dropdown.Menu align="end" className="bg-white shadow border">
+              <Dropdown.Item 
+                onClick={() => handleDelete(Entrega._id!)} 
+                className="text-danger"
+                style={{ backgroundColor: 'white' }}
+              >
+                <i className="fas fa-trash me-2"></i>Eliminar
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
       )
     }
   ];

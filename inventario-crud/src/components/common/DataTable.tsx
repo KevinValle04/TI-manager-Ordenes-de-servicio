@@ -5,6 +5,8 @@ export interface DataTableColumn<T> {
   key: keyof T | string;
   label: string;
   render?: (item: T) => React.ReactNode;
+  style?: React.CSSProperties;
+  headerStyle?: React.CSSProperties;
 }
 
 interface DataTableProps<T> {
@@ -29,7 +31,7 @@ function DataTable<T extends { _id?: string }>({
       <thead>
         <tr>
           {columns.map((col) => (
-            <th key={col.key as string}>{col.label}</th>
+            <th key={col.key as string} style={col.headerStyle}>{col.label}</th>
           ))}
           {actions && <th>Más</th>}
         </tr>
@@ -42,7 +44,7 @@ function DataTable<T extends { _id?: string }>({
             style={onRowClick ? { cursor: 'pointer' } : undefined}
           >
             {columns.map((col) => (
-              <td key={col.key as string}>
+              <td key={col.key as string} style={col.style}>
                 {col.render ? col.render(item) : (item as any)[col.key]}
               </td>
             ))}

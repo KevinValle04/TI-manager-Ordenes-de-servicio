@@ -189,15 +189,43 @@ const OrdenCompraList: React.FC = () => {
               data={paginatedOrdenes}
               columns={columns}
               actions={(orden) => (
-                <div className="d-flex flex-column flex-sm-row align-items-stretch gap-1">
-                  <Button variant="warning" size="sm" onClick={() => handleEdit(orden)} aria-label={`Editar orden ${orden.numeroOrden}`}>Editar</Button>
+                <div className="d-flex gap-1 align-items-center" style={{ flexWrap: 'nowrap' }}>
                   {orden.rutaPdf && (
                     <>
-                      <Button variant="info" size="sm" onClick={() => handleVerPdf(orden)} aria-label={`Ver PDF orden ${orden.numeroOrden}`}>Ver PDF</Button>
-                      <Button variant="secondary" size="sm" onClick={() => handleDescargarPdf(orden)} aria-label={`Descargar PDF orden ${orden.numeroOrden}`}>📄</Button>
+                      <Button 
+                        variant="outline-primary" 
+                        size="sm" 
+                        onClick={() => handleVerPdf(orden)} 
+                        title="Ver PDF"
+                      >
+                        <i className="fas fa-eye"></i>
+                      </Button>
+                      <Button 
+                        variant="outline-success" 
+                        size="sm" 
+                        onClick={() => handleDescargarPdf(orden)} 
+                        title="Descargar PDF"
+                      >
+                        <i className="fas fa-download"></i>
+                      </Button>
                     </>
                   )}
-                  <Button variant="danger" size="sm" onClick={() => handleDelete(orden)} aria-label={`Eliminar orden ${orden.numeroOrden}`}>Eliminar</Button>
+                  <Button 
+                    variant="outline-warning" 
+                    size="sm" 
+                    onClick={() => handleEdit(orden)} 
+                    title="Editar"
+                  >
+                    <i className="fas fa-pencil-alt"></i>
+                  </Button>
+                  <Button 
+                    variant="outline-danger" 
+                    size="sm" 
+                    onClick={() => handleDelete(orden)} 
+                    title="Eliminar"
+                  >
+                    <i className="fas fa-trash"></i>
+                  </Button>
                 </div>
               )}
               className="small"
