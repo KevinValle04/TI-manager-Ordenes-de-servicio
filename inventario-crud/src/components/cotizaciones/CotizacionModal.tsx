@@ -1109,7 +1109,7 @@ const CotizacionModal = ({
             {editingCotizacion ? 'Editar' : 'Nueva'} Cotización
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body className="px-4 py-3" style={{ height: 'calc(100vh - 120px)', overflowY: 'auto', overflowX: 'hidden' }}>
+        <Modal.Body className="px-4 py-3" style={{ overflowY: 'auto', overflowX: 'hidden' }}>
           <Form>
             {/* Checkbox para mostrar contenido de conceptos en PDF */}
             <div className="row mb-2">
