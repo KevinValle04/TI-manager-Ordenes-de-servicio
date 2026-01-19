@@ -579,30 +579,26 @@ const ProyectoList: React.FC = () => {
             </div>
             <div className="d-flex gap-1">
               <Button
-                variant="warning"
+                variant="outline-warning"
                 size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleEdit(proyecto);
                 }}
-                title="Editar proyecto"
-                className="flex-fill"
+                title="Editar"
               >
-                <i className="fas fa-edit me-1"></i>
-                Editar
+                <i className="fas fa-pencil-alt"></i>
               </Button>
               <Button
-                variant="danger"
+                variant="outline-danger"
                 size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleDelete(proyecto._id!);
                 }}
-                title="Eliminar proyecto"
-                className="flex-fill"
+                title="Eliminar"
               >
-                <i className="fas fa-trash me-1"></i>
-                Eliminar
+                <i className="fas fa-trash"></i>
               </Button>
             </div>
           </div>

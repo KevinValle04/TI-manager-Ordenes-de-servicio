@@ -157,12 +157,22 @@ const ClienteList: React.FC = () => {
           columns={columns}
           data={paginated}
           actions={(cliente) => (
-            <div className="d-flex flex-column flex-sm-row align-items-stretch gap-1">
-              <Button variant="warning" size="sm" className="w-100 w-sm-auto" onClick={() => handleEdit(cliente)}>
-                Editar
+            <div className="d-flex gap-1 align-items-center" style={{ flexWrap: 'nowrap' }}>
+              <Button
+                variant="outline-warning"
+                size="sm"
+                onClick={() => handleEdit(cliente)}
+                title="Editar"
+              >
+                <i className="fas fa-pencil-alt"></i>
               </Button>
-              <Button variant="danger" size="sm" className="w-100 w-sm-auto" onClick={() => handleDelete(cliente._id!)}>
-                Eliminar
+              <Button
+                variant="outline-danger"
+                size="sm"
+                onClick={() => handleDelete(cliente._id!)}
+                title="Eliminar"
+              >
+                <i className="fas fa-trash"></i>
               </Button>
             </div>
           )}

@@ -156,17 +156,22 @@ const ProveedorList: React.FC = () => {
           columns={columns}
           data={paginated}
           actions={(proveedor) => (
-            <div className="d-flex flex-column flex-sm-row align-items-stretch gap-1">
-              <Button variant="warning" size="sm" className="w-100 w-sm-auto" onClick={() => handleEdit(proveedor)}>
-                Editar
+            <div className="d-flex gap-1 align-items-center" style={{ flexWrap: 'nowrap' }}>
+              <Button
+                variant="outline-warning"
+                size="sm"
+                onClick={() => handleEdit(proveedor)}
+                title="Editar"
+              >
+                <i className="fas fa-pencil-alt"></i>
               </Button>
               <Button
-                variant="danger"
+                variant="outline-danger"
                 size="sm"
-                className="w-100 w-sm-auto"
                 onClick={() => handleDelete(proveedor._id!)}
+                title="Eliminar"
               >
-                Eliminar
+                <i className="fas fa-trash"></i>
               </Button>
             </div>
           )}

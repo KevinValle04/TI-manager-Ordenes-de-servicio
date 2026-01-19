@@ -50,7 +50,7 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
     // Dashboard sin agrupar
     {
       label: "Dashboard",
-      icon: <FaTachometerAlt size={16} />,
+      icon: <FaTachometerAlt size={14} />,
       items: [
         { path: "/dashboard", label: "Dashboard", icon: <FaTachometerAlt size={14} /> },
       ],
@@ -58,7 +58,7 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
     // Solicitudes solo para admin
     ...((token && (jwtDecode(token) as any).isAdmin) ? [{
       label: "Solicitudes",
-      icon: <FaFileAlt size={16} />,
+      icon: <FaFileAlt size={14} />,
       items: [
         { path: "/solicitudes-inventario", label: "Solicitudes de Inventario", icon: <FaFileAlt size={14} /> },
         { path: "/solicitudes-herramientas", label: "Solicitudes de Herramientas", icon: <FaTools size={14} /> },
@@ -67,7 +67,7 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
     // Empleados
     {
       label: "Empleados",
-      icon: <FaUsers size={16} />,
+      icon: <FaUsers size={14} />,
       items: [
         { path: "/colaboradores", label: "Empleados", icon: <FaUsers size={14} /> },
       ],
@@ -75,14 +75,14 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
     // Guías
     {
       label: "Guías",
-      icon: <FaFileAlt size={16} />,
+      icon: <FaFileAlt size={14} />,
       items: [
         { path: "/guias", label: "Guías", icon: <FaFileAlt size={14} /> },
       ],
     },
     {
       label: "Proyectos",
-      icon: <FaProjectDiagram size={16} />,
+      icon: <FaProjectDiagram size={14} />,
       items: [
         { path: "/proyectos", label: "Control de Proyectos", icon: <FaProjectDiagram size={14} /> },
         { path: "/ordenes-compra", label: "Órdenes de Compra", icon: <FaShoppingCart size={14} /> },
@@ -92,7 +92,7 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
     },
     {
       label: "Almacén",
-      icon: <FaBoxes size={16} />,
+      icon: <FaBoxes size={14} />,
       items: [
         { path: "/inventario", label: "Almacén Interno", icon: <FaWarehouse size={14} /> },
         { path: "/inventarioExterior", label: "Almacén Externo", icon: <FaWarehouse size={14} /> },
@@ -106,7 +106,7 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
     // Control de Vehículos como opción independiente
     {
       label: "Bases de Datos",
-      icon: <FaUsers size={16} />,
+      icon: <FaUsers size={14} />,
       items: [
         { path: "/clientes", label: "Clientes", icon: <FaUsers size={14} /> },
         { path: "/proveedores", label: "Proveedores", icon: <FaTruck size={14} /> },
@@ -117,7 +117,7 @@ const MainLayout: React.FC<{ username?: string | null, onLogout?: () => void }> 
     },
         {
       label: "Control de Vehículos",
-      icon: <FaTruck size={16} />,
+      icon: <FaTruck size={14} />,
       items: [
         { path: "/vehiculos", label: "Control de Vehículos", icon: <FaTruck size={14} /> },
       ],

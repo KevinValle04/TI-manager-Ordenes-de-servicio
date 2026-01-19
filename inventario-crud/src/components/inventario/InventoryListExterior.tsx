@@ -496,22 +496,22 @@ const InventoryListExterior: React.FC = () => {
               columns={columns}
               data={paginatedItems}
               actions={isAdmin ? (item) => (
-                <div className="d-flex flex-column flex-sm-row align-items-stretch gap-1">
+                <div className="d-flex gap-1 align-items-center" style={{ flexWrap: 'nowrap' }}>
                   <Button
-                    variant="warning"
+                    variant="outline-warning"
                     size="sm"
-                    className="w-100 w-sm-auto"
                     onClick={() => handleEditItem(item)}
+                    title="Editar"
                   >
-                    Editar
+                    <i className="fas fa-pencil-alt"></i>
                   </Button>
                   <Button
-                    variant="danger"
+                    variant="outline-danger"
                     size="sm"
-                    className="w-100 w-sm-auto"
                     onClick={() => handleDelete(item._id!)}
+                    title="Eliminar"
                   >
-                    Eliminar
+                    <i className="fas fa-trash"></i>
                   </Button>
                 </div>
               ) : undefined}

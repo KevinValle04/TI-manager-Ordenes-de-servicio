@@ -119,20 +119,20 @@ const VehiculoCard: React.FC<VehiculoCardProps> = ({
             Registrar Servicio
           </Button>
           <Button
-            variant="primary"
+            variant="outline-warning"
             size="sm"
             onClick={() => onEdit(vehiculo)}
-            title="Editar vehículo"
+            title="Editar"
           >
-            ✏️
+            <i className="fas fa-pencil-alt"></i>
           </Button>
           <Button
-            variant="danger"
+            variant="outline-danger"
             size="sm"
             onClick={() => onDelete(vehiculo._id!)}
-            title="Eliminar vehículo"
+            title="Eliminar"
           >
-            🗑️
+            <i className="fas fa-trash"></i>
           </Button>
         </div>
       </Card.Body>
