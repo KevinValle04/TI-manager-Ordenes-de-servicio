@@ -1512,10 +1512,7 @@ const CotizacionModal = ({
               </Modal>
               <div className="table-responsive" style={{ 
                 maxWidth: '100%', 
-                minHeight: '400px',
-                maxHeight: '600px', 
                 overflowX: 'auto', 
-                overflowY: 'auto',
                 border: '1px solid #dee2e6',
                 borderRadius: '0.25rem'
               }}>
