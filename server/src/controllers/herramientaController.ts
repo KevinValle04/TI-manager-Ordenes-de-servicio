@@ -116,6 +116,12 @@ export const generateHerramientasPDF = async (req: Request, res: Response) => {
     const { colaboradorId } = req.params;
     console.log('Generando PDF para colaborador ID:', colaboradorId);
 
+    // Verificar que estemos conectados a la base de datos
+    if (!mongoose.connection.readyState) {
+      console.error('No hay conexión a la base de datos');
+      return res.status(500).json({ message: 'Error de conexión a la base de datos' });
+    }
+
     // Verificar que el ID sea válido
     if (!mongoose.Types.ObjectId.isValid(colaboradorId)) {
       console.log('ID de colaborador inválido:', colaboradorId);

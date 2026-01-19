@@ -122,7 +122,7 @@ export const useHerramientas = ({ colaboradorId, onHerramientasChange, isAdmin =
   };
 
   const exportToPdf = () => {
-    window.open(`http://localhost:6051/api/herramientas/pdf/${colaboradorId}`, '_blank');
+    window.open(`${import.meta.env.VITE_API_URL}herramientas/pdf/${colaboradorId}`, '_blank');
   };
 
   return {

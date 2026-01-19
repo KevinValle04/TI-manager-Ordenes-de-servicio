@@ -9,18 +9,21 @@
 
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import path from 'path';
 
-dotenv.config();
+// Cargar el .env del directorio server
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/timanager';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/timanager';
 
 async function migrarComentariosCotizaciones() {
   console.log('=== MIGRACIÓN DE COMENTARIOS DE COTIZACIONES ===\n');
   
   try {
     // Conectar a MongoDB
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(MONGO_URI);
     console.log('✓ Conectado a MongoDB');
+    console.log(`✓ URI: ${MONGO_URI}\n`);
     
     // Acceder directamente a la colección para evitar validaciones del modelo
     const db = mongoose.connection.db;

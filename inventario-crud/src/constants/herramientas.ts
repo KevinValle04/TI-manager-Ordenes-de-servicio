@@ -1,8 +1,9 @@
-export const API_BASE_URL = 'http://localhost:6051/api';
+// Get the base API URL from environment variables or fall back to the production URL
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://192.168.100.150:6051/api';
 
 export const HERRAMIENTAS_ENDPOINTS = {
   BASE: `${API_BASE_URL}/herramientas`,
-  PDF: (id: string) => `${API_BASE_URL}/herramientas/pdf/${id}`,
+  PDF: (id: string) => `http://192.168.100.150:6051/api/herramientas/pdf/${id}`,
   BY_ID: (id: string) => `${API_BASE_URL}/herramientas/${id}`,
 };
 

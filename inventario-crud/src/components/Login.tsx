@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = import.meta.env.VITE_API_URL + "auth/";
+const API_URL = `${import.meta.env.VITE_API_URL}auth/`;
 
 export default function Login({ onLogin }: { onLogin: (token: string, username: string) => void }) {
   const [username, setUsername] = useState('');

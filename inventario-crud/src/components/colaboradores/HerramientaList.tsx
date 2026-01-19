@@ -160,7 +160,7 @@ const HerramientaList: React.FC<HerramientaListProps> = ({
             type="default"
             icon={<FilePdfOutlined />}
             onClick={() => {
-              window.open(`http://localhost:6051/api/herramientas/pdf/${colaboradorId}`, '_blank');
+              window.open(`${import.meta.env.VITE_API_URL}herramientas/pdf/${colaboradorId}`, '_blank');
             }}
           >
             Exportar PDF

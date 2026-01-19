@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Dropdown } from 'react-bootstrap';
-import { Cliente, Cotizacion, IInventoryItem, Proyecto, RazonSocial, Vendedor } from '../../types';
+import { Button } from 'react-bootstrap';
+import { Cliente, Cotizacion, IInventoryItem, RazonSocial, Proyecto } from '../../types';
 import DataTable from '../common/DataTable';
 import PaginationCompact from '../common/PaginationCompact';
 import SearchBar from '../common/SearchBar';
@@ -27,7 +27,6 @@ const CotizacionList: React.FC = () => {
   const [inventarioItems, setInventarioItems] = useState<IInventoryItem[]>([]);
   const [razonesSociales, setRazonesSociales] = useState<RazonSocial[]>([]);
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
-  const [vendedores, setVendedores] = useState<Vendedor[]>([]);
 
   // Efectos
   useEffect(() => {
@@ -36,7 +35,6 @@ const CotizacionList: React.FC = () => {
     fetchInventarioItems();
     fetchRazonesSociales();
     fetchProyectos();
-    fetchVendedores();
   }, []);
 
   useEffect(() => {
@@ -116,18 +114,6 @@ const CotizacionList: React.FC = () => {
     }
   };
 
-  const fetchVendedores = async () => {
-    try {
-      const response = await fetch('/api/vendedores');
-      if (!response.ok) throw new Error('Error al cargar vendedores');
-      const data = await response.json();
-      setVendedores(data);
-    } catch (error) {
-      console.error('Error al cargar vendedores:', error);
-      setVendedores([]);
-    }
-  };
-
   // Funciones para PDF
   const handleVerPdf = (cotizacion: Cotizacion) => {
     if (!cotizacion._id) {
@@ -143,23 +129,6 @@ const CotizacionList: React.FC = () => {
       return;
     }
     window.open(`/api/cotizaciones/${cotizacion._id}/pdf/descargar`, "_blank");
-  };
-
-  // Funciones para PDF Checklist
-  const handleVerPdfChecklist = (cotizacion: Cotizacion) => {
-    if (!cotizacion._id) {
-      alert("ID de cotización no válido");
-      return;
-    }
-    window.open(`/api/cotizaciones/${cotizacion._id}/pdf-checklist`, "_blank");
-  };
-
-  const handleDescargarPdfChecklist = (cotizacion: Cotizacion) => {
-    if (!cotizacion._id) {
-      alert("ID de cotización no válido");
-      return;
-    }
-    window.open(`/api/cotizaciones/${cotizacion._id}/pdf-checklist/descargar`, "_blank");
   };
 
   // Funciones para la interfaz
@@ -208,54 +177,6 @@ const CotizacionList: React.FC = () => {
     }
   };
 
-  // Duplicar cotización: crea una nueva cotización idéntica y agrega " - DUPLICADO" al número
-  const handleDuplicate = async (cotizacion: Cotizacion) => {
-    try {
-      const baseNumero = cotizacion.numeroPresupuesto || generatePresupuestoNumber();
-      const nuevoNumero = `${baseNumero} - DUPLICADO`;
-
-      // Preparamos el payload para crear (sin _id para forzar POST)
-      const payload: any = { ...cotizacion, numeroPresupuesto: nuevoNumero };
-      delete payload._id;
-
-      // Asegurar que campos que el servidor espera como string sean strings
-      if (payload.cliente && typeof payload.cliente === 'object') {
-        payload.cliente = payload.cliente._id || payload.cliente.nombreEmpresa || String(payload.cliente);
-      }
-      if (payload.razonSocial && typeof payload.razonSocial === 'object') {
-        payload.razonSocial = payload.razonSocial._id || payload.razonSocial.nombre || String(payload.razonSocial);
-      }
-      if (payload.vendedor && typeof payload.vendedor === 'object') {
-        payload.vendedor = payload.vendedor._id || payload.vendedor.nombre || String(payload.vendedor);
-      }
-      if (payload.proyecto && typeof payload.proyecto === 'object') {
-        payload.proyecto = payload.proyecto._id || payload.proyecto.nombre || String(payload.proyecto);
-      }
-
-      const response = await fetch('/api/cotizaciones', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        const err = await response.text().catch(() => '');
-        alert('Error al duplicar la cotización: ' + (err || response.status));
-        return;
-      }
-
-  await response.json().catch(() => null);
-  // Refrescar la lista y restablecer la vista como al entrar al módulo
-  setSearchTerm('');
-  setCurrentPage(1);
-  fetchCotizaciones();
-  alert('Cotización duplicada');
-    } catch (error) {
-      console.error('Error duplicando cotización:', error);
-      alert('Error al duplicar la cotización');
-    }
-  };
-
   // Definición de columnas
   const columns = [
     { key: 'numeroPresupuesto', label: 'No. Presupuesto' },
@@ -266,24 +187,23 @@ const CotizacionList: React.FC = () => {
         if (!cotizacion.cliente) return 'Sin cliente';
         return typeof cotizacion.cliente === 'string' 
           ? cotizacion.cliente 
-          : cotizacion.cliente.nombreEmpresa;
+          : cotizacion.cliente.nombreEmpresa || 'Sin nombre';
       }
-    },
-        { 
-      key: 'comentariosInternos', 
-      label: 'Comentarios',
-      render: (cotizacion: Cotizacion) => cotizacion.comentariosInternos || 'Sin comentarios',
-      style: { 
-        maxWidth: '250px', 
-        wordWrap: 'break-word', 
-        whiteSpace: 'normal',
-        overflow: 'hidden'
-      } as React.CSSProperties
     },
     { 
       key: 'fecha', 
       label: 'Fecha',
       render: (cotizacion: Cotizacion) => new Date(cotizacion.fecha).toLocaleDateString()
+    },
+    { 
+      key: 'vigencia', 
+      label: 'Vigencia',
+      render: (cotizacion: Cotizacion) => new Date(cotizacion.vigencia).toLocaleDateString()
+    },
+    { 
+      key: 'subtotal', 
+      label: 'Subtotal',
+      render: (cotizacion: Cotizacion) => `$${cotizacion.subtotal.toFixed(2)}`
     },
     { 
       key: 'total', 
@@ -302,71 +222,40 @@ const CotizacionList: React.FC = () => {
     {
       key: 'acciones',
       label: 'Acciones',
-      style: { minWidth: '200px' } as React.CSSProperties,
       render: (cotizacion: Cotizacion) => (
-        <div className="d-flex gap-1 align-items-center" style={{ flexWrap: 'nowrap' }}>
+        <>
           <Button
-            variant="outline-primary"
+            variant="primary"
             size="sm"
+            className="me-2"
             onClick={() => handleVerPdf(cotizacion)}
-            title="Ver PDF"
           >
-            <i className="fas fa-eye"></i>
+            Ver PDF
           </Button>
           <Button
-            variant="outline-success"
+            variant="success"
             size="sm"
+            className="me-2"
             onClick={() => handleDescargarPdf(cotizacion)}
-            title="Descargar PDF"
           >
-            <i className="fas fa-download"></i>
+            Descargar
           </Button>
           <Button
-            variant="outline-warning"
+            variant="warning"
             size="sm"
+            className="me-2"
             onClick={() => handleEdit(cotizacion)}
-            title="Editar"
           >
-            <i className="fas fa-pencil-alt"></i>
+            Editar
           </Button>
-          <Dropdown drop="down">
-            <Dropdown.Toggle variant="outline-secondary" size="sm" id={`dropdown-${cotizacion._id}`}>
-              <i className="fas fa-ellipsis-v"></i>
-            </Dropdown.Toggle>
-            <Dropdown.Menu align="end" className="bg-white shadow border">
-              <Dropdown.Item 
-                onClick={() => handleVerPdfChecklist(cotizacion)} 
-                className="text-dark"
-                style={{ backgroundColor: 'white', color: '#212529 !important' }}
-              >
-                <i className="fas fa-list-check me-2 text-info"></i>Ver Checklist
-              </Dropdown.Item>
-              <Dropdown.Item 
-                onClick={() => handleDescargarPdfChecklist(cotizacion)}
-                className="text-dark"
-                style={{ backgroundColor: 'white', color: '#212529 !important' }}
-              >
-                <i className="fas fa-download me-2 text-success"></i>Descargar Checklist
-              </Dropdown.Item>
-              <Dropdown.Divider />
-              <Dropdown.Item 
-                onClick={() => handleDuplicate(cotizacion)}
-                className="text-dark"
-                style={{ backgroundColor: 'white', color: '#212529 !important' }}
-              >
-                <i className="fas fa-clone me-2 text-secondary"></i>Duplicar
-              </Dropdown.Item>
-              <Dropdown.Divider />
-              <Dropdown.Item 
-                onClick={() => handleDelete(cotizacion._id!)} 
-                className="text-danger"
-                style={{ backgroundColor: 'white' }}
-              >
-                <i className="fas fa-trash me-2"></i>Eliminar
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        </div>
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={() => handleDelete(cotizacion._id!)}
+          >
+            Eliminar
+          </Button>
+        </>
       )
     }
   ];
@@ -417,57 +306,30 @@ const CotizacionList: React.FC = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        
-        // Mostrar mensaje de error específico del servidor
-        let errorMessage = 'Error al guardar la cotización';
-        if (errorData.details) {
-          errorMessage = errorData.details;
-        } else if (errorData.error) {
-          errorMessage = errorData.error;
-        }
-        
-        // Si hay errores específicos de validación, mostrar el primero
-        if (errorData.errores && errorData.errores.length > 0) {
-          errorMessage = errorData.errores[0].mensaje;
-        }
-        
-        alert(`${errorMessage}`);
-        throw new Error(errorMessage);
+        throw new Error('Error al guardar la cotización');
       }
 
-      const result = await response.json();
-      console.log('Cotización guardada exitosamente:', result);
-      
       fetchCotizaciones();
       setShowModal(false);
       setEditingCotizacion(null);
-      
-      // Mostrar mensaje de éxito
-      alert(`Cotización ${data._id ? 'actualizada' : 'creada'} exitosamente`);
-      
     } catch (error) {
-      console.error('Error al guardar cotización:', error);
-      // El error ya se mostró en el bloque anterior
+      console.error('Error al guardar:', error);
+      alert('Error al guardar la cotización');
     }
   };
 
   return (
     <div className="container-fluid mt-3">
-      <div className="d-flex justify-content-end mb-3">
-        <Button onClick={() => {
-          setEditingCotizacion(null); // Limpiar cualquier cotización en edición
-          setShowModal(true);
-        }}>Nueva Cotización</Button>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+
+        <Button onClick={() => setShowModal(true)}>Nueva Cotización</Button>
       </div>
 
-      <div style={{ paddingBottom: '16px' }}>
-        <SearchBar
-          value={searchTerm}
-          onChange={handleSearch}
-          placeholder="Buscar por número, cliente o estado..."
-        />
-      </div>
+      <SearchBar
+        value={searchTerm}
+        onChange={handleSearch}
+        placeholder="Buscar por número, cliente o estado..."
+      />
 
       {loading ? (
         <p>Cargando...</p>
@@ -492,17 +354,13 @@ const CotizacionList: React.FC = () => {
       {/* Modal de formulario */}
       <CotizacionModal
         show={showModal}
-        onHide={() => {
-          setShowModal(false);
-          setEditingCotizacion(null); // Limpiar estado de edición al cerrar modal
-        }}
+        onHide={() => setShowModal(false)}
         onSave={handleSave}
         editingCotizacion={editingCotizacion}
         clientes={clientes}
         inventarioItems={inventarioItems}
         razonesSociales={razonesSociales}
         proyectos={proyectos}
-        vendedores={vendedores}
         generatePresupuestoNumber={generatePresupuestoNumber}
       />
     </div>
