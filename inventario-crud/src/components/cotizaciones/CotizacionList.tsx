@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Dropdown } from 'react-bootstrap';
 import { Cliente, Cotizacion, IInventoryItem, RazonSocial, Proyecto } from '../../types';
 import DataTable from '../common/DataTable';
 import PaginationCompact from '../common/PaginationCompact';
@@ -131,6 +131,50 @@ const CotizacionList: React.FC = () => {
     window.open(`/api/cotizaciones/${cotizacion._id}/pdf/descargar`, "_blank");
   };
 
+  const handleVerPdfChecklist = (cotizacion: Cotizacion) => {
+    if (!cotizacion._id) {
+      alert("ID de cotización no válido");
+      return;
+    }
+    window.open(`/api/cotizaciones/${cotizacion._id}/pdf/checklist`, "_blank");
+  };
+
+  const handleDescargarPdfChecklist = (cotizacion: Cotizacion) => {
+    if (!cotizacion._id) {
+      alert("ID de cotización no válido");
+      return;
+    }
+    window.open(`/api/cotizaciones/${cotizacion._id}/pdf/checklist/descargar`, "_blank");
+  };
+
+  const handleDuplicate = async (cotizacion: Cotizacion) => {
+    if (!window.confirm('¿Desea duplicar esta cotización?')) return;
+    
+    try {
+      const duplicatedData = {
+        ...cotizacion,
+        _id: undefined,
+        numeroPresupuesto: generatePresupuestoNumber(),
+        fecha: new Date().toISOString(),
+        estado: 'Borrador'
+      };
+      
+      const response = await fetch('/api/cotizaciones', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(duplicatedData),
+      });
+
+      if (!response.ok) throw new Error('Error al duplicar');
+      
+      fetchCotizaciones();
+      alert('Cotización duplicada exitosamente');
+    } catch (error) {
+      console.error('Error al duplicar:', error);
+      alert('Error al duplicar la cotización');
+    }
+  };
+
   // Funciones para la interfaz
   const handleSearch = (term: string) => {
     setSearchTerm(term);
@@ -191,6 +235,17 @@ const CotizacionList: React.FC = () => {
       }
     },
     { 
+      key: 'comentariosInternos', 
+      label: 'Comentarios',
+      render: (cotizacion: Cotizacion) => cotizacion.comentariosInternos || 'Sin comentarios',
+      style: { 
+        maxWidth: '250px', 
+        wordWrap: 'break-word', 
+        whiteSpace: 'normal',
+        overflow: 'hidden'
+      } as React.CSSProperties
+    },
+    { 
       key: 'fecha', 
       label: 'Fecha',
       render: (cotizacion: Cotizacion) => new Date(cotizacion.fecha).toLocaleDateString()
@@ -222,40 +277,71 @@ const CotizacionList: React.FC = () => {
     {
       key: 'acciones',
       label: 'Acciones',
+      style: { minWidth: '200px' } as React.CSSProperties,
       render: (cotizacion: Cotizacion) => (
-        <>
+        <div className="d-flex gap-1 align-items-center" style={{ flexWrap: 'nowrap' }}>
           <Button
-            variant="primary"
+            variant="outline-primary"
             size="sm"
-            className="me-2"
             onClick={() => handleVerPdf(cotizacion)}
+            title="Ver PDF"
           >
-            Ver PDF
+            <i className="fas fa-eye"></i>
           </Button>
           <Button
-            variant="success"
+            variant="outline-success"
             size="sm"
-            className="me-2"
             onClick={() => handleDescargarPdf(cotizacion)}
+            title="Descargar PDF"
           >
-            Descargar
+            <i className="fas fa-download"></i>
           </Button>
           <Button
-            variant="warning"
+            variant="outline-warning"
             size="sm"
-            className="me-2"
             onClick={() => handleEdit(cotizacion)}
+            title="Editar"
           >
-            Editar
+            <i className="fas fa-pencil-alt"></i>
           </Button>
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={() => handleDelete(cotizacion._id!)}
-          >
-            Eliminar
-          </Button>
-        </>
+          <Dropdown drop="down">
+            <Dropdown.Toggle variant="outline-secondary" size="sm" id={`dropdown-${cotizacion._id}`}>
+              <i className="fas fa-ellipsis-v"></i>
+            </Dropdown.Toggle>
+            <Dropdown.Menu align="end" className="bg-white shadow border">
+              <Dropdown.Item 
+                onClick={() => handleVerPdfChecklist(cotizacion)} 
+                className="text-dark"
+                style={{ backgroundColor: 'white', color: '#212529 !important' }}
+              >
+                <i className="fas fa-list-check me-2 text-info"></i>Ver Checklist
+              </Dropdown.Item>
+              <Dropdown.Item 
+                onClick={() => handleDescargarPdfChecklist(cotizacion)}
+                className="text-dark"
+                style={{ backgroundColor: 'white', color: '#212529 !important' }}
+              >
+                <i className="fas fa-download me-2 text-success"></i>Descargar Checklist
+              </Dropdown.Item>
+              <Dropdown.Divider />
+              <Dropdown.Item 
+                onClick={() => handleDuplicate(cotizacion)}
+                className="text-dark"
+                style={{ backgroundColor: 'white', color: '#212529 !important' }}
+              >
+                <i className="fas fa-clone me-2 text-secondary"></i>Duplicar
+              </Dropdown.Item>
+              <Dropdown.Divider />
+              <Dropdown.Item 
+                onClick={() => handleDelete(cotizacion._id!)} 
+                className="text-danger"
+                style={{ backgroundColor: 'white' }}
+              >
+                <i className="fas fa-trash me-2"></i>Eliminar
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
       )
     }
   ];
