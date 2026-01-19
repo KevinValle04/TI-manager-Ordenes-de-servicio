@@ -947,7 +947,7 @@ const CotizacionModal = ({
           const unidad = (selectedItem.unidad === 'PZA' || selectedItem.unidad === 'MTS') ? selectedItem.unidad : 'PZA' as const;
           const cantidad = newItems[index]?.cantidad || 1;
           const porcentajeGanancia = newItems[index]?.porcentajeGanancia || 0;
-          const ganancia = selectedItem.precioUnitario * (porcentajeGanancia / 100);
+          const ganancia = Math.round(selectedItem.precioUnitario * (porcentajeGanancia / 100) * 100) / 100;
           const concepto = [
             selectedItem.descripcion,
             selectedItem.marca,
@@ -966,7 +966,7 @@ const CotizacionModal = ({
             ganancia: ganancia,
             material: value,
             cantidad,
-            importe: cantidad * (selectedItem.precioUnitario + ganancia),
+            importe: Math.round(cantidad * (selectedItem.precioUnitario + ganancia) * 100) / 100,
             aplicarIva: true
           };
           
@@ -1023,11 +1023,11 @@ const CotizacionModal = ({
           const porcentajeGanancia = Number(updatedItem.porcentajeGanancia || 0);
           const cantidad = Number(updatedItem.cantidad || 0);
           
-          // Calcular ganancia por unidad
-          updatedItem.ganancia = precioUnitario * (porcentajeGanancia / 100);
+          // Calcular ganancia por unidad y redondear a 2 decimales
+          updatedItem.ganancia = Math.round(precioUnitario * (porcentajeGanancia / 100) * 100) / 100;
           
-          // Calcular importe final: cantidad * (precio costo + ganancia)
-          updatedItem.importe = cantidad * (precioUnitario + updatedItem.ganancia);
+          // Calcular importe final: cantidad * (precio costo + ganancia) y redondear a 2 decimales
+          updatedItem.importe = Math.round(cantidad * (precioUnitario + updatedItem.ganancia) * 100) / 100;
         }
 
         newItems[index] = updatedItem;
