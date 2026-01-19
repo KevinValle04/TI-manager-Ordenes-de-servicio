@@ -1670,7 +1670,7 @@ const CotizacionModal = ({
                             <td style={{ backgroundColor: '#d4edda' }}>-</td>
                             <td style={{ backgroundColor: '#d4edda' }}>
                               <span className="fw-bold text-success" style={{ fontSize: '13px' }}>
-                                ${(item.importe || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                                ${(item.importe || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                               </span>
                             </td>
                             <td style={{ backgroundColor: '#d4edda' }}>
@@ -1725,7 +1725,7 @@ const CotizacionModal = ({
                                 ${(subItem.ganancia || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                               </td>
                               <td style={{ backgroundColor: '#f0f9f0' }} className="text-muted small">
-                                ${(subItem.importe || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                                ${(subItem.importe || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                               </td>
                               <td style={{ backgroundColor: '#f0f9f0' }}>
                                 {subItem.aplicarIva ? '✓' : '-'}
