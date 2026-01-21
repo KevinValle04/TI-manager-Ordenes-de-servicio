@@ -188,9 +188,45 @@
     <!-- Título ORDEN DE COMPRA arriba del cuadro -->
     <h1 style="margin: 0 0 3px 0; font-size: 10pt; color: #0F2A52; text-align: right;">ORDEN DE COMPRA</h1>
 
-    <!-- Primera fila: Datos de Facturación y Datos de Orden -->
+    <!-- Primera fila: Proveedor y Datos de Orden -->
     <div style="display: flex; gap: 6px; margin-bottom: 6px;">
-      <!-- Datos de Facturación (Razón Social) -->
+      <!-- Datos del Proveedor -->
+      <div class="info-section" style="flex: 1; margin-bottom: 0;">
+        <h3>Proveedor</h3>
+        <div class="info-grid single-column">
+          <div class="info-item">
+            <span class="info-label">Empresa:</span>
+            <span>{{nomProveedor}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Dirección:</span>
+            <span>{{dirProveedor}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Teléfono:</span>
+            <span>{{telProveedor}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Datos de la Orden -->
+      <div class="info-section" style="flex: 1; margin-bottom: 0; text-align: right;">
+        <div class="info-grid single-column" style="text-align: right;">
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">No. Orden:</span>
+            <span style="font-weight: bold; font-size: 7pt;">{{noDocVal}}</span>
+          </div>
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">Fecha:</span>
+            <span>{{fechaDoc}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Segunda fila: Facturar a -->
+    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+      <!-- Datos de Facturación -->
       <div class="info-section" style="flex: 1; margin-bottom: 0;">
         <h3>Facturar a</h3>
         <div class="info-grid single-column">
@@ -213,59 +249,6 @@
           <div class="info-item">
             <span class="info-label">Email:</span>
             <span>{{emailFacturar}}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Datos de la Orden -->
-      <div class="info-section" style="flex: 1; margin-bottom: 0; text-align: right;">
-        <div class="info-grid single-column" style="text-align: right;">
-          <div class="info-item" style="justify-content: flex-end;">
-            <span class="info-label">No. Orden:</span>
-            <span style="font-weight: bold; font-size: 7pt;">{{noDocVal}}</span>
-          </div>
-          <div class="info-item" style="justify-content: flex-end;">
-            <span class="info-label">Fecha:</span>
-            <span>{{fechaDoc}}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Segunda fila: Información del Proveedor y Contacto -->
-    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
-      <div class="info-section" style="flex: 1; margin-bottom: 0;">
-        <h3>Proveedor</h3>
-        <div class="info-grid single-column">
-          <div class="info-item">
-            <span class="info-label">Empresa:</span>
-            <span>{{nomProveedor}}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Dirección:</span>
-            <span>{{dirProveedor}}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Teléfono:</span>
-            <span>{{telProveedor}}</span>
-          </div>
-        </div>
-      </div>
-      
-      <div class="info-section" style="flex: 1; margin-bottom: 0;">
-        <h3>Contacto del Proveedor</h3>
-        <div class="info-grid single-column">
-          <div class="info-item">
-            <span class="info-label">Nombre:</span>
-            <span>{{contactoProveedor}}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Email:</span>
-            <span>{{emailProveedorContacto}}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Teléfono:</span>
-            <span>{{telProveedorContato}}</span>
           </div>
         </div>
       </div>
