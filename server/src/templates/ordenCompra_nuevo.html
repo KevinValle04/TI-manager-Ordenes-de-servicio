@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Orden de Compra - {{noDocVal}}</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      padding: 6px;
+      font-size: 5pt;
+      line-height: 1.1;
+    }
+
+    #tabla-cotizacion-wrapper {
+      max-width: 100%;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .header h1 {
+      color: #0F2A52;
+      font-size: 8pt;
+      margin: 1px 0;
+    }
+
+    .info-section {
+      margin-bottom: 6px;
+      border: none;
+      padding: 4px 6px;
+      page-break-inside: avoid;
+    }
+
+    .info-section h3 {
+      font-size: 5.5pt;
+      margin: 0 0 2px 0;
+      color: #0F2A52;
+      font-weight: bold;
+      border-bottom: 1px solid #0F2A52;
+      padding-bottom: 2px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 3px 8px;
+    }
+
+    .info-grid.single-column {
+      grid-template-columns: 1fr;
+    }
+
+    .info-item {
+      display: flex;
+      gap: 3px;
+      font-size: 5pt;
+      line-height: 1.2;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #0F2A52;
+      min-width: 65px;
+      flex-shrink: 0;
+    }
+
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 4px;
+      font-size: 6pt;
+    }
+
+    .items-table th,
+    .items-table td {
+      border: 1px solid #ccc;
+      padding: 2px 4px;
+      line-height: 1.2;
+    }
+
+    .items-table th {
+      background-color: #0F2A52;
+      color: white;
+      text-align: center;
+      font-size: 6pt;
+      font-weight: bold;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .items-table td.text-right {
+      text-align: right;
+    }
+
+    .items-table td.text-center {
+      text-align: center;
+    }
+
+    .items-table td.col-importe {
+      background-color: #0F2A52;
+      color: white;
+      text-align: right;
+      font-weight: bold;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .totals-section {
+      margin-left: auto;
+      width: 220px;
+      margin-bottom: 6px;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px 6px;
+      border-bottom: 1px solid #ccc;
+      font-size: 6pt;
+    }
+
+    .total-row.grand-total {
+      background-color: #0F2A52;
+      color: white;
+      font-weight: bold;
+      font-size: 6pt;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .observaciones-section {
+      margin: 4px 0;
+      padding: 3px 4px;
+      border: 1px solid #ccc;
+      background: #f8f9fa;
+      font-size: 6pt;
+      line-height: 1.2;
+    }
+
+    .signatures {
+      margin-top: 30px;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .signature-line {
+      width: 140px;
+      text-align: center;
+      font-size: 5pt;
+    }
+
+    .signature-line hr {
+      margin-bottom: 2px;
+      border: none;
+      border-top: 1px solid #000;
+    }
+
+    .footer {
+      margin-top: 4px;
+      text-align: left;
+      font-size: 6pt;
+      color: #6c757d;
+    }
+
+    .logo {
+      text-align: center;
+      margin: 2px 0 4px 0;
+    }
+
+    .logo img {
+      max-width: 90px;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="tabla-cotizacion-wrapper">
+    <img src="{{topImg}}" alt="Header" style="width: 200px; height: auto; display: block; margin-bottom: 4px;">
+    
+    <!-- Título ORDEN DE COMPRA arriba del cuadro -->
+    <h1 style="margin: 0 0 3px 0; font-size: 10pt; color: #0F2A52; text-align: right;">ORDEN DE COMPRA</h1>
+
+    <!-- Primera fila: Datos de Facturación y Datos de Orden -->
+    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+      <!-- Datos de Facturación (Razón Social) -->
+      <div class="info-section" style="flex: 1; margin-bottom: 0;">
+        <h3>Facturar a</h3>
+        <div class="info-grid single-column">
+          <div class="info-item">
+            <span class="info-label">Razón Social:</span>
+            <span>{{nomFacturar}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">RFC:</span>
+            <span>{{rfcFacturar}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Dirección:</span>
+            <span>{{dirFacturar}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Teléfono:</span>
+            <span>{{telFacturar}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email:</span>
+            <span>{{emailFacturar}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Datos de la Orden -->
+      <div class="info-section" style="flex: 1; margin-bottom: 0; text-align: right;">
+        <div class="info-grid single-column" style="text-align: right;">
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">No. Orden:</span>
+            <span style="font-weight: bold; font-size: 7pt;">{{noDocVal}}</span>
+          </div>
+          <div class="info-item" style="justify-content: flex-end;">
+            <span class="info-label">Fecha:</span>
+            <span>{{fechaDoc}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Segunda fila: Información del Proveedor y Contacto -->
+    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+      <div class="info-section" style="flex: 1; margin-bottom: 0;">
+        <h3>Proveedor</h3>
+        <div class="info-grid single-column">
+          <div class="info-item">
+            <span class="info-label">Empresa:</span>
+            <span>{{nomProveedor}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Dirección:</span>
+            <span>{{dirProveedor}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Teléfono:</span>
+            <span>{{telProveedor}}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="info-section" style="flex: 1; margin-bottom: 0;">
+        <h3>Contacto del Proveedor</h3>
+        <div class="info-grid single-column">
+          <div class="info-item">
+            <span class="info-label">Nombre:</span>
+            <span>{{contactoProveedor}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email:</span>
+            <span>{{emailProveedorContacto}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Teléfono:</span>
+            <span>{{telProveedorContato}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tercera fila: Solicitante y Dirección de Entrega -->
+    <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+      <div class="info-section" style="flex: 1; margin-bottom: 0;">
+        <h3>Solicitante</h3>
+        <div class="info-grid single-column">
+          <div class="info-item">
+            <span class="info-label">Nombre:</span>
+            <span>{{solicitante}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email:</span>
+            <span>{{emailSolicitante}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Teléfono:</span>
+            <span>{{telSolicitante}}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="info-section" style="flex: 1; margin-bottom: 0;">
+        <h3>Entregar a</h3>
+        <div class="info-grid single-column">
+          <div class="info-item">
+            <span class="info-label">Contacto:</span>
+            <span>{{receptor}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Dirección:</span>
+            <span>{{direccionReceptor}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Teléfono:</span>
+            <span>{{telefonoReceptor}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de Productos -->
+    <table class="items-table">
+      <thead>
+        <tr>
+          {{encabezadosTabla}}
+        </tr>
+      </thead>
+      <tbody>
+        {{productos}}
+      </tbody>
+    </table>
+
+    <!-- Totales -->
+    <div class="totals-section">
+      <div class="total-row">
+        <span>Subtotal:</span>
+        <span>{{subtotal}}</span>
+      </div>
+      <div class="total-row">
+        <span>IVA ({{iva}}):</span>
+        <span>{{importeIva}}</span>
+      </div>
+      <div class="total-row grand-total">
+        <span>Total:</span>
+        <span>{{total}}</span>
+      </div>
+    </div>
+
+    <!-- Observaciones -->
+    <div class="observaciones-section">
+      <div style="display: flex; gap: 10px;">
+        <div style="flex: 1;">
+          <strong>Uso de Mercancía:</strong> {{usoMercancia}}
+        </div>
+        <div style="flex: 1;">
+          <strong>Forma de Pago:</strong> {{formaPago}}
+        </div>
+      </div>
+    </div>
+
+    <!-- Firmas -->
+    <div class="signatures" style="margin-top: 60px;">
+      <div class="signature-line">
+        <hr style="margin-top: 40px;">
+        <span>AUTORIZA</span>
+      </div>
+      <div class="signature-line">
+        <hr style="margin-top: 40px;">
+        <span>FIRMA DEL PROVEEDOR</span>
+      </div>
+      <div class="signature-line">
+        <hr style="margin-top: 40px;">
+        <span>FIRMA DEL SOLICITANTE</span>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer" style="margin-top: 20px;">
+      <img src="{{bottom1}}" alt="Footer" style="width: 100%; height: auto; display: block;">
+    </div>
+  </div>
+</body>
+</html>

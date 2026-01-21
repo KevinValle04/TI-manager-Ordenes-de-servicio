@@ -673,6 +673,82 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
     setErrorProcesamiento(null);
   };
 
+  // Crear orden de compra manualmente sin PDF
+  const crearOrdenManual = () => {
+    // Validaciones básicas
+    if (!numeroOrden.trim()) {
+      alert('El número de orden es requerido');
+      return;
+    }
+    
+    if (!proveedorSeleccionado) {
+      alert('Debe seleccionar un proveedor');
+      return;
+    }
+    
+    if (!razonSocialSeleccionada) {
+      alert('Debe seleccionar una razón social');
+      return;
+    }
+
+    // Preparar datos básicos de la orden (sin PDF)
+    const datosBasicos = {
+      numeroOrden,
+      proveedor: {
+        id: proveedorSeleccionado._id,
+        empresa: proveedorSeleccionado.empresa,
+        direccion: proveedorSeleccionado.direccion,
+        telefono: proveedorSeleccionado.telefono,
+        contactos: proveedorSeleccionado.contactos
+      },
+      razonSocial: {
+        id: razonSocialSeleccionada._id,
+        nombre: razonSocialSeleccionada.nombre,
+        rfc: razonSocialSeleccionada.rfc,
+        emailEmpresa: razonSocialSeleccionada.emailEmpresa,
+        telEmpresa: razonSocialSeleccionada.telEmpresa,
+        direccionEmpresa: razonSocialSeleccionada.direccionEmpresa,
+        emailFacturacion: razonSocialSeleccionada.emailFacturacion
+      },
+      vendedor: null,
+      direccionEnvio: direccionEnvioSeleccionada !== null ? {
+        indice: direccionEnvioSeleccionada,
+        ...razonSocialSeleccionada.direccionEnvio[direccionEnvioSeleccionada]
+      } : null,
+      pdfInfo: null,
+      datosPdf: {
+        datosExtraidos: {
+          folio: '',
+          folioOriginal: '',
+          formaPago: 'POR DEFINIR',
+          usoMercancia: 'G03 - GASTOS EN GENERAL',
+          productos: [],
+          totales: {}
+        }
+      },
+      fechaProcesamiento: new Date().toISOString()
+    };
+
+    // Inicializar con un producto vacío para empezar
+    const productosIniciales = [{
+      clave: '',
+      codigo: '',
+      descripcion: '',
+      cantidad: 1,
+      unidad: 'PIEZA',
+      precioUnitario: 0,
+      descuento: 0,
+      importe: 0
+    }];
+
+    setDatosOrdenCompletos(datosBasicos);
+    setProductosEditables(productosIniciales);
+    setTotalesCalculados({ subTotal: 0, iva: 0, total: 0 });
+    setMostrarModalResultados(true);
+    
+    console.log('📋 Orden manual iniciada:', datosBasicos);
+  };
+
   // Función auxiliar para parsear valores numéricos con formato de moneda
   const parseNumericValue = (value: any): number => {
     if (typeof value === 'number') return value || 0;
@@ -1254,7 +1330,7 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
 
             {/* Sección de carga de PDF */}
             <div className="mb-4 p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px', border: '1px solid #dee2e6' }}>
-              <h6 className="text-primary mb-3">Cargar Archivo PDF</h6>
+              <h6 className="text-primary mb-3">Cargar Archivo PDF (Opcional)</h6>
               <Form.Group className="mb-3">
                 <Form.Label>Seleccionar archivo PDF</Form.Label>
                 <Form.Control
@@ -1284,6 +1360,21 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
                   </small>
                 </Alert>
               )}
+              
+              {!archivoPdf && (
+                <Alert variant="light" className="mt-3 border">
+                  <div className="d-flex align-items-center">
+                    <i className="fas fa-info-circle text-info me-2"></i>
+                    <div>
+                      <strong>¿No tienes un PDF?</strong>
+                      <br />
+                      <small className="text-muted">
+                        Puedes crear una orden de compra manualmente usando el botón "Crear Orden Manual" sin necesidad de cargar un archivo PDF.
+                      </small>
+                    </div>
+                  </div>
+                </Alert>
+              )}
             </div>
           </Form>
         </Modal.Body>
@@ -1292,7 +1383,18 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
             Cancelar
           </Button>
           
-          {/* Botón para procesar orden */}
+          {/* Botón para crear orden manual */}
+          <Button 
+            variant="success" 
+            onClick={crearOrdenManual}
+            disabled={procesando || !proveedorSeleccionado || !razonSocialSeleccionada || !numeroOrden.trim()}
+            title="Crear orden sin PDF - Agregar productos manualmente"
+          >
+            <i className="fas fa-edit me-2"></i>
+            Crear Orden Manual
+          </Button>
+          
+          {/* Botón para procesar orden con PDF */}
           <Button 
             variant="outline-primary" 
             onClick={procesarOrden}
@@ -1305,8 +1407,8 @@ const OrdenCompraForm: React.FC<OrdenCompraFormProps> = ({ show, onHide, editId,
               </>
             ) : (
               <>
-                <i className="fas fa-cogs me-2"></i>
-                Procesar Orden
+                <i className="fas fa-file-pdf me-2"></i>
+                Procesar con PDF
               </>
             )}
           </Button>

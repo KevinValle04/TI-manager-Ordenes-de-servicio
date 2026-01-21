@@ -108,6 +108,10 @@ export class PdfGeneratorService {
       total: Number(datosOrden.totalesCalculados?.total) || 0
     };
 
+    // Formatear moneda según la seleccionada
+    const moneda = datosOrden.moneda || 'MXN';
+    const formatearConMoneda = (valor: number) => this.formatearMonedaConTipo(valor, moneda);
+
     // Mapear variables para la plantilla
     const plantillaVars = {
       // Información del documento
@@ -126,9 +130,10 @@ export class PdfGeneratorService {
       telProveedorContato: contactoPrincipal.telefono ? 
         `${contactoPrincipal.telefono} ${contactoPrincipal.extension ? 'Ext. ' + contactoPrincipal.extension : ''}` : '',
       
-      // Facturar a (razón social)
+      // Facturar a (razón social) - incluyendo RFC
       nomFacturar: razonSocial.nombre || '',
-      emailFacturar: razonSocial.emailFacturacion || '',
+      rfcFacturar: (razonSocial as any).rfc || '', // Agregar RFC
+      emailFacturar: razonSocial.emailFacturacion || razonSocial.emailEmpresa || '',
       dirFacturar: razonSocial.direccionEmpresa || '',
       telFacturar: razonSocial.telEmpresa || '',
       
@@ -142,19 +147,25 @@ export class PdfGeneratorService {
       direccionReceptor: direccionEnvio.direccion || '',
       telefonoReceptor: direccionEnvio.telefono || '',
       
-      // Totales
-      subtotal: this.formatearMoneda(totales.subTotal),
+      // Totales con formato de moneda
+      subtotal: formatearConMoneda(totales.subTotal),
       iva: `${datosOrden.porcentajeIvaSimbolico || '16'}%`, // Usar el porcentaje simbólico seleccionado
-      importeIva: this.formatearMoneda(totales.iva),
-      total: this.formatearMoneda(totales.total),
+      importeIva: formatearConMoneda(totales.iva),
+      total: formatearConMoneda(totales.total),
       
       // Información adicional
       usoMercancia: datosPdf.usoMercancia || 'G03 - GASTOS EN GENERAL',
       formaPago: datosPdf.formaPago || 'POR DEFINIR',
-      moneda: datosOrden.moneda || 'MXN'
+      moneda: moneda
     };
     
     return plantillaVars;
+  }
+
+  // Nueva función para formatear moneda con tipo específico
+  private formatearMonedaConTipo(valor: number, moneda: string): string {
+    const locale = moneda === 'USD' ? 'en-US' : 'es-MX';
+    return `$${valor.toLocaleString(locale, { minimumFractionDigits: 2 })} ${moneda}`;
   }
 
   private calcularColspansTotales(productos: Array<any>): { colspanTotales: string, colspanTotalesLabel: string } {
@@ -310,17 +321,88 @@ export class PdfGeneratorService {
     }).join('');
   }
 
+  // Nueva función para generar filas de productos con soporte de moneda
+  private generarFilasProductosConMoneda(productos: Array<any>, moneda: string): string {
+    if (!productos || productos.length === 0) {
+      return '<tr><td colspan="10">No hay productos</td></tr>';
+    }
+
+    // Determinar qué columnas mostrar basándose en los datos disponibles
+    const columnasDisponibles = {
+      codigo: productos.some(p => p.codigo || p.clave || p.codigoFabricante),
+      descripcion: productos.some(p => p.descripcion),
+      unidad: productos.some(p => p.unidad),
+      cantidad: productos.some(p => p.cantidad),
+      precioUnitario: productos.some(p => p.precioUnitario || p.precio || p.precioLista),
+      almacen: productos.some(p => p.alm || p.almacen),
+      precioLista: productos.some(p => p.precioLista && p.precioLista > 0),
+      descuento: productos.some(p => p.descuento && p.descuento > 0),
+      importe: productos.some(p => p.importe || p.total || p.cantidad)
+    };
+
+    return productos.map((producto, index) => {
+      const cantidad = Number(producto.cantidad) || 0;
+      const precioUnitario = Number(producto.precioUnitario) || Number(producto.precio) || Number(producto.precioLista) || 0;
+      const precioLista = Number(producto.precioLista) || 0;
+      const descuento = Number(producto.descuento) || 0;
+      
+      const almacen = producto.alm || producto.almacen || '';
+      const codigo = producto.codigo || producto.clave || producto.codigoFabricante || '';
+      
+      // Usar el importe que viene del modal/frontend (ya calculado correctamente)
+      let importe = Number(producto.importe) || Number(producto.total);
+      if (!importe || isNaN(importe)) {
+        const subtotal = cantidad * precioUnitario;
+        importe = subtotal * (1 - descuento / 100);
+      }
+      
+      let fila = '<tr>';
+      
+      if (columnasDisponibles.codigo) {
+        fila += `<td class="text-center">${codigo}</td>`;
+      }
+      if (columnasDisponibles.descripcion) {
+        fila += `<td colspan="2">${producto.descripcion || producto.concepto || ''}</td>`;
+      }
+      if (columnasDisponibles.unidad) {
+        fila += `<td class="text-center">${producto.unidad || ''}</td>`;
+      }
+      if (columnasDisponibles.cantidad) {
+        fila += `<td class="text-center">${cantidad}</td>`;
+      }
+      if (columnasDisponibles.precioUnitario) {
+        fila += `<td class="text-right">${this.formatearMonedaConTipo(precioUnitario, moneda)}</td>`;
+      }
+      if (columnasDisponibles.almacen) {
+        fila += `<td class="text-center">${almacen}</td>`;
+      }
+      if (columnasDisponibles.precioLista) {
+        fila += `<td class="text-right">${precioLista > 0 ? this.formatearMonedaConTipo(precioLista, moneda) : ''}</td>`;
+      }
+      if (columnasDisponibles.descuento) {
+        fila += `<td class="text-center">${descuento > 0 ? descuento.toFixed(1) + '%' : ''}</td>`;
+      }
+      if (columnasDisponibles.importe) {
+        fila += `<td class="col-importe">${this.formatearMonedaConTipo(importe, moneda)}</td>`;
+      }
+      
+      fila += '</tr>';
+      return fila;
+    }).join('');
+  }
+
   public async generarPdfOrdenCompra(datosOrden: OrdenCompraData): Promise<Buffer> {
     console.log('🖨️ DEBUG pdfGenerator - Datos recibidos:');
     console.log('📦 Productos en PDF:', JSON.stringify(datosOrden.productos?.slice(0, 2), null, 2));
     console.log('🧮 Totales en PDF:', JSON.stringify(datosOrden.totalesCalculados, null, 2));
     console.log('🏷️ Porcentaje IVA en PDF:', datosOrden.porcentajeIvaSimbolico);
+    console.log('💱 Moneda en PDF:', datosOrden.moneda);
     
     let browser;
     
     try {
-      // Leer la plantilla HTML
-      const templatePath = path.join(this.templatesPath, 'ordenCompra.html');
+      // Usar la nueva plantilla mejorada
+      const templatePath = path.join(this.templatesPath, 'ordenCompra_nuevo.html');
       let htmlTemplate = fs.readFileSync(templatePath, 'utf8');
       
       // Procesar los datos de la orden
@@ -328,8 +410,9 @@ export class PdfGeneratorService {
       
       // Generar las filas y encabezados de productos dinámicamente
       const productos = datosOrden.productos || datosOrden.datosPdf?.datosExtraidos?.productos || [];
+      const moneda = datosOrden.moneda || 'MXN';
       const encabezadosTabla = this.generarEncabezadosTabla(productos);
-      const filasProductos = this.generarFilasProductos(productos);
+      const filasProductos = this.generarFilasProductosConMoneda(productos, moneda);
       const { colspanTotales, colspanTotalesLabel } = this.calcularColspansTotales(productos);
       
       // Calcular colspan para la tabla inferior (son 5 columnas fijas)
@@ -348,13 +431,9 @@ export class PdfGeneratorService {
       htmlTemplate = htmlTemplate.replace(/{{colspanTotalesLabel}}/g, colspanTotalesLabel);
       htmlTemplate = htmlTemplate.replace(/{{colspanTotalesLabel2}}/g, colspanTotalesLabel2);
       
-      // Leer CSS
-      const cssPath = path.join(this.templatesPath, 'ordenCompra.css');
-      const cssContent = fs.readFileSync(cssPath, 'utf8');
-      
       // Convertir imágenes a base64 para embeber en el HTML
       const imgTopPath = path.join(this.templatesPath, 'img', 'top.png');
-      const imgBottomPath = path.join(this.templatesPath, 'img', 'bottom-2.png');
+      const imgBottomPath = path.join(this.templatesPath, 'img', 'bottom.png');
       
       let imgTopBase64 = '';
       let imgBottomBase64 = '';
@@ -363,39 +442,31 @@ export class PdfGeneratorService {
         if (fs.existsSync(imgTopPath)) {
           const imgTopBuffer = fs.readFileSync(imgTopPath);
           imgTopBase64 = `data:image/png;base64,${imgTopBuffer.toString('base64')}`;
-          htmlTemplate = htmlTemplate.replace(/src="img\/top\.png"/g, `src="${imgTopBase64}"`);
+          htmlTemplate = htmlTemplate.replace(/{{topImg}}/g, imgTopBase64);
           console.log('Imagen top.png cargada correctamente, tamaño:', imgTopBuffer.length, 'bytes');
         } else {
           console.warn('Imagen top.png no encontrada en:', imgTopPath);
+          // Eliminar la etiqueta de imagen si no existe el archivo
+          htmlTemplate = htmlTemplate.replace(/<img[^>]*{{topImg}}[^>]*>/g, '');
         }
         
         if (fs.existsSync(imgBottomPath)) {
           const imgBottomBuffer = fs.readFileSync(imgBottomPath);
           imgBottomBase64 = `data:image/png;base64,${imgBottomBuffer.toString('base64')}`;
-          htmlTemplate = htmlTemplate.replace(/src="img\/bottom-2\.png"/g, `src="${imgBottomBase64}"`);
-          console.log('Imagen bottom-2.png cargada correctamente, tamaño:', imgBottomBuffer.length, 'bytes');
+          htmlTemplate = htmlTemplate.replace(/{{bottom1}}/g, imgBottomBase64);
+          console.log('Imagen bottom.png cargada correctamente, tamaño:', imgBottomBuffer.length, 'bytes');
         } else {
-          console.warn('Imagen bottom-2.png no encontrada en:', imgBottomPath);
+          console.warn('Imagen bottom.png no encontrada en:', imgBottomPath);
+          // Eliminar la etiqueta de imagen si no existe el archivo
+          htmlTemplate = htmlTemplate.replace(/<img[^>]*{{bottom1}}[^>]*>/g, '');
         }
       } catch (imgError) {
         console.error('Error al cargar imágenes:', imgError);
         // Continuar sin las imágenes en caso de error
       }
       
-      // Crear HTML completo con CSS embebido
-      const htmlCompleto = `
-        <!DOCTYPE html>
-        <html lang="es">
-        <head>
-          <meta charset="UTF-8">
-          <title>Orden de Compra - ${plantillaVars.noDocVal}</title>
-          <style>${cssContent}</style>
-        </head>
-        <body>
-          ${htmlTemplate.replace(/<html[^>]*>[\s\S]*?<\/head>/, '').replace(/<body[^>]*>|<\/body>|<\/html>/g, '')}
-        </body>
-        </html>
-      `;
+      // Crear HTML completo (ya tiene CSS embebido en la plantilla)
+      const htmlCompleto = htmlTemplate;
       
       console.log('Iniciando generación de PDF para orden:', datosOrden.numeroOrden);
       

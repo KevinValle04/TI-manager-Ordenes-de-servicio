@@ -295,7 +295,7 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
     }
   }, [show, productosEditables]);
 
-  // Estado para la moneda seleccionada
+  // Estado para la moneda seleccionada (solo declara la moneda, no convierte valores)
   const [monedaSeleccionada, setMonedaSeleccionada] = useState<string>('MXN');
   // Estado para el porcentaje de IVA simbólico seleccionado
   const [porcentajeIvaSimbolico, setPorcentajeIvaSimbolico] = useState<string>('16');
@@ -660,7 +660,7 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
                 
                 <Col md={3}>
                   <Form.Group className="mb-3">
-                    <Form.Label className="small fw-bold mb-1">Tipo de Moneda:</Form.Label>
+                    <Form.Label className="small fw-bold mb-1">Moneda de los Precios:</Form.Label>
                     <Form.Select
                       size="sm"
                       value={monedaSeleccionada}
@@ -674,6 +674,9 @@ const ModalResultados: React.FC<ModalResultadosProps> = React.memo(({
                         {MONEDAS.USD.simbolo} {MONEDAS.USD.nombre} ({MONEDAS.USD.codigo})
                       </option>
                     </Form.Select>
+                    <Form.Text className="text-muted">
+                      <small><i className="fas fa-dollar-sign me-1"></i>Selecciona la moneda del PDF original</small>
+                    </Form.Text>
                   </Form.Group>
                 </Col>
                 
