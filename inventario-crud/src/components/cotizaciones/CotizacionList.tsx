@@ -151,10 +151,25 @@ const CotizacionList: React.FC = () => {
     if (!window.confirm('¿Desea duplicar esta cotización?')) return;
     
     try {
+      // Incrementar el número de presupuesto basándose en el original
+      const incrementarNumeroPresupuesto = (numeroOriginal: string): string => {
+        // Buscar el último número en el formato
+        const matches = numeroOriginal.match(/^(.+?)(\d+)$/);
+        if (matches) {
+          const prefijo = matches[1];
+          const numero = parseInt(matches[2]);
+          const cantidadDigitos = matches[2].length;
+          const nuevoNumero = String(numero + 1).padStart(cantidadDigitos, '0');
+          return `${prefijo}${nuevoNumero}`;
+        }
+        // Si no tiene número al final, agregar -1
+        return `${numeroOriginal}-1`;
+      };
+
       const duplicatedData = {
         ...cotizacion,
         _id: undefined,
-        numeroPresupuesto: generatePresupuestoNumber(),
+        numeroPresupuesto: incrementarNumeroPresupuesto(cotizacion.numeroPresupuesto),
         fecha: new Date().toISOString(),
         estado: 'Borrador'
       };

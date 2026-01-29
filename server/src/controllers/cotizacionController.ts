@@ -155,7 +155,12 @@ export const createCotizacion = async (req: Request, res: Response) => {
     // Validar campos requeridos
     const { cliente } = req.body;
     
-    if (!cliente || cliente.trim() === '') {
+    // Validar cliente (puede ser string o objeto)
+    const clienteValido = typeof cliente === 'string' 
+      ? cliente.trim() !== '' 
+      : cliente && (typeof cliente === 'object' && (cliente.nombreEmpresa || cliente._id));
+    
+    if (!clienteValido) {
       return res.status(400).json({ 
         error: 'Validación fallida', 
         details: 'El campo Cliente es requerido'
@@ -166,7 +171,7 @@ export const createCotizacion = async (req: Request, res: Response) => {
     let numeroPresupuesto: string;
     
     // Si no se proporciona número de presupuesto, generarlo automáticamente
-    if (!req.body.numeroPresupuesto || req.body.numeroPresupuesto.trim() === '') {
+    if (!req.body.numeroPresupuesto || (typeof req.body.numeroPresupuesto === 'string' && req.body.numeroPresupuesto.trim() === '')) {
       numeroPresupuesto = await generarNumeroPresupuesto(req.body.razonSocial);
       
       // Verificar que sea único, si no lo es, generar otro
@@ -176,7 +181,9 @@ export const createCotizacion = async (req: Request, res: Response) => {
         intentos++;
       }
     } else {
-      numeroPresupuesto = req.body.numeroPresupuesto.trim();
+      numeroPresupuesto = typeof req.body.numeroPresupuesto === 'string' 
+        ? req.body.numeroPresupuesto.trim() 
+        : req.body.numeroPresupuesto;
       
       // Verificar que el número manual sea único
       if (!(await validarNumeroPresupuestoUnico(numeroPresupuesto))) {
@@ -192,9 +199,9 @@ export const createCotizacion = async (req: Request, res: Response) => {
       ...req.body,
       numeroPresupuesto, // Usar el número generado o validado
       // Convertir strings vacías a undefined para campos ObjectId opcionales
-      razonSocial: req.body.razonSocial && req.body.razonSocial.trim() !== '' ? req.body.razonSocial : undefined,
-      proyecto: req.body.proyecto && req.body.proyecto.trim() !== '' ? req.body.proyecto : undefined,
-      vendedor: req.body.vendedor && req.body.vendedor.trim() !== '' ? req.body.vendedor : undefined,
+      razonSocial: req.body.razonSocial && (typeof req.body.razonSocial === 'string' && req.body.razonSocial.trim() !== '') ? req.body.razonSocial : req.body.razonSocial?._id || undefined,
+      proyecto: req.body.proyecto && (typeof req.body.proyecto === 'string' && req.body.proyecto.trim() !== '') ? req.body.proyecto : req.body.proyecto?._id || undefined,
+      vendedor: req.body.vendedor && (typeof req.body.vendedor === 'string' && req.body.vendedor.trim() !== '') ? req.body.vendedor : req.body.vendedor?._id || undefined,
       fechaCreacion: new Date(),
       fechaActualizacion: new Date()
     };
@@ -260,14 +267,23 @@ export const updateCotizacion = async (req: Request, res: Response) => {
     // Validar campos requeridos
     const { cliente, numeroPresupuesto } = req.body;
     
-    if (!cliente || cliente.trim() === '') {
+    // Validar cliente (puede ser string o objeto)
+    const clienteValido = typeof cliente === 'string' 
+      ? cliente.trim() !== '' 
+      : cliente && (typeof cliente === 'object' && (cliente.nombreEmpresa || cliente._id));
+    
+    if (!clienteValido) {
       return res.status(400).json({ 
         error: 'Validación fallida', 
         details: 'El campo Cliente es requerido'
       });
     }
     
-    if (!numeroPresupuesto || numeroPresupuesto.trim() === '') {
+    // Validar numeroPresupuesto (puede ser string)
+    const numeroValido = numeroPresupuesto && 
+      (typeof numeroPresupuesto === 'string' ? numeroPresupuesto.trim() !== '' : true);
+    
+    if (!numeroValido) {
       return res.status(400).json({ 
         error: 'Validación fallida', 
         details: 'El campo Número de Presupuesto es requerido'
@@ -278,9 +294,9 @@ export const updateCotizacion = async (req: Request, res: Response) => {
     const updateData = {
       ...req.body,
       // Convertir strings vacías a undefined para campos ObjectId opcionales
-      razonSocial: req.body.razonSocial && req.body.razonSocial.trim() !== '' ? req.body.razonSocial : undefined,
-      proyecto: req.body.proyecto && req.body.proyecto.trim() !== '' ? req.body.proyecto : undefined,
-      vendedor: req.body.vendedor && req.body.vendedor.trim() !== '' ? req.body.vendedor : undefined,
+      razonSocial: req.body.razonSocial && (typeof req.body.razonSocial === 'string' && req.body.razonSocial.trim() !== '') ? req.body.razonSocial : req.body.razonSocial?._id || undefined,
+      proyecto: req.body.proyecto && (typeof req.body.proyecto === 'string' && req.body.proyecto.trim() !== '') ? req.body.proyecto : req.body.proyecto?._id || undefined,
+      vendedor: req.body.vendedor && (typeof req.body.vendedor === 'string' && req.body.vendedor.trim() !== '') ? req.body.vendedor : req.body.vendedor?._id || undefined,
       fechaActualizacion: new Date()
     };
     
