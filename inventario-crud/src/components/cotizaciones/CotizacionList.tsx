@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
-import { Cliente, Cotizacion, IInventoryItem, RazonSocial, Proyecto } from '../../types';
+import { Cliente, Cotizacion, IInventoryItem, RazonSocial, Proyecto, Vendedor } from '../../types';
 import DataTable from '../common/DataTable';
 import PaginationCompact from '../common/PaginationCompact';
 import SearchBar from '../common/SearchBar';
@@ -27,6 +27,7 @@ const CotizacionList: React.FC = () => {
   const [inventarioItems, setInventarioItems] = useState<IInventoryItem[]>([]);
   const [razonesSociales, setRazonesSociales] = useState<RazonSocial[]>([]);
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
+  const [vendedores, setVendedores] = useState<Vendedor[]>([]);
 
   // Efectos
   useEffect(() => {
@@ -35,6 +36,7 @@ const CotizacionList: React.FC = () => {
     fetchInventarioItems();
     fetchRazonesSociales();
     fetchProyectos();
+    fetchVendedores();
   }, []);
 
   useEffect(() => {
@@ -114,6 +116,20 @@ const CotizacionList: React.FC = () => {
     }
   };
 
+  const fetchVendedores = async () => {
+    try {
+      console.log('Iniciando carga de vendedores...');
+      const response = await fetch('/api/vendedores');
+      if (!response.ok) throw new Error('Error al cargar vendedores');
+      const data = await response.json();
+      console.log('Vendedores cargados:', data);
+      setVendedores(data);
+    } catch (error) {
+      console.error('Error al cargar vendedores:', error);
+      setVendedores([]);
+    }
+  };
+
   // Funciones para PDF
   const handleVerPdf = (cotizacion: Cotizacion) => {
     if (!cotizacion._id) {
@@ -151,27 +167,32 @@ const CotizacionList: React.FC = () => {
     if (!window.confirm('¿Desea duplicar esta cotización?')) return;
     
     try {
-      // Incrementar el número de presupuesto basándose en el original
-      const incrementarNumeroPresupuesto = (numeroOriginal: string): string => {
-        // Buscar el último número en el formato
-        const matches = numeroOriginal.match(/^(.+?)(\d+)$/);
-        if (matches) {
-          const prefijo = matches[1];
-          const numero = parseInt(matches[2]);
-          const cantidadDigitos = matches[2].length;
-          const nuevoNumero = String(numero + 1).padStart(cantidadDigitos, '0');
-          return `${prefijo}${nuevoNumero}`;
-        }
-        // Si no tiene número al final, agregar -1
-        return `${numeroOriginal}-1`;
+      // Extraer solo los IDs de las referencias populadas
+      const extraerId = (campo: any): string | undefined => {
+        if (!campo) return undefined;
+        if (typeof campo === 'string') return campo;
+        if (typeof campo === 'object' && campo._id) return campo._id;
+        return undefined;
       };
 
+      // Enviar sin número de presupuesto para que el servidor lo genere automáticamente
       const duplicatedData = {
-        ...cotizacion,
-        _id: undefined,
-        numeroPresupuesto: incrementarNumeroPresupuesto(cotizacion.numeroPresupuesto),
+        cliente: extraerId(cotizacion.cliente) || cotizacion.cliente,
+        razonSocial: extraerId(cotizacion.razonSocial),
+        proyecto: extraerId(cotizacion.proyecto),
+        numeroPresupuesto: '', // Dejar vacío para que el servidor genere uno nuevo
         fecha: new Date().toISOString(),
-        estado: 'Borrador'
+        vigencia: cotizacion.vigencia,
+        subtotal: cotizacion.subtotal,
+        iva: cotizacion.iva,
+        ivaImporte: cotizacion.ivaImporte,
+        total: cotizacion.total,
+        estado: 'Borrador' as const,
+        moneda: cotizacion.moneda,
+        items: cotizacion.items,
+        comentariosInternos: cotizacion.comentariosInternos,
+        comentariosPdf: cotizacion.comentariosPdf,
+        mostrarContenidoConceptos: cotizacion.mostrarContenidoConceptos
       };
       
       const response = await fetch('/api/cotizaciones', {
@@ -180,13 +201,17 @@ const CotizacionList: React.FC = () => {
         body: JSON.stringify(duplicatedData),
       });
 
-      if (!response.ok) throw new Error('Error al duplicar');
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error del servidor:', errorData);
+        throw new Error(errorData.details || 'Error al duplicar');
+      }
       
       fetchCotizaciones();
       alert('Cotización duplicada exitosamente');
     } catch (error) {
       console.error('Error al duplicar:', error);
-      alert('Error al duplicar la cotización');
+      alert('Error al duplicar la cotización: ' + (error instanceof Error ? error.message : 'Error desconocido'));
     }
   };
 
@@ -462,6 +487,7 @@ const CotizacionList: React.FC = () => {
         inventarioItems={inventarioItems}
         razonesSociales={razonesSociales}
         proyectos={proyectos}
+        vendedores={vendedores}
         generatePresupuestoNumber={generatePresupuestoNumber}
       />
     </div>

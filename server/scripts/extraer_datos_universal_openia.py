@@ -145,32 +145,50 @@ def guardar_json_resultado(json_resultado, folio_original, nombre_archivo_origin
 # =================== EXTRACCIÓN DE TEXTO ===================
 
 def es_pdf_escaneado(archivo_pdf):
-    """Detecta si un PDF parece ser un escaneo (imagen)."""
+    """Detecta si un PDF parece ser un escaneo (imagen).
+    Solo marca como escaneado si NO hay texto extraíble Y hay imágenes grandes.
+    """
     try:
         if PYMUPDF_AVAILABLE:
             doc = fitz.open(archivo_pdf)
+            total_texto = ""
+            tiene_imagenes_grandes = False
+            
             for page in doc:
-                # Obtener lista de imágenes en la página
-                image_list = page.get_images()
-                if image_list:
-                    # Si hay imágenes que ocupan casi toda la página
-                    for img in image_list:
-                        xref = img[0]
-                        imagen = doc.extract_image(xref)
-                        if imagen:
-                            # Si hay una imagen grande que cubre la mayoría de la página
-                            image_size = imagen["width"] * imagen["height"]
-                            page_size = page.rect.width * page.rect.height
-                            if image_size > 0.7 * page_size:  # Si la imagen cubre >70% de la página
-                                doc.close()
-                                return True
+                # Extraer texto de la página
+                texto_pagina = page.get_text().strip()
+                total_texto += texto_pagina
                 
-                # Intentar extraer texto
-                texto = page.get_text().strip()
-                if not texto and image_list:
-                    doc.close()
-                    return True
+                # Verificar imágenes solo si no hay texto
+                if not texto_pagina:
+                    image_list = page.get_images()
+                    if image_list:
+                        for img in image_list:
+                            try:
+                                xref = img[0]
+                                imagen = doc.extract_image(xref)
+                                if imagen:
+                                    # Si hay una imagen grande que cubre la mayoría de la página
+                                    image_size = imagen["width"] * imagen["height"]
+                                    page_size = page.rect.width * page.rect.height
+                                    if image_size > 0.7 * page_size:  # Si la imagen cubre >70% de la página
+                                        tiene_imagenes_grandes = True
+                                        break
+                            except Exception as img_error:
+                                # Ignorar errores al extraer imágenes individuales
+                                continue
+            
             doc.close()
+            
+            # Solo es escaneado si NO hay texto Y tiene imágenes grandes
+            if not total_texto.strip() and tiene_imagenes_grandes:
+                print(f"⚠️ PDF sin texto extraíble con imágenes grandes detectado", file=sys.stderr)
+                return True
+            
+            # Si hay texto, no es un escaneo aunque tenga imágenes
+            if total_texto.strip():
+                print(f"✅ PDF contiene texto extraíble ({len(total_texto)} caracteres)", file=sys.stderr)
+                return False
             
     except Exception as e:
         print(f"⚠️ Error al detectar si es escaneo: {e}", file=sys.stderr)

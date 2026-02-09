@@ -123,7 +123,7 @@ const CotizacionModal = ({
         
       console.log('Enviando requestBody:', requestBody);
         
-      const response = await fetch('http://localhost:6051/api/cotizaciones/generate-numero', {
+      const response = await fetch('/api/cotizaciones/generate-numero', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -633,6 +633,17 @@ const CotizacionModal = ({
       setConceptosExpandidos(new Set());
     }
   }, [editingCotizacion, generatePresupuestoNumber, show]);
+
+  // Debug: Ver vendedores cargados
+  useEffect(() => {
+    console.log('=== DEBUG VENDEDORES ===');
+    console.log('Total vendedores recibidos:', vendedores?.length || 0);
+    if (vendedores && vendedores.length > 0) {
+      console.log('Primer vendedor:', vendedores[0]);
+      console.log('Campos disponibles:', Object.keys(vendedores[0]));
+    }
+    console.log('=======================');
+  }, [vendedores]);
 
   // Genera un objeto comparable (sin campos volátiles) para detectar cambios
   const getComparableData = (data: CotizacionFormData) => {

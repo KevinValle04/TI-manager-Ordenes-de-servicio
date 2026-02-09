@@ -62,7 +62,6 @@ const EntregaModal = ({
   // Estados para productos
   const [productSuggestions, setProductSuggestions] = useState<{[key: number]: IInventoryItem[]}>({});
   const [showProductSuggestions, setShowProductSuggestions] = useState<{[key: number]: boolean}>({}); 
-  const [activeRow, setActiveRow] = useState<number | null>(null);
   
   // Estados para drag & drop
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
@@ -76,7 +75,7 @@ const EntregaModal = ({
   const searchCanalizaciones = async (searchTerm: string) => {
     try {
       setCanalizacionSearchTerm(searchTerm);
-      const response = await fetch(`/api/Entregaes-canalizacion/search?term=${searchTerm}`);
+      const response = await fetch(`/api/cotizaciones-canalizacion/search?term=${searchTerm}`);
       if (response.ok) {
         const data = await response.json();
         setCanalizaciones(data);
@@ -200,11 +199,6 @@ const EntregaModal = ({
     return items;
   };
 
-  // Función auxiliar para calcular totales (no se usa en entregas pero evita errores)
-  const calculateTotals = () => {
-    // Esta función puede quedarse vacía ya que las entregas no calculan totales
-  };
-
   // Funciones de manejo de drag & drop
   const handleDragStart = (e: React.DragEvent, index: number) => {
     setDraggedItem(index);
@@ -269,11 +263,11 @@ const EntregaModal = ({
       items: [
         ...prev.items,
         {
-          clave: '',
+          clave: prev.items.length + 1,
           marca: '',
           modelo: '',
           concepto: '',
-          unidad: 'PZA',
+          unidad: 'PZA' as const,
           cantidad: 1
         }
       ]
@@ -330,11 +324,6 @@ const EntregaModal = ({
     setShowRazonSocialSuggestions(false);
   };
 
-  // Manejo de productos
-  const handleProductFocus = (index: number) => {
-    setActiveRow(index);
-  };
-  
   // Cierra las sugerencias cuando se hace click fuera
   const handleClickOutside = (e: MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -354,7 +343,6 @@ const EntregaModal = ({
 
   const handleProductSearch = (index: number, value: string, field: 'marca' | 'modelo' | 'concepto') => {
     handleItemChange(index, field, value);
-    setActiveRow(index);
     
     console.log('=== BÚSQUEDA DE PRODUCTO ===');
     console.log('Campo:', field);
@@ -406,38 +394,16 @@ const EntregaModal = ({
     setFormData(prev => {
       const newItems = [...prev.items];
       
-      if (name === 'material' && value) {
-        // Si se está seleccionando un material del catálogo
-        const selectedItem = inventarioItems.find(item => item._id === value);
-        if (selectedItem) {
-          const unidad = (selectedItem.unidad === 'PZA' || selectedItem.unidad === 'MTS') ? selectedItem.unidad : 'PZA' as const;
-          const cantidad = newItems[index]?.cantidad || 1;
-          const concepto = [
-            selectedItem.descripcion,
-            selectedItem.marca,
-            selectedItem.modelo
-          ].filter(Boolean).join(' - ');
-          newItems[index] = {
-            ...newItems[index],
-            clave: index + 1,
-            marca: selectedItem.marca,
-            modelo: selectedItem.modelo,
-            concepto: concepto,
-            unidad,
-            cantidad
-          };
-        }
-      } else {
-        const currentItem = newItems[index];
-        const updatedItem: ItemEntrega = {
-          ...currentItem,
-          [name]: value,
-          unidad: currentItem.unidad || 'PZA' as const,
-          clave: currentItem.clave || index + 1
-        };
+      // Simplemente actualizar el campo específico
+      const currentItem = newItems[index];
+      const updatedItem: ItemEntrega = {
+        ...currentItem,
+        [name]: value,
+        unidad: currentItem.unidad || 'PZA' as const,
+        clave: currentItem.clave || index + 1
+      };
 
-        newItems[index] = updatedItem;
-      }
+      newItems[index] = updatedItem;
 
       // Siempre asegurar que haya una fila vacía al final
       const updatedItems = ensureEmptyRow(newItems).map((item, idx) => ({
@@ -463,10 +429,8 @@ const EntregaModal = ({
         concepto: suggestion.descripcion,
         unidad: (suggestion.unidad === 'PZA' || suggestion.unidad === 'MTS') ? suggestion.unidad as 'PZA' | 'MTS' : 'PZA',
         inventarioItemId: suggestion._id, // Guardar referencia al item de inventario
-        precioUnitario: suggestion.precioUnitario,
-        material: suggestion._id,
-        importe: (newItems[index].cantidad || 1) * suggestion.precioUnitario,
-        aplicarIva: true
+        clave: index + 1,
+        cantidad: newItems[index].cantidad || 1
       };
       newItems[index] = updatedItem;
 
@@ -770,7 +734,6 @@ const EntregaModal = ({
                               type="text"
                               value={item.marca || ''}
                               onChange={(e) => handleProductSearch(index, e.target.value, 'marca')}
-                              onFocus={() => handleProductFocus(index)}
                               placeholder="Marca..."
                               autoComplete="off"
                               style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
@@ -810,7 +773,6 @@ const EntregaModal = ({
                               type="text"
                               value={item.modelo || ''}
                               onChange={(e) => handleProductSearch(index, e.target.value, 'modelo')}
-                              onFocus={() => handleProductFocus(index)}
                               placeholder="Modelo..."
                               autoComplete="off"
                               style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
@@ -850,7 +812,6 @@ const EntregaModal = ({
                               type="text"
                               value={item.concepto || ''}
                               onChange={(e) => handleProductSearch(index, e.target.value, 'concepto')}
-                              onFocus={() => handleProductFocus(index)}
                               placeholder="Concepto..."
                               autoComplete="off"
                               style={{ fontSize: '0.875rem', padding: '0.375rem 0.75rem' }}
