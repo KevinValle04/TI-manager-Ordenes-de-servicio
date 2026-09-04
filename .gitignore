@@ -13,6 +13,9 @@ inventario-crud/.env
 
 server/pdfs
 
+# Log temporal del server local (demo)
+server-demo-log.txt
+
 # Archivos de test específicos
 inventario-crud/tests/OrdenCompraTest/test.pdf
 inventario-crud/tests/OrdenCompraTest/orden-compra-visualizacion.png

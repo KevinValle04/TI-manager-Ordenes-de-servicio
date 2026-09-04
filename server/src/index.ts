@@ -37,6 +37,7 @@ import proyectosRoutes from './routes/proyectos';
 import actividadesRoutes from './routes/actividades';
 import vehiculosRoutes from './routes/vehiculos';
 import ordenesServicioRoutes from './routes/ordenesServicio';
+import demoOrdenesRoutes from './routes/demoOrdenes';
 
 dotenv.config();
 const app: Application = express();
@@ -83,6 +84,9 @@ app.use('/templates/img', express.static(path.join(__dirname, 'templates/img')))
 
 // Registrar rutas de ordenes de servicio (vista previa + utilidades de prueba)
 app.use('/api/ordenes-servicio', ordenesServicioRoutes);
+
+// Ordenes de servicio de la demo (guardar/listar desde ordenes-servicio-demo)
+app.use('/api/demo/ordenes', demoOrdenesRoutes);
 
 // Demo HTML para visualizar el formulario sin depender del frontend
 app.get('/demo/ordenes-servicio', (req: Request, res: Response) => {

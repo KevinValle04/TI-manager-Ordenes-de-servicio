@@ -289,6 +289,8 @@
         adminPanel.style.display = 'block';
         orderForm.style.display = 'none';
         renderAdminDashboard();
+        // Refrescar automáticamente cada 30 segundos
+        setInterval(renderAdminDashboard, 30000);
       } else {
         // Técnico: mostrar formulario, ocultar panel admin
         adminPanel.style.display = 'none';
@@ -332,6 +334,26 @@
         }
       }
 
+      // ====== SINCRONIZACIÓN CON EL SERVER ======
+      const API_ORDENES = '/api/demo/ordenes';
+      async function guardarOrdenEnServer(orden) {
+        const res = await fetch(API_ORDENES, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(orden)
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || ('Error del servidor (' + res.status + ')'));
+        }
+        return res.json();
+      }
+      async function obtenerOrdenesDelServer() {
+        const res = await fetch(API_ORDENES, { headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error('Error del servidor (' + res.status + ')');
+        return res.json();
+      }
+
       // ====== COMPRESIÓN DE IMÁGENES ======
       function comprimirImagen(dataUrl, maxDim, calidad) {
         if (!dataUrl || !String(dataUrl).startsWith('data:image')) {
@@ -364,8 +386,16 @@
       function comprimirFirma(d) { return comprimirImagen(d, 400, 0.6); }
 
       // ====== PANEL ADMIN ======
-      function renderAdminDashboard() {
-        const ordenes = getOrdenes();
+      async function renderAdminDashboard() {
+        // Cargar las órdenes de TODOS los técnicos desde el server
+        // (si el server no responde, usa solo las locales del dispositivo)
+        let ordenes = [];
+        try {
+          ordenes = await obtenerOrdenesDelServer();
+        } catch (err) {
+          console.warn('No se pudieron cargar las órdenes del servidor, mostrando solo las locales:', err);
+          ordenes = getOrdenes();
+        }
         const totalOrders = ordenes.length;
 
         // Agrupar por técnico
@@ -732,7 +762,15 @@
         };
         // Guardar en localStorage para que el admin pueda monitorear
         saveOrden(payload);
-        alert('Orden guardada correctamente.'); console.log('Orden guardada:',payload);
+        console.log('Orden guardada:',payload);
+        // Enviar también al server para que el admin la vea desde cualquier dispositivo
+        try {
+          await guardarOrdenEnServer(payload);
+          alert('Orden guardada correctamente y enviada al administrador.');
+        } catch (errServer) {
+          console.error('No se pudo enviar la orden al servidor:', errServer);
+          alert('La orden se guardó en este dispositivo, pero NO se pudo enviar al servidor. Detalle: ' + (errServer && errServer.message ? errServer.message : errServer));
+        }
         // Limpiar formulario para nueva orden
         document.getElementById('numeroOrdenCliente').value='';
         document.getElementById('cliente').value='';
