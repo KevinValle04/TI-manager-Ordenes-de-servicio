@@ -45,7 +45,7 @@ app.use(cors({
   origin: ['http://localhost', 'http://localhost:80', 'http://localhost:5173', 'http://192.168.100.150', 'http://192.168.100.150:80', 'http://timanager.com', 'http://www.timanager.com'],
   credentials: true
 }));
-app.use(express.json());
+app.use(express.json({ limit: '25mb' }));
 
 // Servir archivos estáticos
 app.use('/api/uploads', express.static(path.join(__dirname, '../uploads')));

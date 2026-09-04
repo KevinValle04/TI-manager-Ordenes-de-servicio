@@ -288,6 +288,7 @@
         // Admin: mostrar panel de monitoreo, ocultar formulario
         adminPanel.style.display = 'block';
         orderForm.style.display = 'none';
+        document.getElementById('technicianList').innerHTML = '<div class="empty-state">Cargando órdenes del servidor...</div>';
         renderAdminDashboard();
         // Refrescar automáticamente cada 30 segundos
         setInterval(renderAdminDashboard, 30000);
@@ -386,16 +387,30 @@
       function comprimirFirma(d) { return comprimirImagen(d, 400, 0.6); }
 
       // ====== PANEL ADMIN ======
+      let ordenesCache = []; // Ultima lista exitosa; si un refresco falla, se mantiene
       async function renderAdminDashboard() {
-        // Cargar las órdenes de TODOS los técnicos desde el server
-        // (si el server no responde, usa solo las locales del dispositivo)
-        let ordenes = [];
+        const list = document.getElementById('technicianList');
+        const esPrimerCarga = ordenesCache.length === 0;
         try {
-          ordenes = await obtenerOrdenesDelServer();
+          const ordenes = await obtenerOrdenesDelServer();
+          ordenesCache = ordenes;
+          renderAdminDatos(ordenes);
         } catch (err) {
-          console.warn('No se pudieron cargar las órdenes del servidor, mostrando solo las locales:', err);
-          ordenes = getOrdenes();
+          console.warn('No se pudieron cargar las órdenes del servidor:', err);
+          if (esPrimerCarga) {
+            // Sin datos previos: intentar con lo local y avisar
+            const locales = getOrdenes();
+            if (locales.length > 0) {
+              ordenesCache = locales;
+              renderAdminDatos(locales);
+            } else {
+              list.innerHTML = '<div class="empty-state">No se pudieron cargar las órdenes del servidor. Reintentando automáticamente...</div>';
+            }
+          }
+          // Si ya había datos en pantalla, se dejan tal cual hasta el próximo refresco exitoso
         }
+      }
+      function renderAdminDatos(ordenes) {
         const totalOrders = ordenes.length;
 
         // Agrupar por técnico
