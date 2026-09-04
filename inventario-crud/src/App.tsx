@@ -27,6 +27,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import UsuarioConfig from "./pages/UsuarioConfig";
 import Vehiculos from "./pages/Vehiculos";
+import OrdenForm from "./components/ordenesServicio/OrdenForm";
 import { jwtDecode } from 'jwt-decode';
 import SessionTimeout from './components/SessionTimeout';
 import axios from 'axios';
@@ -184,6 +185,8 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/register" element={<Register onRegister={() => {}} />} />
+        {/* Demo route (public) to view the mobile OrdenForm without login */}
+        <Route path="/ordenes-servicio/demo" element={<OrdenForm />} />
         <Route path="/" element={<PrivateRoute><MainLayout username={username} onLogout={handleLogout} /></PrivateRoute>}>
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
@@ -198,6 +201,7 @@ function App() {
           <Route path="vendedores" element={<Vendedores />} />
           <Route path="mat-elec" element={<MaterialCanalizacion />} />
           <Route path="vehiculos" element={<Vehiculos />} />
+          <Route path="ordenes-servicio/new" element={<OrdenForm />} />
           <Route path="inventario" element={<Inventario />} />
           <Route path="inventarioExterior" element={<InventarioExterior />} />
           <Route path="movimientos-inventario" element={<MovimientosInventario />} />

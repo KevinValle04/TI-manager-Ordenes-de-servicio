@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Demo Orden de Servicio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      body{background:#eef2f6;padding:24px 12px;color:#263442;font-family:Arial,sans-serif;--brand-blue:#102b5c}
+      .card{max-width:820px;margin:12px auto;padding:24px;border:1px solid #d8e0e8;border-radius:6px;background:#fff;box-shadow:0 4px 16px rgba(16,43,92,.08)}
+      .company-header{display:grid;grid-template-columns:1fr 1.5fr 1fr;align-items:start;gap:12px;border-bottom:2px solid #e9ecef;padding-bottom:12px;margin-bottom:16px}
+      .company-logo{width:100%;max-width:150px;height:60px;object-fit:contain;object-position:left center}
+      .company-info{text-align:center;color:var(--brand-blue);font-size:12px;line-height:1.55}
+      .company-info strong{font-size:14px;letter-spacing:.2px}
+      .order-info{text-align:right;color:var(--brand-blue);font-size:12px;line-height:1.55}
+      .order-info strong{font-size:13px}
+      .company-social{text-align:center;color:var(--brand-blue);font-size:12px;line-height:1.5;margin-top:8px}
+      .form-label{color:var(--brand-blue);font-weight:600;margin-bottom:6px}
+      .form-control{border-color:#cbd5df;border-radius:4px;color:#263442}
+      .form-control:focus{border-color:var(--brand-blue);box-shadow:0 0 0 .15rem rgba(16,43,92,.12)}
+      .form-check-label{color:#263442;font-weight:400}
+      .form-check-input{border-color:#9eacba}
+      .form-check-input:checked{background-color:var(--brand-blue);border-color:var(--brand-blue)}
+      .btn-primary{background:var(--brand-blue);border-color:var(--brand-blue);border-radius:4px}
+      .btn-primary:hover{background:#0b2048;border-color:#0b2048}
+      .signature-canvas{display:block;background:#fff}
+      .text-muted{font-size:11px}
+      .session-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;padding:10px 12px;background:#f3f6fa;border-left:4px solid var(--brand-blue);font-size:13px}
+      .session-bar button{width:auto;height:32px;padding:0 12px;font-size:12px}
+      .admin-panel{display:none}
+      .admin-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+      .summary-card{padding:14px;border:1px solid #d8e0e8;border-radius:4px;background:#f8fafc;text-align:center}
+      .summary-card strong{display:block;color:var(--brand-blue);font-size:22px}
+      .technician-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #e9ecef}
+      .technician-row .tech-name{font-weight:600;color:var(--brand-blue)}
+      .technician-row .tech-count{font-size:14px;color:#263442}
+      .technician-row .tech-count strong{color:var(--brand-blue);font-size:18px}
+      .technician-row .tech-orders{font-size:12px;color:#687585;margin-top:4px}
+      .empty-state{text-align:center;padding:24px;color:#687585;font-size:14px}
+      .tech-block{border:1px solid #d8e0e8;border-radius:6px;margin-bottom:8px;background:#fff}
+      .technician-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #e9ecef;cursor:pointer}
+      .tech-toggle{font-size:12px;border:1px solid var(--brand-blue);background:#fff;color:var(--brand-blue);border-radius:4px;padding:4px 10px;cursor:pointer}
+      .tech-ordenes{padding:8px 12px;display:none;background:#f7f9fc}
+      .orden-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid #e2e7ee;border-radius:4px;margin-bottom:6px;background:#fff;cursor:pointer}
+      .orden-item:hover{border-color:var(--brand-blue);background:#edf2f9}
+      .orden-item .orden-folio{font-weight:600;color:var(--brand-blue);font-size:12px}
+      .orden-item .orden-meta{font-size:11px;color:#687585;text-align:right}
+      .orden-hint{font-size:11px;color:#687585;margin:0 0 4px}
+      .orden-modal-overlay{position:fixed;inset:0;background:rgba(16,43,92,.45);display:none;align-items:center;justify-content:center;z-index:1050;padding:16px}
+      .orden-modal{max-width:720px;width:100%;max-height:92vh;overflow:auto;background:#fff;border-radius:8px;padding:20px;box-shadow:0 12px 32px rgba(16,43,92,.25)}
+      .orden-modal .modal-title{display:flex;align-items:center;justify-content:space-between;margin:0 0 14px}
+      .orden-modal h4{margin:0;color:var(--brand-blue);font-size:18px}
+      .orden-modal-close{border:0;background:transparent;font-size:20px;color:var(--brand-blue);cursor:pointer;line-height:1}
+      .det-tabla{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;border-top:1px solid #e9ecef;padding-top:10px;margin-top:10px}
+      .det-tabla div{padding:6px;background:#f6f8fb;border:1px solid #e4e9f0;border-radius:4px;font-size:12px}
+      .det-tabla span{display:block;color:#687585;font-size:11px}
+      .det-tabla b{color:var(--brand-blue);font-weight:600}
+      .det-bloque{border-top:1px solid #e9ecef;padding:10px;margin-top:10px}
+      .det-bloque h6{color:var(--brand-blue);font-size:13px;margin:0 0 6px}
+      .det-bloque p{font-size:13px;color:#263442;margin:0;white-space:pre-wrap}
+      .det-fotos img,.det-fotos h6{display:block}
+      .det-firmas{display:grid;grid-template-columns:1fr 1fr;gap:12px;border-top:1px solid #e9ecef;padding-top:10px;margin-top:10px}
+      .det-firmas h6{color:var(--brand-blue);font-size:13px;margin:0 0 6px}
+      .det-firmas img{max-width:100%;border:1px solid #e4e9f0;border-radius:4px}
+      .det-vacio{color:#9aa6b4;font-size:12px;font-style:italic}
+      @media (max-width:576px){.det-tabla{grid-template-columns:1fr}.det-firmas{grid-template-columns:1fr}.orden-modal{padding:14px}}
+      @media (max-width:576px){.admin-summary{grid-template-columns:1fr}.session-bar{align-items:flex-start;flex-direction:column}}
+      .photos img{width:120px;height:90px;object-fit:cover;margin-right:8px;border-radius:6px}
+      canvas{border:1px solid #ddd;border-radius:6px;width:100%;height:160px}
+      @media (max-width:576px){.company-header{grid-template-columns:1fr;gap:6px}.company-logo{object-position:center}.company-info,.order-info{text-align:center}}
+      .det-fotos img{cursor:pointer}
+      .image-viewer{position:fixed;inset:0;background:rgba(16,43,92,.85);display:none;align-items:center;justify-content:center;z-index:1060;padding:12px}
+      .image-viewer img{max-width:95%;max-height:95%;width:auto;height:auto;object-fit:contain;background:#fff;border-radius:6px;box-shadow:0 12px 32px rgba(0,0,0,.35)}
+      .image-viewer-close{position:fixed;top:12px;right:16px;border:0;background:rgba(255,255,255,.9);font-size:22px;color:var(--brand-blue);border-radius:50%;width:40px;height:40px;cursor:pointer;line-height:1;z-index:1061}
+      .modal-actions{display:flex;align-items:center;gap:8px}
+      .print-area{display:none}
+      .print-area .documento{max-width:820px;margin:0 auto;padding:24px;background:#fff;color:#263442;font-size:13px}
+      .print-area .doc-header{border-bottom:2px solid #1a2b45;padding-bottom:10px;text-align:center}
+      .print-area .doc-header h2{margin:0 0 4px;color:#102b5c;font-size:18px}
+      .print-area .doc-tabla{width:100%;border-collapse:collapse;margin-top:14px;font-size:12px}
+      .print-area .doc-tabla td,.print-area .doc-tabla th{border:1px solid #ccd4df;padding:6px 8px;vertical-align:top}
+      .print-area .doc-tabla th{background:#eef2f8;text-align:left;color:#102b5c}
+      .print-area .doc-nota{font-style:italic;color:#687585;font-size:11px;margin-top:12px}
+      .print-area .doc-firmas{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:30px}
+      .print-area .doc-firma{text-align:center;font-size:11px}
+      .print-area .doc-firma img.doc-firma-img{max-height:80px;max-width:100%;object-fit:contain;margin:0 0 14px}
+      .print-area .doc-firma .doc-firma-linea{margin-top:4px;border-top:1px solid #555}
+      .print-area .doc-firma .doc-firma-rol{margin-top:2px}
+      .print-area img{max-width:100%}
+      @media print {
+        body { background: #fff; margin: 0; }
+        body > div:not(.print-area) { display: none !important; }
+        .session-bar, .card, .admin-panel, .orden-modal-overlay, .image-viewer { display: none !important; }
+        .print-area { display: block !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="session-bar">
+        <span>Sesión: <strong id="sessionUser">Usuario</strong> | <span id="sessionRole">Técnico</span></span>
+        <button id="logout" type="button" class="btn btn-outline-secondary">Cerrar sesión</button>
+      </div>
+      <div class="text-center mb-2"><img src="/templates/img/top.png" alt="Banner superior" style="width:100%;max-height:90px;object-fit:cover;border-radius:6px" /></div>
+      <div class="company-header">
+        <div>
+          <div class="company-social">Facebook: /tiservicesmxl<br />Instagram: /tiservicesmxl<br />www.tiservicesmxl.com</div>
+        </div>
+        <div class="company-info">
+          <strong>TI SERVICES SOLUTIONS NETWORKS</strong><br />
+            Presa Francisco Zarco #929, Col 5 de Julio<br />
+            Mexicali, B.C. C.P.21387<br />
+            (686)3264576 |(686)3268693<br />
+            tiservicesmxl@gmail.com
+        </div>
+        <div class="order-info">
+          <strong>ORDEN DE SERVICIO</strong><br />
+          Folio: <span id="folio">[Folio]</span><br />
+          Fecha: <span id="headerFecha">[Fecha]</span>
+        </div>
+      </div>
+      <!-- Panel de administrador: solo visible para rol Administrador -->
+      <section id="adminPanel" class="admin-panel">
+        <h4>Monitoreo de técnicos</h4>
+        <div class="admin-summary">
+          <div class="summary-card"><strong id="totalOrders">0</strong>Órdenes totales</div>
+          <div class="summary-card"><strong id="totalTechnicians">0</strong>Técnicos activos</div>
+          <div class="summary-card"><strong id="averageOrders">0</strong>Promedio por técnico</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Órdenes por técnico</label>
+          <div id="technicianList"></div>
+        </div>
+      </section>
+      <!-- Formulario de orden de servicio: solo visible para rol Técnico -->
+      <div id="orderForm">
+        <div class="mb-3">
+          <label class="form-label">Tipo de servicio</label>
+          <div class="row g-2">
+            <div class="col-6"><div class="form-check"><input class="form-check-input service-type" type="checkbox" value="Computo" id="tipo-1"><label class="form-check-label" for="tipo-1">Computo</label></div></div>
+            <div class="col-6"><div class="form-check"><input class="form-check-input service-type" type="checkbox" value="Sonido" id="tipo-2"><label class="form-check-label" for="tipo-2">Sonido</label></div></div>
+            <div class="col-6"><div class="form-check"><input class="form-check-input service-type" type="checkbox" value="Conectividad" id="tipo-3"><label class="form-check-label" for="tipo-3">Conectividad</label></div></div>
+            <div class="col-6"><div class="form-check"><input class="form-check-input service-type" type="checkbox" value="Telefonia" id="tipo-4"><label class="form-check-label" for="tipo-4">Telefonia</label></div></div>
+            <div class="col-6"><div class="form-check"><input class="form-check-input service-type" type="checkbox" value="Impresora" id="tipo-5"><label class="form-check-label" for="tipo-5">Impresora</label></div></div>
+            <div class="col-6"><div class="form-check"><input class="form-check-input service-type" type="checkbox" value="Video" id="tipo-6"><label class="form-check-label" for="tipo-6">Video</label></div></div>
+            <div class="col-6"><div class="form-check"><input class="form-check-input service-type" type="checkbox" value="CCTV" id="tipo-7"><label class="form-check-label" for="tipo-7">CCTV</label></div></div>
+            <div class="col-6"><div class="form-check"><input class="form-check-input service-type" type="checkbox" value="Deteccion de incendios" id="tipo-8"><label class="form-check-label" for="tipo-8">Detección de incendios</label></div></div>
+            <div class="col-6"><div class="form-check"><input class="form-check-input service-type" type="checkbox" value="Control de acceso" id="tipo-9"><label class="form-check-label" for="tipo-9">Control de acceso</label></div></div>
+            <div class="col-6"><div class="form-check"><input class="form-check-input service-type" type="checkbox" value="Cerco electrificado" id="tipo-10"><label class="form-check-label" for="tipo-10">Cerco electrificado</label></div></div>
+            <div class="col-6"><div class="form-check"><input class="form-check-input service-type" type="checkbox" value="Electrico" id="tipo-11"><label class="form-check-label" for="tipo-11">Eléctrico</label></div></div>
+            <div class="col-6"><div class="form-check"><input class="form-check-input service-type" type="checkbox" value="Alarma" id="tipo-12"><label class="form-check-label" for="tipo-12">Alarma</label></div></div>
+            <div class="col-6"><div class="form-check"><input class="form-check-input service-type" type="checkbox" value="Cotizacion" id="tipo-13"><label class="form-check-label" for="tipo-13">Cotización</label></div></div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Datos del cliente</label>
+          <div class="row g-2">
+            <div class="col-12"><input class="form-control" id="numeroOrdenCliente" placeholder="No. orden cliente" /></div>
+            <div class="col-12 col-md-6"><input class="form-control" id="fecha" type="date" /></div>
+            <div class="col-12 col-md-6"><input class="form-control" id="cliente" placeholder="Cliente" /></div>
+            <div class="col-12"><input class="form-control" id="direccion" placeholder="Dirección" /></div>
+            <div class="col-12 col-md-6"><input class="form-control" id="email" type="email" placeholder="E-mail" /></div>
+            <div class="col-12 col-md-6"><input class="form-control" id="sucursal" placeholder="Sucursal" /></div>
+            <div class="col-12 col-md-6"><input class="form-control" id="telefono" type="tel" placeholder="Teléfono" /></div>
+          </div>
+        </div>
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <div class="mb-3"><label class="form-label">Actividades</label><textarea class="form-control" id="actividades" rows="6" placeholder="Describa el trabajo realizado"></textarea></div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Fotos / Evidencias</label>
+              <input type="file" id="photos" accept="image/*" multiple capture="environment" />
+              <small class="text-muted d-block mt-1">Puedes agregar varias fotos; cada nueva captura se sumará a las anteriores.</small>
+              <div id="preview" class="photos mt-2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3"><label class="form-label">Solución</label><textarea class="form-control" id="solucion" rows="3"></textarea></div>
+        <div class="mb-3">
+          <label class="form-label">Presupuesto</label>
+          <div class="row g-2">
+            <div class="col-12 col-md-4">
+              <label class="form-label small mb-1" for="presupuesto">Presupuesto total</label>
+              <input class="form-control money-input" id="presupuesto" inputmode="decimal" placeholder="0" />
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label small mb-1" for="anticipo">Anticipo</label>
+              <input class="form-control money-input" id="anticipo" inputmode="decimal" placeholder="0" />
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label small mb-1" for="saldo">Saldo restante</label>
+              <input class="form-control" id="saldo" inputmode="decimal" placeholder="0" readonly />
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Satisfacción del cliente</label>
+          <div class="row g-2">
+            <div class="col-6 col-md-3"><div class="form-check"><input class="form-check-input satisfaction" type="checkbox" value="Excelente" id="satisfaccion-excelente"><label class="form-check-label" for="satisfaccion-excelente">Excelente</label></div></div>
+            <div class="col-6 col-md-3"><div class="form-check"><input class="form-check-input satisfaction" type="checkbox" value="Regular" id="satisfaccion-regular"><label class="form-check-label" for="satisfaccion-regular">Regular</label></div></div>
+            <div class="col-6 col-md-3"><div class="form-check"><input class="form-check-input satisfaction" type="checkbox" value="Bueno" id="satisfaccion-bueno"><label class="form-check-label" for="satisfaccion-bueno">Bueno</label></div></div>
+            <div class="col-6 col-md-3"><div class="form-check"><input class="form-check-input satisfaction" type="checkbox" value="Malo" id="satisfaccion-malo"><label class="form-check-label" for="satisfaccion-malo">Malo</label></div></div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Horario del servicio</label>
+          <div class="row g-2">
+            <div class="col-12 col-md-6">
+              <label class="form-label small mb-1" for="horaInicio">Hora de inicio</label>
+              <input class="form-control" id="horaInicio" type="time" />
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label small mb-1" for="horaFin">Hora de fin</label>
+              <input class="form-control" id="horaFin" type="time" />
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Firmas</label>
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label small mb-1" for="sigTecnico">Firma del técnico</label>
+              <canvas id="sigTecnico" class="signature-canvas" width="600" height="160"></canvas>
+              <button id="clearTecnico" type="button" class="btn btn-sm btn-outline-secondary mt-2">Limpiar firma técnico</button>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label small mb-1" for="sigCliente">Firma del cliente</label>
+              <canvas id="sigCliente" class="signature-canvas" width="600" height="160"></canvas>
+              <button id="clearCliente" type="button" class="btn btn-sm btn-outline-secondary mt-2">Limpiar firma cliente</button>
+            </div>
+          </div>
+        </div>
+        <div class="d-grid"><button id="save" class="btn btn-primary">Guardar demo</button></div>
+      </div>
+    </div>
+    <!-- Modal de detalle de orden (panel admin) -->
+    <div id="ordenModal" class="orden-modal-overlay" style="display:none">
+      <div class="orden-modal" role="dialog" aria-modal="true">
+        <div class="modal-title">
+          <h4>Detalle de orden</h4>
+          <div class="modal-actions">
+            <button type="button" id="descargarOrden" class="btn btn-sm btn-primary">⬇ Descargar</button>
+            <button type="button" id="ordenModalCerrar" class="orden-modal-close" aria-label="Cerrar">✕</button>
+          </div>
+        </div>
+        <div id="ordenDetalle"></div>
+      </div>
+    </div>
+    <!-- Visor de imagen en grande (admin) -->
+    <div id="imageViewer" class="image-viewer" style="display:none">
+      <button type="button" id="imageViewerCerrar" class="image-viewer-close" aria-label="Cerrar">✕</button>
+      <img id="imageViewerImg" src="" alt="Imagen en grande" />
+    </div>
+    <!-- Área de impresión / descarga de la orden -->
+    <div id="printArea" class="print-area"></div>
+    <div class="text-center mt-3"><img src="/templates/img/bottom-2.png" alt="footer" style="width:100%;max-height:120px;object-fit:cover;border-radius:6px" /></div>
+    <script>
+      // ====== SESIÓN ======
+      const SESSION_KEY = 'ordenes_servicio_demo_session';
+      const ORDENES_KEY = 'ordenes_servicio_demo_ordenes';
+      const session = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+
+      // Si no hay sesión, redirigir al login
+      if (!session) {
+        window.location.href = '/demo/login';
+      }
+
+      const esAdmin = session && session.role === 'Administrador';
+      const usuarioActual = session ? session.username : null;
+
+      // Mostrar datos de sesión
+      document.getElementById('sessionUser').textContent = session ? (session.nombre || session.username) : 'Usuario';
+      document.getElementById('sessionRole').textContent = session ? session.role : 'Técnico';
+
+      // Cerrar sesión
+      document.getElementById('logout').addEventListener('click', () => {
+        localStorage.removeItem(SESSION_KEY);
+        window.location.href = '/demo/login';
+      });
+
+      // ====== VISTA SEGÚN ROL ======
+      const adminPanel = document.getElementById('adminPanel');
+      const orderForm = document.getElementById('orderForm');
+
+      if (esAdmin) {
+        // Admin: mostrar panel de monitoreo, ocultar formulario
+        adminPanel.style.display = 'block';
+        orderForm.style.display = 'none';
+        renderAdminDashboard();
+      } else {
+        // Técnico: mostrar formulario, ocultar panel admin
+        adminPanel.style.display = 'none';
+        orderForm.style.display = 'block';
+        // Generar folio automático
+        const folioNum = Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('folio').textContent = `OS-${folioNum}`;
+        document.getElementById('headerFecha').textContent = new Date().toLocaleDateString('es-MX');
+        document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+      }
+
+      // ====== FUNCIONES DE ALMACENAMIENTO ======
+      function getOrdenes() {
+        return JSON.parse(localStorage.getItem(ORDENES_KEY) || '[]');
+      }
+
+      function saveOrden(orden) {
+        // Intenta guardar; si la cuota de localStorage está llena,
+        // libera espacio borrando las imágenes de órdenes antiguas.
+        const colocar = () => {
+          const ordenes = getOrdenes();
+          ordenes.push(orden);
+          localStorage.setItem(ORDENES_KEY, JSON.stringify(ordenes));
+        };
+        try {
+          colocar();
+          return;
+        } catch (err) {
+          try {
+            const ordenes = getOrdenes();
+            ordenes.forEach(o => {
+              o.photos = [];
+              o.firmaTecnico = '';
+              o.firmaCliente = '';
+            });
+            localStorage.setItem(ORDENES_KEY, JSON.stringify(ordenes));
+            colocar();
+          } catch (err2) {
+            throw err2;
+          }
+        }
+      }
+
+      // ====== COMPRESIÓN DE IMÁGENES ======
+      function comprimirImagen(dataUrl, maxDim, calidad) {
+        if (!dataUrl || !String(dataUrl).startsWith('data:image')) {
+          return Promise.resolve(dataUrl || '');
+        }
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            try {
+              const escala = Math.min(1, maxDim / Math.max(img.width, img.height));
+              const nw = Math.max(1, Math.round(img.width * escala));
+              const nh = Math.max(1, Math.round(img.height * escala));
+              const cv = document.createElement('canvas');
+              cv.width = nw;
+              cv.height = nh;
+              const c = cv.getContext('2d');
+              c.fillStyle = '#fff';
+              c.fillRect(0, 0, nw, nh);
+              c.drawImage(img, 0, 0, nw, nh);
+              resolve(cv.toDataURL('image/jpeg', calidad));
+            } catch (e) {
+              resolve(dataUrl);
+            }
+          };
+          img.onerror = () => resolve(dataUrl);
+          img.src = dataUrl;
+        });
+      }
+      function comprimirFoto(d) { return comprimirImagen(d, 700, 0.55); }
+      function comprimirFirma(d) { return comprimirImagen(d, 400, 0.6); }
+
+      // ====== PANEL ADMIN ======
+      function renderAdminDashboard() {
+        const ordenes = getOrdenes();
+        const totalOrders = ordenes.length;
+
+        // Agrupar por técnico
+        const porTecnico = {};
+        ordenes.forEach(orden => {
+          const key = orden.username || 'desconocido';
+          if (!porTecnico[key]) {
+            porTecnico[key] = { nombre: orden.nombre || key, count: 0, ordenes: [] };
+          }
+          porTecnico[key].count++;
+          porTecnico[key].ordenes.push(orden);
+        });
+
+        const tecnicos = Object.keys(porTecnico).length;
+        const promedio = tecnicos > 0 ? (totalOrders / tecnicos).toFixed(1) : 0;
+
+        document.getElementById('totalOrders').textContent = totalOrders;
+ document.getElementById('totalTechnicians').textContent = tecnicos;
+ document.getElementById('averageOrders').textContent = promedio;
+
+        const list = document.getElementById('technicianList');
+        list.innerHTML = '';
+
+        if (totalOrders === 0) {
+          list.innerHTML = '<div class="empty-state">Aún no hay órdenes registradas. Los técnicos verán sus órdenes aquí cuando guarden.</div>';
+          return;
+        }
+
+        // Ordenar por cantidad descendente
+        const sorted = Object.values(porTecnico).sort((a, b) => b.count - a.count);
+
+        sorted.forEach(tech => {
+          const block = document.createElement('div');
+          block.className = 'tech-block';
+          const ultima = tech.ordenes[tech.ordenes.length - 1];
+          const fechaUltima = ultima ? (ultima.fecha || ultima.folio) : '';
+          const ordenesHtml = tech.ordenes.map((o, i) => `
+            <div class="orden-item" data-idx="${i}">
+              <span class="orden-folio">${o.folio || 'Sin folio'}</span>
+              <span class="orden-meta">${o.cliente || 'Sin cliente'} · ${o.fecha || ''}</span>
+            </div>`).join('');
+          block.innerHTML = `
+            <div class="technician-row">
+              <div>
+                <div class="tech-name">${tech.nombre}</div>
+                <div class="tech-orders">Última: ${fechaUltima || 'N/A'} · ${tech.count} órdenes</div>
+              </div>
+              <button type="button" class="tech-toggle">Ver órdenes ▾</button>
+            </div>
+            <div class="tech-ordenes">
+              <div class="orden-hint">Toca una orden para revisarla:</div>
+              ${ordenesHtml}
+            </div>
+          `;
+          block.querySelector('.tech-toggle').addEventListener('click', e => {
+            const box = block.querySelector('.tech-ordenes');
+            const abierto = box.style.display !== 'none';
+            box.style.display = abierto ? 'none' : 'block';
+            e.currentTarget.textContent = abierto ? 'Ver órdenes ▾' : 'Ocultar órdenes ▴';
+          });
+          block.querySelectorAll('.orden-item').forEach(el => {
+            const idx = Number(el.dataset.idx);
+            el.addEventListener('click', () => mostrarOrdenDetalle(tech.ordenes[idx]));
+          });
+          list.appendChild(block);
+        });
+      }
+
+      // ====== MODAL DE DETALLE DE ORDEN (ADMIN) ======
+      function escaparHtml(valor) {
+        return String(valor || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+      function mostrarOrdenDetalle(orden) {
+        const c = document.getElementById('ordenDetalle');
+        if (!orden) {
+          c.innerHTML = '<p class="det-vacio">No hay datos de la orden.</p>';
+          document.getElementById('ordenModal').style.display = 'flex';
+          return;
+        }
+        const tipos = (orden.tipos || []).join(', ');
+        const fotos = (orden.photos || []);
+        window.__fotosOrden = fotos;
+        const headerHtml = `
+          <div class="text-center mb-2"><img src="/templates/img/top.png" alt="Banner superior" style="width:100%;max-height:90px;object-fit:cover;border-radius:6px" /></div>
+          <div class="company-header">
+            <div>
+              <div class="company-social">Facebook: /tiservicesmxl<br />Instagram: /tiservicesmxl<br />www.tiservicesmxl.com</div>
+            </div>
+            <div class="company-info">
+              <strong>TI SERVICES SOLUTIONS NETWORKS</strong><br />
+              Presa Francisco Zarco #929, Col 5 de Julio<br />
+              Mexicali, B.C. C.P.21387<br />
+              (686)3264576 |(686)3268693<br />
+              tiservicesmxl@gmail.com
+            </div>
+            <div class="order-info">
+              <strong>ORDEN DE SERVICIO</strong><br />
+              Folio: <span>${escaparHtml(orden.folio)}</span><br />
+              Fecha: <span>${escaparHtml(orden.fecha)}</span>
+            </div>
+          </div>
+        `;
+        const fotosHtml = fotos.length
+          ? `<div class="det-bloque"><h6>Fotos / Evidencias</h6><div class="det-fotos">${fotos.map((p, i) => `<img src="${p}" alt="foto-${i + 1}" data-foto="${i}" onclick="abrirImagenPorIndice(${i})" style="width:120px;height:90px;object-fit:cover;border-radius:6px;margin:4px">`).join('')}</div></div>`
+          : '';
+        const firmaTecnico = orden.firmaTecnico ? `<img src="${orden.firmaTecnico}" alt="firma-tecnico">` : '<p class="det-vacio">Sin firma</p>';
+        const firmaCliente = orden.firmaCliente ? `<img src="${orden.firmaCliente}" alt="firma-cliente">` : '<p class="det-vacio">Sin firma</p>';
+        c.innerHTML = `
+          ${headerHtml}
+          <div class="det-tabla">
+            <div><span>Folio</span><b>${escaparHtml(orden.folio)}</b></div>
+            <div><span>Fecha</span><b>${escaparHtml(orden.fecha)}</b></div>
+            <div><span>Cliente</span><b>${escaparHtml(orden.cliente)}</b></div>
+            <div><span>Dirección</span><b>${escaparHtml(orden.direccion)}</b></div>
+            <div><span>Teléfono</span><b>${escaparHtml(orden.telefono)}</b></div>
+            <div><span>E-mail</span><b>${escaparHtml(orden.email)}</b></div>
+            <div><span>Sucursal</span><b>${escaparHtml(orden.sucursal)}</b></div>
+            <div><span>No. orden cliente</span><b>${escaparHtml(orden.numeroOrdenCliente)}</b></div>
+            <div><span>Tipo de servicio</span><b>${escaparHtml(tipos)}</b></div>
+            <div><span>Horario</span><b>${escaparHtml(orden.horaInicio)} - ${escaparHtml(orden.horaFin)}</b></div>
+          </div>
+          <div class="det-bloque"><h6>Actividades</h6><p>${escaparHtml(orden.actividades)}</p></div>
+          <div class="det-bloque"><h6>Solución</h6><p>${escaparHtml(orden.solucion)}</p></div>
+          <div class="det-tabla">
+            <div><span>Presupuesto</span><b>${escaparHtml(orden.presupuesto)}</b></div>
+            <div><span>Anticipo</span><b>${escaparHtml(orden.anticipo)}</b></div>
+            <div><span>Saldo</span><b>${escaparHtml(orden.saldo)}</b></div>
+            <div><span>Satisfacción</span><b>${escaparHtml(orden.satisfaccion)}</b></div>
+            <div><span>Técnico</span><b>${escaparHtml(orden.nombre)}</b></div>
+            <div><span>Guardada el</span><b>${escaparHtml(orden.guardadaEn)}</b></div>
+          </div>
+          ${fotosHtml}
+          <div class="det-firmas">
+            <div><h6>Firma del técnico</h6>${firmaTecnico}</div>
+            <div><h6>Firma del cliente</h6>${firmaCliente}</div>
+          </div>
+        `;
+        document.getElementById('ordenModal').style.display = 'flex';
+        // Construir versión de impresión/descarga
+        const fotosPrint = fotos.length
+          ? `<div style="margin-top:14px"><strong>Fotos / Evidencias</strong><br>${fotos.map(p => `<img src="${p}" alt="foto" style="width:180px;margin:4px">`).join('')}</div>`
+          : '';
+        const docHtml = `
+          <div class="documento">
+            <div style="text-align:center;margin:0 0 8px"><img src="/templates/img/top.png" alt="banner" style="width:100%;max-height:90px;object-fit:cover"></div>
+            <div class="doc-header">
+              <h2>ORDEN DE SERVICIO</h2>
+              <div><strong>TI SERVICES SOLUTIONS NETWORKS</strong><br>
+              Presa Francisco Zarco #929, Col 5 de Julio, Mexicali, B.C. C.P.21387<br>
+              (686)3264576 | (686)3268693 | tiservicesmxl@gmail.com</div>
+            </div>
+            <table class="doc-tabla">
+              <tr><th>Folio</th><td>${escaparHtml(orden.folio)}</td><th>Fecha</th><td>${escaparHtml(orden.fecha)}</td></tr>
+              <tr><th>Cliente</th><td colspan="3">${escaparHtml(orden.cliente)}</td></tr>
+              <tr><th>Dirección</th><td colspan="3">${escaparHtml(orden.direccion)}</td></tr>
+              <tr><th>Teléfono</th><td>${escaparHtml(orden.telefono)}</td><th>E-mail</th><td>${escaparHtml(orden.email)}</td></tr>
+              <tr><th>Sucursal</th><td>${escaparHtml(orden.sucursal)}</td><th>No. orden cliente</th><td>${escaparHtml(orden.numeroOrdenCliente)}</td></tr>
+              <tr><th>Tipo de servicio</th><td colspan="3">${escaparHtml(tipos)}</td></tr>
+              <tr><th>Horario</th><td>${escaparHtml(orden.horaInicio)} - ${escaparHtml(orden.horaFin)}</td><th>Satisfacción</th><td>${escaparHtml(orden.satisfaccion)}</td></tr>
+            </table>
+            <table class="doc-tabla">
+              <tr><th colspan="2">Actividades</th><th colspan="2">Solución</th></tr>
+              <tr><td colspan="2" style="min-height:60px">${escaparHtml(orden.actividades)}</td><td colspan="2" style="min-height:60px">${escaparHtml(orden.solucion)}</td></tr>
+            </table>
+            <table class="doc-tabla">
+              <tr><th>Presupuesto</th><td>${escaparHtml(orden.presupuesto)}</td><th>Anticipo</th><td>${escaparHtml(orden.anticipo)}</td><th>Saldo</th><td>${escaparHtml(orden.saldo)}</td></tr>
+            </table>
+            ${fotosPrint}
+            <div class="doc-firmas">
+              <div class="doc-firma">
+                ${orden.firmaTecnico ? `<img src="${orden.firmaTecnico}" alt="firma-tecnico" class="doc-firma-img">` : ''}
+                <div class="doc-firma-linea"></div>
+                <div class="doc-firma-rol">Firma del técnico</div>
+              </div>
+              <div class="doc-firma">
+                ${orden.firmaCliente ? `<img src="${orden.firmaCliente}" alt="firma-cliente" class="doc-firma-img">` : ''}
+                <div class="doc-firma-linea"></div>
+                <div class="doc-firma-rol">Firma del cliente</div>
+              </div>
+            </div>
+            <div class="doc-nota">Guardada el ${escaparHtml(orden.guardadaEn)} por ${escaparHtml(orden.nombre)}.</div>
+          </div>`;
+        document.getElementById('printArea').innerHTML = docHtml;
+      }
+      document.getElementById('descargarOrden').addEventListener('click', () => {
+        window.print();
+      });
+      document.getElementById('ordenModalCerrar').addEventListener('click', () => {
+        document.getElementById('ordenModal').style.display = 'none';
+      });
+      document.getElementById('ordenModal').addEventListener('click', e => {
+        if (e.target && e.target.id === 'ordenModal') {
+          document.getElementById('ordenModal').style.display = 'none';
+        }
+      });
+
+      // ====== VISOR DE IMAGEN EN GRANDE (ADMIN) ======
+      function abrirImagenGrande(src) {
+        const viewer = document.getElementById('imageViewer');
+        const img = document.getElementById('imageViewerImg');
+        if (!src) return;
+        img.src = src;
+        viewer.style.display = 'flex';
+      }
+      function abrirImagenPorIndice(idx) {
+        const fotos = window.__fotosOrden || [];
+        abrirImagenGrande(fotos[idx] || '');
+      }
+      function cerrarVisorImagen() {
+        const viewer = document.getElementById('imageViewer');
+        viewer.style.display = 'none';
+        document.getElementById('imageViewerImg').src = '';
+      }
+      document.getElementById('imageViewerCerrar').addEventListener('click', cerrarVisorImagen);
+      document.getElementById('imageViewer').addEventListener('click', e => {
+        if (e.target && e.target.id === 'imageViewer') {
+          cerrarVisorImagen();
+        }
+      });
+
+      // ====== FORMULARIO TÉCNICO ======
+      const photosInput = document.getElementById('photos');
+      const preview = document.getElementById('preview');
+      const photoDataUrls = [];
+      photosInput.addEventListener('change', e => {
+        Array.from(e.target.files).forEach(f => {
+          const r = new FileReader();
+          r.onload = () => {
+            photoDataUrls.push(r.result);
+            const img = document.createElement('img');
+            img.src = r.result;
+            preview.appendChild(img);
+          };
+          r.readAsDataURL(f);
+        });
+        photosInput.value = '';
+      });
+      document.querySelectorAll('.service-type').forEach(input => input.addEventListener('change', () => {
+        if (input.checked) document.querySelectorAll('.service-type').forEach(other => { if (other !== input) other.checked = false; });
+      }));
+      function configurarFirma(id, clearId) {
+        const canvas = document.getElementById(id);
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        function pos(e) {
+          const r = canvas.getBoundingClientRect();
+          return {
+            x: (e.touches ? e.touches[0].clientX : e.clientX) - r.left,
+            y: (e.touches ? e.touches[0].clientY : e.clientY) - r.top
+          };
+        }
+
+        canvas.addEventListener('mousedown', function(e) {
+          drawing = true;
+          const p = pos(e);
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+        });
+
+        canvas.addEventListener('mousemove', function(e) {
+          if (!drawing) return;
+          const p = pos(e);
+          ctx.lineTo(p.x, p.y);
+          ctx.stroke();
+        });
+
+        canvas.addEventListener('touchstart', function(e) {
+          drawing = true;
+          const p = pos(e);
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          e.preventDefault();
+        });
+
+        canvas.addEventListener('touchmove', function(e) {
+          if (!drawing) return;
+          const p = pos(e);
+          ctx.lineTo(p.x, p.y);
+          ctx.stroke();
+          e.preventDefault();
+        });
+
+        window.addEventListener('mouseup', function() { drawing = false; });
+        window.addEventListener('touchend', function() { drawing = false; });
+
+        document.getElementById(clearId).addEventListener('click', function() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        return canvas;
+      }
+      const firmaTecnico = configurarFirma('sigTecnico', 'clearTecnico');
+      const firmaCliente = configurarFirma('sigCliente', 'clearCliente');
+      const presupuestoInput = document.getElementById('presupuesto');
+      const anticipoInput = document.getElementById('anticipo');
+      const saldoInput = document.getElementById('saldo');
+        document.querySelectorAll('.satisfaction').forEach(input => input.addEventListener('change', () => {
+          if (input.checked) document.querySelectorAll('.satisfaction').forEach(other => { if (other !== input) other.checked = false; });
+        }));
+      function parseMonto(value){
+        return Number(String(value).replace(/,/g, '')) || 0;
+      }
+      function formatearMonto(value){
+        const limpio = String(value).replace(/[^0-9.]/g, '');
+        if (!limpio) return '';
+        const partes = limpio.split('.');
+        const entero = Number(partes[0] || 0).toLocaleString('en-US');
+        return partes.length > 1 ? `${entero}.${partes[1].slice(0, 2)}` : entero;
+      }
+      function actualizarSaldo(){
+        if (!presupuestoInput.value && !anticipoInput.value) {
+          saldoInput.value = '';
+          return;
+        }
+        const presupuesto = parseMonto(presupuestoInput.value);
+        const anticipo = parseMonto(anticipoInput.value);
+        const saldo = Math.max(0, presupuesto - anticipo);
+        saldoInput.value = formatearMonto(Number.isInteger(saldo) ? String(saldo) : saldo.toFixed(2).replace(/0+$/, '').replace(/\.$/, ''));
+      }
+      document.querySelectorAll('.money-input').forEach(input => input.addEventListener('input', () => {
+        input.value = formatearMonto(input.value);
+        actualizarSaldo();
+      }));
+      function capturarFirma(canvas) {
+        try {
+          const data = canvas.toDataURL('image/png');
+          return (typeof data === 'string' && data.length > 0) ? data : '';
+        } catch (e) {
+          console.warn('No se pudo capturar la firma (canvas):', e);
+          return '';
+        }
+      }
+      document.getElementById('save').addEventListener('click', async ()=>{
+        try {
+        // Comprimir fotos y firmas para no superar la cuota de localStorage
+        const fotosComprimidas = await Promise.all((photoDataUrls || []).map(comprimirFoto));
+        const firmaT = await comprimirFirma(capturarFirma(firmaTecnico));
+        const firmaC = await comprimirFirma(capturarFirma(firmaCliente));
+        const payload={
+          username:usuarioActual,
+          nombre:session ? session.nombre : '',
+          folio:document.getElementById('folio').textContent,
+          tipos:Array.from(document.querySelectorAll('.service-type:checked')).map(input=>input.value),
+          numeroOrdenCliente:document.getElementById('numeroOrdenCliente').value,
+          fecha:document.getElementById('fecha').value,
+          cliente:document.getElementById('cliente').value,
+          direccion:document.getElementById('direccion').value,
+          email:document.getElementById('email').value,
+          sucursal:document.getElementById('sucursal').value,
+          telefono:document.getElementById('telefono').value,
+          actividades:document.getElementById('actividades').value,
+          solucion:document.getElementById('solucion').value,
+          presupuesto:document.getElementById('presupuesto').value,
+          anticipo:document.getElementById('anticipo').value,
+          saldo:document.getElementById('saldo').value,
+          satisfaccion:document.querySelector('.satisfaction:checked')?.value || '',
+          horaInicio:document.getElementById('horaInicio').value,
+          horaFin:document.getElementById('horaFin').value,
+          photos:fotosComprimidas,
+          firmaTecnico:firmaT,
+          firmaCliente:firmaC,
+          guardadaEn:new Date().toISOString()
+        };
+        // Guardar en localStorage para que el admin pueda monitorear
+        saveOrden(payload);
+        alert('Orden guardada correctamente.'); console.log('Orden guardada:',payload);
+        // Limpiar formulario para nueva orden
+        document.getElementById('numeroOrdenCliente').value='';
+        document.getElementById('cliente').value='';
+        document.getElementById('direccion').value='';
+        document.getElementById('email').value='';
+        document.getElementById('sucursal').value='';
+        document.getElementById('telefono').value='';
+        document.getElementById('actividades').value='';
+        document.getElementById('solucion').value='';
+        document.getElementById('presupuesto').value='';
+        document.getElementById('anticipo').value='';
+        document.getElementById('saldo').value='';
+        document.getElementById('horaInicio').value='';
+        document.getElementById('horaFin').value='';
+        document.querySelectorAll('.service-type').forEach(i=>i.checked=false);
+        document.querySelectorAll('.satisfaction').forEach(i=>i.checked=false);
+        preview.innerHTML='';
+        photoDataUrls.length=0;
+        firmaTecnico.getContext('2d').clearRect(0,0,firmaTecnico.width,firmaTecnico.height);
+        firmaCliente.getContext('2d').clearRect(0,0,firmaCliente.width,firmaCliente.height);
+        // Nuevo folio
+        const folioNum = Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('folio').textContent = `OS-${folioNum}`;
+        } catch (error) {
+          console.error('Error al guardar la orden:', error);
+          alert('No se pudo guardar la orden. Revisa la consola. Detalle: ' + (error && error.message ? error.message : error));
+        }
+      });
+    </script>
+  </body>
+</html>

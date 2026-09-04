@@ -1,0 +1,25 @@
+Resumen breve - Demo Orden de Servicio
+Fecha: 2026-09-02 {DIA 1 }
+
+Objetivo: demo móvil para capturar órdenes (datos, fotos, firma) y mostrar logos.
+
+Hecho:
+- `server/src/templates/ordenServicio_demo.html` (página demo, servida en `/demo/ordenes-servicio`).
+- Ruta añadida en `server/src/index.ts`.
+- Banner/logo/footer insertados en la demo y en `inventario-crud/src/components/ordenesServicio/OrdenForm.tsx`.
+
+Ver: http://localhost:6063/demo/ordenes-servicio  (ajusta puerto/IP según servidor)
+
+Notas rápidas:
+- Borradores: `localStorage` → `ordenes_servicio_drafts`.
+- Imagen directa: http://localhost:6063/templates/img/logo.png
+
+
+Archivos añadidos:
+- server/src/templates/ordenServicio_demo.html
+- REPORTE_ordenes_servicio_demo.txt
+
+Archivos modificados:
+- server/src/index.ts
+- inventario-crud/src/components/ordenesServicio/OrdenForm.tsx
+

@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Acceso | Ordenes de servicio</title>
+    <style>
+      :root{font-family:Arial,sans-serif;color:#263442;background:#eef2f6;--brand-blue:#102b5c}
+      *{box-sizing:border-box}
+      body{display:grid;min-height:100vh;place-items:center;margin:0;padding:20px}
+      .login-card{width:min(100%,390px);padding:32px;background:#fff;border:1px solid #d8e0e8;border-radius:6px;box-shadow:0 8px 24px rgba(16,43,92,.1)}
+      h1{margin:0 0 8px;color:var(--brand-blue);font-size:24px;text-align:center}
+      .subtitle{margin:0 0 24px;color:#687585;text-align:center;font-size:14px}
+      label{display:block;margin:0 0 6px;color:var(--brand-blue);font-size:13px;font-weight:600}
+      input{width:100%;height:44px;margin-bottom:16px;padding:0 12px;border:1px solid #cbd5df;border-radius:4px;font-size:16px}
+      input:focus{outline:none;border-color:var(--brand-blue);box-shadow:0 0 0 3px rgba(16,43,92,.12)}
+      .roles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+      .role{position:relative}
+      .role input{position:absolute;width:1px;height:1px;opacity:0}
+      .role label{display:flex;min-height:48px;align-items:center;justify-content:center;margin:0;padding:8px;border:1px solid #cbd5df;border-radius:4px;color:#263442;text-align:center;cursor:pointer}
+      .role input:checked + label{border-color:var(--brand-blue);background:#edf2f9;color:var(--brand-blue)}
+      button{width:100%;height:44px;border:0;border-radius:4px;background:var(--brand-blue);color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+      button:hover{background:#0b2048}
+      .message{min-height:20px;margin-top:14px;color:#b42318;text-align:center;font-size:13px}
+      .demo-users{margin-top:20px;padding:12px;background:#f3f6fa;border:1px solid #d8e0e8;border-radius:4px;font-size:12px;color:#687585}
+      .demo-users strong{color:var(--brand-blue)}
+      .demo-users table{width:100%;border-collapse:collapse;margin-top:8px}
+      .demo-users td{padding:4px 6px;border-bottom:1px solid #e9ecef}
+      .demo-users td:first-child{font-weight:600;color:#263442}
+      .tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+      .tab-btn{width:100%;height:40px;border:1px solid #cbd5df;border-radius:4px;background:#fff;color:#263442;font-size:14px;font-weight:600;cursor:pointer}
+      .tab-btn.active{border-color:var(--brand-blue);background:var(--brand-blue);color:#fff}
+      .reg-hint{margin:8px 0 0;color:#687585;font-size:12px;text-align:center}
+      @media (max-width:400px){.login-card{padding:24px}}
+    </style>
+  </head>
+  <body>
+    <main class="login-card">
+      <h1>Ordenes de servicio</h1>
+      <p class="subtitle">Acceso de usuarios</p>
+      <div class="tabs">
+        <button type="button" id="tabLogin" class="tab-btn active">Iniciar sesión</button>
+        <button type="button" id="tabRegistro" class="tab-btn">Crear cuenta</button>
+      </div>
+      <form id="loginForm">
+        <label for="username">Usuario</label>
+        <input id="username" type="text" autocomplete="username" required />
+        <label for="password">Contrasena</label>
+        <input id="password" type="password" autocomplete="current-password" required />
+        <label>Tipo de usuario</label>
+        <div class="roles">
+          <div class="role"><input id="admin" name="role" type="radio" value="Administrador" required /><label for="admin">Administrador</label></div>
+          <div class="role"><input id="technician" name="role" type="radio" value="Tecnico" /><label for="technician">Tecnico</label></div>
+        </div>
+        <button type="submit">Ingresar</button>
+        <div id="message" class="message" aria-live="polite"></div>
+      </form>
+      <form id="registroForm" style="display:none">
+        <label for="regNombre">Nombre completo</label>
+        <input id="regNombre" type="text" autocomplete="name" />
+        <label for="regUsuario">Usuario</label>
+        <input id="regUsuario" type="text" autocomplete="username" />
+        <label for="regPassword">Contrasena</label>
+        <input id="regPassword" type="password" autocomplete="new-password" />
+        <button type="submit">Registrarme</button>
+        <div id="regMessage" class="message" aria-live="polite"></div>
+        <p class="reg-hint">Los usuarios registrados serán de tipo <strong>Técnico</strong>.</p>
+      </form>
+      <div class="demo-users">
+        <strong>Usuarios de prueba:</strong>
+        <table>
+          <tr><td>admin</td><td>admin123</td><td>Administrador</td></tr>
+          <tr><td>tecnico1</td><td>tec123</td><td>Tecnico</td></tr>
+          <tr><td>tecnico2</td><td>tec123</td><td>Tecnico</td></tr>
+          <tr><td>tecnico3</td><td>tec123</td><td>Tecnico</td></tr>
+        </table>
+      </div>
+    </main>
+    <script>
+      // Usuarios de prueba hardcodeados
+      const USUARIOS_PRUEBA = {
+        admin: { password: 'admin123', role: 'Administrador', nombre: 'Administrador' },
+        tecnico1: { password: 'tec123', role: 'Tecnico', nombre: 'Tecnico 1' },
+        tecnico2: { password: 'tec123', role: 'Tecnico', nombre: 'Tecnico 2' },
+        tecnico3: { password: 'tec123', role: 'Tecnico', nombre: 'Tecnico 3' }
+      };
+      const USUARIOS_KEY = 'ordenes_servicio_demo_usuarios';
+      const SESSION_KEY = 'ordenes_servicio_demo_session';
+
+      function getUsuariosRegistrados() {
+        try {
+          return JSON.parse(localStorage.getItem(USUARIOS_KEY) || '{}');
+        } catch (e) {
+          return {};
+        }
+      }
+
+      // ====== Pestañas: Iniciar sesión / Crear cuenta ======
+      const tabLogin = document.getElementById('tabLogin');
+      const tabRegistro = document.getElementById('tabRegistro');
+      const loginForm = document.getElementById('loginForm');
+      const registroForm = document.getElementById('registroForm');
+
+      function mostrarLogin() {
+        tabLogin.classList.add('active');
+        tabRegistro.classList.remove('active');
+        loginForm.style.display = '';
+        registroForm.style.display = 'none';
+      }
+      function mostrarRegistro() {
+        tabRegistro.classList.add('active');
+        tabLogin.classList.remove('active');
+        registroForm.style.display = '';
+        loginForm.style.display = 'none';
+      }
+      tabLogin.addEventListener('click', mostrarLogin);
+      tabRegistro.addEventListener('click', mostrarRegistro);
+
+      // ====== Registro de nuevo técnico ======
+      registroForm.addEventListener('submit', event => {
+        event.preventDefault();
+        const nombre = document.getElementById('regNombre').value.trim();
+        const usuario = document.getElementById('regUsuario').value.trim().toLowerCase();
+        const password = document.getElementById('regPassword').value;
+        const msg = document.getElementById('regMessage');
+
+        if (!nombre || !usuario || !password) {
+          msg.textContent = 'Completa nombre, usuario y contrasena.';
+          return;
+        }
+        if (password.length < 4) {
+          msg.textContent = 'La contrasena debe tener al menos 4 caracteres.';
+          return;
+        }
+        if (USUARIOS_PRUEBA[usuario]) {
+          msg.textContent = 'Ese usuario ya existe. Elige otro.';
+          return;
+        }
+        const registrados = getUsuariosRegistrados();
+        if (registrados[usuario]) {
+          msg.textContent = 'Ese usuario ya esta registrado. Inicia sesion.';
+          return;
+        }
+
+        registrados[usuario] = { password, role: 'Tecnico', nombre };
+        try {
+          localStorage.setItem(USUARIOS_KEY, JSON.stringify(registrados));
+        } catch (e) {
+          msg.textContent = 'No se pudo guardar. El almacenamiento esta lleno.';
+          return;
+        }
+
+        msg.textContent = 'Cuenta creada. Ahora inicia sesion.';
+        msg.style.color = '#163a1f';
+        document.getElementById('regNombre').value = '';
+        document.getElementById('regUsuario').value = '';
+        document.getElementById('regPassword').value = '';
+        // Pasar a la pestaña de login y autocompletar el usuario
+        setTimeout(() => {
+          mostrarLogin();
+          document.getElementById('username').value = usuario;
+          document.getElementById('message').textContent = '';
+          document.getElementById('message').style.color = '';
+          document.getElementById('technician').checked = true;
+          document.getElementById('password').focus();
+        }, 800);
+      });
+
+      // ====== Iniciar sesión ======
+      loginForm.addEventListener('submit', event => {
+        event.preventDefault();
+        const username = document.getElementById('username').value.trim().toLowerCase();
+        const password = document.getElementById('password').value;
+        const role = document.querySelector('input[name="role"]:checked')?.value;
+        const message = document.getElementById('message');
+
+        if (!username || !password || !role) {
+          message.textContent = 'Completa usuario, contrasena y tipo de usuario.';
+          return;
+        }
+
+        let usuario = USUARIOS_PRUEBA[username];
+        if (!usuario) {
+          const registrados = getUsuariosRegistrados();
+          usuario = registrados[username];
+        }
+
+        if (!usuario || usuario.password !== password) {
+          message.textContent = 'Usuario o contrasena incorrectos.';
+          return;
+        }
+
+        // Validar que el rol seleccionado coincida con el usuario
+        if (usuario.role !== role) {
+          message.textContent = 'El rol seleccionado no coincide con el usuario.';
+          return;
+        }
+
+        // Guardar sesión
+        localStorage.setItem(SESSION_KEY, JSON.stringify({
+          username,
+          nombre: usuario.nombre,
+          role: usuario.role,
+          loggedAt: new Date().toISOString()
+        }));
+
+        window.location.href = '/demo/ordenes-servicio';
+      });
+    </script>
+  </body>
+</html>

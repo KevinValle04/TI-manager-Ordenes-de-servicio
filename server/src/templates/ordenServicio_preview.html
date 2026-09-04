@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vista previa - {{title}}</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:12px;background:#f6f7fb}
+    .card{background:#fff;border-radius:8px;padding:12px;max-width:720px;margin:12px auto;box-shadow:0 2px 6px rgba(0,0,0,0.06)}
+    .header img.top{width:100%;height:auto}
+    .brand{display:flex;align-items:center;gap:12px;margin-top:8px}
+    .brand img.logo{height:40px}
+    .meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+    .photos{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .photos img{width:120px;height:90px;object-fit:cover;border-radius:6px}
+    .sig{margin-top:12px;text-align:center}
+    .footer img{width:100%;height:auto;margin-top:12px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <img src="/templates/img/top.png" class="top" alt="top">
+      <div class="brand">
+        <img src="/templates/img/logo.png" class="logo" alt="logo">
+        <div><strong>Orden de Servicio</strong></div>
+      </div>
+    </div>
+
+    <div class="meta">
+      <div><strong>No:</strong> {{noDoc}}</div>
+      <div><strong>Fecha:</strong> {{date}}</div>
+      <div><strong>Cliente:</strong> {{clientName}}</div>
+    </div>
+
+    <div style="margin-top:12px">
+      <h3>{{title}}</h3>
+      <p>{{description}}</p>
+    </div>
+
+    <div class="photos">
+      {{#if photos}}
+        {{#each photos}}
+          <img src="{{this}}" alt="evidencia">
+        {{/each}}
+      {{else}}
+        <div>(Sin fotos)</div>
+      {{/if}}
+    </div>
+
+    <div class="sig">
+      {{#if signatureUrl}}
+        <div>Firma:</div>
+        <img src="{{signatureUrl}}" alt="firma" style="max-width:240px;max-height:120px;border:1px solid #ddd;border-radius:6px">
+      {{else}}
+        <div>Firma: ______________________</div>
+      {{/if}}
+    </div>
+
+    <div class="footer">
+      <img src="/templates/img/bottom-2.png" alt="bottom">
+    </div>
+  </div>
+</body>
+</html>

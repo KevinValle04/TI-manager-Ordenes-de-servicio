@@ -36,11 +36,12 @@ import solicitudesRoutes from './routes/solicitudes';
 import proyectosRoutes from './routes/proyectos';
 import actividadesRoutes from './routes/actividades';
 import vehiculosRoutes from './routes/vehiculos';
+import ordenesServicioRoutes from './routes/ordenesServicio';
 
 dotenv.config();
 const app: Application = express();
 app.use(cors({
-  origin: ['http://localhost', 'http://localhost:80', 'http://localhost:5173', 'http://192.168.100.150', 'http://192.168.100.150:80', 'http://www.timanager.com'],
+  origin: ['http://localhost', 'http://localhost:80', 'http://localhost:5173', 'http://192.168.100.150', 'http://192.168.100.150:80', 'http://timanager.com', 'http://www.timanager.com'],
   credentials: true
 }));
 app.use(express.json());
@@ -77,6 +78,22 @@ app.use('/api/solicitudes', solicitudesRoutes);
 app.use('/api/proyectos', proyectosRoutes);
 app.use('/api/actividades', actividadesRoutes);
 app.use('/api/vehiculos', vehiculosRoutes);
+// Exponer imágenes de plantilla (server/src/templates/img)
+app.use('/templates/img', express.static(path.join(__dirname, 'templates/img')));
+
+// Registrar rutas de ordenes de servicio (vista previa + utilidades de prueba)
+app.use('/api/ordenes-servicio', ordenesServicioRoutes);
+
+// Demo HTML para visualizar el formulario sin depender del frontend
+app.get('/demo/ordenes-servicio', (req: Request, res: Response) => {
+  const demoPath = path.join(__dirname, '..', '..', 'ordenes-servicio-demo', 'ordenServicio_demo.html');
+  res.sendFile(demoPath);
+});
+
+app.get('/demo/login', (req: Request, res: Response) => {
+  const loginPath = path.join(__dirname, '..', '..', 'ordenes-servicio-demo', 'login.html');
+  res.sendFile(loginPath);
+});
 
 app.post("/api/notificar-guias", async (req, res) => {
   try {
